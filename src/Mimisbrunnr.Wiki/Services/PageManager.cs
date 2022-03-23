@@ -1,0 +1,115 @@
+﻿using Mimisbrunnr.Wiki.Contracts;
+using Skidbladnir.Repository.Abstractions;
+
+namespace Mimisbrunnr.Wiki.Services;
+
+internal class PageManager : IPageManager
+{
+    private readonly IRepository<Page> _pageRepository;
+
+    public PageManager(IRepository<Page> pageRepository)
+    {
+        _pageRepository = pageRepository;
+    }
+
+    public Task<Page[]> GetAllOnSpace(Space space)
+    {
+        return Task.FromResult(_pageRepository.GetAll().Where(x => x.SpaceId == space.Id).ToArray());
+    }
+
+    public Task<Page[]> FindByName(string name)
+    {
+        return Task.FromResult(_pageRepository.GetAll()
+            .Where(x => x.Name.Contains(name, StringComparison.OrdinalIgnoreCase)).ToArray());
+    }
+
+    public async Task<Page[]> GetAllChilds(Page page)
+    {
+        var childs = _pageRepository.GetAll().Where(x => x.ParentId == page.Id).ToList();
+        foreach (var child in childs)
+        {
+            var innerChilds = await GetAllChilds(child);
+            if(innerChilds != null && innerChilds.Length > 0)
+                childs.AddRange(innerChilds);
+        }
+
+        return childs.ToArray();
+    }
+
+    public Task<Page> GetById(string id)
+    {
+        return Task.FromResult(_pageRepository.GetAll().SingleOrDefault(x => x.Id == id));
+    }
+
+    public async Task<Page> Create(string spaceId, string name, string content, UserInfo createdBy, string parentPageId = null)
+    {
+        var page = new Page()
+        {
+            SpaceId = spaceId,
+            Name = name,
+            Content = content,
+            Created = DateTime.UtcNow,
+            Updated = DateTime.UtcNow,
+            CreatedBy = createdBy,
+            UpdatedBy = createdBy,
+            ParentId = parentPageId
+        };
+        await _pageRepository.Create(page);
+        return page;
+    }
+
+    public Task Update(Page page, UserInfo updatedBy)
+    {
+        page.UpdatedBy = updatedBy;
+        page.Updated = DateTime.UtcNow;
+        return _pageRepository.Update(page);
+    }
+
+    public async Task<Page> Copy(Page source, Page destinationParentPage)
+    {
+        var destinationPage = source.Clone();
+        destinationPage.SpaceId = destinationParentPage.SpaceId;
+        destinationPage.ParentId = destinationParentPage.Id;
+        destinationPage.Updated = DateTime.UtcNow;
+        await _pageRepository.Create(destinationPage);
+        return destinationPage;
+    }
+    
+    public async Task<Page> Move(Page source, Page destinationParentPage)
+    {
+        source.SpaceId = destinationParentPage.SpaceId;
+        source.ParentId = destinationParentPage.Id;
+        await _pageRepository.Update(source);
+        return source;
+    }
+
+    public Task Remove(Page page, bool deleteChild = false)
+    {
+        if (deleteChild)
+            return RemoveRecuesively(page);
+        return RemoveOnlyPage(page);
+    }
+
+    private async Task RemoveOnlyPage(Page page)
+    {
+        var childs = _pageRepository.GetAll().Where(x => x.ParentId == page.Id).ToList();
+        foreach (var child in childs)
+        {
+            child.ParentId = page.ParentId;
+            await _pageRepository.Update(child);
+        }
+
+        await _pageRepository.Delete(page);
+    }
+
+    private async Task RemoveRecuesively(Page page)
+    {
+        var allChilds = await GetAllChilds(page);
+        foreach (var child in allChilds)
+        {
+            await _pageRepository.Delete(child);
+        }
+
+        await _pageRepository.Delete(page);
+    }
+}
