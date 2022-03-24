@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Mimisbrunner.Users;
 using Mimisbrunnr.Storage.MongoDb.Mappings;
+using Mimisbrunnr.Web.Infrastructure.Contracts;
 using Mimisbrunnr.Wiki.Contracts;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
@@ -23,9 +24,12 @@ public class MongoDbStoreModule : RunnableModule
         };
 
         ConventionRegistry.Register("Influunt", pack, t => true);
-
+        var configuration = Configuration.Get<MongoDbStoreModuleConfiguration>();
         services.AddMongoDbContext(builder => 
-            builder.AddEntity<User,UserMap>()
+            builder
+                .UseConnectionString(configuration.ConnectionString)
+                .AddEntity<ApplicationConfiguration,ApplicationConfigurationMap>()
+                .AddEntity<User,UserMap>()
                 .AddEntity<Group, GroupMap>()
                 .AddEntity<UserGroup, UserGroupMap>()
                 .AddEntity<Space, SpaceMap>()

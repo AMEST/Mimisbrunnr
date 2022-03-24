@@ -29,6 +29,15 @@ internal class SpaceManager : ISpaceManager
         return Task.FromResult(_spaceRepository.GetAll().SingleOrDefault(x => x.Key == key.ToUpper()));
     }
 
+    public Task<Space> FindPersonalSpace(UserInfo user)
+    {
+        var personalSpace = _spaceRepository.GetAll().FirstOrDefault(
+            x => x.Type == SpaceType.Personal
+                 && x.Permissions.Any(p => p.IsAdmin && p.User != null && p.User.Email == user.Email)
+        );
+        return Task.FromResult(personalSpace);
+    }
+
     public Task<Space[]> FindByName(string name)
     {
         return Task.FromResult(_spaceRepository.GetAll()
@@ -63,6 +72,10 @@ internal class SpaceManager : ISpaceManager
     {
         if (permission.Group != null && permission.User != null)
             throw new InvalidOperationException("Only one permission targer allowed. User or Group");
+        
+        if (space.Type == SpaceType.Personal && space.Permissions.Any(x => x.IsAdmin) && permission.IsAdmin)
+            throw new InvalidOperationException("Cannot add more administrators to personal space");
+        
         var newPermissions = new List<Permission>(space.Permissions) { permission };
         space.Permissions = newPermissions;
         return Update(space);
@@ -81,6 +94,10 @@ internal class SpaceManager : ISpaceManager
     {
         if (permission.Group != null && permission.User != null)
             throw new InvalidOperationException("Only one permission targer allowed. User or Group");
+        
+        if (space.Type == SpaceType.Personal && permission.IsAdmin)
+            throw new InvalidOperationException("Cannot remove administrators from personal space");
+        
         var newPermissions = space.Permissions.Where(x => permission.User != null 
             ? !x.User.Equals(permission.User)
             : !x.Group.Equals(permission.Group));

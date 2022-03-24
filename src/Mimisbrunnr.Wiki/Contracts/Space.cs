@@ -17,6 +17,6 @@ public class Space : IHasId<string>
     public SpaceType Type { get; internal set; }
     
     public SpaceStatus Status { get; internal set; }
-    
+
     public IEnumerable<Permission> Permissions { get; internal set; }
 }

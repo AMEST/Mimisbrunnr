@@ -8,7 +8,7 @@ public class UserInfo
     
     public string AvatarUrl { get; set; }
 
-    public override bool Equals(object? obj)
+    public override bool Equals(object obj)
     {
         return obj is UserInfo userInfo && Email.Equals(userInfo.Email, StringComparison.OrdinalIgnoreCase);
     }

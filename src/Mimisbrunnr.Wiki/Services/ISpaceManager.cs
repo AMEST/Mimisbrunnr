@@ -10,6 +10,8 @@ public interface ISpaceManager
     
     Task<Space> GetByKey(string key);
 
+    Task<Space> FindPersonalSpace(UserInfo user);
+
     Task<Space[]> FindByName(string name);
     
     Task<Space> Create(string key, string name, string description, SpaceType type, UserInfo owner);
