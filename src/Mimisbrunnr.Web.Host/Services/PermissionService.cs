@@ -41,13 +41,11 @@ internal class PermissionService : IPermissionService
         if (space.Type == SpaceType.Public)
             return;
 
-        if (userInfo == null && space.Type != SpaceType.Public)
+        if (space == null || userInfo == null)
             throw new UserHasNotPermissionException();
 
-
-        var user = await _userManager.FindByEmail(userInfo?.Email);
-        var userGroups = await _userGroupManager.GetUserGroups(user);
-        var userPermission = FindViewPermission(space, userInfo, userGroups);
+        var userGroups = await GetUserGroups(userInfo);
+        var userPermission = FindPermission(space.Permissions.Where(x => (x.CanView || x.IsAdmin)).ToArray(), userInfo, userGroups);
 
         if (userPermission == null)
             throw new UserHasNotPermissionException();
@@ -56,13 +54,12 @@ internal class PermissionService : IPermissionService
     public async Task EnsureEditPermission(string spaceKey, UserInfo userInfo)
     {
         var space = await _spaceManager.GetByKey(spaceKey);
-
-        if (userInfo == null)
+        
+        if (space == null || userInfo == null)
             throw new UserHasNotPermissionException();
 
-        var user = await _userManager.FindByEmail(userInfo?.Email);
-        var userGroups = await _userGroupManager.GetUserGroups(user);
-        var userPermission = FindEditPermission(space, userInfo, userGroups);
+        var userGroups = await GetUserGroups(userInfo);
+        var userPermission = FindPermission(space.Permissions.Where(x => (x.CanEdit || x.IsAdmin)).ToArray(), userInfo, userGroups);
 
         if (userPermission == null)
             throw new UserHasNotPermissionException();
@@ -72,41 +69,42 @@ internal class PermissionService : IPermissionService
     {
         var space = await _spaceManager.GetByKey(spaceKey);
 
-        if (userInfo == null)
+        if (space == null || userInfo == null)
             throw new UserHasNotPermissionException();
 
-        var user = await _userManager.FindByEmail(userInfo?.Email);
-        var userGroups = await _userGroupManager.GetUserGroups(user);
-        var userPermission = FindRemovePermission(space, userInfo, userGroups);
+        var userGroups = await GetUserGroups(userInfo);
+        var userPermission = FindPermission(space.Permissions.Where(x => (x.CanRemove || x.IsAdmin)).ToArray(), userInfo, userGroups);
 
         if (userPermission == null)
             throw new UserHasNotPermissionException();
     }
     
-    private static Permission FindViewPermission(Space space, UserInfo user, Group[] groups)
+    public async Task EnsureAdminPermission(string spaceKey, UserInfo userInfo)
     {
-        var userPermission =
-            space.Permissions.FirstOrDefault(x => (x.CanView || x.IsAdmin) && x.User != null && x.User.Equals(user));
-        var groupPermission = space.Permissions.FirstOrDefault(x =>
-            (x.CanView || x.IsAdmin) && x.Group != null && groups.Any(g => g.Name.Equals(x.Group.Name)));
-        return userPermission ?? groupPermission;
+        var space = await _spaceManager.GetByKey(spaceKey);
+        if (space == null || userInfo == null)
+            throw new UserHasNotPermissionException();
+        
+        var userGroups = await GetUserGroups(userInfo);
+        var userPermission = FindPermission(space.Permissions.Where(x => x.IsAdmin).ToArray(), userInfo, userGroups);
+
+        if (userPermission == null)
+            throw new UserHasNotPermissionException();
     }
 
-    private static Permission FindEditPermission(Space space, UserInfo user, Group[] groups)
+    private async Task<Group[]> GetUserGroups(UserInfo userInfo)
     {
-        var userPermission =
-            space.Permissions.FirstOrDefault(x => (x.CanEdit || x.IsAdmin) && x.User != null && x.User.Equals(user));
-        var groupPermission = space.Permissions.FirstOrDefault(x =>
-            (x.CanEdit || x.IsAdmin) && x.Group != null && groups.Any(g => g.Name.Equals(x.Group.Name)));
-        return userPermission ?? groupPermission;
+        var user = await _userManager.FindByEmail(userInfo?.Email);
+        var userGroups = await _userGroupManager.GetUserGroups(user);
+        return userGroups;
     }
     
-    private static Permission FindRemovePermission(Space space, UserInfo user, Group[] groups)
+    private static Permission FindPermission(Permission[] permissions, UserInfo user, Group[] groups)
     {
         var userPermission =
-            space.Permissions.FirstOrDefault(x => (x.CanRemove || x.IsAdmin) && x.User != null && x.User.Equals(user));
-        var groupPermission = space.Permissions.FirstOrDefault(x =>
-            (x.CanRemove || x.IsAdmin) && x.Group != null && groups.Any(g => g.Name.Equals(x.Group.Name)));
+            permissions.FirstOrDefault(x => x.User != null && x.User.Equals(user));
+        var groupPermission = permissions.FirstOrDefault(x =>
+            x.Group != null && groups.Any(g => g.Name.Equals(x.Group.Name)));
         return userPermission ?? groupPermission;
     }
 }

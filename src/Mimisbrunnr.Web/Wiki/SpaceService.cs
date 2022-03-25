@@ -54,9 +54,9 @@ internal class SpaceService : ISpaceService
     public async Task<SpacePermissionModel[]> GetSpacePermissions(string key, UserInfo requestedBy)
     {
         EnsureIsNotAnonymous(requestedBy);
+        await _permissionService.EnsureAdminPermission(key, requestedBy);
 
         var space = await _spaceManager.GetByKey(key);
-        await EnsureAdminPermission(requestedBy, space);
 
         return space.Permissions.Select(x => x.ToSpacePermissionModel()).ToArray();
     }
@@ -79,10 +79,10 @@ internal class SpaceService : ISpaceService
     public async Task Update(string key, SpaceUpdateModel model, UserInfo updatedBy)
     {
         EnsureIsNotAnonymous(updatedBy);
+        await _permissionService.EnsureAdminPermission(key, updatedBy);
 
         var space = await _spaceManager.GetByKey(key);
-        await EnsureAdminPermission(updatedBy, space);
-        
+
         space.Name = model.Name;
         space.Description = model.Description;
         await _spaceManager.Update(space);
@@ -91,9 +91,9 @@ internal class SpaceService : ISpaceService
     public async Task Archive(string key, UserInfo archivedBy)
     {
         EnsureIsNotAnonymous(archivedBy);
+        await _permissionService.EnsureAdminPermission(key, archivedBy);
         
         var space = await _spaceManager.GetByKey(key);
-        await EnsureAdminPermission(archivedBy, space);
 
         await _spaceManager.Archieve(space);
 
@@ -102,9 +102,10 @@ internal class SpaceService : ISpaceService
     public async Task UnArchive(string key, UserInfo unArchivedBy)
     {
         EnsureIsNotAnonymous(unArchivedBy);
+        await _permissionService.EnsureAdminPermission(key, unArchivedBy);
+        
         
         var space = await _spaceManager.GetByKey(key);
-        await EnsureAdminPermission(unArchivedBy, space);
 
         await _spaceManager.UnArchieve(space);
     }
@@ -112,9 +113,9 @@ internal class SpaceService : ISpaceService
     public async Task Remove(string key, UserInfo removedBy)
     {
         EnsureIsNotAnonymous(removedBy);
+        await _permissionService.EnsureAdminPermission(key, removedBy);
         
         var space = await _spaceManager.GetByKey(key);
-        await EnsureAdminPermission(removedBy, space);
 
         if (space.Status != SpaceStatus.Archived)
             throw new InvalidOperationException("Only archived spaces allowed for removing");
@@ -126,15 +127,6 @@ internal class SpaceService : ISpaceService
     {
         if (userInfo == null)
             throw new AnonymousNotAllowedException();
-    }
-
-    private async Task EnsureAdminPermission(UserInfo user, Space space)
-    {
-        var userGroups = await GetUserGroups(user);
-        var userPermission = FindPermission(space.Permissions.Where(x => x.IsAdmin).ToArray(), user, userGroups);
-
-        if (userPermission == null)
-            throw new UserHasNotPermissionException();
     }
 
     private async Task<Group[]> GetUserGroups(UserInfo userInfo)

@@ -10,11 +10,11 @@ public interface IPageService
 
     Task<PageModel> Create(PageCreateModel createModel, UserInfo createdBy);
 
-    Task Update(PageUpdateModel updateModel, UserInfo updatedBy);
+    Task Update(string pageId, PageUpdateModel updateModel, UserInfo updatedBy);
 
     Task Delete(string pageId, UserInfo deletedBy, bool recursively);
 
     Task<PageModel> Copy(string sourcePageId, string destinationParentPageId, UserInfo copiedBy);
     
-    Task<PageModel> Move(string sourcePageId, string destinationParentPageId, UserInfo copiedBy);
+    Task<PageModel> Move(string sourcePageId, string destinationParentPageId, UserInfo movedBy);
 }

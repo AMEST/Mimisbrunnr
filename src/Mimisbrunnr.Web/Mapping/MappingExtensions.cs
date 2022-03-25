@@ -40,7 +40,7 @@ public static class MappingExtensions
             AvatarUrl = user.AvatarUrl
         };
     }
-    
+
     public static GroupModel ToModel(this GroupInfo group)
     {
         return new GroupModel()
@@ -59,6 +59,32 @@ public static class MappingExtensions
             Type = (SpaceTypeModel)space.Type,
             HomePageId = space.HomePageId
         };
+    }
+
+    public static PageModel ToModel(this Page page, string spaceKey = null)
+    {
+        return new PageModel()
+        {
+            Id = page.Id,
+            SpaceKey = spaceKey,
+            Name = page.Name,
+            Content = page.Content,
+            Created = page.Created,
+            CreatedBy = page.CreatedBy?.ToModel(),
+            Updated = page.Updated,
+            UpdatedBy = page.UpdatedBy?.ToModel()
+        };
+    }
+
+    public static PageTreeModel ToModel(this Page[] childs, Page rootPage, Space space = null)
+    {
+        var pageTree = new PageTreeModel
+        {
+            Page = rootPage.ToModel()
+        };
+        var childsPages = childs.Where(x => x.ParentId == rootPage.Id).Select(x => childs.ToModel(x, space)).ToList();
+        pageTree.Childs = childsPages;
+        return pageTree;
     }
 
     public static UserPermissionModel ToModel(this Permission permission)

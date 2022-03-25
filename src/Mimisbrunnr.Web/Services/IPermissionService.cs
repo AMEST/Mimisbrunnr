@@ -11,4 +11,6 @@ public interface IPermissionService
     Task EnsureEditPermission(string spaceKey, UserInfo userInfo);
 
     Task EnsureRemovePermission(string spaceKey, UserInfo userInfo);
+
+    Task EnsureAdminPermission(string spaceKey, UserInfo userInfo);
 }
