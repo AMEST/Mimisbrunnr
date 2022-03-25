@@ -8,6 +8,5 @@ public class PageMap : EntityMapClass<Page>
     public PageMap()
     {
         ToCollection("Pages");
-        MapId(x => x.Id);
     }
 }

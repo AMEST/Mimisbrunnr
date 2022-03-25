@@ -4,7 +4,9 @@ namespace Mimisbrunnr.Web.Quickstart;
 
 public interface IQuickstartService
 {
-    Task<bool> IsInitialized();
+    Task<QuickstartModel> Get();
     
+    Task<bool> IsInitialized();
+
     Task Initialize(QuickstartModel model, UserInfo user);
 }

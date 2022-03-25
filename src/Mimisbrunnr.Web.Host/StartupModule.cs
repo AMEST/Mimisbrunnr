@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Mimisbrunnr.Storage.MongoDb;
 using Mimisbrunnr.Web.Host.Services;
 using Mimisbrunnr.Web.Services;
+using Mimisbrunnr.Wiki;
 using Skidbladnir.DataProtection.MongoDb;
 using Skidbladnir.Modules;
 
@@ -13,7 +14,7 @@ public class StartupModule : Module
 {
     public override Type[] DependsModules => new[]
     {
-        typeof(AspNetModule), typeof(MongoDbStoreModule),  typeof(WebModule)
+        typeof(AspNetModule), typeof(MongoDbStoreModule), typeof(WebModule), typeof(WikiModule)
     };
 
     public override void Configure(IServiceCollection services)

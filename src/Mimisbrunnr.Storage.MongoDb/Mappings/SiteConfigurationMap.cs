@@ -8,6 +8,5 @@ public class ApplicationConfigurationMap : EntityMapClass<ApplicationConfigurati
     public ApplicationConfigurationMap()
     {
         ToCollection("Configuration");
-        MapId(x => x.Id);
     }
 }

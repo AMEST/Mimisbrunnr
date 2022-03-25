@@ -32,7 +32,7 @@ public class Page : IHasId<string>
             ParentId = ParentId,
             Name = Name,
             Content = Content,
-            Attachments = Attachments.ToArray(),
+            Attachments = Attachments?.ToArray(),
             Created = Created,
             Updated = Updated,
             CreatedBy = CreatedBy,

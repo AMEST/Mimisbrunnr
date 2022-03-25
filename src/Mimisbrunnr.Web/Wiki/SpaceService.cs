@@ -71,7 +71,11 @@ internal class SpaceService : ISpaceService
                 throw new InvalidOperationException("Only one personal space allowed");
         }
 
-        var space = await _spaceManager.Create(model.Key, model.Name, model.Description, (SpaceType)model.Type,
+        var space = await _spaceManager.GetByKey(model.Key);
+        if (space != null)
+            throw new InvalidOperationException("Cannot create space becase space with same key already exists");
+
+        space = await _spaceManager.Create(model.Key, model.Name, model.Description, (SpaceType)model.Type,
             createdBy);
         return space.ToModel();
     }

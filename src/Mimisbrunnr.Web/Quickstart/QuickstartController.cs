@@ -15,6 +15,14 @@ public class QuickstartController : ControllerBase
     {
         _quickstartService = quickstartService;
     }
+    
+    [HttpGet]
+    [ProducesResponseType(typeof(InitializeState), 200)]
+    public async Task<IActionResult> Get()
+    { 
+        var state = await _quickstartService.Get();
+        return Ok(state);
+    }
 
     [HttpGet("initialize")]
     [ProducesResponseType(typeof(InitializeState), 200)]

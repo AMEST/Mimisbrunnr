@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
@@ -31,7 +32,11 @@ public class AspNetModule : Module
                 Configuration.AppConfiguration.GetSection("Openid").Bind(options);
             });
         services.AddMemoryCache();
-        services.AddControllers();
+        services.AddControllers()
+            .AddJsonOptions(x =>
+            {
+                x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
         services.AddDataProtection()
             .SetApplicationName("Mimisbrunnr");
         services.AddEndpointsApiExplorer();

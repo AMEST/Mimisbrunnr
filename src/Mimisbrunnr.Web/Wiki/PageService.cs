@@ -46,7 +46,7 @@ internal class PageService : IPageService
         await _permissionService.EnsureViewPermission(space.Key, requestedBy);
         var pageTree = await _pageManager.GetAllChilds(page);
         
-        return pageTree.ToModel(page, space);
+        return pageTree?.ToModel(page, space);
     }
 
     public async Task<PageModel> Create(PageCreateModel createModel, UserInfo createdBy)

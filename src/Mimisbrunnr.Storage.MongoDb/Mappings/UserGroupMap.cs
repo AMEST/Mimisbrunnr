@@ -8,6 +8,5 @@ public class UserGroupMap: EntityMapClass<UserGroup>
     public UserGroupMap()
     {
         ToCollection("UserGroups");
-        MapId(x => x.Id);
     }
 }

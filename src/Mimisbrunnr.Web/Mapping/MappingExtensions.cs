@@ -30,6 +30,15 @@ public static class MappingExtensions
             AllowAnonymous = model.AllowAnonymous
         };
     }
+    
+    public static QuickstartModel ToModel(this ApplicationConfiguration model)
+    {
+        return new QuickstartModel()
+        {
+            Title = model.Title,
+            AllowAnonymous = model.AllowAnonymous
+        };
+    }
 
     public static UserModel ToModel(this UserInfo user)
     {
@@ -80,9 +89,9 @@ public static class MappingExtensions
     {
         var pageTree = new PageTreeModel
         {
-            Page = rootPage.ToModel()
+            Page = rootPage?.ToModel()
         };
-        var childsPages = childs.Where(x => x.ParentId == rootPage.Id).Select(x => childs.ToModel(x, space)).ToList();
+        var childsPages = childs.Where(x => x.ParentId == rootPage?.Id).ToArray().Select(x => childs.ToModel(x, space)).ToList();
         pageTree.Childs = childsPages;
         return pageTree;
     }
@@ -102,8 +111,8 @@ public static class MappingExtensions
     {
         return new SpacePermissionModel()
         {
-            Group = permission.Group.ToModel(),
-            User = permission.User.ToModel(),
+            Group = permission.Group?.ToModel(),
+            User = permission.User?.ToModel(),
             CanEdit = permission.CanEdit,
             CanRemove = permission.CanRemove,
             CanView = permission.CanView,

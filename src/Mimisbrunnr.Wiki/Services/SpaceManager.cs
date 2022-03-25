@@ -32,7 +32,7 @@ internal class SpaceManager : ISpaceManager
     public Task<Space> FindPersonalSpace(UserInfo user)
     {
         var personalSpace = _spaceRepository.GetAll().FirstOrDefault(
-            x => x.Type == SpaceType.Personal
+            x => x.Type != SpaceType.Personal && x.Type != SpaceType.Public
                  && x.Permissions.Any(p => p.IsAdmin && p.User != null && p.User.Email == user.Email)
         );
         return Task.FromResult(personalSpace);
@@ -65,7 +65,7 @@ internal class SpaceManager : ISpaceManager
 
     public Task Update(Space space)
     {
-        return Update(space);
+        return _spaceRepository.Update(space);
     }
 
     public Task AddPermission(Space space, Permission permission)

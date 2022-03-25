@@ -25,15 +25,17 @@ internal class PageManager : IPageManager
 
     public async Task<Page[]> GetAllChilds(Page page)
     {
+        var flatChildsList = new List<Page>();
         var childs = _pageRepository.GetAll().Where(x => x.ParentId == page.Id).ToList();
+        flatChildsList.AddRange(childs);
         foreach (var child in childs)
         {
             var innerChilds = await GetAllChilds(child);
             if(innerChilds != null && innerChilds.Length > 0)
-                childs.AddRange(innerChilds);
+                flatChildsList.AddRange(innerChilds);
         }
 
-        return childs.ToArray();
+        return flatChildsList.ToArray();
     }
 
     public Task<Page> GetById(string id)
