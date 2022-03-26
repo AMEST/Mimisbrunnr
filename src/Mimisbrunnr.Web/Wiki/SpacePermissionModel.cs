@@ -1,8 +1,9 @@
-﻿using Mimisbrunnr.Web.Authentication.Account;
+﻿using System.ComponentModel.DataAnnotations;
+using Mimisbrunnr.Web.Authentication.Account;
 
 namespace Mimisbrunnr.Web.Wiki;
 
-public class SpacePermissionModel
+public class SpacePermissionModel : IValidatableObject
 {
     public UserModel User { get; set; }
 
@@ -15,4 +16,16 @@ public class SpacePermissionModel
     public bool CanEdit { get; set; }
 
     public bool CanRemove { get; set; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if ((User == null && Group == null) || (User != null && Group != null))
+            return new[]
+            {
+                new ValidationResult("The permission must only belong to a group or user.",
+                    new[] { nameof(User), nameof(Group) })
+            };
+        
+        return new[] { ValidationResult.Success };
+    }
 }

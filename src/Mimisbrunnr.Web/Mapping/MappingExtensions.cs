@@ -30,6 +30,37 @@ public static class MappingExtensions
             AllowAnonymous = model.AllowAnonymous
         };
     }
+
+    public static UserInfo ToEntity(this UserModel model)
+    {
+        return new UserInfo()
+        {
+            Email = model.Email,
+            Name = model.Name,
+            AvatarUrl = model.AvatarUrl
+        };
+    }
+
+    public static GroupInfo ToEntity(this GroupModel model)
+    {
+        return new GroupInfo()
+        {
+            Name = model.Name
+        };
+    }
+
+    public static Permission ToEntity(this SpacePermissionModel model)
+    {
+        return new Permission()
+        {
+            Group = model.Group?.ToEntity(),
+            User = model.User?.ToEntity(),
+            CanEdit = model.CanEdit,
+            CanRemove = model.CanRemove,
+            CanView = model.CanView,
+            IsAdmin = model.IsAdmin
+        };
+    }
     
     public static QuickstartModel ToModel(this ApplicationConfiguration model)
     {

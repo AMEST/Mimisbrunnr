@@ -47,13 +47,44 @@ public class SpaceController : ControllerBase
     }
     
     [HttpGet("{key}/permissions")]
-    [ProducesResponseType(typeof(SpacePermissionModel),200)]
+    [ProducesResponseType(typeof(SpacePermissionModel[]),200)]
     [ProducesResponseType(401)]
     [ProducesResponseType(403)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetPermissions([FromRoute] string key)
     {
         return Ok(await _spaceService.GetSpacePermissions(key, User?.ToEntity()));
+    }
+    
+    [HttpPost("{key}/permissions")]
+    [ProducesResponseType(typeof(SpacePermissionModel),200)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> AddPermissions([FromRoute] string key, [FromBody] SpacePermissionModel model)
+    {
+        return Ok(await _spaceService.AddPermission(key, model, User?.ToEntity()));
+    }
+    
+    [HttpPut("{key}/permissions")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> UpdatePermissions([FromRoute] string key, [FromBody] SpacePermissionModel model)
+    {
+        await _spaceService.UpdatePermission(key, model, User?.ToEntity());
+        return Ok();
+    }
+    [HttpDelete("{key}/permissions")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> DeleePermissions([FromRoute] string key, [FromBody] SpacePermissionModel model)
+    {
+        await _spaceService.RemovePermission(key, model, User?.ToEntity());
+        return Ok();
     }
     
     [HttpPost]

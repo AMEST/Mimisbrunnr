@@ -61,6 +61,35 @@ internal class SpaceService : ISpaceService
         return space.Permissions.Select(x => x.ToSpacePermissionModel()).ToArray();
     }
 
+    public async Task<SpacePermissionModel> AddPermission(string key, SpacePermissionModel model, UserInfo addedBy)
+    {
+        await _permissionService.EnsureAdminPermission(key, addedBy);
+        
+        var space = await _spaceManager.GetByKey(key);
+
+        await _spaceManager.AddPermission(space, model.ToEntity());
+
+        return model;
+    }
+
+    public async Task UpdatePermission(string key, SpacePermissionModel model, UserInfo updatedBy)
+    {
+        await _permissionService.EnsureAdminPermission(key, updatedBy);
+        
+        var space = await _spaceManager.GetByKey(key);
+
+        await _spaceManager.UpdatePermission(space, model.ToEntity());
+    }
+
+    public async Task RemovePermission(string key, SpacePermissionModel model, UserInfo removedBy)
+    {
+        await _permissionService.EnsureAdminPermission(key, removedBy);
+        
+        var space = await _spaceManager.GetByKey(key);
+
+        await _spaceManager.RemovePermission(space, model.ToEntity());
+    }
+
     public async Task<SpaceModel> Create(SpaceCreateModel model, UserInfo createdBy)
     {
         EnsureIsNotAnonymous(createdBy);

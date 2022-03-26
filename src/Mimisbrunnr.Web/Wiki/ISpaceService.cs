@@ -12,6 +12,10 @@ public interface ISpaceService
 
     Task<SpacePermissionModel[]> GetSpacePermissions(string key, UserInfo requestedBy);
 
+    Task<SpacePermissionModel> AddPermission(string key, SpacePermissionModel model, UserInfo addedBy);
+    Task UpdatePermission(string key, SpacePermissionModel model, UserInfo updatedBy);
+    Task RemovePermission(string key,SpacePermissionModel model, UserInfo removedBy);
+
     Task<SpaceModel> Create(SpaceCreateModel model, UserInfo createdBy);
 
     Task Update(string key, SpaceUpdateModel model, UserInfo updatedBy);
