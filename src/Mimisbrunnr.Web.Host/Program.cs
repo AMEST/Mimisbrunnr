@@ -1,9 +1,8 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.SpaServices;
 using Mimisbrunnr.Storage.MongoDb;
 using Mimisbrunnr.Web.Host;
 using Skidbladnir.Modules;
+using VueCliMiddleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +25,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseSpaStaticFiles();
+
 app.UseRouting();
 
 app.UseAuthentication();
@@ -33,5 +34,18 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapToVueCliProxy(
+    "{*path}",
+    new SpaOptions { SourcePath = "ClientApp"},
+    npmScript: "serve",
+    regex: "Compiled successfully",
+    forceKill: true
+);
+
+app.UseSpa(spa =>
+{
+    spa.Options.SourcePath = "ClientApp";
+});
 
 app.Run();
