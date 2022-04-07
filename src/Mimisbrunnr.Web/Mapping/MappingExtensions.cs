@@ -66,8 +66,8 @@ public static class MappingExtensions
     {
         return new QuickstartModel()
         {
-            Title = model.Title,
-            AllowAnonymous = model.AllowAnonymous
+            Title = model?.Title ?? "Mimisbrunnr",
+            AllowAnonymous = model?.AllowAnonymous ?? false
         };
     }
 

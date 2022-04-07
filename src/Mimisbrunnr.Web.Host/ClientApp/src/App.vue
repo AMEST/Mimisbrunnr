@@ -1,15 +1,43 @@
 <template>
-  <div id="app">
-    <Header/>
-    <router-view/>
+  <div id="app" >
+    <div v-if="this.loaded && this.initialized">
+      <Header/>
+      <router-view/>
+    </div>
+    <div v-if="this.loaded && !this.initialized">
+        <Quickstart/>
+    </div>
   </div>
 </template>
 
 <script>
 import Header from '@/components/base/Header.vue'
+import Quickstart from '@/components/quickstart/Quickstart.vue'
+import axios from 'axios'
 export default {
   components: {
-    Header
+    Header,
+    Quickstart
+  },
+  data: () => ({
+    loaded: false,
+    initialized: false
+  }),
+  created: async function(){
+    var initializedRequest = await axios.get("/api/quickstart/initialize");
+    var currentAccountRequest = await axios.get("/api/account/current", { validateStatus: false });
+
+    if(currentAccountRequest.status == 404 
+      && (!initializedRequest.data.isInitialized || !this.$store.state.application.info.allowAnonymous)){
+      window.location.href = "/api/account/login"
+      return
+    }
+    
+    if (currentAccountRequest.status != 404)
+      this.$store.commit("changeProfile", currentAccountRequest.data)
+
+    this.loaded = true;
+    this.initialized = initializedRequest.data.isInitialized;
   }
 }
 </script>

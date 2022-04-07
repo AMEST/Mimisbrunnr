@@ -17,6 +17,7 @@ public class QuickstartController : ControllerBase
     }
     
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(InitializeState), 200)]
     public async Task<IActionResult> Get()
     { 
@@ -25,6 +26,7 @@ public class QuickstartController : ControllerBase
     }
 
     [HttpGet("initialize")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(InitializeState), 200)]
     public async Task<IActionResult> GetInitializeStatus()
     { 

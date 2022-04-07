@@ -31,9 +31,10 @@ internal class ApplicationConfigurationService : IApplicationConfigurationServic
         await _userManager.ChangeRole(initializedBy, UserRole.Admin);
     }
 
-    public Task<bool> IsInitialized()
+    public async Task<bool> IsInitialized()
     {
-        return Task.FromResult(_repository.GetAll().Any());
+        var configuration = await Get();
+        return configuration is not null;
     }
 
     public Task<ApplicationConfiguration> Get()

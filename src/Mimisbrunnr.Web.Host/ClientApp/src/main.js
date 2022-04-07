@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
+import store from './services/store'
+import axios from 'axios'
 import './registerServiceWorker'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
@@ -15,7 +17,18 @@ Vue.use(IconsPlugin)
 
 Vue.config.productionTip = false
 
-new Vue({
-  router,
-  render: h => h(App)
-}).$mount('#app')
+var applicationInfoTask = axios.get('/api/quickstart').then(result => {
+  if (result.data == null || result.status !== 200) {
+    return
+  }
+  store.commit('changeApplicationInfo', result.data)
+  document.title = result.data.title
+})
+
+Promise.all([applicationInfoTask]).then(result => {
+  new Vue({
+    store,
+    router,
+    render: h => h(App)
+  }).$mount('#app')
+})

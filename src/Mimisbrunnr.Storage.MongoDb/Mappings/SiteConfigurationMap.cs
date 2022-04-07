@@ -8,5 +8,7 @@ public class ApplicationConfigurationMap : EntityMapClass<ApplicationConfigurati
     public ApplicationConfigurationMap()
     {
         ToCollection("Configuration");
+        MapProperty(x => x.AllowAnonymous).SetIgnoreIfDefault(false);
+        MapProperty(x => x.SwaggerEnabled).SetIgnoreIfDefault(false);
     }
 }

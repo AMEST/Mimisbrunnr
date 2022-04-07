@@ -2,7 +2,9 @@
   <div>
     <b-navbar toggleable="lg" type="dark" variant="primary">
       <b-container>
-        <b-navbar-brand href="#">Mimisbrunnr</b-navbar-brand>
+        <b-navbar-brand to="/">{{
+          this.$store.state.application.info.title
+        }}</b-navbar-brand>
 
         <b-navbar-nav class="mr-auto">
           <b-nav-item-dropdown text="Spaces" right>
@@ -25,13 +27,20 @@
             >
           </b-nav-form>
 
-          <b-nav-item-dropdown right>
+          <div v-if="!this.$store.state.application.profile">
+            <b-button class="text-light" variant="link" href="/api/account/login">Log in</b-button>
+          </div>
+          <b-nav-item-dropdown v-else right class="custom-dropdown">
             <!-- Using 'button-content' slot -->
             <template #button-content>
-              <em>User</em>
+              <b-avatar
+                class="avatar-bg"
+                :text="getInitials()"
+                :src="$store.state.application.profile.avatarUrl"
+              ></b-avatar>
             </template>
-            <b-dropdown-item href="#">Profile</b-dropdown-item>
-            <b-dropdown-item href="#">Sign Out</b-dropdown-item>
+            <b-dropdown-item href="#" disabled>Profile</b-dropdown-item>
+            <b-dropdown-item href="/api/account/logout">Sign Out</b-dropdown-item>
           </b-nav-item-dropdown>
         </b-navbar-nav>
       </b-container>
@@ -42,9 +51,16 @@
 <script>
 export default {
   name: "Header",
-    data: function(){
-    return {
-    }
+  data: function () {
+    return {};
+  },
+  methods: {
+    getInitials: function () {
+      if (!this.$store.state.application.profile.name) return "";
+      var splited = this.$store.state.application.profile.name.split(" ");
+      if (splited.length > 1) return splited[0][0] + splited[1][0];
+      return splited[0][0];
+    },
   },
 };
 </script>
@@ -64,9 +80,14 @@ export default {
     display: none;
   }
 }
-
 .dropdown-menu {
   position: absolute !important;
   right: 0 !important;
+}
+.custom-dropdown .nav-link {
+  padding: 0 !important;
+}
+.avatar-bg .b-avatar-img img {
+  background-color: var(--bs-body-bg);
 }
 </style>

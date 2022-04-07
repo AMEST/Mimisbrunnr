@@ -8,7 +8,7 @@ public class ApplicationConfiguration : IHasId<string>
     
     public string Title { get; set; } = "Mimisbrunnr wiki";
 
-    public bool AllowAnonymous { get; set; } = true;
+    public bool AllowAnonymous { get; set; }
 
-    public bool SwaggerEnabled { get; set; } = true;
+    public bool SwaggerEnabled { get; set; }
 }
