@@ -11,24 +11,30 @@
             <b-dropdown-item href="#">Space directory</b-dropdown-item>
             <b-dropdown-item href="#">Create Space</b-dropdown-item>
           </b-nav-item-dropdown>
+          <b-button variant="light" class="create-button my-2 my-sm-0"
+            >Create</b-button
+          >
         </b-navbar-nav>
-
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
           <b-nav-form class="flex-search invisibleComponentBorder">
-            <b-form-input
-              size="sm"
-              class="mr-sm-2"
-              placeholder="Search"
-              disabled
-            ></b-form-input>
-            <b-button size="sm" class="my-2 my-sm-0" type="submit" disabled
-              >Search</b-button
-            >
+            <b-input-group size="sm">
+              <b-form-input placeholder="Search" disabled></b-form-input>
+              <b-input-group-append>
+                <b-button size="sm" text="Button" variant="success" disabled
+                  >Search</b-button
+                >
+              </b-input-group-append>
+            </b-input-group>
           </b-nav-form>
 
           <div v-if="!this.$store.state.application.profile">
-            <b-button class="text-light" variant="link" href="/api/account/login">Log in</b-button>
+            <b-button
+              class="text-light"
+              variant="link"
+              href="/api/account/login"
+              >Log in</b-button
+            >
           </div>
           <b-nav-item-dropdown v-else right class="custom-dropdown">
             <!-- Using 'button-content' slot -->
@@ -40,7 +46,9 @@
               ></b-avatar>
             </template>
             <b-dropdown-item href="#" disabled>Profile</b-dropdown-item>
-            <b-dropdown-item href="/api/account/logout">Sign Out</b-dropdown-item>
+            <b-dropdown-item href="/api/account/logout"
+              >Sign Out</b-dropdown-item
+            >
           </b-nav-item-dropdown>
         </b-navbar-nav>
       </b-container>
@@ -64,6 +72,12 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.create-button {
+  margin-left: 7px;
+}
+</style>
 
 <style>
 .mr-auto {
