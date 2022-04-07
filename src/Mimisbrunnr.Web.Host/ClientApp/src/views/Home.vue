@@ -1,29 +1,56 @@
 <template>
   <div class="home">
-    <b-container fluid>
-      <b-row class="h-100vh">
-        <b-col>
-          <Menu/>
-        </b-col>
-
-        <b-col>
-          none
-          <b-button v-b-toggle.home-sidebar>Toggle Sidebar</b-button>
-        </b-col>
-      </b-row>
+    <b-container fluid class="full-size-container">
+      <b-card no-body class="h-100vh">
+        <b-tabs
+          pills
+          card
+          vertical
+          nav-class="home-nav"
+          active-nav-item-class="home-nav-active-item"
+        >
+          <template #tabs-start>
+            <br />
+            <h5 style="text-align: left">DISCOVER</h5>
+            <br />
+          </template>
+          <Updates />
+          <RecentlyVisited />
+        </b-tabs>
+      </b-card>
     </b-container>
   </div>
 </template>
 
 <script>
-import Menu from '@/components/home/Menu.vue'
+import Updates from "@/components/home/Updates.vue";
+import RecentlyVisited from "@/components/home/RecentlyVisited.vue";
 export default {
-  name: 'home',
+  name: "home",
   components: {
-    Menu
-  }
-}
+    Updates,
+    RecentlyVisited,
+  },
+};
 </script>
-
 <style scoped>
+.full-size-container {
+  padding: 0 !important;
+  margin: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+</style>
+<style>
+.tabs {
+  height: 100%;
+}
+.home-nav {
+  width: 250px !important;
+  text-align: left;
+}
+.home-nav-active-item {
+  background-color: rgba(9, 30, 66, 0.08) !important;
+  color: #42526e !important;
+}
 </style>

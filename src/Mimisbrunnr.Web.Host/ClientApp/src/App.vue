@@ -68,4 +68,8 @@ body {
 .h-100vh{
     height: calc(100vh - 56px) !important;
 }
+.max-tab-pane {
+  overflow: auto !important;
+  max-height: calc(100vh - 57px) !important;
+}
 </style>
