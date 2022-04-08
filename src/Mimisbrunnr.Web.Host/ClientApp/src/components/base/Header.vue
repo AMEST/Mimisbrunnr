@@ -9,11 +9,20 @@
         <b-navbar-nav class="mr-auto">
           <b-nav-item-dropdown text="Spaces" right>
             <b-dropdown-item to="/spaces">Space directory</b-dropdown-item>
-            <b-dropdown-item href="#" v-b-modal.space-create-modal>Create Space</b-dropdown-item>
+            <b-dropdown-item
+              href="#"
+              v-b-modal.space-create-modal
+              :disabled="!this.$store.state.application.profile"
+              >Create Space</b-dropdown-item
+            >
           </b-nav-item-dropdown>
-          <b-button variant="light" class="create-button my-2 my-sm-0"
-            >Create</b-button
+          <b-button
+            variant="light"
+            class="create-button my-2 my-sm-0"
+            v-if="this.$store.state.application.profile"
           >
+            Create
+          </b-button>
         </b-navbar-nav>
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">

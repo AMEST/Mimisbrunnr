@@ -10,6 +10,8 @@ public class UserMap : EntityMapClass<User>
     public UserMap()
     {
         ToCollection("Users");
-        MapMember(x => x.Role).SetSerializer(new EnumSerializer<UserRole>(BsonType.String));
+        MapMember(x => x.Role)
+        .SetSerializer(new EnumSerializer<UserRole>(BsonType.String))
+        .SetIgnoreIfDefault(false);
     }
 }

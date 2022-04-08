@@ -84,7 +84,7 @@ export default {
   },
   computed: {
     keyValidation() {
-      return this.form.key.length > 1 && this.form.key.length <= 12
+      return this.form.key.length > 1 && this.form.key.length <= 24
         ? true
         : false;
     },
@@ -105,6 +105,7 @@ export default {
       }
       alert(JSON.stringify(response.data));
     },
+    // eslint-disable-next-line
     onReset(event) {
       // Reset our form values
       this.form.key = "";
@@ -116,6 +117,13 @@ export default {
       this.$nextTick(() => {
         this.show = true;
       });
+    },
+  },
+  watch: {
+    // eslint-disable-next-line
+    "form.type": function(to, from) {
+      if ( to === 'Personal' )
+        this.form.key = this.$store.state.application.profile.email
     },
   },
 };

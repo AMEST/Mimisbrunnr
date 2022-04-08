@@ -30,7 +30,7 @@ export default {
     var initializedRequest = await axios.get("/api/quickstart/initialize");
     var currentAccountRequest = await axios.get("/api/account/current", { validateStatus: false });
 
-    if(currentAccountRequest.status == 404 
+    if(currentAccountRequest.status == 401 
       && (!initializedRequest.data.isInitialized || !this.$store.state.application.info.allowAnonymous)){
       window.location.href = "/api/account/login"
       return

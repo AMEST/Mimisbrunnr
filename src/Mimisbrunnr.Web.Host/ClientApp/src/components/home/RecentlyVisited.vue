@@ -1,5 +1,5 @@
 <template>
-  <b-tab active class="max-tab-pane">
+  <b-tab class="max-tab-pane">
     <template #title>
       <b-icon icon="clock-history" class="text-secondary"></b-icon>
       <strong class="text-secondary"> Recently visited</strong>

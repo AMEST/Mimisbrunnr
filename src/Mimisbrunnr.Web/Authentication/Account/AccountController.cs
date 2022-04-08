@@ -11,7 +11,6 @@ namespace Mimisbrunnr.Web.Authentication.Account;
 public class AccountController : ControllerBase
 {
     [HttpGet("current")]
-    [AllowAnonymous]
     public IActionResult GetCurrentUser()
     {
         var user = User.ToEntity();

@@ -105,13 +105,13 @@ internal class SpaceManager : ISpaceManager
         return Update(space);
     }
 
-    public Task Archieve(Space space)
+    public Task Archive(Space space)
     {
         space.Status = SpaceStatus.Archived;
         return Update(space);
     }
 
-    public Task UnArchieve(Space space)
+    public Task UnArchive(Space space)
     {
         space.Status = SpaceStatus.Actual;
         return Update(space);

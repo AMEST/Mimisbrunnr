@@ -120,7 +120,7 @@ public static class MappingExtensions
     {
         var pageTree = new PageTreeModel
         {
-            Page = rootPage?.ToModel()
+            Page = rootPage?.ToModel(space.Key)
         };
         var childsPages = childs.Where(x => x.ParentId == rootPage?.Id).ToArray().Select(x => childs.ToModel(x, space)).ToList();
         pageTree.Childs = childsPages;

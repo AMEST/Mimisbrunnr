@@ -1,8 +1,10 @@
 <template>
-  <container fluid>
+  <container fluid class="text-left">
     <b-card>
-      <h2 class="text-left">Space Directory</h2>
+      <h2>Space Directory</h2>
     </b-card>
+    <br>
+    <h5>All spaces</h5>
     <b-table-simple style="text-align: left">
       <b-thead>
         <b-tr>

@@ -37,13 +37,13 @@ internal class SpaceService : ISpaceService
         var groups = await GetUserGroups(requestedBy);
         foreach (var space in spaces)
         {
-            if(space.Type == SpaceType.Public)
+            if (space.Type == SpaceType.Public)
             {
                 visibleSpaces.Add(space.ToModel());
                 continue;
             }
             var permission = FindPermission(space.Permissions.ToArray(), requestedBy, groups);
-            if(permission is not null)
+            if (permission is not null)
                 visibleSpaces.Add(space.ToModel());
         }
 
@@ -54,7 +54,11 @@ internal class SpaceService : ISpaceService
     {
         await _permissionService.EnsureAnonymousAllowed(requestedBy);
         await _permissionService.EnsureViewPermission(key, requestedBy);
-        return (await _spaceManager.GetByKey(key)).ToModel();
+
+        var space = await _spaceManager.GetByKey(key);
+        EnsureSpaceExists(space);
+
+        return space.ToModel();
     }
 
     public async Task<UserPermissionModel> GetPermission(string key, UserInfo requestedBy)
@@ -64,6 +68,8 @@ internal class SpaceService : ISpaceService
             return new UserPermissionModel() { CanView = true };
 
         var space = await _spaceManager.GetByKey(key);
+        EnsureSpaceExists(space);
+
         var userGroups = await GetUserGroups(requestedBy);
         var userPermission = FindPermission(space.Permissions.ToArray(), requestedBy, userGroups);
 
@@ -76,6 +82,7 @@ internal class SpaceService : ISpaceService
         await _permissionService.EnsureAdminPermission(key, requestedBy);
 
         var space = await _spaceManager.GetByKey(key);
+        EnsureSpaceExists(space);
 
         return space.Permissions.Select(x => x.ToSpacePermissionModel()).ToArray();
     }
@@ -85,6 +92,7 @@ internal class SpaceService : ISpaceService
         await _permissionService.EnsureAdminPermission(key, addedBy);
 
         var space = await _spaceManager.GetByKey(key);
+        EnsureSpaceExists(space);
 
         await _spaceManager.AddPermission(space, model.ToEntity());
 
@@ -96,6 +104,8 @@ internal class SpaceService : ISpaceService
         await _permissionService.EnsureAdminPermission(key, updatedBy);
 
         var space = await _spaceManager.GetByKey(key);
+        if (space == null)
+            throw new SpaceNotFoundException();
 
         await _spaceManager.UpdatePermission(space, model.ToEntity());
     }
@@ -105,6 +115,7 @@ internal class SpaceService : ISpaceService
         await _permissionService.EnsureAdminPermission(key, removedBy);
 
         var space = await _spaceManager.GetByKey(key);
+        EnsureSpaceExists(space);
 
         await _spaceManager.RemovePermission(space, model.ToEntity());
     }
@@ -117,13 +128,16 @@ internal class SpaceService : ISpaceService
             var personalSpace = await _spaceManager.FindPersonalSpace(createdBy);
             if (personalSpace != null)
                 throw new InvalidOperationException("Only one personal space allowed");
+
+            if (model.Key != createdBy.Email)
+                model.Key = createdBy.Email;
         }
 
         var space = await _spaceManager.GetByKey(model.Key);
         if (space != null)
-            throw new InvalidOperationException("Cannot create space becase space with same key already exists");
+            throw new InvalidOperationException("Cannot create space because space with same key already exists");
 
-        space = await _spaceManager.Create(model.Key, model.Name, model.Description, (SpaceType)model.Type,
+        space = await _spaceManager.Create(model.Key.ToUpper(), model.Name, model.Description, (SpaceType)model.Type,
             createdBy);
         return space.ToModel();
     }
@@ -134,6 +148,7 @@ internal class SpaceService : ISpaceService
         await _permissionService.EnsureAdminPermission(key, updatedBy);
 
         var space = await _spaceManager.GetByKey(key);
+        EnsureSpaceExists(space);
 
         space.Name = model.Name;
         space.Description = model.Description;
@@ -146,9 +161,9 @@ internal class SpaceService : ISpaceService
         await _permissionService.EnsureAdminPermission(key, archivedBy);
 
         var space = await _spaceManager.GetByKey(key);
+        EnsureSpaceExists(space);
 
-        await _spaceManager.Archieve(space);
-
+        await _spaceManager.Archive(space);
     }
 
     public async Task UnArchive(string key, UserInfo unArchivedBy)
@@ -156,10 +171,10 @@ internal class SpaceService : ISpaceService
         EnsureIsNotAnonymous(unArchivedBy);
         await _permissionService.EnsureAdminPermission(key, unArchivedBy);
 
-
         var space = await _spaceManager.GetByKey(key);
+        EnsureSpaceExists(space);
 
-        await _spaceManager.UnArchieve(space);
+        await _spaceManager.UnArchive(space);
     }
 
     public async Task Remove(string key, UserInfo removedBy)
@@ -168,6 +183,7 @@ internal class SpaceService : ISpaceService
         await _permissionService.EnsureAdminPermission(key, removedBy);
 
         var space = await _spaceManager.GetByKey(key);
+        EnsureSpaceExists(space);
 
         if (space.Status != SpaceStatus.Archived)
             throw new InvalidOperationException("Only archived spaces allowed for removing");
@@ -179,6 +195,12 @@ internal class SpaceService : ISpaceService
     {
         if (userInfo == null)
             throw new AnonymousNotAllowedException();
+    }
+
+    private static void EnsureSpaceExists(Space space)
+    {
+        if(space == null)
+            throw new SpaceNotFoundException();
     }
 
     private async Task<Group[]> GetUserGroups(UserInfo userInfo)

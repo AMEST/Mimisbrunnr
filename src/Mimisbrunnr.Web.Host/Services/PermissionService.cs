@@ -1,6 +1,7 @@
 ﻿using Mimisbrunner.Users;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Services;
+using Mimisbrunnr.Web.Wiki;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;
 
@@ -38,10 +39,14 @@ internal class PermissionService : IPermissionService
     public async Task EnsureViewPermission(string spaceKey, UserInfo userInfo)
     {
         var space = await _spaceManager.GetByKey(spaceKey);
+
+        if (space == null)
+            throw new SpaceNotFoundException();
+
         if (space.Type == SpaceType.Public)
             return;
 
-        if (space == null || userInfo == null)
+        if (userInfo == null)
             throw new UserHasNotPermissionException();
 
         var userGroups = await GetUserGroups(userInfo);
@@ -54,8 +59,11 @@ internal class PermissionService : IPermissionService
     public async Task EnsureEditPermission(string spaceKey, UserInfo userInfo)
     {
         var space = await _spaceManager.GetByKey(spaceKey);
-        
-        if (space == null || userInfo == null)
+
+        if (space == null)
+            throw new SpaceNotFoundException();
+
+        if (userInfo == null)
             throw new UserHasNotPermissionException();
 
         var userGroups = await GetUserGroups(userInfo);
@@ -64,12 +72,15 @@ internal class PermissionService : IPermissionService
         if (userPermission == null)
             throw new UserHasNotPermissionException();
     }
-    
+
     public async Task EnsureRemovePermission(string spaceKey, UserInfo userInfo)
     {
         var space = await _spaceManager.GetByKey(spaceKey);
 
-        if (space == null || userInfo == null)
+        if (space == null)
+            throw new SpaceNotFoundException();
+
+        if (userInfo == null)
             throw new UserHasNotPermissionException();
 
         var userGroups = await GetUserGroups(userInfo);
@@ -78,13 +89,17 @@ internal class PermissionService : IPermissionService
         if (userPermission == null)
             throw new UserHasNotPermissionException();
     }
-    
+
     public async Task EnsureAdminPermission(string spaceKey, UserInfo userInfo)
     {
         var space = await _spaceManager.GetByKey(spaceKey);
-        if (space == null || userInfo == null)
+
+        if (space == null)
+            throw new SpaceNotFoundException();
+
+        if (userInfo == null)
             throw new UserHasNotPermissionException();
-        
+
         var userGroups = await GetUserGroups(userInfo);
         var userPermission = FindPermission(space.Permissions.Where(x => x.IsAdmin).ToArray(), userInfo, userGroups);
 
@@ -98,7 +113,7 @@ internal class PermissionService : IPermissionService
         var userGroups = await _userGroupManager.GetUserGroups(user);
         return userGroups;
     }
-    
+
     private static Permission FindPermission(Permission[] permissions, UserInfo user, Group[] groups)
     {
         var userPermission =

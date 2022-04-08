@@ -24,9 +24,9 @@ public interface ISpaceManager
 
     Task RemovePermission(Space space, Permission permission);
 
-    Task Archieve(Space space);
+    Task Archive(Space space);
     
-    Task UnArchieve(Space space);
+    Task UnArchive(Space space);
 
     Task Remove(Space space);
 }
