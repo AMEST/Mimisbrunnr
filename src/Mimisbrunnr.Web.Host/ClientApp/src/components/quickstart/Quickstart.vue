@@ -40,6 +40,7 @@ export default {
   methods: {
     init: async function () {
       await axios.post("/api/quickstart/initialize", this.info);
+      window.location.reload();
     },
   },
   created: function () {

@@ -7,16 +7,19 @@
     <div v-if="this.loaded && !this.initialized">
         <Quickstart/>
     </div>
+    <SpaceCreateModal/>
   </div>
 </template>
 
 <script>
 import Header from '@/components/base/Header.vue'
+import SpaceCreateModal from '@/components/base/SpaceCreateModal.vue'
 import Quickstart from '@/components/quickstart/Quickstart.vue'
 import axios from 'axios'
 export default {
   components: {
     Header,
+    SpaceCreateModal,
     Quickstart
   },
   data: () => ({
@@ -71,5 +74,8 @@ body {
 .max-tab-pane {
   overflow: auto !important;
   max-height: calc(100vh - 57px) !important;
+}
+.text-left {
+  text-align: left  !important;
 }
 </style>

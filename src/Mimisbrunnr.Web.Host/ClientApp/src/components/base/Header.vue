@@ -8,8 +8,8 @@
 
         <b-navbar-nav class="mr-auto">
           <b-nav-item-dropdown text="Spaces" right>
-            <b-dropdown-item href="#">Space directory</b-dropdown-item>
-            <b-dropdown-item href="#">Create Space</b-dropdown-item>
+            <b-dropdown-item to="/spaces">Space directory</b-dropdown-item>
+            <b-dropdown-item href="#" v-b-modal.space-create-modal>Create Space</b-dropdown-item>
           </b-nav-item-dropdown>
           <b-button variant="light" class="create-button my-2 my-sm-0"
             >Create</b-button
