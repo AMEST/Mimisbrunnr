@@ -3,7 +3,7 @@
     <b-card>
       <h2 class="text-left">Space Directory</h2>
     </b-card>
-    <b-table-simple>
+    <b-table-simple style="text-align: left">
       <b-thead>
         <b-tr>
           <b-th>Name</b-th>

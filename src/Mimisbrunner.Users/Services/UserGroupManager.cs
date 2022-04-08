@@ -74,7 +74,7 @@ internal class UserGroupManager : IUserGroupManager
     public Task<Group[]> GetUserGroups(User user)
     {
         var groups = new List<Group>();
-        var userInGroups = _userGroupsRepository.GetAll().Where(x => x.UserId == user.Id);
+        var userInGroups = _userGroupsRepository.GetAll().Where(x => x.UserId == user.Id).ToArray();
         foreach (var userInGroup in userInGroups)
         {
             var group = _groupRepository.GetAll().FirstOrDefault(x => x.Id == userInGroup.GroupId);
