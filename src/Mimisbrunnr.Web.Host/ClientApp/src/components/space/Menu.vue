@@ -11,15 +11,15 @@
       <i class="text-muted">Space actions</i>
       <b-list-group class="mt-1">
         <b-list-group-item
-          v-if="this.homePage"
+          v-if="this.homePage && this.space.type == 'Personal'"
           :to="'/profile/' + this.homePage.createdBy.email"
         >
           <b-icon icon="person-fill" />&nbsp; Profile
         </b-list-group-item>
-        <b-list-group-item href="#">
+        <b-list-group-item href="#" v-if="userPermissions.isAdmin">
           <b-icon icon="shield-lock-fill" />&nbsp; Permissions
         </b-list-group-item>
-        <b-list-group-item href="#">
+        <b-list-group-item href="#" v-if="userPermissions.isAdmin">
           <b-icon icon="gear-fill" />&nbsp; Settings
         </b-list-group-item>
       </b-list-group>
@@ -60,6 +60,7 @@ export default {
   props: {
     space: Object,
     pageTree: Object,
+    userPermissions: Object
   },
   methods: {
     getInitials: function () {
@@ -100,17 +101,48 @@ export default {
       });
       return tree;
     },
+    expandTree: function(){
+      var pageId = this.$route.params.pageId;
+      if(pageId == null)
+        return;
+      var flatPageList = this.findPageTree(this.pageTree.childs, pageId);
+      for(var i = 0; i < flatPageList.length; i++){
+        if(flatPageList[i] == pageId) continue;
+        var pageTreeItem = document.getElementById(flatPageList[i]);
+        if(pageTreeItem == null) continue;
+        var expandIcon = pageTreeItem.getElementsByClassName("vtl-icon");
+        if(expandIcon != null && expandIcon.length > 0)
+          expandIcon[0].click();
+      }
+    },
+    findPageTree: function(pages, neededPageId){
+      var pagesFlat = []
+      for(var i = 0; i < pages.length; i++){
+        if(pages[i].page.id == neededPageId){
+          pagesFlat.push(pages[i].page.id);
+          return pagesFlat;
+        }
+        var inner = this.findPageTree(pages[i].childs, neededPageId);
+        if(inner.length != 0){
+          inner.push(pages[i].page.id);
+          return inner;
+        }
+      }
+      return pagesFlat;
+    }
   },
   watch: {
     // eslint-disable-next-line
     space: async function (newValue, oldValue) {
       await this.loadHomePage();
       this.loadPageTree();
+      setTimeout(this.expandTree, 1000);
     },
   },
   mounted: async function () {
     await this.loadHomePage();
     this.loadPageTree();
+    setTimeout(this.expandTree, 1000);
   },
 };
 </script>
@@ -133,10 +165,6 @@ export default {
 }
 .space-menu-title a {
   text-decoration: none;
-}
-
-.space-actions-menu {
-  padding-left: 0.5em;
 }
 
 .space-actions-menu .list-group-item {

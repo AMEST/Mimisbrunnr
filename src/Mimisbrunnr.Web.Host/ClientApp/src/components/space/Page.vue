@@ -1,5 +1,5 @@
 <template>
-  <b-col sm="9">
+  <b-col sm="9" class="page-view">
     <div align="right" class="page-head">
       <b-dropdown
         split
@@ -9,18 +9,19 @@
         text="Edit"
         size="sm"
         class="m-2"
+        :disabled="!userPermissions.canEdit"
       >
         <b-dropdown-item href="#" disabled>Attachments</b-dropdown-item>
-        <b-dropdown-item href="#" disabled>Copy</b-dropdown-item>
-        <b-dropdown-item href="#" disabled>Move</b-dropdown-item>
-        <b-dropdown-item variant="danger" href="#" disabled>Delete</b-dropdown-item>
+        <b-dropdown-item href="#" :disabled="!userPermissions.canEdit">Copy</b-dropdown-item>
+        <b-dropdown-item href="#" :disabled="!userPermissions.canEdit && !userPermissions.canRemove">Move</b-dropdown-item>
+        <b-dropdown-item variant="danger" href="#" :disabled="!userPermissions.canRemove">Delete</b-dropdown-item>
       </b-dropdown>
     </div>
     <div class="pb-2 page-title">
       <h2>{{ this.page.name }}</h2>
       <p class="text-muted page-title-dates">
-        Created by <b-link :to="'/profile/'+this.page.createdBy.email">{{this.page.createdBy.name}}</b-link> at {{this.page.created}}.
-        Updated by <b-link :to="'/profile/'+this.page.updatedBy.email">{{this.page.updatedBy.name}}</b-link> at {{this.page.updated}}.
+        Created by <b-link :to="'/profile/'+this.page.createdBy.email">{{this.page.createdBy.name}}</b-link> at {{new Date(this.page.created).toLocaleString()}}.
+        Updated by <b-link :to="'/profile/'+this.page.updatedBy.email">{{this.page.updatedBy.name}}</b-link> at {{new Date(this.page.updated).toLocaleString()}}.
       </p>
     </div>
     <div>
@@ -38,6 +39,7 @@ export default {
   },
   props: {
     page: Object,
+    userPermissions: Object
   },
 };
 </script>
@@ -58,5 +60,9 @@ export default {
 .page-title-dates a{
   color: #6c757d !important;
   text-decoration-color: #6c757d !important;
+}
+.page-view{
+  overflow: auto;
+  max-height: calc( 100vh - 57px);
 }
 </style>

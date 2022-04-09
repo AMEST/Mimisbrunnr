@@ -8,10 +8,11 @@
         v-model="page.name"
         placeholder="PageName"
         class="page-edit-name"
+        :state="nameState"
       ></b-form-input>
       <vue-simplemde :configs="mdeConfig" v-model="page.content" ref="markdownEditor" />
       <div style="float: right; padding-right: 1em">
-        <b-button @click="save" variant="primary" style="margin-right: 0.5em">
+        <b-button @click="save" variant="primary" style="margin-right: 0.5em" :disabled="!nameState">
           Update
         </b-button>
         <b-button @click="cancel" variant="secondary"> Close </b-button>
@@ -56,7 +57,12 @@ export default {
         spellChecker: false,
       },
     };
-  },
+  },    
+  computed: {
+      nameState() {
+        return this.page.name.length > 0 ? true : false
+      }
+    },
   methods: {
     init: async function () {
       var pageId = this.$route.params.pageId;

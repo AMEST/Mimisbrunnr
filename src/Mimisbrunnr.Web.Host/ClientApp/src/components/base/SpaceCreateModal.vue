@@ -122,10 +122,11 @@ export default {
   },
   watch: {
     // eslint-disable-next-line
-    "form.type": function(to, from) {
-      if ( to === 'Personal' )
-        this.form.key = this.$store.state.application.profile.email
-        this.form.name = this.$store.state.application.profile.name
+    "form.type": function (to, from) {
+      if (to === "Personal") {
+        this.form.key = this.$store.state.application.profile.email;
+        this.form.name = this.$store.state.application.profile.name;
+      }
     },
   },
 };

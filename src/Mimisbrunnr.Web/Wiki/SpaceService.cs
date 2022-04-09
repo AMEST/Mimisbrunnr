@@ -33,6 +33,10 @@ internal class SpaceService : ISpaceService
         if (requestedBy is null)
             return spaces.Where(x => x.Type == SpaceType.Public).Select(x => x.ToModel()).ToArray();
 
+        var user = await _userManager.FindByEmail(requestedBy.Email);
+        if(user.Role == UserRole.Admin)
+            return spaces.ToList().Select(x => x.ToModel()).ToArray();
+
         var visibleSpaces = new List<SpaceModel>();
         var groups = await GetUserGroups(requestedBy);
         foreach (var space in spaces)
@@ -73,7 +77,10 @@ internal class SpaceService : ISpaceService
         var userGroups = await GetUserGroups(requestedBy);
         var userPermission = FindPermission(space.Permissions.ToArray(), requestedBy, userGroups);
 
-        return userPermission?.ToModel();
+        if(userPermission == null)
+            return new UserPermissionModel(){CanView = space.Type == SpaceType.Public};
+
+        return userPermission.ToModel();
     }
 
     public async Task<SpacePermissionModel[]> GetSpacePermissions(string key, UserInfo requestedBy)

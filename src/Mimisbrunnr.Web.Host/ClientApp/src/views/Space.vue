@@ -4,8 +4,8 @@
       <h2>Space not found or user has no permissions</h2>
     </b-row>
     <b-row v-else class="h-100vh">
-      <Menu :space="space" :pageTree="pageTree"/>
-      <Page :page="page"/>
+      <Menu :space="space" :pageTree="pageTree" :userPermissions="userPermissions"/>
+      <Page :page="page" :userPermissions="userPermissions"/>
     </b-row>
   </b-container>
 </template>
@@ -26,6 +26,7 @@ export default {
       error: false,
       space: null,
       page: null,
+      userPermissions: null,
       pageTree: []
     };
   },
@@ -35,6 +36,7 @@ export default {
       if(!await this.loadSpace()) return;
       if(!await this.loadPage()) return;
       if(!await this.loadPageTree()) return;
+      // eslint-disable-next-line
       console.log("Space initialized");
       this.loaded = true;
     },
@@ -56,6 +58,17 @@ export default {
       }
 
       this.space = spacesRequest.data;
+
+      var permissionsRequest = await axios.get("/api/space/" + key + "/permission", {
+        validateStatus: false,
+      });
+      if (spacesRequest.status != 200) {
+        this.loaded = true;
+        this.error = true;
+        return false;
+      }
+      this.userPermissions = permissionsRequest.data;
+
       return true;
     },
     loadPage: async function () {
@@ -94,13 +107,15 @@ export default {
   watch: {
     // eslint-disable-next-line
     "$route.params.key": function (to, from) {
+      // eslint-disable-next-line
       console.log("Space key change from " + from + " to " + to);
       this.init();
     },
     // eslint-disable-next-line
     "$route.params.pageId": function (to, from) {
+      // eslint-disable-next-line
       console.log("Page id change from " + from + " to " + to);
-      this.init();
+      this.loadPage();
     },
   },
 };

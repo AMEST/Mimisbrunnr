@@ -49,7 +49,11 @@ internal class PermissionService : IPermissionService
         if (userInfo == null)
             throw new UserHasNotPermissionException();
 
-        var userGroups = await GetUserGroups(userInfo);
+        var user = await _userManager.FindByEmail(userInfo.Email);
+        if(user.Role == UserRole.Admin)
+            return;
+
+        var userGroups = await GetUserGroups(user);
         var userPermission = FindPermission(space.Permissions.Where(x => (x.CanView || x.IsAdmin)).ToArray(), userInfo, userGroups);
 
         if (userPermission == null)
@@ -66,7 +70,11 @@ internal class PermissionService : IPermissionService
         if (userInfo == null)
             throw new UserHasNotPermissionException();
 
-        var userGroups = await GetUserGroups(userInfo);
+        var user = await _userManager.FindByEmail(userInfo.Email);
+        if(user.Role == UserRole.Admin)
+            return;
+
+        var userGroups = await GetUserGroups(user);
         var userPermission = FindPermission(space.Permissions.Where(x => (x.CanEdit || x.IsAdmin)).ToArray(), userInfo, userGroups);
 
         if (userPermission == null)
@@ -83,7 +91,11 @@ internal class PermissionService : IPermissionService
         if (userInfo == null)
             throw new UserHasNotPermissionException();
 
-        var userGroups = await GetUserGroups(userInfo);
+        var user = await _userManager.FindByEmail(userInfo.Email);
+        if(user.Role == UserRole.Admin)
+            return;
+
+        var userGroups = await GetUserGroups(user);
         var userPermission = FindPermission(space.Permissions.Where(x => (x.CanRemove || x.IsAdmin)).ToArray(), userInfo, userGroups);
 
         if (userPermission == null)
@@ -99,17 +111,20 @@ internal class PermissionService : IPermissionService
 
         if (userInfo == null)
             throw new UserHasNotPermissionException();
+            
+        var user = await _userManager.FindByEmail(userInfo.Email);
+        if(user.Role == UserRole.Admin)
+            return;
 
-        var userGroups = await GetUserGroups(userInfo);
+        var userGroups = await GetUserGroups(user);
         var userPermission = FindPermission(space.Permissions.Where(x => x.IsAdmin).ToArray(), userInfo, userGroups);
 
         if (userPermission == null)
             throw new UserHasNotPermissionException();
     }
 
-    private async Task<Group[]> GetUserGroups(UserInfo userInfo)
+    private async Task<Group[]> GetUserGroups(User user)
     {
-        var user = await _userManager.FindByEmail(userInfo?.Email);
         var userGroups = await _userGroupManager.GetUserGroups(user);
         return userGroups;
     }

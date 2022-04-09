@@ -20,6 +20,7 @@
             variant="light"
             class="create-button my-2 my-sm-0"
             v-if="this.$store.state.application.profile"
+            @click="create"
           >
             Create
           </b-button>
@@ -54,7 +55,10 @@
                 :src="$store.state.application.profile.avatarUrl"
               ></b-avatar>
             </template>
-            <b-dropdown-item :to="'/profile/'+$store.state.application.profile.email">Profile</b-dropdown-item>
+            <b-dropdown-item
+              :to="'/profile/' + $store.state.application.profile.email"
+              >Profile</b-dropdown-item
+            >
             <b-dropdown-item href="/api/account/logout"
               >Sign Out</b-dropdown-item
             >
@@ -66,6 +70,7 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   name: "Header",
   data: function () {
@@ -77,6 +82,52 @@ export default {
       var splited = this.$store.state.application.profile.name.split(" ");
       if (splited.length > 1) return splited[0][0] + splited[1][0];
       return splited[0][0];
+    },
+    create: async function () {
+      var spaceKey = this.$route.params.key;
+      var pageId = this.$route.params.pageId;
+      if (spaceKey == null) {
+        spaceKey = await this.getOrCreatePersonalSpace();
+      }
+      if (pageId == null) {
+        var spaceHomePageRequest = await axios.get("/api/space/" + spaceKey);
+        pageId = spaceHomePageRequest.data.homePageId;
+      }
+      await this.createPage(spaceKey, pageId);
+    },
+    getOrCreatePersonalSpace: async function(){
+      var personalSpaceKey = this.$store.state.application.profile.email.toUpperCase()
+      var getPersonalSpaceRequest = await axios.get("/api/space/"+personalSpaceKey, {
+        validateStatus: false,
+      });
+      if(getPersonalSpaceRequest.status == 200)
+        return personalSpaceKey;
+      var createPersonalSpaceRequest = await axios.post("/api/space",{
+        key: personalSpaceKey,
+        name: this.$store.state.application.profile.name,
+        type: "Personal",
+        description: "my personal space",
+      }, {
+        validateStatus: false,
+      });
+      if(createPersonalSpaceRequest.status != 200){
+        alert(createPersonalSpaceRequest.statusText + "\n" + createPersonalSpaceRequest.data);
+        throw new Exception();
+      }
+      return personalSpaceKey;
+    },
+    createPage: async function (spaceKey, parentPageId) {
+      var newPage = {
+        spaceKey: spaceKey,
+        parentPageId: parentPageId,
+        name: "New page",
+        content: "**Page content**",
+      };
+      var createPageRequest = await axios.post("/api/page", newPage);
+      if (createPageRequest.status == 200)
+        this.$router.push(
+          "/space/" + spaceKey + "/" + createPageRequest.data.id + "/edit"
+        );
     },
   },
 };
