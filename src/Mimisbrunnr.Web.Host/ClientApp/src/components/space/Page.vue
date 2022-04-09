@@ -4,6 +4,7 @@
       <b-dropdown
         split
         split-variant="outline-secondary"
+        :split-to="'/space/'+this.page.spaceKey+'/'+this.page.id+'/edit'"
         variant="secondary"
         text="Edit"
         size="sm"

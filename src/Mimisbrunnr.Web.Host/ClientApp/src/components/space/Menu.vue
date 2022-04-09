@@ -2,7 +2,7 @@
   <b-col sm="3" class="space-menu">
     <div class="space-menu-title space-menu-bottom-line">
       <b-avatar class="space-avatar-bg" :text="getInitials()"></b-avatar>
-      <a :href="'/space/' + this.space.key">{{ this.space.name }}</a>
+      <b-link :to="'/space/' + this.space.key">{{ this.space.name }}</b-link>
     </div>
     <div class="mt-3 pb-3 space-menu-bottom-line">
       <i class="text-muted">Description: {{ this.space.description }}</i>
