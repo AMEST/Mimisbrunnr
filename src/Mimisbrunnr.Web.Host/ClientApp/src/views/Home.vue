@@ -33,14 +33,6 @@ export default {
   },
 };
 </script>
-<style scoped>
-.full-size-container {
-  padding: 0 !important;
-  margin: 0 !important;
-  height: 100% !important;
-  overflow: hidden !important;
-}
-</style>
 <style>
 .tabs {
   height: 100%;

@@ -1,21 +1,25 @@
 <template>
   <b-container v-if="loaded" fluid class="text-left">
-    <div v-if="error">Space not found or user has no permissions</div>
-    <div v-else>
-      <ul>
-        <li>Key: {{ this.$route.params.key }}</li>
-        <li>PageId: {{ this.$route.params.pageId }}</li>
-        <li>Space: {{JSON.stringify(this.space)}}</li>
-        <li>Page: {{JSON.stringify(this.page)}}</li>
-      </ul>
-    </div>
+    <b-row v-if="error" class="h-100vh">
+      <h2>Space not found or user has no permissions</h2>
+    </b-row>
+    <b-row v-else class="h-100vh">
+      <Menu :space="space" :pageTree="pageTree"/>
+      <Page :page="page"/>
+    </b-row>
   </b-container>
 </template>
 
 <script>
 import axios from "axios";
+import Menu from "@/components/space/Menu.vue";
+import Page from "@/components/space/Page.vue";
 export default {
   name: "Space",
+  components:{
+    Menu,
+    Page
+  },
   data() {
     return {
       loaded: false,

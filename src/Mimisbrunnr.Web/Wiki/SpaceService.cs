@@ -131,6 +131,8 @@ internal class SpaceService : ISpaceService
 
             if (model.Key != createdBy.Email)
                 model.Key = createdBy.Email;
+            if (model.Name != createdBy.Name)
+                model.Name = createdBy.Name;
         }
 
         var space = await _spaceManager.GetByKey(model.Key);

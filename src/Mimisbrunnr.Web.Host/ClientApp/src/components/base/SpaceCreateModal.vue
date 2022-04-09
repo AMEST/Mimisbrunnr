@@ -17,7 +17,7 @@
           placeholder="Enter space key"
           :state="keyValidation"
           aria-describedby="create-space-key-live-feedback"
-          required
+          :disabled="form.type == 'Personal'"
         ></b-form-input>
         <b-form-invalid-feedback id="create-space-key-live-feedback">
           Space key length need more then 2 symbols and lower then 12 symbols
@@ -29,6 +29,7 @@
           id="create-space-name"
           v-model="form.name"
           placeholder="Enter name"
+          :disabled="form.type == 'Personal'"
           required
         ></b-form-input>
       </b-form-group>
@@ -124,6 +125,7 @@ export default {
     "form.type": function(to, from) {
       if ( to === 'Personal' )
         this.form.key = this.$store.state.application.profile.email
+        this.form.name = this.$store.state.application.profile.name
     },
   },
 };

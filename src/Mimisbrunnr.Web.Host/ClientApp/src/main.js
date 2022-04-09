@@ -4,12 +4,15 @@ import router from './router'
 import store from './services/store'
 import axios from 'axios'
 import './registerServiceWorker'
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-
 // Import Bootstrap an BootstrapVue CSS files (order is important)
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+// Vue tree list
+import VueTreeList from 'vue-tree-list'
 
+// TreeList plugin
+Vue.use(VueTreeList)
 // Make BootstrapVue available throughout your project
 Vue.use(BootstrapVue)
 // Optionally install the BootstrapVue icon components plugin

@@ -54,7 +54,7 @@
                 :src="$store.state.application.profile.avatarUrl"
               ></b-avatar>
             </template>
-            <b-dropdown-item href="#" disabled>Profile</b-dropdown-item>
+            <b-dropdown-item :to="'/profile/'+$store.state.application.profile.email">Profile</b-dropdown-item>
             <b-dropdown-item href="/api/account/logout"
               >Sign Out</b-dropdown-item
             >

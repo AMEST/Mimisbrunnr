@@ -6,6 +6,7 @@
     </template>
     <h2 style="text-align: left" >Updates</h2>
     <b-card v-for="n in 10" :key="n">
+      <b-skeleton type="avatar" class="updates-avatar"></b-skeleton>
       <b-skeleton animation="wave" width="15%"></b-skeleton>
       <b-skeleton animation="wave" width="55%"></b-skeleton>
       <b-skeleton animation="wave" width="70%"></b-skeleton>
@@ -21,4 +22,10 @@ export default {
 </script>
 
 <style>
+.updates-avatar{
+  float: left;
+  width: 3.5em !important;
+  height: 3.5em !important;
+  margin-right: 1em;
+}
 </style>
