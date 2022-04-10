@@ -161,6 +161,10 @@ export default {
 .custom-dropdown .nav-link {
   padding: 0 !important;
 }
+.avatar-bg {
+  background-color: var(--bs-body-bg);
+  color: black;
+}
 .avatar-bg .b-avatar-img img {
   background-color: var(--bs-body-bg);
 }

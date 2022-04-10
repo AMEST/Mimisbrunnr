@@ -2,6 +2,7 @@
 using Mimisbrunner.Users;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Quickstart;
+using Mimisbrunnr.Web.User;
 using Mimisbrunnr.Web.Wiki;
 using Skidbladnir.Modules;
 
@@ -16,5 +17,6 @@ public class WebModule : Module
         services.AddSingleton<IQuickstartService, QuickstartService>();
         services.AddSingleton<ISpaceService, SpaceService>();
         services.AddSingleton<IPageService, PageService>();
+        services.AddSingleton<IUserService, UserService>();
     }
 }

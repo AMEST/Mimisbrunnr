@@ -28,7 +28,7 @@ export default {
   }),
   created: async function(){
     var initializedRequest = await axios.get("/api/quickstart/initialize");
-    var currentAccountRequest = await axios.get("/api/account/current", { validateStatus: false });
+    var currentAccountRequest = await axios.get("/api/user/current", { validateStatus: false });
 
     if(currentAccountRequest.status == 401 
       && (!initializedRequest.data.isInitialized || !this.$store.state.application.info.allowAnonymous)){

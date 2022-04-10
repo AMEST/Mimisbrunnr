@@ -71,6 +71,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
   name: "Profile",
   data() {
@@ -94,8 +95,17 @@ export default {
       return splited[0][0];
     },
     loadProfile: async function () {
-
-      this.profile = this.$store.state.application.profile;
+      if (!this.$route.params.email) return "";
+      var profileRequest = await axios.get("/api/user/find?email="+this.$route.params.email, { validateStatus: false });
+      if(profileRequest.status == 404){
+          this.$router.push("/error/notfound");
+          return;
+      }
+      if(profileRequest.status != 200){
+          this.$router.push("/error/unknown");
+          return;
+      }
+      this.profile = profileRequest.data;
     },
     ensureAnonymous: function(){
       if (this.isAnonymous) {

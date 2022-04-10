@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Mimisbrunnr.Web.Authentication.Account;
+using Mimisbrunnr.Web.User;
 using Mimisbrunnr.Web.Infrastructure.Contracts;
 using Mimisbrunnr.Web.Quickstart;
 using Mimisbrunnr.Web.Wiki;
@@ -72,6 +73,16 @@ public static class MappingExtensions
     }
 
     public static UserModel ToModel(this UserInfo user)
+    {
+        return new UserModel()
+        {
+            Email = user.Email,
+            Name = user.Name,
+            AvatarUrl = user.AvatarUrl
+        };
+    }
+
+        public static UserModel ToModel(this Mimisbrunner.Users.User user)
     {
         return new UserModel()
         {

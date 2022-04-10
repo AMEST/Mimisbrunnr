@@ -10,15 +10,6 @@ namespace Mimisbrunnr.Web.Authentication.Account;
 [Authorize]
 public class AccountController : ControllerBase
 {
-    [HttpGet("current")]
-    public IActionResult GetCurrentUser()
-    {
-        var user = User.ToEntity();
-        if (user == null)
-            return NotFound();
-        return Ok(user.ToModel());
-    }
-
     [HttpGet("login")]
     [AllowAnonymous]
     public IActionResult Login()

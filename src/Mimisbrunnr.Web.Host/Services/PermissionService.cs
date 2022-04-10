@@ -123,7 +123,7 @@ internal class PermissionService : IPermissionService
             throw new UserHasNotPermissionException();
     }
 
-    private async Task<Group[]> GetUserGroups(User user)
+    private async Task<Group[]> GetUserGroups(Mimisbrunner.Users.User user)
     {
         var userGroups = await _userGroupManager.GetUserGroups(user);
         return userGroups;

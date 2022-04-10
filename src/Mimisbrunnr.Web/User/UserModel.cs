@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Mimisbrunnr.Web.Authentication.Account;
+namespace Mimisbrunnr.Web.User;
 
 public class UserModel
 {
