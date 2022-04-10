@@ -14,7 +14,7 @@
         <b-dropdown-item href="#" disabled>Attachments</b-dropdown-item>
         <b-dropdown-item href="#" :disabled="!userPermissions.canEdit">Copy</b-dropdown-item>
         <b-dropdown-item href="#" :disabled="!userPermissions.canEdit && !userPermissions.canRemove">Move</b-dropdown-item>
-        <b-dropdown-item variant="danger" href="#" :disabled="!userPermissions.canRemove">Delete</b-dropdown-item>
+        <b-dropdown-item variant="danger" v-b-modal.page-delete-modal :disabled="!userPermissions.canRemove">Delete</b-dropdown-item>
       </b-dropdown>
     </div>
     <div class="pb-2 page-title">

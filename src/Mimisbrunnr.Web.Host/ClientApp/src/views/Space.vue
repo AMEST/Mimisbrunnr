@@ -7,6 +7,7 @@
       <Menu :space="space" :pageTree="pageTree" :userPermissions="userPermissions"/>
       <Page :page="page" :userPermissions="userPermissions"/>
     </b-row>
+    <DeletePage/>
   </b-container>
 </template>
 
@@ -14,11 +15,13 @@
 import axios from "axios";
 import Menu from "@/components/space/Menu.vue";
 import Page from "@/components/space/Page.vue";
+import DeletePage from "@/components/space/modal/DeletePage.vue";
 export default {
   name: "Space",
   components:{
     Menu,
-    Page
+    Page,
+    DeletePage
   },
   data() {
     return {
