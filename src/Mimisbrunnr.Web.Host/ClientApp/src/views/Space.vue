@@ -68,6 +68,13 @@ export default {
         return false;
       }
       this.userPermissions = permissionsRequest.data;
+      this.$store.commit('addToHistory', {
+        id: this.space.key,
+        key: this.space.key,
+        name: this.space.name,
+        date: Date.now(),
+        type: "Space"
+      })
 
       return true;
     },
@@ -85,6 +92,13 @@ export default {
       }
 
       this.page = pageRequest.data;
+      this.$store.commit('addToHistory', {
+        id: this.page.id,
+        name: this.page.name,
+        key: this.page.spaceKey,
+        date: Date.now(),
+        type: "Page"
+      })
       return true;
     },
     loadPageTree: async function () {

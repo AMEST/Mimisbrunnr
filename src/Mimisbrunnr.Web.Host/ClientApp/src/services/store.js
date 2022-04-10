@@ -21,29 +21,37 @@ export default new Vuex.Store({
   },
   getters: {},
   mutations: {
-    changeProfile (state, payload) {
+    // eslint-disable-next-line
+    changeProfile(state, payload) {
       state.application.profile = payload
     },
-    changeApplicationInfo (state, payload) {
+    // eslint-disable-next-line
+    changeApplicationInfo(state, payload) {
       state.application.info = payload
     },
-    changeTheme (state, payload) {
+    // eslint-disable-next-line
+    changeTheme(state, payload) {
       window.localStorage['theme'] = payload
       state.application.theme = payload
     },
     // eslint-disable-next-line
-    clearProfile (state) {
+    clearProfile(state) {
       state.application.profile = null
     },
-    addToHistory (state, payload) {
-      if (state.application.history.length > 10) {
-        var sliceAt = state.application.history.length - 10
+    // eslint-disable-next-line
+    addToHistory(state, payload) {
+      for (let h of state.application.history) {
+        if (payload.id === h.id) return
+      }
+      if (state.application.history.length > 15) {
+        var sliceAt = state.application.history.length - 15
         state.application.history = state.application.history.slice(sliceAt, state.application.history.length)
       }
       state.application.history.push(payload)
       window.localStorage['history'] = JSON.stringify(state.application.history)
     },
-    changeVersion (state, value) {
+    // eslint-disable-next-line
+    changeVersion(state, value) {
       state.application.version = value
     }
   },

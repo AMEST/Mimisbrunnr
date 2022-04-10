@@ -20,6 +20,14 @@ Vue.use(IconsPlugin)
 
 Vue.config.productionTip = false
 
+// Restore history
+var recentlyVisited = window.localStorage['history']
+if (recentlyVisited !== undefined) {
+  var parsedRecentlyVisited = JSON.parse(recentlyVisited)
+  parsedRecentlyVisited.forEach(element => {
+    store.commit('addToHistory', element)
+  })
+}
 var applicationInfoTask = axios.get('/api/quickstart').then(result => {
   if (result.data == null || result.status !== 200) {
     return
