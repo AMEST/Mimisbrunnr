@@ -153,6 +153,7 @@ export default {
   overflow-x: hidden;
   overflow-y: auto;
   box-shadow: inset 0 0rem .5em rgba(0,0,0,.15)!important;
+  max-height: calc( 100vh - 57px);
 }
 .space-menu-title {
   padding-top: 3em;
