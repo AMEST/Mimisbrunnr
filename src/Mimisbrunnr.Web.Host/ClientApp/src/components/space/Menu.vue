@@ -1,5 +1,5 @@
 <template>
-  <b-col sm="3" class="space-menu">
+  <b-col sm="2" class="space-menu">
     <div class="space-menu-title space-menu-bottom-line">
       <b-avatar class="space-avatar-bg" :text="getInitials()"></b-avatar>
       <b-link :to="'/space/' + this.space.key">{{ this.space.name }}</b-link>
@@ -152,9 +152,10 @@ export default {
   background-color: rgba(0, 0, 0, 0.03);
   overflow-x: hidden;
   overflow-y: auto;
+  box-shadow: inset 0 0rem .5em rgba(0,0,0,.15)!important;
 }
 .space-menu-title {
-  padding-top: 2em;
+  padding-top: 3em;
   padding-bottom: 2em;
   padding-left: 1.5em;
   width: 100%;
@@ -165,6 +166,13 @@ export default {
 }
 .space-menu-title a {
   text-decoration: none;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: inline-block;
+  max-width: 70%;
+  text-transform: none;
+  margin-top: 0;
 }
 
 .space-actions-menu .list-group-item {
@@ -179,6 +187,7 @@ export default {
   width: 4em;
   height: 4em;
   margin-right: 10px;
+  margin-top: -15px;
 }
 .space-avatar-bg .b-avatar-img img {
   background-color: white;

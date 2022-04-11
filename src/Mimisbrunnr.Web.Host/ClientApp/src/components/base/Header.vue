@@ -18,9 +18,10 @@
           </b-nav-item-dropdown>
           <b-button
             variant="light"
-            class="create-button my-2 my-sm-0"
+            class="create-button"
             v-if="this.$store.state.application.profile"
             @click="create"
+            size="sm"
           >
             Create
           </b-button>
@@ -32,7 +33,7 @@
               <b-form-input placeholder="Search" disabled></b-form-input>
               <b-input-group-append>
                 <b-button size="sm" text="Button" variant="success" disabled
-                  >Search</b-button
+                  ><b-icon icon="search"/></b-button
                 >
               </b-input-group-append>
             </b-input-group>
@@ -136,6 +137,8 @@ export default {
 <style scoped>
 .create-button {
   margin-left: 7px;
+  height: 32px;
+  margin-top: 0.2em;
 }
 </style>
 

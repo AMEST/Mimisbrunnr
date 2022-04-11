@@ -53,6 +53,7 @@ export default {
 .home-nav {
   width: 250px !important;
   text-align: left;
+  box-shadow: inset 0 0rem .5em rgba(0,0,0,.15)!important;
 }
 .home-nav-active-item {
   background-color: rgba(9, 30, 66, 0.08) !important;
