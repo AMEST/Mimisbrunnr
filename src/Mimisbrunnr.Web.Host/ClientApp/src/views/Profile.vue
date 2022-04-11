@@ -7,7 +7,7 @@
         <b-avatar
           class="profile-avatar-bg"
           :text="getInitials()"
-          :src="$store.state.application.profile.avatarUrl"
+          :src="this.profile.avatarUrl"
         ></b-avatar>
         <div class="profile-title">
           <h4>{{ this.profile.name }}</h4>
