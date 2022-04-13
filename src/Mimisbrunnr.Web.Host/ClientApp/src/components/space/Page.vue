@@ -1,5 +1,5 @@
 <template>
-  <b-col sm="10" class="page-view">
+  <b-col sm="8" md="9" xl="10" class="page-view">
     <div align="right" class="page-head">
       <b-dropdown
         split

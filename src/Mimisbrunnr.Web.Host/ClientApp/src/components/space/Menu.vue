@@ -1,5 +1,5 @@
 <template>
-  <b-col sm="2" class="space-menu">
+  <b-col sm="4" md="3" xl="2" class="space-menu">
     <div class="space-menu-title space-menu-bottom-line">
       <b-avatar class="space-avatar-bg" :text="getInitials()"></b-avatar>
       <b-link :to="'/space/' + this.space.key">{{ this.space.name }}</b-link>
@@ -24,7 +24,7 @@
         </b-list-group-item>
       </b-list-group>
     </div>
-    <div class="mt-3">
+    <div class="mt-3 space-menu-page-tree">
       <i class="text-muted">Page tree</i>
       <vue-tree-list
         :model="pageTreeList"
@@ -86,6 +86,7 @@ export default {
     convertTree: function (pages) {
       var self = this;
       var tree = [];
+      // eslint-disable-next-line
       pages.forEach(function(page, i, arr) {
         var treeNode = {
           name: page.page.name,
@@ -195,5 +196,10 @@ export default {
 }
 .space-avatar-bg .b-avatar-text {
   background-color: white;
+}
+.space-menu-page-tree .vtl-node-content {
+  height: 24px;
+  overflow: hidden;
+  word-break: break-all;
 }
 </style>

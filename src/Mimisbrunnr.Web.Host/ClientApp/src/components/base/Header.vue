@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-navbar toggleable="lg" type="dark" variant="primary">
+    <b-navbar toggleable="sm" type="dark" variant="primary">
       <b-container>
         <b-navbar-brand to="/">{{
           this.$store.state.application.info.title
@@ -33,8 +33,8 @@
               <b-form-input placeholder="Search" disabled></b-form-input>
               <b-input-group-append>
                 <b-button size="sm" text="Button" variant="success" disabled
-                  ><b-icon icon="search"/></b-button
-                >
+                  ><b-icon icon="search"
+                /></b-button>
               </b-input-group-append>
             </b-input-group>
           </b-nav-form>
@@ -96,23 +96,34 @@ export default {
       }
       await this.createPage(spaceKey, pageId);
     },
-    getOrCreatePersonalSpace: async function(){
-      var personalSpaceKey = this.$store.state.application.profile.email.toUpperCase()
-      var getPersonalSpaceRequest = await axios.get("/api/space/"+personalSpaceKey, {
-        validateStatus: false,
-      });
-      if(getPersonalSpaceRequest.status == 200)
-        return personalSpaceKey;
-      var createPersonalSpaceRequest = await axios.post("/api/space",{
-        key: personalSpaceKey,
-        name: this.$store.state.application.profile.name,
-        type: "Personal",
-        description: "my personal space",
-      }, {
-        validateStatus: false,
-      });
-      if(createPersonalSpaceRequest.status != 200){
-        alert(createPersonalSpaceRequest.statusText + "\n" + createPersonalSpaceRequest.data);
+    getOrCreatePersonalSpace: async function () {
+      var personalSpaceKey =
+        this.$store.state.application.profile.email.toUpperCase();
+      var getPersonalSpaceRequest = await axios.get(
+        "/api/space/" + personalSpaceKey,
+        {
+          validateStatus: false,
+        }
+      );
+      if (getPersonalSpaceRequest.status == 200) return personalSpaceKey;
+      var createPersonalSpaceRequest = await axios.post(
+        "/api/space",
+        {
+          key: personalSpaceKey,
+          name: this.$store.state.application.profile.name,
+          type: "Personal",
+          description: "my personal space",
+        },
+        {
+          validateStatus: false,
+        }
+      );
+      if (createPersonalSpaceRequest.status != 200) {
+        alert(
+          createPersonalSpaceRequest.statusText +
+            "\n" +
+            createPersonalSpaceRequest.data
+        );
         throw new Exception();
       }
       return personalSpaceKey;
@@ -155,6 +166,14 @@ export default {
 @media (max-width: 993px) {
   .invisibleComponentBorder {
     display: none;
+  }
+}
+@media (min-width: 390px) {
+  .navbar-expand-sm .navbar-nav {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: row;
+    flex-direction: row;
   }
 }
 .dropdown-menu {

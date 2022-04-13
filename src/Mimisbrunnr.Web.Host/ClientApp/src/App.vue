@@ -87,4 +87,8 @@ body {
   height: 100% !important;
   overflow: hidden !important;
 }
+.badge-primary {
+    color: #fff;
+    background-color: #007bff;
+}
 </style>
