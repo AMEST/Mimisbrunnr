@@ -71,6 +71,10 @@ internal class SpaceService : ISpaceService
         if (requestedBy == null)
             return new UserPermissionModel() { CanView = true };
 
+        var user = await _userManager.GetByEmail(requestedBy.Email);
+        if(user.Role == UserRole.Admin)
+            return new  UserPermissionModel() { CanView = true, CanEdit = true, CanRemove = true, IsAdmin = true };
+
         var space = await _spaceManager.GetByKey(key);
         EnsureSpaceExists(space);
 
