@@ -45,6 +45,7 @@ public class MongoDbStoreModule : RunnableModule
         {
             await CreateUserIndexes(baseMongoContext);
             await CreateGroupIndexes(baseMongoContext);
+            await CreateUserGroupIndexes(baseMongoContext);
             await CreateSpaceIndexes(baseMongoContext);
             await CreatePageIndexes(baseMongoContext);
         }
@@ -79,6 +80,26 @@ public class MongoDbStoreModule : RunnableModule
             Background = true
         }));
     }
+
+        private async Task CreateUserGroupIndexes(IMongoDbContext mongoContext)
+    {
+        var collection = mongoContext.GetCollection<UserGroup>();
+        var userGroupsKeDefinition = Builders<UserGroup>.IndexKeys.Ascending(x => x.UserId);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<UserGroup>(userGroupsKeDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+        var userInGroupKeDefinition = Builders<UserGroup>.IndexKeys.Ascending(x => x.UserId).Ascending(x=>x.GroupId);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<UserGroup>(userInGroupKeDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+        var groupIdKeyDefinition = Builders<UserGroup>.IndexKeys.Ascending(x=>x.GroupId);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<UserGroup>(groupIdKeyDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+    }
     
     private async Task CreateSpaceIndexes(IMongoDbContext mongoContext)
     {
@@ -91,6 +112,12 @@ public class MongoDbStoreModule : RunnableModule
         }));
         var nameKeyDefinition = Builders<Space>.IndexKeys.Ascending(x => x.Name);
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<Space>(nameKeyDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+
+        var personalSpaceSearch = Builders<Space>.IndexKeys.Ascending(x => x.Type).Ascending(x=>x.Permissions);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Space>(personalSpaceSearch, new CreateIndexOptions()
         {
             Background = true
         }));

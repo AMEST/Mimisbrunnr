@@ -96,7 +96,7 @@ export default {
     },
     loadProfile: async function () {
       if (!this.$route.params.email) return "";
-      var profileRequest = await axios.get("/api/user/find?email="+this.$route.params.email, { validateStatus: false });
+      var profileRequest = await axios.get("/api/user/"+this.$route.params.email, { validateStatus: false });
       if(profileRequest.status == 404){
           this.$router.push("/error/notfound");
           return;

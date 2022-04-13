@@ -49,7 +49,7 @@ internal class PermissionService : IPermissionService
         if (userInfo == null)
             throw new UserHasNotPermissionException();
 
-        var user = await _userManager.FindByEmail(userInfo.Email);
+        var user = await _userManager.GetByEmail(userInfo.Email);
         if(user.Role == UserRole.Admin)
             return;
 
@@ -70,7 +70,7 @@ internal class PermissionService : IPermissionService
         if (userInfo == null)
             throw new UserHasNotPermissionException();
 
-        var user = await _userManager.FindByEmail(userInfo.Email);
+        var user = await _userManager.GetByEmail(userInfo.Email);
         if(user.Role == UserRole.Admin)
             return;
 
@@ -91,7 +91,7 @@ internal class PermissionService : IPermissionService
         if (userInfo == null)
             throw new UserHasNotPermissionException();
 
-        var user = await _userManager.FindByEmail(userInfo.Email);
+        var user = await _userManager.GetByEmail(userInfo.Email);
         if(user.Role == UserRole.Admin)
             return;
 
@@ -112,7 +112,7 @@ internal class PermissionService : IPermissionService
         if (userInfo == null)
             throw new UserHasNotPermissionException();
             
-        var user = await _userManager.FindByEmail(userInfo.Email);
+        var user = await _userManager.GetByEmail(userInfo.Email);
         if(user.Role == UserRole.Admin)
             return;
 

@@ -26,10 +26,10 @@ public class UserController : ControllerBase
         return Ok(user.ToModel());
     }
 
-    [HttpGet("find")]
-    public async Task<IActionResult> Find([FromQuery] string email)
+    [HttpGet("{email}")]
+    public async Task<IActionResult> Get([FromRoute] string email)
     {
-        var user = await _userService.FindByEmail(email, User.ToEntity());
+        var user = await _userService.GetByEmail(email, User.ToEntity());
         if (user == null)
             return NotFound();
         return Ok(user);

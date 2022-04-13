@@ -11,7 +11,7 @@ internal class UserManager : IUserManager
         _userRepository = userRepository;
     }
     
-    public Task<User> FindByEmail(string email)
+    public Task<User> GetByEmail(string email)
     {
         return Task.FromResult(_userRepository.GetAll().FirstOrDefault(x => x.Email == email.ToLower()));
     }

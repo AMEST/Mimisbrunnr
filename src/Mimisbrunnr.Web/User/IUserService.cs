@@ -4,6 +4,6 @@ namespace Mimisbrunnr.Web.User
 {
     public interface IUserService
     {
-         Task<UserModel> FindByEmail(string email, UserInfo requestedBy);
+         Task<UserModel> GetByEmail(string email, UserInfo requestedBy);
     }
 }

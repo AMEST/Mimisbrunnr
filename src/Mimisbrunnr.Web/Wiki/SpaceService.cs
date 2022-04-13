@@ -33,7 +33,7 @@ internal class SpaceService : ISpaceService
         if (requestedBy is null)
             return spaces.Where(x => x.Type == SpaceType.Public).Select(x => x.ToModel()).ToArray();
 
-        var user = await _userManager.FindByEmail(requestedBy.Email);
+        var user = await _userManager.GetByEmail(requestedBy.Email);
         if(user.Role == UserRole.Admin)
             return spaces.ToList().Select(x => x.ToModel()).ToArray();
 
@@ -214,7 +214,7 @@ internal class SpaceService : ISpaceService
 
     private async Task<Group[]> GetUserGroups(UserInfo userInfo)
     {
-        var user = await _userManager.FindByEmail(userInfo?.Email);
+        var user = await _userManager.GetByEmail(userInfo?.Email);
         var userGroups = await _userGroupManager.GetUserGroups(user);
         return userGroups;
     }

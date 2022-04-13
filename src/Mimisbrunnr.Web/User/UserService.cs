@@ -13,9 +13,9 @@ namespace Mimisbrunnr.Web.User
 
         }
 
-        public async Task<UserModel> FindByEmail(string email, UserInfo requestedBy)
+        public async Task<UserModel> GetByEmail(string email, UserInfo requestedBy)
         {
-            var user = await _userManager.FindByEmail(email);
+            var user = await _userManager.GetByEmail(email);
             return user?.ToModel();
         }
     }

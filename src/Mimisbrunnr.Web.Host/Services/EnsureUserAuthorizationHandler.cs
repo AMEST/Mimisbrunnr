@@ -23,7 +23,7 @@ internal class EnsureUserAuthorizationHandler : IAuthorizationHandler
             return;
 
         var userInfo = context.User.ToEntity();
-        var applicationUser = await _userManager.FindByEmail(userInfo.Email);
+        var applicationUser = await _userManager.GetByEmail(userInfo.Email);
         if (applicationUser == null)
         {
             _logger.LogDebug("Add new user `{Email}`", userInfo.Email);

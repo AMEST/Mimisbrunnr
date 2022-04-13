@@ -38,7 +38,7 @@ internal class QuickstartService : IQuickstartService
         if (isInitialized)
             throw new InitializeException("Application already initialized");
         
-        var applicationUser = await _userManager.FindByEmail(user.Email);
+        var applicationUser = await _userManager.GetByEmail(user.Email);
         await _applicationConfigurationService.Initialize(model.ToEntity(), applicationUser);
     }
 }

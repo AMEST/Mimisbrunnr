@@ -8,6 +8,8 @@
       <Page :page="page" :userPermissions="userPermissions"/>
     </b-row>
     <DeletePage/>
+    <CopyPage/>
+    <MovePage/>
   </b-container>
 </template>
 
@@ -16,12 +18,16 @@ import axios from "axios";
 import Menu from "@/components/space/Menu.vue";
 import Page from "@/components/space/Page.vue";
 import DeletePage from "@/components/space/modal/DeletePage.vue";
+import CopyPage from "@/components/space/modal/CopyPage.vue";
+import MovePage from "@/components/space/modal/MovePage.vue";
 export default {
   name: "Space",
   components:{
     Menu,
     Page,
-    DeletePage
+    DeletePage,
+    CopyPage,
+    MovePage
   },
   data() {
     return {

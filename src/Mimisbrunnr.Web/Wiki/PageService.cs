@@ -118,9 +118,9 @@ internal class PageService : IPageService
         
         var destinationSpace = sourcePage.SpaceId == destinationParentPage.SpaceId
             ? sourceSpace
-            : await _spaceManager.GetById(sourcePage.SpaceId);
+            : await _spaceManager.GetById(destinationParentPage.SpaceId);
         if (sourceSpace.Id != destinationSpace.Id)
-            await _permissionService.EnsureEditPermission(destinationSpace.Id, copiedBy);
+            await _permissionService.EnsureEditPermission(destinationSpace.Key, copiedBy);
 
         var copiedPage = await _pageManager.Copy(sourcePage, destinationParentPage);
         
@@ -143,11 +143,11 @@ internal class PageService : IPageService
         
         var destinationSpace = sourcePage.SpaceId == destinationParentPage.SpaceId
             ? sourceSpace
-            : await _spaceManager.GetById(sourcePage.SpaceId);
+            : await _spaceManager.GetById(destinationParentPage.SpaceId);
         if (sourceSpace.Id != destinationSpace.Id)
         {
             await _permissionService.EnsureRemovePermission(sourceSpace.Key, movedBy);
-            await _permissionService.EnsureEditPermission(destinationSpace.Id, movedBy);
+            await _permissionService.EnsureEditPermission(destinationSpace.Key, movedBy);
         }
 
         var movedPage = await _pageManager.Move(sourcePage, destinationParentPage);

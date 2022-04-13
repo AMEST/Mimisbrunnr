@@ -2,7 +2,7 @@
 
 public interface IUserManager
 {
-    Task<User> FindByEmail(string email);
+    Task<User> GetByEmail(string email);
 
     Task Add(string email, string name, string avatarUrl, UserRole role);
 
