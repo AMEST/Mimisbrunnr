@@ -4,7 +4,6 @@ using Mimisbrunner.Users;
 using Mimisbrunnr.Storage.MongoDb.Mappings;
 using Mimisbrunnr.Web.Infrastructure.Contracts;
 using Mimisbrunnr.Wiki.Contracts;
-using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Skidbladnir.Modules;
@@ -25,11 +24,11 @@ public class MongoDbStoreModule : RunnableModule
 
         ConventionRegistry.Register("Influunt", pack, t => true);
         var configuration = Configuration.Get<MongoDbStoreModuleConfiguration>();
-        services.AddMongoDbContext(builder => 
+        services.AddMongoDbContext(builder =>
             builder
                 .UseConnectionString(configuration.ConnectionString)
-                .AddEntity<ApplicationConfiguration,ApplicationConfigurationMap>()
-                .AddEntity<User,UserMap>()
+                .AddEntity<ApplicationConfiguration, ApplicationConfigurationMap>()
+                .AddEntity<User, UserMap>()
                 .AddEntity<Group, GroupMap>()
                 .AddEntity<UserGroup, UserGroupMap>()
                 .AddEntity<Space, SpaceMap>()
@@ -81,7 +80,7 @@ public class MongoDbStoreModule : RunnableModule
         }));
     }
 
-        private async Task CreateUserGroupIndexes(IMongoDbContext mongoContext)
+    private async Task CreateUserGroupIndexes(IMongoDbContext mongoContext)
     {
         var collection = mongoContext.GetCollection<UserGroup>();
         var userGroupsKeDefinition = Builders<UserGroup>.IndexKeys.Ascending(x => x.UserId);
@@ -89,18 +88,18 @@ public class MongoDbStoreModule : RunnableModule
         {
             Background = true
         }));
-        var userInGroupKeDefinition = Builders<UserGroup>.IndexKeys.Ascending(x => x.UserId).Ascending(x=>x.GroupId);
+        var userInGroupKeDefinition = Builders<UserGroup>.IndexKeys.Ascending(x => x.UserId).Ascending(x => x.GroupId);
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<UserGroup>(userInGroupKeDefinition, new CreateIndexOptions()
         {
             Background = true
         }));
-        var groupIdKeyDefinition = Builders<UserGroup>.IndexKeys.Ascending(x=>x.GroupId);
+        var groupIdKeyDefinition = Builders<UserGroup>.IndexKeys.Ascending(x => x.GroupId);
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<UserGroup>(groupIdKeyDefinition, new CreateIndexOptions()
         {
             Background = true
         }));
     }
-    
+
     private async Task CreateSpaceIndexes(IMongoDbContext mongoContext)
     {
         var collection = mongoContext.GetCollection<Space>();
@@ -116,13 +115,30 @@ public class MongoDbStoreModule : RunnableModule
             Background = true
         }));
 
-        var personalSpaceSearch = Builders<Space>.IndexKeys.Ascending(x => x.Type).Ascending(x=>x.Permissions);
+        var personalSpaceSearch = Builders<Space>.IndexKeys.Ascending(x => x.Type).Ascending(x => x.Permissions);
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<Space>(personalSpaceSearch, new CreateIndexOptions()
         {
             Background = true
         }));
+
+        var nameSpaceFullTextSearch = Builders<Space>.IndexKeys.Text(x=>x.Name);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Space>(nameSpaceFullTextSearch, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+        
+        var descripionSpaceFullTextSearch = Builders<Space>.IndexKeys.Text(x=>x.Description);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Space>(descripionSpaceFullTextSearch, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+        var descripionAndNameSpaceFullTextSearch = Builders<Space>.IndexKeys.Text(x=>x.Description).Text(x=>x.Name);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Space>(descripionSpaceFullTextSearch, new CreateIndexOptions()
+        {
+            Background = true
+        }));
     }
-    
+
     private async Task CreatePageIndexes(IMongoDbContext mongoContext)
     {
         var collection = mongoContext.GetCollection<Page>();
@@ -139,6 +155,24 @@ public class MongoDbStoreModule : RunnableModule
 
         var nameKeyDefinition = Builders<Page>.IndexKeys.Ascending(x => x.Name);
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<Page>(nameKeyDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+
+        var contentFullTextSearch = Builders<Page>.IndexKeys.Text(x => x.Content);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Page>(contentFullTextSearch, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+
+        var titleFullTextSearch = Builders<Page>.IndexKeys.Text(x => x.Name);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Page>(titleFullTextSearch, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+
+        var contentTitleFullTextSearch = Builders<Page>.IndexKeys.Text(x => x.Name).Text(x => x.Content);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Page>(contentTitleFullTextSearch, new CreateIndexOptions()
         {
             Background = true
         }));

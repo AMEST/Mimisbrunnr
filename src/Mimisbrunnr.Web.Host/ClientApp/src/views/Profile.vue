@@ -43,7 +43,7 @@
               <b-form-input :disabled="!this.itsMe" placeholder="Organization"></b-form-input>
             </b-input-group-prepend>
             <b-input-group-prepend is-text>
-              <b-icon icon="cursor" /> &nbsp;
+              <b-icon icon="geo-alt" /> &nbsp;
               <b-form-input :disabled="!this.itsMe" placeholder="Location"></b-form-input>
             </b-input-group-prepend>
           </b-card-text>

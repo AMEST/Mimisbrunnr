@@ -7,9 +7,10 @@
       <Menu :space="space" :pageTree="pageTree" :userPermissions="userPermissions"/>
       <Page :page="page" :userPermissions="userPermissions"/>
     </b-row>
-    <DeletePage/>
-    <CopyPage/>
-    <MovePage/>
+    <delete-page v-if="userPermissions && userPermissions.canRemove"/>
+    <copy-page v-if="userPermissions && userPermissions.canEdit"/>
+    <move-page v-if="userPermissions && userPermissions.canEdit && userPermissions.canRemove"/>
+    <permissions v-if="userPermissions && userPermissions.isAdmin"/>
   </b-container>
 </template>
 
@@ -20,6 +21,7 @@ import Page from "@/components/space/Page.vue";
 import DeletePage from "@/components/space/modal/DeletePage.vue";
 import CopyPage from "@/components/space/modal/CopyPage.vue";
 import MovePage from "@/components/space/modal/MovePage.vue";
+import Permissions from "@/components/space/modal/Permissions.vue";
 export default {
   name: "Space",
   components:{
@@ -27,7 +29,8 @@ export default {
     Page,
     DeletePage,
     CopyPage,
-    MovePage
+    MovePage,
+    Permissions
   },
   data() {
     return {

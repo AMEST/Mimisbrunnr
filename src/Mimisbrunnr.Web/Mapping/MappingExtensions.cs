@@ -14,7 +14,7 @@ public static class MappingExtensions
     {
         var user = new UserInfo
         {
-            Email = principal.FindFirst(ClaimTypes.Email)?.Value ?? principal.FindFirst("email")?.Value,
+            Email = principal.FindFirst(ClaimTypes.Email)?.Value?.ToLower() ?? principal.FindFirst("email")?.Value?.ToLower(),
             Name = principal.Identity?.Name,
             AvatarUrl = principal.FindFirst("picture")?.Value
         };
@@ -36,7 +36,7 @@ public static class MappingExtensions
     {
         return new UserInfo()
         {
-            Email = model.Email,
+            Email = model.Email.ToLower(),
             Name = model.Name,
             AvatarUrl = model.AvatarUrl
         };
