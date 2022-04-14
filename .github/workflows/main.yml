@@ -1,11 +1,11 @@
 name: Mimisbrunnr Build
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     tags:
       - v*
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   publish:
@@ -21,4 +21,4 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         target: app
         tag_with_ref: true
-        push: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/') }}
+        push: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
