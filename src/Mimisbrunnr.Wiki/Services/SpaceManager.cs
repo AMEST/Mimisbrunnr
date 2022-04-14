@@ -16,32 +16,32 @@ internal class SpaceManager : ISpaceManager
 
     public Task<Space[]> GetAll()
     {
-        return Task.FromResult(_spaceRepository.GetAll().ToArray());
+        return Task.Factory.StartNew(() =>_spaceRepository.GetAll().ToArray(), TaskCreationOptions.LongRunning);
     }
 
     public Task<Space> GetById(string id)
     {
-        return Task.FromResult(_spaceRepository.GetAll().SingleOrDefault(x => x.Id == id));
+        return Task.Factory.StartNew(() =>_spaceRepository.GetAll().SingleOrDefault(x => x.Id == id), TaskCreationOptions.LongRunning);
     }
 
     public Task<Space> GetByKey(string key)
     {
-        return Task.FromResult(_spaceRepository.GetAll().SingleOrDefault(x => x.Key == key.ToUpper()));
+        return Task.Factory.StartNew(() =>_spaceRepository.GetAll().SingleOrDefault(x => x.Key == key.ToUpper()), TaskCreationOptions.LongRunning);
     }
 
-    public Task<Space> FindPersonalSpace(UserInfo user)
+    public async Task<Space> FindPersonalSpace(UserInfo user)
     {
-        var personalSpace = _spaceRepository.GetAll().FirstOrDefault(
+        var personalSpace = await Task.Factory.StartNew(() =>_spaceRepository.GetAll().FirstOrDefault(
             x => x.Type != SpaceType.Personal && x.Type != SpaceType.Public
                  && x.Permissions.Any(p => p.IsAdmin && p.User != null && p.User.Email == user.Email)
-        );
-        return Task.FromResult(personalSpace);
+        ), TaskCreationOptions.LongRunning);
+        return personalSpace;
     }
 
     public Task<Space[]> FindByName(string name)
     {
-        return Task.FromResult(_spaceRepository.GetAll()
-            .Where(x => x.Name.Contains(name, StringComparison.OrdinalIgnoreCase)).ToArray());
+        return Task.Factory.StartNew(() =>_spaceRepository.GetAll()
+            .Where(x => x.Name.Contains(name, StringComparison.OrdinalIgnoreCase)).ToArray(), TaskCreationOptions.LongRunning);
     }
 
     public async Task<Space> Create(string key, string name, string description, SpaceType type, UserInfo owner)
