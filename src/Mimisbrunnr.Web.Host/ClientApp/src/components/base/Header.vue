@@ -56,6 +56,18 @@
                 :src="$store.state.application.profile.avatarUrl"
               ></b-avatar>
             </template>
+            <b-dropdown-text style="width: 240px">
+              Signed as
+              <span class="username">{{
+                $store.state.application.profile.name
+              }}</span>
+            </b-dropdown-text>
+            <b-dropdown-divider></b-dropdown-divider>
+            <b-dropdown-item
+              @click="goToPersonalSpace"
+              >Personal space</b-dropdown-item
+            >
+            <b-dropdown-divider></b-dropdown-divider>
             <b-dropdown-item
               :to="'/profile/' + $store.state.application.profile.email"
               >Profile</b-dropdown-item
@@ -83,6 +95,10 @@ export default {
       var splited = this.$store.state.application.profile.name.split(" ");
       if (splited.length > 1) return splited[0][0] + splited[1][0];
       return splited[0][0];
+    },
+    goToPersonalSpace: async function(){
+      var personalSpaceKey = await this.getOrCreatePersonalSpace();
+      this.$router.push("/space/"+personalSpaceKey);
     },
     create: async function () {
       var spaceKey = this.$route.params.key;
@@ -189,5 +205,8 @@ export default {
 }
 .avatar-bg .b-avatar-img img {
   background-color: var(--bs-body-bg);
+}
+.username {
+  font-weight: bold;
 }
 </style>
