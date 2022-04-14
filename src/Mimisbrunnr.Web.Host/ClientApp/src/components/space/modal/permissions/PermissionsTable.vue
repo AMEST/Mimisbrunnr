@@ -124,9 +124,6 @@ export default {
         await this.actionCallBack();
     },
   },
-  mounted: async function () {
-    console.log(this.permissions);
-  },
 };
 </script>
 

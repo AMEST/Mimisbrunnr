@@ -28,7 +28,7 @@
     </div>
     <div role="group" v-if="space.type != 'Personal'">
       <label>Space private type:</label>
-      <b-form-checkbox v-model="public"
+      <b-form-checkbox v-model="this.public"
         >&nbsp;Is public space?</b-form-checkbox
       >
       <b-form-text>Allow visible space to all users </b-form-text>

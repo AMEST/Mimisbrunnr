@@ -140,6 +140,7 @@ export default {
             "\n" +
             createPersonalSpaceRequest.data
         );
+        // eslint-disable-next-line
         throw new Exception();
       }
       return personalSpaceKey;
