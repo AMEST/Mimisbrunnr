@@ -4,6 +4,7 @@
     id="page-copy-modal"
     centered
     title="Copy page"
+    hide-header-close
   >
     <div role="group">
       <label>Destination type:</label>

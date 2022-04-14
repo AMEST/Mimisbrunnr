@@ -34,7 +34,7 @@ internal class SpaceService : ISpaceService
             return spaces.Where(x => x.Type == SpaceType.Public).Select(x => x.ToModel()).ToArray();
 
         var user = await _userManager.GetByEmail(requestedBy.Email);
-        if(user.Role == UserRole.Admin)
+        if (user.Role == UserRole.Admin)
             return spaces.ToList().Select(x => x.ToModel()).ToArray();
 
         var visibleSpaces = new List<SpaceModel>();
@@ -72,8 +72,8 @@ internal class SpaceService : ISpaceService
             return new UserPermissionModel() { CanView = true };
 
         var user = await _userManager.GetByEmail(requestedBy.Email);
-        if(user.Role == UserRole.Admin)
-            return new  UserPermissionModel() { CanView = true, CanEdit = true, CanRemove = true, IsAdmin = true };
+        if (user.Role == UserRole.Admin)
+            return new UserPermissionModel() { CanView = true, CanEdit = true, CanRemove = true, IsAdmin = true };
 
         var space = await _spaceManager.GetByKey(key);
         EnsureSpaceExists(space);
@@ -81,8 +81,8 @@ internal class SpaceService : ISpaceService
         var userGroups = await GetUserGroups(requestedBy);
         var userPermission = FindPermission(space.Permissions.ToArray(), requestedBy, userGroups);
 
-        if(userPermission == null)
-            return new UserPermissionModel(){CanView = space.Type == SpaceType.Public};
+        if (userPermission == null)
+            return new UserPermissionModel() { CanView = space.Type == SpaceType.Public };
 
         return userPermission.ToModel();
     }
@@ -165,6 +165,11 @@ internal class SpaceService : ISpaceService
 
         space.Name = model.Name;
         space.Description = model.Description;
+        if (space.Type != SpaceType.Personal && model.Public is not null)
+        {
+            space.Type = model.Public.Value ? SpaceType.Public : SpaceType.Private;
+        }
+
         await _spaceManager.Update(space);
     }
 
@@ -212,7 +217,7 @@ internal class SpaceService : ISpaceService
 
     private static void EnsureSpaceExists(Space space)
     {
-        if(space == null)
+        if (space == null)
             throw new SpaceNotFoundException();
     }
 

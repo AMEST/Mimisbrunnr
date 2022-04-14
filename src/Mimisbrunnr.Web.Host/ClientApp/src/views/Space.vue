@@ -1,9 +1,6 @@
 <template>
   <b-container v-if="loaded" fluid class="text-left">
-    <b-row v-if="error" class="h-100vh">
-      <h2>Space not found or user has no permissions</h2>
-    </b-row>
-    <b-row v-else class="h-100vh">
+    <b-row class="h-100vh">
       <Menu :space="space" :pageTree="pageTree" :userPermissions="userPermissions"/>
       <Page :page="page" :userPermissions="userPermissions"/>
     </b-row>
@@ -35,7 +32,6 @@ export default {
   data() {
     return {
       loaded: false,
-      error: false,
       space: null,
       page: null,
       userPermissions: null,
@@ -55,8 +51,7 @@ export default {
     loadSpace: async function () {
       var key = this.$route.params.key;
       if (key == null) {
-        this.loaded = true;
-        this.error = true;
+        this.$router.push("/error/notfound");
         return false;
       }
 
@@ -64,8 +59,7 @@ export default {
         validateStatus: false,
       });
       if (spacesRequest.status != 200) {
-        this.loaded = true;
-        this.error = true;
+        this.$router.push("/error/unauthorized");
         return false;
       }
 
@@ -75,8 +69,7 @@ export default {
         validateStatus: false,
       });
       if (spacesRequest.status != 200) {
-        this.loaded = true;
-        this.error = true;
+        this.$router.push("/error/unauthorized");
         return false;
       }
       this.userPermissions = permissionsRequest.data;
@@ -98,8 +91,7 @@ export default {
         validateStatus: false,
       });
       if (pageRequest.status != 200 || pageRequest.data.spaceKey != this.space.key) {
-        this.loaded = true;
-        this.error = true;
+        this.$router.push("/error/unknown");
         return false;
       }
 
@@ -118,8 +110,7 @@ export default {
         validateStatus: false,
       });
       if (pageTreeRequest.status != 200) {
-        this.loaded = true;
-        this.error = true;
+        this.$router.push("/error/unknown");
         return false;
       }
 

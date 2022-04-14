@@ -6,7 +6,9 @@ public class SpaceUpdateModel
 {
     [Required]
     public string Name { get; set; }
-    
+
     [Required]
     public string Description { get; set; }
+
+    public bool? Public { get; set; }
 }

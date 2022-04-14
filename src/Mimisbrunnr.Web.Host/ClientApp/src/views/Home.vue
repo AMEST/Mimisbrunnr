@@ -59,8 +59,17 @@ export default {
   methods: {
     switchMenu: function(){
       this.menuClosed = !this.menuClosed;
+      this.$store.commit('changeHomeMenuClose', this.menuClosed);
       document.getElementsByClassName('home-nav')[0].hidden = this.menuClosed;
     }
+  },
+  mounted: function(){
+    if(window.innerWidth > 860){
+      this.$store.commit('changeHomeMenuClose', false);
+      return;
+    }
+    this.menuClosed = this.$store.state.application.homeMenuClosed;
+    document.getElementsByClassName('home-nav')[0].hidden = this.menuClosed;
   }
 };
 </script>

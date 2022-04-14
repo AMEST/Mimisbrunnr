@@ -4,6 +4,7 @@
     id="page-move-modal"
     centered
     title="Move page"
+    hide-header-close
   >
     <div role="group">
       <label>Destination type:</label>

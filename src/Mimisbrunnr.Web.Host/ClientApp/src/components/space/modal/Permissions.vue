@@ -4,6 +4,7 @@
     centered
     size="lg"
     title="Space Permissions"
+    hide-header-close
   >
     <h6>Groups</h6>
     <permissions-table :permissions="permissions.filter( x=> x.group )" :type="'Group'" :actionCallBack="getPermissions"/>

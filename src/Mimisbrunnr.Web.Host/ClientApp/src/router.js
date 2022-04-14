@@ -16,42 +16,33 @@ export default new Router({
     {
       path: '/spaces',
       name: 'spaces',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import(/* webpackChunkName: "about" */ './views/SpaceDirectory.vue')
     },
     {
       path: '/space/:key',
       name: 'space',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import(/* webpackChunkName: "about" */ './views/Space.vue')
     },
     {
       path: '/space/:key/:pageId',
       name: 'page',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import(/* webpackChunkName: "about" */ './views/Space.vue')
     },
     {
       path: '/space/:key/:pageId/edit',
       name: 'pageEdit',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import(/* webpackChunkName: "about" */ './views/PageEdit.vue')
     },
     {
       path: '/profile/:email',
       name: 'profile',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import(/* webpackChunkName: "about" */ './views/Profile.vue')
+    }
+    ,
+    {
+      path: '/error/:err',
+      name: 'error',
+      component: () => import(/* webpackChunkName: "about" */ './views/Error.vue')
     }
   ]
 })

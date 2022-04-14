@@ -1,9 +1,6 @@
 <template>
   <b-container v-if="loaded" fluid class="full-size-container text-left">
-    <div v-if="error">
-      <h2>Page not found or user has no permissions</h2>
-    </div>
-    <div v-else class="h-100vh">
+    <div class="h-100vh">
       <b-form-input
         v-model="page.name"
         placeholder="PageName"
@@ -33,7 +30,6 @@ export default {
     return {
       page: { content: "" },
       loaded: false,
-      error: false,
       mdeConfig: {
         toolbar: [
           "bold",
@@ -71,8 +67,7 @@ export default {
         validateStatus: false,
       });
       if (pageRequest.status != 200) {
-        this.loaded = true;
-        this.error = true;
+        this.$router.push("/error/unauthorized");
         return;
       }
 

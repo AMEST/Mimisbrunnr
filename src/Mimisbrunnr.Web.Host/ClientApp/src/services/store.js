@@ -10,6 +10,7 @@ export default new Vuex.Store({
   state: {
     application: {
       profile: null,
+      homeMenuClosed: false,
       info: {
         title: 'Mimisbrunnr',
         allowAnonymous: false
@@ -33,6 +34,11 @@ export default new Vuex.Store({
     changeTheme(state, payload) {
       window.localStorage['theme'] = payload
       state.application.theme = payload
+    },
+    // eslint-disable-next-line
+    changeHomeMenuClose(state, payload) {
+      window.localStorage['homeMenuClosed'] = JSON.stringify(payload)
+      state.application.homeMenuClosed = payload
     },
     // eslint-disable-next-line
     clearProfile(state) {

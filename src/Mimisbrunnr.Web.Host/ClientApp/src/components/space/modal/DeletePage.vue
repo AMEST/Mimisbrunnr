@@ -1,5 +1,5 @@
 <template>
-  <b-modal @shown="onShow" id="page-delete-modal" centered title="Are you shure delete page?">
+  <b-modal @shown="onShow" id="page-delete-modal" centered title="Are you shure delete page?" hide-header-close>
     <b-form-checkbox v-model="recursive">&nbsp;Delete page and all children</b-form-checkbox>
     <template #modal-footer >
         <div align="right">

@@ -14,7 +14,7 @@ public class Space : IHasId<string>
     
     public string HomePageId { get; internal set; }
     
-    public SpaceType Type { get; internal set; }
+    public SpaceType Type { get; set; }
     
     public SpaceStatus Status { get; internal set; }
 

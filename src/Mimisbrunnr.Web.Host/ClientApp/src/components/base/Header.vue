@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-navbar toggleable="sm" type="dark" variant="primary">
-      <b-container>
+      <b-container fluid>
         <b-navbar-brand to="/">{{
           this.$store.state.application.info.title
         }}</b-navbar-brand>

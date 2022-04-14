@@ -28,6 +28,12 @@ if (recentlyVisited !== undefined) {
     store.commit('addToHistory', element)
   })
 }
+// Restore Home menu close state
+var homeMenuClosed = window.localStorage['homeMenuClosed']
+if (homeMenuClosed !== undefined) {
+  var parsedHomeMenuClosed = JSON.parse(homeMenuClosed)
+  store.commit('changeHomeMenuClose', parsedHomeMenuClosed)
+}
 var applicationInfoTask = axios.get('/api/quickstart').then(result => {
   if (result.data == null || result.status !== 200) {
     return
