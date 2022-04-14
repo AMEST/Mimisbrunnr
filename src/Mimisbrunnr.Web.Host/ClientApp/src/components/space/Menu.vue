@@ -19,7 +19,7 @@
         <b-list-group-item v-b-modal.space-permissions-modal v-if="userPermissions.isAdmin">
           <b-icon icon="shield-lock-fill" />&nbsp; Permissions
         </b-list-group-item>
-        <b-list-group-item href="#" v-if="userPermissions.isAdmin">
+        <b-list-group-item v-b-modal.space-settings-modal v-if="userPermissions.isAdmin">
           <b-icon icon="gear-fill" />&nbsp; Settings
         </b-list-group-item>
       </b-list-group>
