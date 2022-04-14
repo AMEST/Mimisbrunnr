@@ -42,6 +42,7 @@ var applicationInfoTask = axios.get('/api/quickstart').then(result => {
   document.title = result.data.title
 })
 
+// eslint-disable-next-line
 Promise.all([applicationInfoTask]).then(result => {
   new Vue({
     store,
