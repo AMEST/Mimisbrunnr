@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
-using Mimisbrunner.Users;
+using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Mapping;
 
 namespace Mimisbrunnr.Web.Host.Services;

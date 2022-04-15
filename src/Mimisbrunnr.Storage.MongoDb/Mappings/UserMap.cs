@@ -1,4 +1,4 @@
-﻿using Mimisbrunner.Users;
+﻿using Mimisbrunnr.Users;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Serializers;
 using Skidbladnir.Repository.MongoDB;

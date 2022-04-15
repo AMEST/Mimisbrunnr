@@ -1,4 +1,4 @@
-﻿namespace Mimisbrunner.Users;
+﻿namespace Mimisbrunnr.Users;
 
 public enum UserRole
 {

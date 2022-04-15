@@ -1,4 +1,4 @@
-﻿using Mimisbrunner.Users;
+﻿using Mimisbrunnr.Users;
 using Skidbladnir.Repository.MongoDB;
 
 namespace Mimisbrunnr.Storage.MongoDb.Mappings;
