@@ -1,5 +1,5 @@
 [![Mimisbrunnr Build](https://github.com/AMEST/Mimisbrunnr/actions/workflows/main.yml/badge.svg)](https://github.com/AMEST/Mimisbrunnr/actions/workflows/main.yml)
-![hub.docker.com](https://img.shields.io/docker/pulls/eluki/mimisbrunnr.svg)
+![hub.docker.com](https://img.shields.io/docker/pulls/eluki/mimisbrunnr-wiki.svg)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/amest/Mimisbrunnr)
 ![GitHub](https://img.shields.io/github/license/amest/Mimisbrunnr)
 
@@ -7,7 +7,7 @@
 
 ## Links
 * **[Try Mimisbrunnr](https://wiki.nb-47.ml)**  
-* **[Docker image](https://hub.docker.com/r/eluki/mimisbrunnr)**
+* **[Docker image](https://hub.docker.com/r/eluki/mimisbrunnr-wiki)**
 
 ## Description
 
