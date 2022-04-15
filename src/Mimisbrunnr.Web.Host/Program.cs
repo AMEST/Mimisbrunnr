@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.SpaServices;
 using Mimisbrunnr.Storage.MongoDb;
 using Mimisbrunnr.Web.Host;
@@ -17,7 +18,15 @@ builder.Services.AddSkidbladnirModules<StartupModule>(configuration =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-app.UseForwardedHeaders();
+var forwardedHeadersOptions = new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+    RequireHeaderSymmetry = false
+};
+forwardedHeadersOptions.KnownNetworks.Clear();
+forwardedHeadersOptions.KnownProxies.Clear();
+
+app.UseForwardedHeaders(forwardedHeadersOptions);
 
 if (app.Environment.IsDevelopment())
 {
@@ -35,13 +44,16 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapToVueCliProxy(
-    "{*path}",
-    new SpaOptions { SourcePath = "ClientApp"},
-    npmScript: "serve",
-    regex: "Compiled successfully",
-    forceKill: true
-);
+if (app.Environment.IsDevelopment())
+{
+    app.MapToVueCliProxy(
+        "{*path}",
+        new SpaOptions { SourcePath = "ClientApp"},
+        npmScript: "serve",
+        regex: "Compiled successfully",
+        forceKill: true
+    );
+}
 
 app.UseSpa(spa =>
 {
