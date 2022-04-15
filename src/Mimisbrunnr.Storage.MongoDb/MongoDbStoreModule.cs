@@ -126,17 +126,6 @@ public class MongoDbStoreModule : RunnableModule
         {
             Background = true
         }));
-        
-        var descripionSpaceFullTextSearch = Builders<Space>.IndexKeys.Text(x=>x.Description);
-        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Space>(descripionSpaceFullTextSearch, new CreateIndexOptions()
-        {
-            Background = true
-        }));
-        var descripionAndNameSpaceFullTextSearch = Builders<Space>.IndexKeys.Text(x=>x.Description).Text(x=>x.Name);
-        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Space>(descripionSpaceFullTextSearch, new CreateIndexOptions()
-        {
-            Background = true
-        }));
     }
 
     private async Task CreatePageIndexes(IMongoDbContext mongoContext)
@@ -155,18 +144,6 @@ public class MongoDbStoreModule : RunnableModule
 
         var nameKeyDefinition = Builders<Page>.IndexKeys.Ascending(x => x.Name);
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<Page>(nameKeyDefinition, new CreateIndexOptions()
-        {
-            Background = true
-        }));
-
-        var contentFullTextSearch = Builders<Page>.IndexKeys.Text(x => x.Content);
-        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Page>(contentFullTextSearch, new CreateIndexOptions()
-        {
-            Background = true
-        }));
-
-        var titleFullTextSearch = Builders<Page>.IndexKeys.Text(x => x.Name);
-        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Page>(titleFullTextSearch, new CreateIndexOptions()
         {
             Background = true
         }));
