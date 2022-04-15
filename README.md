@@ -6,7 +6,7 @@
 # Mimisbrunnr - wiki system (like confluence)
 
 ## Links
-* **[Try Mimisbrunnr](https://peer-meeting.nb-47.ml)**  
+* **[Try Mimisbrunnr](https://wiki.nb-47.ml)**  
 * **[Docker image](https://hub.docker.com/r/eluki/mimisbrunnr)**
 
 ## Description
