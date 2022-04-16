@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimisbrunnr.Wiki", "src\Mim
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimisbrunnr.Storage.MongoDb", "src\Mimisbrunnr.Storage.MongoDb\Mimisbrunnr.Storage.MongoDb.csproj", "{08E5C5D6-4920-4016-89B8-9BD83022580C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimisbrunner.Users", "src\Mimisbrunner.Users\Mimisbrunner.Users.csproj", "{C69EC431-9F8E-4368-AC2C-D1DC8B930573}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimisbrunnr.Users", "src\Mimisbrunnr.Users\Mimisbrunnr.Users.csproj", "{C69EC431-9F8E-4368-AC2C-D1DC8B930573}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimisbrunnr.Web.Infrastructure", "src\Mimisbrunnr.Web.Infrastructure\Mimisbrunnr.Web.Infrastructure.csproj", "{425CCCC9-EDF8-49A5-86CD-B5E268B47C36}"
 EndProject

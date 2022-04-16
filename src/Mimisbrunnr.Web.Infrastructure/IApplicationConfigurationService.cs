@@ -1,4 +1,4 @@
-﻿using Mimisbrunner.Users;
+﻿using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Infrastructure.Contracts;
 
 namespace Mimisbrunnr.Web.Infrastructure;

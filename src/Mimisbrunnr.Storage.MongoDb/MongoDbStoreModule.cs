@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Mimisbrunner.Users;
+using Mimisbrunnr.Users;
 using Mimisbrunnr.Storage.MongoDb.Mappings;
 using Mimisbrunnr.Web.Infrastructure.Contracts;
 using Mimisbrunnr.Wiki.Contracts;

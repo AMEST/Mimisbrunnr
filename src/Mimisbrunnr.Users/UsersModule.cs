@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Skidbladnir.Modules;
 
-namespace Mimisbrunner.Users;
+namespace Mimisbrunnr.Users;
 
 public class UsersModule : Module
 {

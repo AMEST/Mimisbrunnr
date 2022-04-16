@@ -1,6 +1,6 @@
 ﻿using Skidbladnir.Repository.Abstractions;
 
-namespace Mimisbrunner.Users;
+namespace Mimisbrunnr.Users;
 
 public class UserGroup : IHasId<string>
 {

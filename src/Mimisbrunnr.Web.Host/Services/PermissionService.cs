@@ -1,4 +1,4 @@
-﻿using Mimisbrunner.Users;
+﻿using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Web.Wiki;
@@ -123,7 +123,7 @@ internal class PermissionService : IPermissionService
             throw new UserHasNotPermissionException();
     }
 
-    private async Task<Group[]> GetUserGroups(Mimisbrunner.Users.User user)
+    private async Task<Group[]> GetUserGroups(Mimisbrunnr.Users.User user)
     {
         var userGroups = await _userGroupManager.GetUserGroups(user);
         return userGroups;

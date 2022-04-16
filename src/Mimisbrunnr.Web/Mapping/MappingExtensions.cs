@@ -82,7 +82,7 @@ public static class MappingExtensions
         };
     }
 
-        public static UserModel ToModel(this Mimisbrunner.Users.User user)
+        public static UserModel ToModel(this Mimisbrunnr.Users.User user)
     {
         return new UserModel()
         {
