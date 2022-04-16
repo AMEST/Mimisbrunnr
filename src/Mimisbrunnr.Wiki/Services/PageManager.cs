@@ -26,7 +26,18 @@ internal class PageManager : IPageManager
     public async Task<Page[]> GetAllChilds(Page page)
     {
         var flatChildsList = new List<Page>();
-        var childs = await Task.Factory.StartNew(() =>_pageRepository.GetAll().Where(x => x.ParentId == page.Id).ToList(), TaskCreationOptions.LongRunning);
+        var childs = await Task.Factory.StartNew(() =>
+        _pageRepository
+            .GetAll()
+            .Where(x => x.ParentId == page.Id)
+            .Select(x => new Page{
+                Id = x.Id,
+                ParentId = x.ParentId,
+                SpaceId = x.SpaceId,
+                Name = x.Name
+            })
+            .ToList()
+        , TaskCreationOptions.LongRunning);
         flatChildsList.AddRange(childs);
         foreach (var child in childs)
         {

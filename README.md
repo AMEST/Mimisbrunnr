@@ -22,3 +22,34 @@ Support for the following features:
 4. Markdown page editor (with the ability to insert html code)
 5. Copy / move pages
 6. Tree of pages
+
+
+## Get started
+
+### Configuration
+
+All configuration may be configured in `appsettings.json` or in Environment variables
+
+#### Authentication
+
+* `Openid:Authority` - openid authority (example: `https://accounts.google.com`)
+* `Openid:ClientId` - client id in openid provider 
+* `Openid:ClientSecret` - client secret in openid provider 
+* `Openid:ResponseType` - oidc authentication response type (example: `code`)
+* `Openid:Scope` - array with oidc scope requested when authenticate. By default in index 0,1,2 values ("openid","profile","email") 
+
+#### Database
+
+Mimisbrunnr use MongoDB as persistent data storage.
+
+*  `Storage:ConnectionString` - mongo connection string (example: `mongodb://app:password@localhost/mimisbrunnr?authSource=admin`)
+
+#### Caching
+
+For better responsiveness of the service, caching is used. The service supports several caching modes:
+1. In memory - suitable for working in only 1 copy, or for development. (DO NOT RECOMMEND USING THIS TYPE FOR 2 or more service instances)
+2. In MongoDB - does not give a special performance boost, but allows you to cache aggregated data without making many queries each time (for example, the space page tree is quite hard to calculate)
+3. In Redis - the most productive and recommended mode.
+
+* `Caching:Type` - cache type (`Memory`, `MongoDb`, `Redis`)
+* `Caching:RedisConnectionString` - connection string for Redis cache type
