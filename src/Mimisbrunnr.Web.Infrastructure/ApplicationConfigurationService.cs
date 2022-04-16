@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Mimisbrunnr.Users;
+using Microsoft.Extensions.Caching.Distributed;
+using Mimisbrunner.Users;
 using Mimisbrunnr.Web.Infrastructure.Contracts;
 using Skidbladnir.Repository.Abstractions;
 
@@ -8,17 +8,18 @@ namespace Mimisbrunnr.Web.Infrastructure;
 internal class ApplicationConfigurationService : IApplicationConfigurationService
 {
     private const string ConfigurationCacheKey = "ApplicationConfigurationCache";
+    private readonly TimeSpan _defaultCacheTime = TimeSpan.FromMinutes(10);
     private readonly IRepository<ApplicationConfiguration> _repository;
     private readonly IUserManager _userManager;
-    private readonly IMemoryCache _memoryCache;
+    private readonly IDistributedCache _distributedCache;
 
     public ApplicationConfigurationService(IRepository<ApplicationConfiguration> repository, 
         IUserManager userManager,
-        IMemoryCache memoryCache)
+        IDistributedCache distributedCache)
     {
         _repository = repository;
         _userManager = userManager;
-        _memoryCache = memoryCache;
+        _distributedCache = distributedCache;
     }
     
     public async Task Initialize(ApplicationConfiguration configuration, User initializedBy)
@@ -37,17 +38,18 @@ internal class ApplicationConfigurationService : IApplicationConfigurationServic
         return configuration is not null;
     }
 
-    public Task<ApplicationConfiguration> Get()
+    public async Task<ApplicationConfiguration> Get()
     {
-        if(_memoryCache.TryGetValue(ConfigurationCacheKey, out ApplicationConfiguration configuration ))
-            return Task.FromResult(configuration);
+        var configuration = await _distributedCache.GetAsync<ApplicationConfiguration>(ConfigurationCacheKey);
+        if(configuration is not null)
+            return configuration;
         
         configuration = _repository.GetAll().SingleOrDefault();
         if(configuration == null)
-            return Task.FromResult<ApplicationConfiguration>(null);
+            return null;
 
-        _memoryCache.Set(ConfigurationCacheKey, configuration, TimeSpan.FromMinutes(5));
-        return Task.FromResult(configuration);
+        await _distributedCache.SetAsync(ConfigurationCacheKey, configuration, new DistributedCacheEntryOptions(){ AbsoluteExpirationRelativeToNow = _defaultCacheTime});
+        return configuration;
     }
 
     public async Task Configure(ApplicationConfiguration configuration)
@@ -56,6 +58,6 @@ internal class ApplicationConfigurationService : IApplicationConfigurationServic
         if (!isInitialized)
             throw new InvalidOperationException("Mimisbrunner not initialized");
         await _repository.Update(configuration);
-        _memoryCache.Remove(ConfigurationCacheKey);
+        await _distributedCache.RemoveAsync(ConfigurationCacheKey);
     }
 }

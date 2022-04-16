@@ -1,10 +1,11 @@
-﻿using System;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Caching.Distributed;
 using Mimisbrunnr.Storage.MongoDb;
+using Mimisbrunnr.Web.Host.Configuration;
 using Mimisbrunnr.Web.Host.Services;
 using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Wiki;
+using Skidbladnir.Caching.Distributed.MongoDB;
 using Skidbladnir.DataProtection.MongoDb;
 using Skidbladnir.Modules;
 
@@ -23,5 +24,26 @@ public class StartupModule : Module
         services.AddDataProtectionMongoDb(mongoStoreConfiguration.ConnectionString);
         services.AddSingleton<IAuthorizationHandler, EnsureUserAuthorizationHandler>();
         services.AddSingleton<IPermissionService, PermissionService>();
+        ConfigureDistributedCache(services);
+    }
+
+    private void ConfigureDistributedCache(IServiceCollection services)
+    {
+        var cacheConfiguration = Configuration.Get<CachingConfiguration>();
+        switch (cacheConfiguration.Type)
+        {
+            case CachingType.MongoDb:
+                services.UseMongoDistributedCache();
+                break;
+            case CachingType.Redis:
+                if (string.IsNullOrEmpty(cacheConfiguration.RedisConnectionString))
+                    throw new ArgumentNullException(nameof(cacheConfiguration.RedisConnectionString));
+                services.AddStackExchangeRedisCache(c => c.Configuration = cacheConfiguration.RedisConnectionString)
+                        .Decorate<IDistributedCache, RedisCacheFallbackDecorator>();
+                break;
+            default:
+                services.AddDistributedMemoryCache();
+                break;
+        }
     }
 }

@@ -1,47 +1,72 @@
-﻿using Skidbladnir.Repository.Abstractions;
+﻿using Microsoft.Extensions.Caching.Distributed;
+using Mimisbrunnr.Users.Services;
+using Skidbladnir.Repository.Abstractions;
 
 namespace Mimisbrunnr.Users;
 
 internal class UserManager : IUserManager
 {
+    private readonly TimeSpan _defaultCacheTime = TimeSpan.FromMinutes(10);
     private readonly IRepository<User> _userRepository;
+    private readonly IDistributedCache _distributedCache;
 
-    public UserManager(IRepository<User> userRepository)
+    public UserManager(IRepository<User> userRepository, IDistributedCache distributedCache)
     {
         _userRepository = userRepository;
+        _distributedCache = distributedCache;
     }
     
-    public Task<User> GetByEmail(string email)
+    public async Task<User> GetByEmail(string email)
     {
-        return Task.FromResult(_userRepository.GetAll().FirstOrDefault(x => x.Email == email.ToLower()));
+        var user = await _distributedCache.GetAsync<User>(GetUserCacheKey(email));
+        if( user is not null)
+            return user;
+
+        user = _userRepository.GetAll().FirstOrDefault(x => x.Email == email.ToLower());
+        if(user is null)
+            return user;
+
+        await _distributedCache.SetAsync(GetUserCacheKey(email), user, new DistributedCacheEntryOptions(){
+            AbsoluteExpirationRelativeToNow = _defaultCacheTime
+        });
+        return user;
     }
 
-    public Task Add(string email, string name, string avatarUrl, UserRole role)
+    public async Task Add(string email, string name, string avatarUrl, UserRole role)
     {
-        return _userRepository.Create(new User()
+        var user = new User()
         {
             Email = email.ToLower(),
             Name = name,
             AvatarUrl = avatarUrl,
             Role = role
+        };
+        await _userRepository.Create(user);
+        await _distributedCache.SetAsync(GetUserCacheKey(email), user, new DistributedCacheEntryOptions(){
+            AbsoluteExpirationRelativeToNow = _defaultCacheTime
         });
     }
 
-    public Task Disable(User user)
+    public async Task Disable(User user)
     {
         user.Enable = false;
-        return _userRepository.Update(user);
+        await _userRepository.Update(user);
+        await _distributedCache.RemoveAsync(GetUserCacheKey(user.Email));
     }
 
-    public Task Enable(User user)
+    public async Task Enable(User user)
     {
         user.Enable = true;
-        return _userRepository.Update(user);
+        await _userRepository.Update(user);
+        await _distributedCache.RemoveAsync(GetUserCacheKey(user.Email));
     }
 
-    public Task ChangeRole(User user, UserRole role)
+    public async Task ChangeRole(User user, UserRole role)
     {
         user.Role = role;
-        return _userRepository.Update(user);
+        await _userRepository.Update(user);
+        await _distributedCache.RemoveAsync(GetUserCacheKey(user.Email));
     }
+
+    private static string GetUserCacheKey(string email) => $"user_cache_{email.ToLower()}";
 }

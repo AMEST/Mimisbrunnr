@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.SpaServices;
 using Mimisbrunnr.Storage.MongoDb;
 using Mimisbrunnr.Web.Host;
+using Mimisbrunnr.Web.Host.Configuration;
 using Skidbladnir.Modules;
 using VueCliMiddleware;
 
@@ -12,6 +13,8 @@ builder.Services.AddSkidbladnirModules<StartupModule>(configuration =>
 {
     var mongoConfig = builder.Configuration.GetSection("Storage").Get<MongoDbStoreModuleConfiguration>();
     configuration.Add(mongoConfig);
+    var cachingConfiguration = builder.Configuration.GetSection("Caching").Get<CachingConfiguration>();
+    configuration.Add(cachingConfiguration);
 }, builder.Configuration);
 
 

@@ -1,4 +1,5 @@
-﻿using Mimisbrunnr.Web.Mapping;
+﻿using Microsoft.Extensions.Caching.Distributed;
+using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;
@@ -7,24 +8,28 @@ namespace Mimisbrunnr.Web.Wiki;
 
 internal class PageService : IPageService
 {
+    private readonly TimeSpan _defaultCacheTime = TimeSpan.FromMinutes(10);
     private readonly IPageManager _pageManager;
     private readonly ISpaceManager _spaceManager;
     private readonly IPermissionService _permissionService;
+    private readonly IDistributedCache _distributedCache;
 
     public PageService(IPageManager pageManager,
         ISpaceManager spaceManager,
-        IPermissionService permissionService
+        IPermissionService permissionService,
+        IDistributedCache distributedCache
     )
     {
         _pageManager = pageManager;
         _spaceManager = spaceManager;
         _permissionService = permissionService;
+        _distributedCache = distributedCache;
     }
 
     public async Task<PageModel> GetById(string pageId, UserInfo requestedBy)
     {
         await _permissionService.EnsureAnonymousAllowed(requestedBy);
-        
+
         var page = await _pageManager.GetById(pageId);
         if (page == null)
             throw new PageNotFountException();
@@ -37,16 +42,25 @@ internal class PageService : IPageService
     public async Task<PageTreeModel> GetPageTreeByPageId(string pageId, UserInfo requestedBy)
     {
         await _permissionService.EnsureAnonymousAllowed(requestedBy);
-        
+
+        var cachedPageTree = await _distributedCache.GetAsync<PageTreeModel>(GetPageTreeCacheKey(pageId));
+        if (cachedPageTree is not null)
+            return cachedPageTree;
+
         var page = await _pageManager.GetById(pageId);
-        if (page == null)
+        if (page is null)
             throw new PageNotFountException();
         var space = await _spaceManager.GetById(page.SpaceId);
 
         await _permissionService.EnsureViewPermission(space.Key, requestedBy);
         var pageTree = await _pageManager.GetAllChilds(page);
-        
-        return pageTree?.ToModel(page, space);
+
+        var pageTreeModel = pageTree?.ToModel(page, space);
+        if (pageTreeModel is not null)
+            await _distributedCache.SetAsync(GetPageTreeCacheKey(pageId), pageTreeModel, new DistributedCacheEntryOptions() {
+                 AbsoluteExpirationRelativeToNow = _defaultCacheTime
+                 });
+        return pageTreeModel;
     }
 
     public async Task<PageModel> Create(PageCreateModel createModel, UserInfo createdBy)
@@ -63,6 +77,8 @@ internal class PageService : IPageService
         var page = await _pageManager.Create(space.Id, createModel.Name, createModel.Content, createdBy,
             createModel.ParentPageId);
         
+        await _distributedCache.RemoveAsync(GetPageTreeCacheKey(space.HomePageId));
+
         return page.ToModel(space.Key);
     }
 
@@ -71,7 +87,7 @@ internal class PageService : IPageService
         var page = await _pageManager.GetById(pageId);
         if (page == null)
             throw new PageNotFountException();
-        
+
         var space = await _spaceManager.GetById(page.SpaceId);
         if (space == null)
             throw new SpaceNotFoundException();
@@ -82,6 +98,7 @@ internal class PageService : IPageService
         page.Content = updateModel.Content;
 
         await _pageManager.Update(page, updatedBy);
+        await _distributedCache.RemoveAsync(GetPageTreeCacheKey(space.HomePageId));
     }
 
     public async Task Delete(string pageId, UserInfo deletedBy, bool recursively)
@@ -89,7 +106,7 @@ internal class PageService : IPageService
         var page = await _pageManager.GetById(pageId);
         if (page == null)
             throw new PageNotFountException();
-        
+
         var space = await _spaceManager.GetById(page.SpaceId);
         if (space == null)
             throw new SpaceNotFoundException();
@@ -100,6 +117,7 @@ internal class PageService : IPageService
             throw new InvalidOperationException("Cannot remove home page of space");
 
         await _pageManager.Remove(page, recursively);
+        await _distributedCache.RemoveAsync(GetPageTreeCacheKey(space.HomePageId));
     }
 
     public async Task<PageModel> Copy(string sourcePageId, string destinationParentPageId, UserInfo copiedBy)
@@ -107,15 +125,15 @@ internal class PageService : IPageService
         var sourcePage = await _pageManager.GetById(sourcePageId);
         if (sourcePage == null)
             throw new PageNotFountException($"Source page with id `{sourcePageId}` not found");
-        
+
         var destinationParentPage = await _pageManager.GetById(destinationParentPageId);
         if (destinationParentPage == null)
             throw new PageNotFountException($"Destination parent page with id `{destinationParentPageId}` not found");
-        
+
         var sourceSpace = await _spaceManager.GetById(sourcePage.SpaceId);
-        
+
         await _permissionService.EnsureEditPermission(sourceSpace.Key, copiedBy);
-        
+
         var destinationSpace = sourcePage.SpaceId == destinationParentPage.SpaceId
             ? sourceSpace
             : await _spaceManager.GetById(destinationParentPage.SpaceId);
@@ -123,7 +141,11 @@ internal class PageService : IPageService
             await _permissionService.EnsureEditPermission(destinationSpace.Key, copiedBy);
 
         var copiedPage = await _pageManager.Copy(sourcePage, destinationParentPage);
-        
+
+        await _distributedCache.RemoveAsync(GetPageTreeCacheKey(sourceSpace.HomePageId));
+        if(!sourcePage.Id.Equals(destinationSpace.Id))
+            await _distributedCache.RemoveAsync(GetPageTreeCacheKey(destinationSpace.HomePageId));
+
         return copiedPage.ToModel(destinationSpace.Key);
     }
 
@@ -132,15 +154,15 @@ internal class PageService : IPageService
         var sourcePage = await _pageManager.GetById(sourcePageId);
         if (sourcePage == null)
             throw new PageNotFountException($"Source page with id `{sourcePageId}` not found");
-        
+
         var destinationParentPage = await _pageManager.GetById(destinationParentPageId);
         if (destinationParentPage == null)
             throw new PageNotFountException($"Destination parent page with id `{destinationParentPageId}` not found");
-        
+
         var sourceSpace = await _spaceManager.GetById(sourcePage.SpaceId);
-        
+
         await _permissionService.EnsureEditPermission(sourceSpace.Key, movedBy);
-        
+
         var destinationSpace = sourcePage.SpaceId == destinationParentPage.SpaceId
             ? sourceSpace
             : await _spaceManager.GetById(destinationParentPage.SpaceId);
@@ -152,6 +174,12 @@ internal class PageService : IPageService
 
         var movedPage = await _pageManager.Move(sourcePage, destinationParentPage);
 
+        await _distributedCache.RemoveAsync(GetPageTreeCacheKey(sourceSpace.HomePageId));
+        if(!sourcePage.Id.Equals(destinationSpace.Id))
+            await _distributedCache.RemoveAsync(GetPageTreeCacheKey(destinationSpace.HomePageId));
+
         return movedPage.ToModel(destinationSpace.Key);
     }
+
+    private static string GetPageTreeCacheKey(string pageId) => $"page_tree_{pageId}";
 }
