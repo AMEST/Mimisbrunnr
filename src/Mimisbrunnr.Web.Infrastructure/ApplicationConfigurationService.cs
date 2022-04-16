@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Caching.Distributed;
-using Mimisbrunner.Users;
+using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Infrastructure.Contracts;
 using Skidbladnir.Repository.Abstractions;
 
