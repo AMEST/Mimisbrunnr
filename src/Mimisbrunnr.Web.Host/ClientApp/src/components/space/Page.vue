@@ -25,7 +25,7 @@
       </p>
     </div>
     <div>
-      <vue-markdown :source="this.page.content"></vue-markdown>
+      <vue-markdown :html="this.$store.state.application.info.allowHtml" :source="this.page.content"></vue-markdown>
     </div>
   </b-col>
 </template>

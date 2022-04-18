@@ -21,6 +21,22 @@
           &nbsp;Allow anonymous access
         </b-form-checkbox>
       </b-form-group>
+      <b-form-group
+        label="Markdown settings"
+        description="Allow using html inside markdown on pages"
+      >
+        <b-form-checkbox v-model="info.allowHtml" switch>
+          &nbsp;Allow html
+        </b-form-checkbox>
+      </b-form-group>
+      <b-form-group
+        label="Application swagger"
+        description="Enable swagger for view application api"
+      >
+        <b-form-checkbox v-model="info.swaggerEnabled" switch>
+          &nbsp;Enable swagger
+        </b-form-checkbox>
+      </b-form-group>
     </b-card-text>
     <br />
     <b-button @click="init" variant="primary" size="lg"> Initialize </b-button>
@@ -35,6 +51,8 @@ export default {
     info: {
       title: "",
       allowAnonymous: false,
+      allowHtml: true,
+      swaggerEnabled: true
     },
   }),
   methods: {
@@ -46,6 +64,8 @@ export default {
   created: function () {
     this.info.title = this.$store.state.application.info.title;
     this.info.allowAnonymous = this.$store.state.application.info.allowAnonymous;
+    this.info.allowHtml = this.$store.state.application.info.allowHtml;
+    this.info.swaggerEnabled = this.$store.state.application.info.swaggerEnabled;
   },
 };
 </script>

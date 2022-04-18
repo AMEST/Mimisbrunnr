@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Mimisbrunnr.Storage.MongoDb;
 using Mimisbrunnr.Web.Host.Configuration;
 using Mimisbrunnr.Web.Host.Services;
+using Mimisbrunnr.Web.Host.Services.Features;
 using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Wiki;
 using Skidbladnir.Caching.Distributed.MongoDB;
@@ -24,6 +25,7 @@ public class StartupModule : Module
         services.AddDataProtectionMongoDb(mongoStoreConfiguration.ConnectionString);
         services.AddSingleton<IAuthorizationHandler, EnsureUserAuthorizationHandler>();
         services.AddSingleton<IPermissionService, PermissionService>();
+        services.AddSingleton<IFeatureService, FeatureService>();
         ConfigureDistributedCache(services);
     }
 

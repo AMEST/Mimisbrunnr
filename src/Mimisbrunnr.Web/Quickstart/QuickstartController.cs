@@ -15,12 +15,12 @@ public class QuickstartController : ControllerBase
     {
         _quickstartService = quickstartService;
     }
-    
+
     [HttpGet]
     [AllowAnonymous]
-    [ProducesResponseType(typeof(InitializeState), 200)]
+    [ProducesResponseType(typeof(QuickstartModel), 200)]
     public async Task<IActionResult> Get()
-    { 
+    {
         var state = await _quickstartService.Get();
         return Ok(state);
     }
@@ -29,11 +29,11 @@ public class QuickstartController : ControllerBase
     [AllowAnonymous]
     [ProducesResponseType(typeof(InitializeState), 200)]
     public async Task<IActionResult> GetInitializeStatus()
-    { 
+    {
         var state = await _quickstartService.IsInitialized();
         return Ok(new InitializeState() { IsInitialized = state });
     }
-    
+
     [HttpPost("initialize")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
@@ -46,7 +46,7 @@ public class QuickstartController : ControllerBase
         }
         catch (InitializeException e)
         {
-            return new ObjectResult(new { message = e.Message }){StatusCode = 400};
+            return new ObjectResult(new { message = e.Message }) { StatusCode = 400 };
         }
     }
 }
