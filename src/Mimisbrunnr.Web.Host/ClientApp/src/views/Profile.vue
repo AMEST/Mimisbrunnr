@@ -114,6 +114,14 @@ export default {
       }
     }
   },
+  watch: {
+    // eslint-disable-next-line
+    "$route.params.email": function (to, from) {
+      // eslint-disable-next-line
+      this.ensureAnonymous();
+      this.loadProfile();
+    },
+  },
   mounted: function () {
     this.ensureAnonymous();
     this.loadProfile();
