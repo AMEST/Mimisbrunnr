@@ -10,5 +10,8 @@ public class ApplicationConfigurationMap : EntityMapClass<ApplicationConfigurati
         ToCollection("Configuration");
         MapProperty(x => x.AllowAnonymous).SetIgnoreIfDefault(false);
         MapProperty(x => x.SwaggerEnabled).SetIgnoreIfDefault(false);
+        MapProperty(x => x.AllowHtml)
+            .SetIgnoreIfDefault(false)
+            .SetDefaultValue(true);
     }
 }

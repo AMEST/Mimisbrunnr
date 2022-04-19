@@ -28,7 +28,9 @@ public static class MappingExtensions
         return new ApplicationConfiguration()
         {
             Title = model.Title,
-            AllowAnonymous = model.AllowAnonymous
+            AllowAnonymous = model.AllowAnonymous,
+            SwaggerEnabled = model.SwaggerEnabled,
+            AllowHtml = model.AllowHtml
         };
     }
 
@@ -62,13 +64,15 @@ public static class MappingExtensions
             IsAdmin = model.IsAdmin
         };
     }
-    
+
     public static QuickstartModel ToModel(this ApplicationConfiguration model)
     {
         return new QuickstartModel()
         {
             Title = model?.Title ?? "Mimisbrunnr",
-            AllowAnonymous = model?.AllowAnonymous ?? false
+            AllowAnonymous = model?.AllowAnonymous ?? false,
+            AllowHtml = model?.AllowHtml ?? true,
+            SwaggerEnabled = model?.SwaggerEnabled ?? false
         };
     }
 
@@ -82,7 +86,7 @@ public static class MappingExtensions
         };
     }
 
-        public static UserModel ToModel(this Mimisbrunnr.Users.User user)
+    public static UserModel ToModel(this Mimisbrunnr.Users.User user)
     {
         return new UserModel()
         {

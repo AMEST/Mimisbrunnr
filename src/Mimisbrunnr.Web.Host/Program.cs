@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.SpaServices;
 using Mimisbrunnr.Storage.MongoDb;
 using Mimisbrunnr.Web.Host;
 using Mimisbrunnr.Web.Host.Configuration;
+using Mimisbrunnr.Web.Host.Middlewares;
 using Skidbladnir.Modules;
 using VueCliMiddleware;
 
@@ -31,11 +32,7 @@ forwardedHeadersOptions.KnownProxies.Clear();
 
 app.UseForwardedHeaders(forwardedHeadersOptions);
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwaggerFeature();
 
 app.UseSpaStaticFiles();
 

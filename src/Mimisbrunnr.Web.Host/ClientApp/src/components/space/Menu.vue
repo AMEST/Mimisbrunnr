@@ -1,5 +1,5 @@
 <template>
-  <b-col sm="4" md="3" xl="2" class="space-menu">
+  <b-col sm="4" md="auto" class="space-menu">
     <div class="space-menu-title space-menu-bottom-line">
       <b-avatar class="space-avatar-bg" :text="getInitials()"></b-avatar>
       <b-link :to="'/space/' + this.space.key">{{ this.space.name }}</b-link>
@@ -154,7 +154,12 @@ export default {
   overflow-x: hidden;
   overflow-y: auto;
   box-shadow: inset 0 0rem .5em rgba(0,0,0,.15)!important;
-  max-height: calc( 100vh - 57px);
+}
+@media (min-width: 575px) {
+  .space-menu {
+    max-height: calc( 100vh - 57px);
+    max-width: 350px
+  }
 }
 .space-menu-title {
   padding-top: 3em;

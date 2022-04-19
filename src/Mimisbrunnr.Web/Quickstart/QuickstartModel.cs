@@ -10,4 +10,10 @@ public class QuickstartModel
 
     [Required]
     public bool AllowAnonymous { get; set; }
+
+    [Required]
+    public bool SwaggerEnabled {get; set;}
+
+    [Required]
+    public bool AllowHtml { get; set; }
 }
