@@ -1,5 +1,5 @@
 <template>
-  <b-col sm="8" md="9" xl="10" class="page-view">
+  <b-col class="page-view">
     <div align="right" class="page-head">
       <b-dropdown
         split
@@ -63,6 +63,10 @@ export default {
 }
 .page-view{
   overflow: auto;
-  max-height: calc( 100vh - 57px);
+}
+@media (min-width: 575px) {
+  .page-view {
+    max-height: calc( 100vh - 57px);
+  }
 }
 </style>
