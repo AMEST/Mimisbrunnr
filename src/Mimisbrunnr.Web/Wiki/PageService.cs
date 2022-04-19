@@ -8,7 +8,7 @@ namespace Mimisbrunnr.Web.Wiki;
 
 internal class PageService : IPageService
 {
-    private readonly TimeSpan _defaultCacheTime = TimeSpan.FromMinutes(10);
+    private readonly TimeSpan _defaultCacheTime = TimeSpan.FromHours(12);
     private readonly IPageManager _pageManager;
     private readonly ISpaceManager _spaceManager;
     private readonly IPermissionService _permissionService;

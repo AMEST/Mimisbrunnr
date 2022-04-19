@@ -6,7 +6,7 @@ namespace Mimisbrunnr.Wiki.Services;
 
 internal class SpaceManager : ISpaceManager
 {
-    private readonly TimeSpan _defaultCacheTime = TimeSpan.FromMinutes(10);
+    private readonly TimeSpan _defaultCacheTime = TimeSpan.FromHours(12);
     private readonly IRepository<Space> _spaceRepository;
     private readonly IPageManager _pageManager;
     private readonly IDistributedCache _distributedCache;
