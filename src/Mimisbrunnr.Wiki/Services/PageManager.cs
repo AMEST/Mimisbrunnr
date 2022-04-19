@@ -14,20 +14,19 @@ internal class PageManager : IPageManager
 
     public Task<Page[]> GetAllOnSpace(Space space)
     {
-        return Task.Factory.StartNew(() => _pageRepository.GetAll().Where(x => x.SpaceId == space.Id).ToArray(), TaskCreationOptions.LongRunning);
+        return _pageRepository.GetAll().Where(x => x.SpaceId == space.Id).ToArrayAsync();
     }
 
     public Task<Page[]> FindByName(string name)
     {
-        return Task.Factory.StartNew(() =>_pageRepository.GetAll()
-            .Where(x => x.Name.Contains(name, StringComparison.OrdinalIgnoreCase)).ToArray(), TaskCreationOptions.LongRunning);
+        return _pageRepository.GetAll()
+            .Where(x => x.Name.Contains(name, StringComparison.OrdinalIgnoreCase)).ToArrayAsync();
     }
 
     public async Task<Page[]> GetAllChilds(Page page)
     {
         var flatChildsList = new List<Page>();
-        var childs = await Task.Factory.StartNew(() =>
-        _pageRepository
+        var childs = await _pageRepository
             .GetAll()
             .Where(x => x.ParentId == page.Id)
             .Select(x => new Page{
@@ -36,8 +35,7 @@ internal class PageManager : IPageManager
                 SpaceId = x.SpaceId,
                 Name = x.Name
             })
-            .ToList()
-        , TaskCreationOptions.LongRunning);
+            .ToListAsync();
         flatChildsList.AddRange(childs);
         foreach (var child in childs)
         {
@@ -51,7 +49,7 @@ internal class PageManager : IPageManager
 
     public Task<Page> GetById(string id)
     {
-        return Task.Factory.StartNew(() =>_pageRepository.GetAll().SingleOrDefault(x => x.Id == id), TaskCreationOptions.LongRunning);
+        return _pageRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<Page> Create(string spaceId, string name, string content, UserInfo createdBy, string parentPageId = null)
@@ -105,7 +103,7 @@ internal class PageManager : IPageManager
 
     private async Task RemoveOnlyPage(Page page)
     {
-        var childs = await Task.Factory.StartNew(() =>_pageRepository.GetAll().Where(x => x.ParentId == page.Id).ToList(), TaskCreationOptions.LongRunning);
+        var childs = await _pageRepository.GetAll().Where(x => x.ParentId == page.Id).ToListAsync();
         foreach (var child in childs)
         {
             child.ParentId = page.ParentId;

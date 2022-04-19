@@ -22,7 +22,7 @@ internal class UserManager : IUserManager
         if( user is not null)
             return user;
 
-        user = _userRepository.GetAll().FirstOrDefault(x => x.Email == email.ToLower());
+        user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Email == email.ToLower());
         if(user is null)
             return user;
 

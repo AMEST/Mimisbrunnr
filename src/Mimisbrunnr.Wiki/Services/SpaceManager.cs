@@ -20,7 +20,7 @@ internal class SpaceManager : ISpaceManager
 
     public Task<Space[]> GetAll()
     {
-        return Task.Factory.StartNew(() => _spaceRepository.GetAll().ToArray(), TaskCreationOptions.LongRunning);
+        return _spaceRepository.GetAll().ToArrayAsync();
     }
 
     public async Task<Space> GetById(string id)
@@ -28,7 +28,7 @@ internal class SpaceManager : ISpaceManager
         var space = await _distributedCache.GetAsync<Space>(GetSpaceCacheKeyById(id));
         if (space is not null)
             return space;
-        space = _spaceRepository.GetAll().SingleOrDefault(x => x.Id == id);
+        space = await _spaceRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
         await AddSpaceToCache(space);
         return space;
     }
@@ -39,24 +39,24 @@ internal class SpaceManager : ISpaceManager
         if (space is not null)
             return space;
 
-        space = _spaceRepository.GetAll().SingleOrDefault(x => x.Key == key.ToUpper());
+        space = await _spaceRepository.GetAll().FirstOrDefaultAsync(x => x.Key == key.ToUpper());
         await AddSpaceToCache(space);
         return space;
     }
 
-    public Task<Space> FindPersonalSpace(UserInfo user)
+    public async Task<Space> FindPersonalSpace(UserInfo user)
     {
-        var personalSpace = _spaceRepository.GetAll().FirstOrDefault(
+        var personalSpace = await _spaceRepository.GetAll().FirstOrDefaultAsync(
             x => x.Type != SpaceType.Personal && x.Type != SpaceType.Public
                  && x.Permissions.Any(p => p.IsAdmin && p.User != null && p.User.Email == user.Email)
         );
-        return Task.FromResult(personalSpace);
+        return personalSpace;
     }
 
     public Task<Space[]> FindByName(string name)
     {
-        return Task.Factory.StartNew(() => _spaceRepository.GetAll()
-            .Where(x => x.Name.Contains(name, StringComparison.OrdinalIgnoreCase)).ToArray(), TaskCreationOptions.LongRunning);
+        return _spaceRepository.GetAll()
+            .Where(x => x.Name.Contains(name, StringComparison.OrdinalIgnoreCase)).ToArrayAsync();
     }
 
     public async Task<Space> Create(string key, string name, string description, SpaceType type, UserInfo owner)

@@ -15,7 +15,7 @@ internal class UserGroupManager : IUserGroupManager
     
     public Task<Group> FindByName(string name)
     {
-        return Task.FromResult(_groupRepository.GetAll().FirstOrDefault(x => x.Name == name));
+        return _groupRepository.GetAll().FirstOrDefaultAsync(x => x.Name == name);
     }
 
     public async Task<Group> Add(string name, string description, string ownerEmail)
@@ -37,11 +37,11 @@ internal class UserGroupManager : IUserGroupManager
 
     public async Task Remove(Group userGroup)
     {
-        var groupExist = _groupRepository.GetAll().Any(x => x.Id == userGroup.Id);
+        var groupExist = await _groupRepository.GetAll().AnyAsync(x => x.Id == userGroup.Id);
         if (!groupExist)
             return;
 
-        var usersGroups = _userGroupsRepository.GetAll().Where(x => x.GroupId == userGroup.Id);
+        var usersGroups = await _userGroupsRepository.GetAll().Where(x => x.GroupId == userGroup.Id).ToArrayAsync();
         foreach (var userInGroup in usersGroups)
         {
             await _userGroupsRepository.Delete(userInGroup);
@@ -53,7 +53,7 @@ internal class UserGroupManager : IUserGroupManager
     public async Task AddToGroup(Group userGroup, User user)
     {
         var userInGroup =
-            _userGroupsRepository.GetAll().Any(x => x.UserId == user.Id && x.GroupId == userGroup.Id);
+           await _userGroupsRepository.GetAll().AnyAsync(x => x.UserId == user.Id && x.GroupId == userGroup.Id);
         if (userInGroup)
             return;
         await _userGroupsRepository.Create(new UserGroup()
@@ -66,22 +66,22 @@ internal class UserGroupManager : IUserGroupManager
     public async Task RemoveFromGroup(Group userGroup, User user)
     {
         var userInGroup =
-            _userGroupsRepository.GetAll().FirstOrDefault(x => x.UserId == user.Id && x.GroupId == userGroup.Id);
+           await _userGroupsRepository.GetAll().FirstOrDefaultAsync(x => x.UserId == user.Id && x.GroupId == userGroup.Id);
         if (userInGroup != null)
             await _userGroupsRepository.Delete(userInGroup);
     }
 
-    public Task<Group[]> GetUserGroups(User user)
+    public async Task<Group[]> GetUserGroups(User user)
     {
         var groups = new List<Group>();
-        var userInGroups = _userGroupsRepository.GetAll().Where(x => x.UserId == user.Id).ToArray();
+        var userInGroups = await _userGroupsRepository.GetAll().Where(x => x.UserId == user.Id).ToArrayAsync();
         foreach (var userInGroup in userInGroups)
         {
-            var group = _groupRepository.GetAll().FirstOrDefault(x => x.Id == userInGroup.GroupId);
+            var group = await _groupRepository.GetAll().FirstOrDefaultAsync(x => x.Id == userInGroup.GroupId);
             if(group != null)
                 groups.Add(group);
         }
 
-        return Task.FromResult(groups.ToArray());
+        return groups.ToArray();
     }
 }
