@@ -32,12 +32,12 @@ export default {
 
     if(currentAccountRequest.status == 401 || currentAccountRequest.status == 404
       && (!initializedRequest.data.isInitialized || !this.$store.state.application.info.allowAnonymous)){
-      window.location.href = "/api/account/login"
-      return
+      window.location.href = "/api/account/login?redirectUri="+window.location.pathname;
+      return;
     }
     
     if (currentAccountRequest.status != 404)
-      this.$store.commit("changeProfile", currentAccountRequest.data)
+      this.$store.commit("changeProfile", currentAccountRequest.data);
 
     this.loaded = true;
     this.initialized = initializedRequest.data.isInitialized;

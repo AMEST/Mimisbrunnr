@@ -12,15 +12,19 @@ public class AccountController : ControllerBase
 {
     [HttpGet("login")]
     [AllowAnonymous]
-    public IActionResult Login()
+    public IActionResult Login([FromQuery] string redirectUri = null)
     {
+        var redirect = "/";
+        if(!string.IsNullOrEmpty(redirect) && redirect.StartsWith("/"))
+            redirect = redirectUri;
+
         var user = User.ToEntity();
         if (user != null)
-            return Redirect("/");
+            return Redirect(redirect);
 
         var properties = new AuthenticationProperties()
         {
-            RedirectUri = "/"
+            RedirectUri = redirect
         };
         return Challenge(properties, "OpenIdConnect");
     }
