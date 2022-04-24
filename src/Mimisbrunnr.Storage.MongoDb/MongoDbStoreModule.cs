@@ -22,7 +22,7 @@ public class MongoDbStoreModule : RunnableModule
             new IgnoreExtraElementsConvention(true),
         };
 
-        ConventionRegistry.Register("Influunt", pack, t => true);
+        ConventionRegistry.Register("Mimisbrunnr", pack, t => true);
         var configuration = Configuration.Get<MongoDbStoreModuleConfiguration>();
         services.AddMongoDbContext(builder =>
             builder
@@ -33,6 +33,7 @@ public class MongoDbStoreModule : RunnableModule
                 .AddEntity<UserGroup, UserGroupMap>()
                 .AddEntity<Space, SpaceMap>()
                 .AddEntity<Page, PageMap>()
+                .AddEntity<PageUpdateEvent, PageUpdateEventMap>()
         );
     }
 
@@ -47,6 +48,7 @@ public class MongoDbStoreModule : RunnableModule
             await CreateUserGroupIndexes(baseMongoContext);
             await CreateSpaceIndexes(baseMongoContext);
             await CreatePageIndexes(baseMongoContext);
+            await CreatePageUpdatesIndexes(baseMongoContext);
         }
         catch (Exception e)
         {
@@ -54,7 +56,7 @@ public class MongoDbStoreModule : RunnableModule
         }
     }
 
-    private async Task CreateUserIndexes(IMongoDbContext mongoContext)
+    private static async Task CreateUserIndexes(IMongoDbContext mongoContext)
     {
         var collection = mongoContext.GetCollection<User>();
         var emailKeyDefinition = Builders<User>.IndexKeys.Ascending(x => x.Email);
@@ -69,7 +71,7 @@ public class MongoDbStoreModule : RunnableModule
             Background = true
         }));
     }
-    private async Task CreateGroupIndexes(IMongoDbContext mongoContext)
+    private static async Task CreateGroupIndexes(IMongoDbContext mongoContext)
     {
         var collection = mongoContext.GetCollection<Group>();
         var nameKeyDefinition = Builders<Group>.IndexKeys.Ascending(x => x.Name);
@@ -80,7 +82,7 @@ public class MongoDbStoreModule : RunnableModule
         }));
     }
 
-    private async Task CreateUserGroupIndexes(IMongoDbContext mongoContext)
+    private static async Task CreateUserGroupIndexes(IMongoDbContext mongoContext)
     {
         var collection = mongoContext.GetCollection<UserGroup>();
         var userGroupsKeDefinition = Builders<UserGroup>.IndexKeys.Ascending(x => x.UserId);
@@ -100,7 +102,7 @@ public class MongoDbStoreModule : RunnableModule
         }));
     }
 
-    private async Task CreateSpaceIndexes(IMongoDbContext mongoContext)
+    private static async Task CreateSpaceIndexes(IMongoDbContext mongoContext)
     {
         var collection = mongoContext.GetCollection<Space>();
         var keyDefinition = Builders<Space>.IndexKeys.Ascending(x => x.Key);
@@ -121,14 +123,14 @@ public class MongoDbStoreModule : RunnableModule
             Background = true
         }));
 
-        var nameSpaceFullTextSearch = Builders<Space>.IndexKeys.Text(x=>x.Name);
+        var nameSpaceFullTextSearch = Builders<Space>.IndexKeys.Text(x => x.Name);
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<Space>(nameSpaceFullTextSearch, new CreateIndexOptions()
         {
             Background = true
         }));
     }
 
-    private async Task CreatePageIndexes(IMongoDbContext mongoContext)
+    private static async Task CreatePageIndexes(IMongoDbContext mongoContext)
     {
         var collection = mongoContext.GetCollection<Page>();
         var spaceIdkeyDefinition = Builders<Page>.IndexKeys.Ascending(x => x.SpaceId);
@@ -150,6 +152,41 @@ public class MongoDbStoreModule : RunnableModule
 
         var contentTitleFullTextSearch = Builders<Page>.IndexKeys.Text(x => x.Name).Text(x => x.Content);
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<Page>(contentTitleFullTextSearch, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+    }
+
+    private static async Task CreatePageUpdatesIndexes(IMongoDbContext mongoContext)
+    {
+        var collection = mongoContext.GetCollection<PageUpdateEvent>();
+
+        var dateDefinition = Builders<PageUpdateEvent>.IndexKeys.Descending(x => x.Updated);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<PageUpdateEvent>(dateDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+
+        var dateAndSpaceTypeDefinition = Builders<PageUpdateEvent>.IndexKeys.Descending(x => x.Updated).Ascending(x => x.SpaceType);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<PageUpdateEvent>(dateAndSpaceTypeDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+
+        var dateAndSpaceTypeAndKeyDefinition = Builders<PageUpdateEvent>.IndexKeys.Descending(x => x.Updated).Ascending(x => x.SpaceType).Ascending(x => x.SpaceKey);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<PageUpdateEvent>(dateAndSpaceTypeAndKeyDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+
+        var dateAndEmailKeyDefinition = Builders<PageUpdateEvent>.IndexKeys.Descending(x => x.Updated).Ascending(x => x.UpdatedBy.Email);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<PageUpdateEvent>(dateAndEmailKeyDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+
+        var dateAndSpaceTypeAndEmailKeyDefinition = Builders<PageUpdateEvent>.IndexKeys.Descending(x => x.Updated).Ascending(x => x.SpaceType).Ascending(x => x.UpdatedBy.Email);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<PageUpdateEvent>(dateAndSpaceTypeAndEmailKeyDefinition, new CreateIndexOptions()
         {
             Background = true
         }));

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Mimisbrunnr.Users;
+using Mimisbrunnr.Web.Feed;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Quickstart;
 using Mimisbrunnr.Web.User;
@@ -18,5 +19,6 @@ public class WebModule : Module
         services.AddSingleton<ISpaceService, SpaceService>();
         services.AddSingleton<IPageService, PageService>();
         services.AddSingleton<IUserService, UserService>();
+        services.AddSingleton<IFeedService, FeedService>();
     }
 }
