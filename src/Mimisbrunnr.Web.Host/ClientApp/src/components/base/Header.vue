@@ -43,7 +43,7 @@
             <b-button
               class="text-light"
               variant="link"
-              href="/api/account/login"
+              @click="auth"
               >Log in</b-button
             >
           </div>
@@ -95,6 +95,9 @@ export default {
       var splited = this.$store.state.application.profile.name.split(" ");
       if (splited.length > 1) return splited[0][0] + splited[1][0];
       return splited[0][0];
+    },
+    auth: function(){
+      window.location.href = "/api/account/login?redirectUri="+window.location.pathname;
     },
     goToPersonalSpace: async function(){
       var personalSpaceKey = await this.getOrCreatePersonalSpace();

@@ -15,7 +15,7 @@ public class AccountController : ControllerBase
     public IActionResult Login([FromQuery] string redirectUri = null)
     {
         var redirect = "/";
-        if(!string.IsNullOrEmpty(redirect) && redirect.StartsWith("/"))
+        if(!string.IsNullOrEmpty(redirectUri) && redirectUri.StartsWith("/"))
             redirect = redirectUri;
 
         var user = User.ToEntity();
