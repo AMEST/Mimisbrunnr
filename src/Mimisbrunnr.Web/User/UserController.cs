@@ -17,7 +17,6 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("current")]
-    [AllowAnonymous]
     public IActionResult GetCurrentUser()
     {
         var user = User.ToEntity();
