@@ -42,6 +42,7 @@ namespace Mimisbrunnr.Wiki.Services
             {
                 SpaceKey = space.Key,
                 SpaceType = space.Type,
+                PageId = page.Id,
                 PageTitle = page.Name,
                 Updated = DateTime.UtcNow,
                 UpdatedBy = updatedBy

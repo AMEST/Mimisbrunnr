@@ -172,6 +172,7 @@ public static class MappingExtensions
         return new PageUpdateEventModel()
         {
             PageTitle = pageUpdateEvent.PageTitle,
+            PageId = pageUpdateEvent.PageId,
             SpaceKey = pageUpdateEvent.SpaceKey,
             Updated = pageUpdateEvent.Updated,
             UpdatedBy = pageUpdateEvent.UpdatedBy.ToModel()
