@@ -19,10 +19,10 @@ Support for the following features:
 1. Spaces (personal, private, public)
 2. Permissions for spaces (issuing permissions to users (groups _in progress_) to be able to view / edit / delete or administer a space)
 3. Enabling anonymous access (permission to read public spaces)
-4. Markdown page editor (with the ability to insert html code)
+4. Markdown page editor (with the ability to insert html code or disable rendering html inside markdown global in service)
 5. Copy / move pages
 6. Tree of pages
-
+7. Page updates feed
 
 ## Get started
 
