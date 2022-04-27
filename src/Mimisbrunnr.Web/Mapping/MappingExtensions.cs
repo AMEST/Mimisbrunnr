@@ -5,6 +5,7 @@ using Mimisbrunnr.Web.Infrastructure.Contracts;
 using Mimisbrunnr.Web.Quickstart;
 using Mimisbrunnr.Web.Wiki;
 using Mimisbrunnr.Wiki.Contracts;
+using Mimisbrunnr.Web.Feed;
 
 namespace Mimisbrunnr.Web.Mapping;
 
@@ -80,7 +81,7 @@ public static class MappingExtensions
     {
         return new UserModel()
         {
-            Email = user.Email,
+            Email = user.Email.ToLower(),
             Name = user.Name,
             AvatarUrl = user.AvatarUrl
         };
@@ -90,7 +91,7 @@ public static class MappingExtensions
     {
         return new UserModel()
         {
-            Email = user.Email,
+            Email = user.Email.ToLower(),
             Name = user.Name,
             AvatarUrl = user.AvatarUrl
         };
@@ -163,6 +164,18 @@ public static class MappingExtensions
             CanRemove = permission.CanRemove,
             CanView = permission.CanView,
             IsAdmin = permission.IsAdmin
+        };
+    }
+
+    public static PageUpdateEventModel ToModel(this PageUpdateEvent pageUpdateEvent)
+    {
+        return new PageUpdateEventModel()
+        {
+            PageTitle = pageUpdateEvent.PageTitle,
+            PageId = pageUpdateEvent.PageId,
+            SpaceKey = pageUpdateEvent.SpaceKey,
+            Updated = pageUpdateEvent.Updated,
+            UpdatedBy = pageUpdateEvent.UpdatedBy.ToModel()
         };
     }
 }

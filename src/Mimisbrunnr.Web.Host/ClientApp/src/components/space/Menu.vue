@@ -158,7 +158,12 @@ export default {
 @media (min-width: 575px) {
   .space-menu {
     max-height: calc( 100vh - 57px);
-    max-width: 350px
+    max-width: 350px;
+  }
+}
+@media (min-width: 699px) {
+  .space-menu {
+    min-width: 350px;
   }
 }
 .space-menu-title {

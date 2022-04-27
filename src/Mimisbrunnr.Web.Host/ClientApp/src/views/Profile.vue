@@ -27,52 +27,19 @@
             >Favorites</b-button
           >
         </div>
-        <b-card class="profile-info">
-          <span class="text-muted"> Additional information </span>
-          <b-card-text>
-            <b-input-group-prepend is-text>
-              <b-icon icon="bag-fill" /> &nbsp;
-              <b-form-input :disabled="!this.itsMe" placeholder="Post"></b-form-input>
-            </b-input-group-prepend>
-            <b-input-group-prepend is-text>
-              <b-icon icon="diagram2" /> &nbsp;
-              <b-form-input :disabled="!this.itsMe" placeholder="Department"></b-form-input>
-            </b-input-group-prepend>
-            <b-input-group-prepend is-text>
-              <b-icon icon="building" /> &nbsp;
-              <b-form-input :disabled="!this.itsMe" placeholder="Organization"></b-form-input>
-            </b-input-group-prepend>
-            <b-input-group-prepend is-text>
-              <b-icon icon="geo-alt" /> &nbsp;
-              <b-form-input :disabled="!this.itsMe" placeholder="Location"></b-form-input>
-            </b-input-group-prepend>
-          </b-card-text>
-        </b-card>
+        <additional-info/>
       </b-col>
-      <b-col sm="9" class="text-left">
-        <div class="profile-worked-on">
-          <h5> Worked on </h5>
-          <b-card>
-            <b-card-text>
-              <b-list-group-item
-                button
-                v-for="h in [1, 2, 3, 4, 5, 6]"
-                :key="h"
-              >
-                <b-icon icon="file-earmark-text" style="float: left" />
-                <b-skeleton animation="wave" width="25%"></b-skeleton>
-              </b-list-group-item>
-            </b-card-text>
-          </b-card>
-        </div>
-      </b-col>
+      <worked-on/>
     </b-row>
   </b-container>
 </template>
 
 <script>
 import axios from 'axios';
+import WorkedOn from "@/components/profile/WorkedOn.vue";
+import AdditionalInfo from "@/components/profile/AdditionalInfo.vue";
 export default {
+  components: { WorkedOn, AdditionalInfo },
   name: "Profile",
   data() {
     return {

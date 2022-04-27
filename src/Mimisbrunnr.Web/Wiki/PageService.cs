@@ -11,17 +11,20 @@ internal class PageService : IPageService
     private readonly TimeSpan _defaultCacheTime = TimeSpan.FromHours(12);
     private readonly IPageManager _pageManager;
     private readonly ISpaceManager _spaceManager;
+    private readonly IFeedManager _feedManager;
     private readonly IPermissionService _permissionService;
     private readonly IDistributedCache _distributedCache;
 
     public PageService(IPageManager pageManager,
         ISpaceManager spaceManager,
+        IFeedManager feedManager,
         IPermissionService permissionService,
         IDistributedCache distributedCache
     )
     {
         _pageManager = pageManager;
         _spaceManager = spaceManager;
+        _feedManager = feedManager;
         _permissionService = permissionService;
         _distributedCache = distributedCache;
     }
@@ -98,6 +101,7 @@ internal class PageService : IPageService
         page.Content = updateModel.Content;
 
         await _pageManager.Update(page, updatedBy);
+        await _feedManager.AddPageUpdate(space, page, updatedBy);
         await _distributedCache.RemoveAsync(GetPageTreeCacheKey(space.HomePageId));
     }
 
