@@ -20,7 +20,7 @@ public class AspNetModule : Module
             })
             .AddCookie(options =>
             {
-                options.Cookie.Name = "Mimisbunnr";
+                options.Cookie.Name = "Mimisbrunnr";
                 options.Events.OnRedirectToAccessDenied =
                     options.Events.OnRedirectToLogin = c =>
                     {

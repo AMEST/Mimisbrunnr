@@ -6,9 +6,9 @@ public class Page : IHasId<string>
 {
     public string Id { get; set; }
 
-    public string SpaceId { get; internal set; }
+    public string SpaceId { get; set; }
 
-    public string ParentId { get; internal set; }
+    public string ParentId { get; set; }
 
     public string Name { get; set; }
 
