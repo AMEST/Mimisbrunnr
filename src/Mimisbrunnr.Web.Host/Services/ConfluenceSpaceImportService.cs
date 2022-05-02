@@ -2,13 +2,17 @@ using System.IO.Compression;
 using System.Xml.Linq;
 using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.Services;
+using Mimisbrunnr.Web.Wiki;
+using Mimisbrunnr.Web.Wiki.Import;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;
+using ReverseMarkdown;
 
-namespace Mimisbrunnr.Web.Wiki;
+namespace Mimisbrunnr.Web.Host.Services;
 
-public class ConfluenceSpaceImportService : ISpaceImportService
+internal class ConfluenceSpaceImportService : ISpaceImportService
 {
+    private readonly Converter _markdownConverter;
     private readonly IPageManager _pageManager;
     private readonly ISpaceManager _spaceManager;
     private readonly IPermissionService _permissionService;
@@ -22,6 +26,17 @@ public class ConfluenceSpaceImportService : ISpaceImportService
         _pageManager = pageManager;
         _spaceManager = spaceManager;
         _permissionService = permissionService;
+        var markdownConfig = new Config
+        {
+            UnknownTags = Config.UnknownTagsOption.Bypass,
+            // generate GitHub flavoured markdown, supported for BR, PRE and table tags
+            GithubFlavored = true,
+            // will ignore all comments
+            RemoveComments = true,
+            // remove markdown output for links where appropriate
+            SmartHrefHandling = true
+        };
+        _markdownConverter = new Converter(markdownConfig);
     }
 
     public async Task Import(SpaceModel spaceModel, Stream importStream, UserInfo createdBy)
@@ -70,6 +85,25 @@ public class ConfluenceSpaceImportService : ISpaceImportService
         );
         foreach (var child in pageTreeModel.Childs)
             await CreatePageFromTree(child, spaceId, page.Id, createdBy);
+    }
+
+    private Page ToPage(IDictionary<string, object> page, string spaceId, IDictionary<string, string> contents)
+    {
+        var body = "Empty page";
+        if (page.ContainsKey("bodyContents"))
+        {
+            var contentId = ((string[])page["bodyContents"]).First();
+            body = _markdownConverter.Convert(contents[contentId]);
+        }
+
+        return new Page
+        {
+            Id = page.ContainsKey("id") ? page["id"]?.ToString() : string.Empty,
+            Name = page.ContainsKey("title") ? page["title"]?.ToString() : string.Empty,
+            SpaceId = spaceId,
+            Content = body,
+            ParentId = page.ContainsKey("parent") ? page["parent"]?.ToString() : null
+        };
     }
 
     private static IList<IDictionary<string, object>> ParsePages(XDocument doc)
@@ -148,26 +182,6 @@ public class ConfluenceSpaceImportService : ISpaceImportService
         }
         return bodyContents;
     }
-
-    private static Page ToPage(IDictionary<string, object> page, string spaceId, IDictionary<string, string> contents)
-    {
-        var body = "Empty page";
-        if (page.ContainsKey("bodyContents"))
-        {
-            var contentId = ((string[])page["bodyContents"]).First();
-            body = contents[contentId];
-        }
-
-        return new Page
-        {
-            Id = page.ContainsKey("id") ? page["id"]?.ToString() : string.Empty,
-            Name = page.ContainsKey("title") ? page["title"]?.ToString() : string.Empty,
-            SpaceId = spaceId,
-            Content = body,
-            ParentId = page.ContainsKey("parent") ? page["parent"]?.ToString() : null
-        };
-    }
-
 
     private static Task<string> ReadEntitiesFromZip(Stream zip)
     {

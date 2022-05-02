@@ -5,6 +5,7 @@ using Mimisbrunnr.Web.Host.Configuration;
 using Mimisbrunnr.Web.Host.Services;
 using Mimisbrunnr.Web.Host.Services.Features;
 using Mimisbrunnr.Web.Services;
+using Mimisbrunnr.Web.Wiki.Import;
 using Mimisbrunnr.Wiki;
 using Skidbladnir.Caching.Distributed.MongoDB;
 using Skidbladnir.DataProtection.MongoDb;
@@ -26,6 +27,7 @@ public class StartupModule : Module
         services.AddSingleton<IAuthorizationHandler, EnsureUserAuthorizationHandler>();
         services.AddSingleton<IPermissionService, PermissionService>();
         services.AddSingleton<IFeatureService, FeatureService>();
+        services.AddSingleton<ISpaceImportService, ConfluenceSpaceImportService>();
         ConfigureDistributedCache(services);
     }
 

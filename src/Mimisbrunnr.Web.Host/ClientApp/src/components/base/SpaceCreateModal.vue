@@ -56,6 +56,23 @@
         ></b-form-textarea>
       </b-form-group>
 
+      <b-form-group
+        label="Import space from another wiki"
+        description="Create new space and import pages from export file"
+        class="mb-0"
+      >
+        <b-form-checkbox v-model="importEnabled">
+          &nbsp;Import from another wiki?
+        </b-form-checkbox>
+
+        <b-form-file
+          v-if="importEnabled"
+          v-model="importFile"
+          placeholder="Choose a file or drop it here..."
+          drop-placeholder="Drop file here..."
+        ></b-form-file>
+      </b-form-group>
+
       <b-button type="submit" variant="primary">Create</b-button>
       <b-button type="reset" variant="danger">Reset</b-button>
     </b-form>
@@ -74,6 +91,8 @@ export default {
         type: null,
         description: "",
       },
+      importEnabled: false,
+      importFile: null,
       spaceTypes: [
         { text: "Select One", value: null },
         "Personal",
@@ -93,9 +112,11 @@ export default {
   methods: {
     onSubmit: async function (event) {
       event.preventDefault();
-      var response = await axios.post("/api/space", this.form, {
-        validateStatus: false,
-      });
+      var response = null;
+      if(this.importEnabled)
+        response = await this.createAndImportSpace();
+      else
+        response = await this.createSpace();
 
       if (response.status == 200) {
         var spaceKey = this.form.key;
@@ -106,6 +127,22 @@ export default {
       }
       alert(JSON.stringify(response.data));
     },
+    createSpace: function () {
+      return axios.post("/api/space", this.form, {
+        validateStatus: false,
+      });
+    },
+    createAndImportSpace: function () {
+      var formData = new FormData();
+      formData.append("model", JSON.stringify(this.form));
+      formData.append("import", this.importFile);
+      return axios({
+        method: 'post',
+        url: '/api/space/import',
+        data: formData,
+        validateStatus: false,
+    })
+    },
     // eslint-disable-next-line
     onReset(event) {
       // Reset our form values
@@ -113,6 +150,8 @@ export default {
       this.form.name = "";
       this.form.type = null;
       this.form.description = "";
+      this.importEnabled = false;
+      this.importFile = null;
       // Trick to reset/clear native browser form validation state
       this.show = false;
       this.$nextTick(() => {

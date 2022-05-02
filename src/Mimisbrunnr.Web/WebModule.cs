@@ -5,6 +5,7 @@ using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Quickstart;
 using Mimisbrunnr.Web.User;
 using Mimisbrunnr.Web.Wiki;
+using Mimisbrunnr.Web.Wiki.Import;
 using Skidbladnir.Modules;
 
 namespace Mimisbrunnr.Web;
@@ -20,6 +21,5 @@ public class WebModule : Module
         services.AddSingleton<IPageService, PageService>();
         services.AddSingleton<IUserService, UserService>();
         services.AddSingleton<IFeedService, FeedService>();
-        services.AddSingleton<ISpaceImportService, ConfluenceSpaceImportService>();
     }
 }

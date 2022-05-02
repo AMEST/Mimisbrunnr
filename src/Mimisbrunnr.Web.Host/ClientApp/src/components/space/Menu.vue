@@ -201,15 +201,12 @@ export default {
   margin-right: 10px;
   margin-top: -15px;
 }
-.space-avatar-bg .b-avatar-img img {
-  background-color: white;
-}
-.space-avatar-bg .b-avatar-text {
-  background-color: white;
-}
 .space-menu-page-tree .vtl-node-content {
   height: 24px;
   overflow: hidden;
   word-break: break-all;
+}
+.space-menu-page-tree .vtl-icon-folder:before{
+  content: unset !important;
 }
 </style>
