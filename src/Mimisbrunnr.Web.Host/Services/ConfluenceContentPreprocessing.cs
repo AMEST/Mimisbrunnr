@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace Mimisbrunnr.Web.Host.Services;
 
@@ -44,7 +45,7 @@ internal static class ConfluenceContentPreprocessing
         {
             var foundedString = match.Value;
             var code = match.Groups.Values.Last()?.Value;
-            processingContent = processingContent.Replace(foundedString, $"<pre><code>{code}</code></pre>");
+            processingContent = processingContent.Replace(foundedString, $"<pre><code>{HttpUtility.HtmlEncode(code)}</code></pre>");
         }
         return processingContent;
     }

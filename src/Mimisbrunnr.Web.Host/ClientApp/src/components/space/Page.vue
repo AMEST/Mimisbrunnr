@@ -31,6 +31,9 @@
 </template>
 
 <script>
+// eslint-disable-next-line
+import hljs from 'highlight.js'
+import 'highlight.js/styles/github.css'
 import VueMarkdown from 'vue-markdown'
 export default {
   name: "Page",
@@ -41,6 +44,15 @@ export default {
     page: Object,
     userPermissions: Object
   },
+  watch: {
+    // eslint-disable-next-line
+    page: function (newValue, oldValue) {
+      setTimeout(() => hljs.highlightAll(), 100);
+    },
+  },
+  mounted: function(){
+    setTimeout(() => hljs.highlightAll(), 100);
+  }
 };
 </script>
 

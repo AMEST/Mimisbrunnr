@@ -12,6 +12,7 @@
     "bootstrap": "4.6.1",
     "bootstrap-vue": "2.21.2",
     "core-js": "^2.6.5",
+    "highlight.js": "^11.5.1",
     "marked": "^4.0.13",
     "register-service-worker": "^1.6.2",
     "vue": "^2.6.14",
