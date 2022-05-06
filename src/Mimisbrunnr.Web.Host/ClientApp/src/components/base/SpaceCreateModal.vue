@@ -57,7 +57,6 @@
       </b-form-group>
 
       <b-form-group
-        label="Import space from another wiki"
         description="Create new space and import pages from export file"
         class="mb-0"
       >
@@ -70,6 +69,7 @@
           v-model="importFile"
           placeholder="Choose a file or drop it here..."
           drop-placeholder="Drop file here..."
+          accept=".zip"
         ></b-form-file>
       </b-form-group>
 

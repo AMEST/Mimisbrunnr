@@ -35,7 +35,7 @@ internal class PageService : IPageService
 
         var page = await _pageManager.GetById(pageId);
         if (page == null)
-            throw new PageNotFountException();
+            throw new PageNotFoundException();
         var space = await _spaceManager.GetById(page.SpaceId);
 
         await _permissionService.EnsureViewPermission(space.Key, requestedBy);
@@ -52,7 +52,7 @@ internal class PageService : IPageService
 
         var page = await _pageManager.GetById(pageId);
         if (page is null)
-            throw new PageNotFountException();
+            throw new PageNotFoundException();
         var space = await _spaceManager.GetById(page.SpaceId);
 
         await _permissionService.EnsureViewPermission(space.Key, requestedBy);
@@ -60,9 +60,10 @@ internal class PageService : IPageService
 
         var pageTreeModel = pageTree?.ToModel(page, space);
         if (pageTreeModel is not null)
-            await _distributedCache.SetAsync(GetPageTreeCacheKey(pageId), pageTreeModel, new DistributedCacheEntryOptions() {
-                 AbsoluteExpirationRelativeToNow = _defaultCacheTime
-                 });
+            await _distributedCache.SetAsync(GetPageTreeCacheKey(pageId), pageTreeModel, new DistributedCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = _defaultCacheTime
+            });
         return pageTreeModel;
     }
 
@@ -73,13 +74,16 @@ internal class PageService : IPageService
         if (space == null)
             throw new SpaceNotFoundException();
 
+        if (space.Status == SpaceStatus.Archived)
+            throw new InvalidOperationException("Can't create page because space archived");
+
         var parentPage = await _pageManager.GetById(createModel.ParentPageId);
         if (parentPage == null || parentPage.SpaceId != space.Id)
-            throw new PageNotFountException();
+            throw new PageNotFoundException();
 
         var page = await _pageManager.Create(space.Id, createModel.Name, createModel.Content, createdBy,
             createModel.ParentPageId);
-        
+
         await _distributedCache.RemoveAsync(GetPageTreeCacheKey(space.HomePageId));
 
         return page.ToModel(space.Key);
@@ -89,13 +93,16 @@ internal class PageService : IPageService
     {
         var page = await _pageManager.GetById(pageId);
         if (page == null)
-            throw new PageNotFountException();
+            throw new PageNotFoundException();
 
         var space = await _spaceManager.GetById(page.SpaceId);
         if (space == null)
             throw new SpaceNotFoundException();
 
         await _permissionService.EnsureEditPermission(space.Key, updatedBy);
+
+        if (space.Status == SpaceStatus.Archived)
+            throw new InvalidOperationException("Can't update page because space archived");
 
         page.Name = updateModel.Name;
         page.Content = updateModel.Content;
@@ -109,13 +116,16 @@ internal class PageService : IPageService
     {
         var page = await _pageManager.GetById(pageId);
         if (page == null)
-            throw new PageNotFountException();
+            throw new PageNotFoundException();
 
         var space = await _spaceManager.GetById(page.SpaceId);
         if (space == null)
             throw new SpaceNotFoundException();
 
         await _permissionService.EnsureRemovePermission(space.Key, deletedBy);
+
+        if (space.Status == SpaceStatus.Archived)
+            throw new InvalidOperationException("Can't remove page because space archived");
 
         if (space.HomePageId == pageId)
             throw new InvalidOperationException("Cannot remove home page of space");
@@ -128,11 +138,11 @@ internal class PageService : IPageService
     {
         var sourcePage = await _pageManager.GetById(sourcePageId);
         if (sourcePage == null)
-            throw new PageNotFountException($"Source page with id `{sourcePageId}` not found");
+            throw new PageNotFoundException($"Source page with id `{sourcePageId}` not found");
 
         var destinationParentPage = await _pageManager.GetById(destinationParentPageId);
         if (destinationParentPage == null)
-            throw new PageNotFountException($"Destination parent page with id `{destinationParentPageId}` not found");
+            throw new PageNotFoundException($"Destination parent page with id `{destinationParentPageId}` not found");
 
         var sourceSpace = await _spaceManager.GetById(sourcePage.SpaceId);
 
@@ -141,13 +151,17 @@ internal class PageService : IPageService
         var destinationSpace = sourcePage.SpaceId == destinationParentPage.SpaceId
             ? sourceSpace
             : await _spaceManager.GetById(destinationParentPage.SpaceId);
+
+        if (destinationSpace.Status == SpaceStatus.Archived)
+            throw new InvalidOperationException("Can't copy page because destination space archived");
+
         if (sourceSpace.Id != destinationSpace.Id)
             await _permissionService.EnsureEditPermission(destinationSpace.Key, copiedBy);
 
         var copiedPage = await _pageManager.Copy(sourcePage, destinationParentPage);
 
         await _distributedCache.RemoveAsync(GetPageTreeCacheKey(sourceSpace.HomePageId));
-        if(!sourcePage.Id.Equals(destinationSpace.Id))
+        if (!sourcePage.Id.Equals(destinationSpace.Id))
             await _distributedCache.RemoveAsync(GetPageTreeCacheKey(destinationSpace.HomePageId));
 
         return copiedPage.ToModel(destinationSpace.Key);
@@ -157,11 +171,11 @@ internal class PageService : IPageService
     {
         var sourcePage = await _pageManager.GetById(sourcePageId);
         if (sourcePage == null)
-            throw new PageNotFountException($"Source page with id `{sourcePageId}` not found");
+            throw new PageNotFoundException($"Source page with id `{sourcePageId}` not found");
 
         var destinationParentPage = await _pageManager.GetById(destinationParentPageId);
         if (destinationParentPage == null)
-            throw new PageNotFountException($"Destination parent page with id `{destinationParentPageId}` not found");
+            throw new PageNotFoundException($"Destination parent page with id `{destinationParentPageId}` not found");
 
         var sourceSpace = await _spaceManager.GetById(sourcePage.SpaceId);
 
@@ -170,6 +184,13 @@ internal class PageService : IPageService
         var destinationSpace = sourcePage.SpaceId == destinationParentPage.SpaceId
             ? sourceSpace
             : await _spaceManager.GetById(destinationParentPage.SpaceId);
+
+        if (sourceSpace.Status == SpaceStatus.Archived)
+            throw new InvalidOperationException("Can't move page because source space archived");
+
+        if (destinationSpace.Status == SpaceStatus.Archived)
+            throw new InvalidOperationException("Can't move page because destination space archived");
+
         if (sourceSpace.Id != destinationSpace.Id)
         {
             await _permissionService.EnsureRemovePermission(sourceSpace.Key, movedBy);
@@ -179,7 +200,7 @@ internal class PageService : IPageService
         var movedPage = await _pageManager.Move(sourcePage, destinationParentPage);
 
         await _distributedCache.RemoveAsync(GetPageTreeCacheKey(sourceSpace.HomePageId));
-        if(!sourcePage.Id.Equals(destinationSpace.Id))
+        if (!sourcePage.Id.Equals(destinationSpace.Id))
             await _distributedCache.RemoveAsync(GetPageTreeCacheKey(destinationSpace.HomePageId));
 
         return movedPage.ToModel(destinationSpace.Key);

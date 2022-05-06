@@ -87,7 +87,9 @@ export default {
       var self = this;
       var tree = [];
       // eslint-disable-next-line
-      pages.forEach(function(page, i, arr) {
+      pages.sort(function(a,b){
+        return a.page.name > b.page.name;
+      }).forEach(function(page, i, arr) {
         var treeNode = {
           name: page.page.name,
           id: page.page.id,

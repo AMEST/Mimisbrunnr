@@ -93,7 +93,8 @@ internal class ConfluenceSpaceImportService : ISpaceImportService
         if (page.ContainsKey("bodyContents"))
         {
             var contentId = ((string[])page["bodyContents"]).First();
-            body = _markdownConverter.Convert(contents[contentId]);
+            var content = contents[contentId];
+            body = _markdownConverter.Convert(ConfluenceContentPreprocessing.Process(content));
         }
 
         return new Page
