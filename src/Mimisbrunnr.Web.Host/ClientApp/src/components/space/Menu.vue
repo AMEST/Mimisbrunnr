@@ -88,7 +88,7 @@ export default {
       var tree = [];
       /*eslint-disable*/
       pages.sort(function(a,b){
-        return a.page.name > b.page.name;
+        return a.page.name.localeCompare(b.page.name, undefined, {sensitivity:"base", ignorePunctuation: true});
       }).forEach(function(page, i, arr) {
         var treeNode = {
           name: page.page.name,
