@@ -6,7 +6,7 @@ internal static class ConfluenceContentPreprocessing
 {
     private static readonly Regex FindImageAcRegEx = new Regex("<ac:image\\s[^>]*><ri:url\\sri:value=\"([^\"]*)\"\\s\\/><\\/ac:image>", RegexOptions.Compiled);
     private static readonly Regex FindCodeMacro = new Regex(
-        "<ac:structured-macro\\sac:name=\"code\"[^>]*>[\\s\\n]*(?:<ac:parameter[^>]*>[^>]*>)*<ac:plain-text-body><!\\[CDATA\\[([^\\]\\]]*)]{2}\\s*><\\/ac:plain-text-body><\\/ac:structured-macro>"
+        "<ac:structured-macro\\sac:name=\"code\"[^>]*>[\\s\\n]*(?:<ac:parameter[^>]*>[^>]*>)*<ac:plain-text-body><!\\[CDATA\\[([\\s\\S]*?)\\]{2}\\s*><\\/ac:plain-text-body><\\/ac:structured-macro>"
         , RegexOptions.Compiled);
 
     public static string Process(string content)
