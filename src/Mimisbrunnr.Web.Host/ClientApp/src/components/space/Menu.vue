@@ -86,7 +86,7 @@ export default {
     convertTree: function (pages) {
       var self = this;
       var tree = [];
-      // eslint-disable-next-line
+      /*eslint-disable*/
       pages.sort(function(a,b){
         return a.page.name > b.page.name;
       }).forEach(function(page, i, arr) {
@@ -102,6 +102,7 @@ export default {
         treeNode.children = self.convertTree(page.childs);
         tree.push(treeNode);
       });
+      /* eslint-enable*/
       return tree;
     },
     expandTree: function(){
