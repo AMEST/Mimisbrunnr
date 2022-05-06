@@ -148,7 +148,7 @@ export default {
     // eslint-disable-next-line
     onReset(event) {
       // Reset our form values
-      this.processing = true;
+      this.processing = false;
       this.form.key = "";
       this.form.name = "";
       this.form.type = null;
