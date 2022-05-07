@@ -16,13 +16,16 @@ Mímisbrunnr is the source of knowledge. A wiki system for storing knowledge to 
 ### Features
 
 Support for the following features:
+
 1. Spaces (personal, private, public)
-2. Permissions for spaces (issuing permissions to users (groups _in progress_) to be able to view / edit / delete or administer a space)
-3. Enabling anonymous access (permission to read public spaces)
-4. Markdown page editor (with the ability to insert html code or disable rendering html inside markdown global in service)
-5. Copy / move pages
-6. Tree of pages
-7. Page updates feed
+2. _Import pages from **Confluence** when creating new space_
+3. Permissions for spaces (issuing permissions to users (groups _in progress_) to be able to view / edit / delete or administer a space)
+4. Enabling anonymous access (permission to read public spaces)
+5. Markdown page editor (with the ability to insert html code or disable rendering html inside markdown global in service)
+6. Highlight code blocks on pages
+7. Copy / move pages
+8. Tree of pages
+9. Page updates feed
 
 ## Get started
 

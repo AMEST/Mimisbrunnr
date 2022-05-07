@@ -15,6 +15,12 @@ namespace Mimisbrunnr.Web.Wiki;
 [HandleWikiErrors]
 public class SpaceController : ControllerBase
 {
+    private static readonly JsonSerializerOptions DeserializeSettings = new()
+    {
+            PropertyNameCaseInsensitive = true,
+            Converters = { new JsonStringEnumConverter() }
+    };
+
     private readonly ISpaceService _spaceService;
     private readonly ISpaceImportService _spaceImportService;
 
@@ -112,13 +118,11 @@ public class SpaceController : ControllerBase
         if (string.IsNullOrEmpty(createModelForm.Value.ToString()))
             return BadRequest();
 
-        var deserializeSettings = new JsonSerializerOptions{
-            PropertyNameCaseInsensitive = true,
-        };
-        deserializeSettings.Converters.Add(new JsonStringEnumConverter());
-
-        var createModel = JsonSerializer.Deserialize<SpaceCreateModel>(createModelForm.Value.ToString(), deserializeSettings);
+        var createModel = JsonSerializer.Deserialize<SpaceCreateModel>(createModelForm.Value.ToString(), DeserializeSettings);
         var importZip = HttpContext.Request.Form.Files.FirstOrDefault(x => x.Name.Equals("import", StringComparison.OrdinalIgnoreCase));
+        if (importZip == null)
+            return BadRequest();
+
         using var importZipStream = new MemoryStream();
         await importZip.CopyToAsync(importZipStream);
 
