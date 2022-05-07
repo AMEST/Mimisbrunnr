@@ -27,7 +27,7 @@
           </b-button>
         </b-navbar-nav>
         <!-- Right aligned nav items -->
-        <b-navbar-nav class="ml-auto">
+        <b-navbar-nav class="header-right-menu">
           <b-nav-form class="flex-search invisibleComponentBorder">
             <b-input-group size="sm">
               <b-form-input placeholder="Search" disabled></b-form-input>
@@ -40,10 +40,7 @@
           </b-nav-form>
 
           <div v-if="!this.$store.state.application.profile">
-            <b-button
-              class="text-light"
-              variant="link"
-              @click="auth"
+            <b-button class="text-light" variant="link" @click="auth"
               >Log in</b-button
             >
           </div>
@@ -63,8 +60,7 @@
               }}</span>
             </b-dropdown-text>
             <b-dropdown-divider></b-dropdown-divider>
-            <b-dropdown-item
-              @click="goToPersonalSpace"
+            <b-dropdown-item @click="goToPersonalSpace"
               >Personal space</b-dropdown-item
             >
             <b-dropdown-divider></b-dropdown-divider>
@@ -96,12 +92,13 @@ export default {
       if (splited.length > 1) return splited[0][0] + splited[1][0];
       return splited[0][0];
     },
-    auth: function(){
-      window.location.href = "/api/account/login?redirectUri="+window.location.pathname;
+    auth: function () {
+      window.location.href =
+        "/api/account/login?redirectUri=" + window.location.pathname;
     },
-    goToPersonalSpace: async function(){
+    goToPersonalSpace: async function () {
       var personalSpaceKey = await this.getOrCreatePersonalSpace();
-      this.$router.push("/space/"+personalSpaceKey);
+      this.$router.push("/space/" + personalSpaceKey);
     },
     create: async function () {
       var spaceKey = this.$route.params.key;
@@ -212,5 +209,18 @@ export default {
 }
 .username {
   font-weight: bold;
+}
+.header-right-menu {
+  margin-left: auto;
+}
+@media (max-width: 574px) {
+  .header-right-menu {
+    margin-left: unset;
+  }
+}
+@media (max-width: 387px ) {
+  .header-right-menu .flex-search {
+    display: none !important;
+  }
 }
 </style>

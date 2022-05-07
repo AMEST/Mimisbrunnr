@@ -53,4 +53,7 @@ export default {
 </script>
 
 <style>
+#space-permissions-modal .modal-body {
+  overflow: auto;
+}
 </style>

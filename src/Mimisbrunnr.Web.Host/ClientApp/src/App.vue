@@ -59,6 +59,17 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  --header-height: 56px;
+}
+@media (max-width: 575px) {
+  #app {
+    --header-height: 94.5px;
+  }
+}
+@media (max-width: 313px) {
+  #app {
+    --header-height: 129.13px;
+  }
 }
 #nav {
   padding: 30px;
@@ -76,7 +87,7 @@ body {
   background-color: #f4f5f7 !important;
 }
 .h-100vh {
-  height: calc(100vh - 56px) !important;
+  height: calc(100vh - var(--header-height)) !important;
 }
 .max-tab-pane {
   overflow: auto !important;

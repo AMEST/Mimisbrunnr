@@ -62,13 +62,13 @@
           class="mb-0"
         >
           <b-form-checkbox v-model="importEnabled">
-            &nbsp;Import from another wiki?
+            &nbsp;Import pages from confluence?
           </b-form-checkbox>
 
           <b-form-file
             v-if="importEnabled"
             v-model="importFile"
-            placeholder="Choose a file or drop it here..."
+            placeholder="Choose a confluence space export zip"
             drop-placeholder="Drop file here..."
             accept=".zip"
           ></b-form-file>
