@@ -135,9 +135,7 @@ internal class ConfluenceSpaceImportService : ISpaceImportService
                     {
                         var ids = element.Elements().Select(x => x.Elements().FirstOrDefault()?.Value)?.ToArray();
                         pageData.Add(name, ids);
-
                     }
-
             }
             parsedPages.Add(pageData);
         }
