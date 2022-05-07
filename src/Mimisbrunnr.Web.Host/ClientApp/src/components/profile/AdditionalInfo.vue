@@ -34,6 +34,9 @@
 <script>
 export default {
   name: "AdditionalInfo",
+  props: {
+    itsMe: Boolean
+  },
 };
 </script>
 

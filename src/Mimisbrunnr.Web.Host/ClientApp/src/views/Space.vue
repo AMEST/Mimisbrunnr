@@ -2,7 +2,7 @@
   <b-container v-if="loaded" fluid class="text-left">
     <b-row class="h-100vh">
       <Menu :space="space" :pageTree="pageTree" :userPermissions="userPermissions"/>
-      <Page :page="page" :userPermissions="userPermissions"/>
+      <Page :space="space" :page="page" :userPermissions="userPermissions"/>
     </b-row>
     <delete-page v-if="userPermissions && userPermissions.canRemove"/>
     <copy-page v-if="userPermissions && userPermissions.canEdit"/>
