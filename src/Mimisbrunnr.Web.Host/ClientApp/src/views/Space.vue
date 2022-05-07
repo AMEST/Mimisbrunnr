@@ -136,7 +136,8 @@ export default {
     "$route.params.pageId": function (to, from) {
       // eslint-disable-next-line
       console.log("Page id change from " + from + " to " + to);
-      this.loadPage();
+      if ( to != undefined)
+        this.loadPage();
     },
   },
 };

@@ -168,7 +168,6 @@ export default {
     await this.loadHomePage();
     if (this.pageTree != undefined) {
       this.loadPageTree();
-      setTimeout(this.expandTree, 1000);
     }
   },
 };
