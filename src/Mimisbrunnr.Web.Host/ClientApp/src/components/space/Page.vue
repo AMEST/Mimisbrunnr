@@ -5,18 +5,24 @@
       :items="breadcrumbs"
     ></b-breadcrumb>
     <div align="right" class="page-head">
-      <b-dropdown
-        split
-        split-variant="outline-secondary"
-        :split-to="
-          '/space/' + this.page.spaceKey + '/' + this.page.id + '/edit'
-        "
-        variant="secondary"
-        text="Edit"
+      <b-button
+        :to="'/space/' + this.page.spaceKey + '/' + this.page.id + '/edit'"
+        variant="outline-secondary"
         size="sm"
         class="m-2"
+      >
+        <b-icon icon="pencil-fill" font-scale="0.9"/>
+        Edit
+      </b-button>
+      <b-dropdown
+        variant="secondary"
+        size="sm"
+        class="m-2 no-arrow-dropdown"
         :disabled="!userPermissions.canEdit"
       >
+        <template #button-content>
+          <b-icon icon="three-dots" />
+        </template>
         <b-dropdown-item href="#" disabled>Attachments</b-dropdown-item>
         <b-dropdown-item
           v-b-modal.page-copy-modal
@@ -149,5 +155,8 @@ export default {
   float: left !important;
   margin-bottom: 0 !important;
   background-color: transparent !important;
+}
+.no-arrow-dropdown .dropdown-toggle::after {
+  content: unset !important;
 }
 </style>
