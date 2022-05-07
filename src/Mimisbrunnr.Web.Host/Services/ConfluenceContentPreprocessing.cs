@@ -6,7 +6,7 @@ namespace Mimisbrunnr.Web.Host.Services;
 internal static class ConfluenceContentPreprocessing
 {
     private static readonly Regex FindImageAcRegEx = new Regex("<ac:image\\s[^>]*><ri:url\\sri:value=\"([^\"]*)\"\\s\\/><\\/ac:image>", RegexOptions.Compiled);
-    private static readonly Regex FindCodeMacro = new Regex(
+    private static readonly Regex FindCodeMacroRegEx = new Regex(
         "<ac:structured-macro\\sac:name=\"code\"[^>]*>[\\s\\n]*(?:<ac:parameter[^>]*>[^>]*>)*<ac:plain-text-body><!\\[CDATA\\[([\\s\\S]*?)\\]{2}\\s*><\\/ac:plain-text-body><\\/ac:structured-macro>"
         , RegexOptions.Compiled);
 
@@ -37,7 +37,7 @@ internal static class ConfluenceContentPreprocessing
 
     private static string ProcessCodeMacro(string processingContent)
     {
-        var codeDetect = FindCodeMacro.Matches(processingContent);
+        var codeDetect = FindCodeMacroRegEx.Matches(processingContent);
         if (!codeDetect.Any())
             return processingContent;
 

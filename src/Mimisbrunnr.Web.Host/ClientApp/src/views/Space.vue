@@ -38,7 +38,7 @@ export default {
       space: null,
       page: null,
       userPermissions: null,
-      pageTree: []
+      pageTree: null
     };
   },
   methods: {
@@ -46,10 +46,11 @@ export default {
       this.loaded = false;
       if(!await this.loadSpace()) return;
       if(!await this.loadPage()) return;
-      if(!await this.loadPageTree()) return;
       // eslint-disable-next-line
       console.log("Space initialized");
       this.loaded = true;
+      await this.loadPageTree();
+      console.log("Page tree loaded")
     },
     loadSpace: async function () {
       var key = this.$route.params.key;
