@@ -27,7 +27,7 @@
             >Favorites</b-button
           >
         </div>
-        <additional-info/>
+        <additional-info :itsMe="this.itsMe"/>
       </b-col>
       <worked-on/>
     </b-row>
@@ -152,10 +152,13 @@ export default {
   width: 8em;
   height: 8em;
   margin-top: -4em;
-  background-color: var(--bs-body-bg);
+  background-color: #373a3c !important;
+}
+.profile-avatar-bg .b-avatar-text {
+  font-size: 28px;
 }
 .profile-avatar-bg .b-avatar-img img {
-  background-color: var(--bs-body-bg);
+  background-color: white;
 }
 .profile-actions {
   padding-bottom: 2em;

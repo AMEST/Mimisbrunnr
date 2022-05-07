@@ -1,53 +1,60 @@
 <template>
-  <div id="app" >
+  <div id="app">
     <div v-if="this.loaded && this.initialized">
-      <Header/>
-      <router-view/>
+      <Header />
+      <router-view />
     </div>
     <div v-if="this.loaded && !this.initialized">
-        <Quickstart/>
+      <Quickstart />
     </div>
-    <SpaceCreateModal/>
+    <SpaceCreateModal />
   </div>
 </template>
 
 <script>
-import Header from '@/components/base/Header.vue'
-import SpaceCreateModal from '@/components/base/SpaceCreateModal.vue'
-import Quickstart from '@/components/quickstart/Quickstart.vue'
-import axios from 'axios'
+import Header from "@/components/base/Header.vue";
+import SpaceCreateModal from "@/components/base/SpaceCreateModal.vue";
+import Quickstart from "@/components/quickstart/Quickstart.vue";
+import axios from "axios";
 export default {
   components: {
     Header,
     SpaceCreateModal,
-    Quickstart
+    Quickstart,
   },
   data: () => ({
     loaded: false,
-    initialized: false
+    initialized: false,
   }),
-  created: async function(){
+  created: async function () {
     var initializedRequest = await axios.get("/api/quickstart/initialize");
-    var currentAccountRequest = await axios.get("/api/user/current", { validateStatus: false });
+    var currentAccountRequest = await axios.get("/api/user/current", {
+      validateStatus: false,
+    });
 
-    if((currentAccountRequest.status == 401 || currentAccountRequest.status == 404)
-      && (!initializedRequest.data.isInitialized || !this.$store.state.application.info.allowAnonymous)){
-      window.location.href = "/api/account/login?redirectUri="+window.location.pathname;
+    if (
+      (currentAccountRequest.status == 401 ||
+        currentAccountRequest.status == 404) &&
+      (!initializedRequest.data.isInitialized ||
+        !this.$store.state.application.info.allowAnonymous)
+    ) {
+      window.location.href =
+        "/api/account/login?redirectUri=" + window.location.pathname;
       return;
     }
-    
+
     if (currentAccountRequest.status != 404)
       this.$store.commit("changeProfile", currentAccountRequest.data);
 
     this.loaded = true;
     this.initialized = initializedRequest.data.isInitialized;
-  }
-}
+  },
+};
 </script>
 
 <style>
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
@@ -68,18 +75,18 @@ export default {
 body {
   background-color: #f4f5f7 !important;
 }
-.h-100vh{
-    height: calc(100vh - 56px) !important;
+.h-100vh {
+  height: calc(100vh - 56px) !important;
 }
 .max-tab-pane {
   overflow: auto !important;
   max-height: calc(100vh - 57px) !important;
 }
 .text-left {
-  text-align: left  !important;
+  text-align: left !important;
 }
 .text-right {
-  text-align: right  !important;
+  text-align: right !important;
 }
 .full-size-container {
   padding: 0 !important;
@@ -88,7 +95,7 @@ body {
   overflow: hidden !important;
 }
 .badge-primary {
-    color: #fff;
-    background-color: #007bff;
+  color: #fff;
+  background-color: #007bff;
 }
 </style>

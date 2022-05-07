@@ -29,7 +29,7 @@ public class HandleWikiErrorsAttribute : ExceptionFilterAttribute
                 context.Result = new ObjectResult(new { message = spaceNotFoundEx.Message }) { StatusCode = 404 };
                 context.ExceptionHandled = true;
                 break;
-            case PageNotFountException pageNotFoundEx:
+            case PageNotFoundException pageNotFoundEx:
                 context.Result = new ObjectResult(new { message = pageNotFoundEx.Message }) { StatusCode = 404 };
                 context.ExceptionHandled = true;
                 break;

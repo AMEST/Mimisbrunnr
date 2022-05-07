@@ -16,16 +16,25 @@
         >
           <b-icon icon="person-fill" />&nbsp; Profile
         </b-list-group-item>
-        <b-list-group-item v-b-modal.space-permissions-modal v-if="userPermissions.isAdmin">
+        <b-list-group-item
+          v-b-modal.space-permissions-modal
+          v-if="userPermissions.isAdmin"
+        >
           <b-icon icon="shield-lock-fill" />&nbsp; Permissions
         </b-list-group-item>
-        <b-list-group-item v-b-modal.space-settings-modal v-if="userPermissions.isAdmin">
+        <b-list-group-item
+          v-b-modal.space-settings-modal
+          v-if="userPermissions.isAdmin"
+        >
           <b-icon icon="gear-fill" />&nbsp; Settings
         </b-list-group-item>
       </b-list-group>
     </div>
     <div class="mt-3 space-menu-page-tree">
       <i class="text-muted">Page tree</i>
+      <div class="text-center" v-if="this.pageTree == undefined">
+        <b-spinner variant="secondary"></b-spinner>
+      </div>
       <vue-tree-list
         :model="pageTreeList"
         default-tree-node-name="Home page"
@@ -34,7 +43,9 @@
       >
         <template v-slot:leafNameDisplay="slotProps">
           <span>
-            <b-link :to="'/space/' + space.key + '/' + slotProps.model.id">{{ slotProps.model.name }}</b-link>
+            <b-link :to="'/space/' + space.key + '/' + slotProps.model.id">{{
+              slotProps.model.name
+            }}</b-link>
           </span>
         </template>
       </vue-tree-list>
@@ -60,7 +71,7 @@ export default {
   props: {
     space: Object,
     pageTree: Object,
-    userPermissions: Object
+    userPermissions: Object,
   },
   methods: {
     getInitials: function () {
@@ -86,64 +97,79 @@ export default {
     convertTree: function (pages) {
       var self = this;
       var tree = [];
-      // eslint-disable-next-line
-      pages.forEach(function(page, i, arr) {
-        var treeNode = {
-          name: page.page.name,
-          id: page.page.id,
-          dragDisabled: true,
-          addTreeNodeDisabled: true,
-          addLeafNodeDisabled: true,
-          editNodeDisabled: true,
-          delNodeDisabled: true,
-        };
-        treeNode.children = self.convertTree(page.childs);
-        tree.push(treeNode);
-      });
+      /*eslint-disable*/
+      pages
+        .sort(function (a, b) {
+          return a.page.name.localeCompare(b.page.name, undefined, {
+            sensitivity: "base",
+            ignorePunctuation: true,
+          });
+        })
+        .forEach(function (page, i, arr) {
+          var treeNode = {
+            name: page.page.name,
+            id: page.page.id,
+            dragDisabled: true,
+            addTreeNodeDisabled: true,
+            addLeafNodeDisabled: true,
+            editNodeDisabled: true,
+            delNodeDisabled: true,
+          };
+          treeNode.children = self.convertTree(page.childs);
+          tree.push(treeNode);
+        });
+      /* eslint-enable*/
       return tree;
     },
-    expandTree: function(){
+    expandTree: function () {
       var pageId = this.$route.params.pageId;
-      if(pageId == null)
-        return;
+      if (pageId == null) return;
       var flatPageList = this.findPageTree(this.pageTree.childs, pageId);
-      for(var i = 0; i < flatPageList.length; i++){
-        if(flatPageList[i] == pageId) continue;
+      for (var i = 0; i < flatPageList.length; i++) {
+        if (flatPageList[i] == pageId) continue;
         var pageTreeItem = document.getElementById(flatPageList[i]);
-        if(pageTreeItem == null) continue;
+        if (pageTreeItem == null) continue;
         var expandIcon = pageTreeItem.getElementsByClassName("vtl-icon");
-        if(expandIcon != null && expandIcon.length > 0)
-          expandIcon[0].click();
+        if (expandIcon != null && expandIcon.length > 0) expandIcon[0].click();
       }
     },
-    findPageTree: function(pages, neededPageId){
-      var pagesFlat = []
-      for(var i = 0; i < pages.length; i++){
-        if(pages[i].page.id == neededPageId){
+    findPageTree: function (pages, neededPageId) {
+      var pagesFlat = [];
+      for (var i = 0; i < pages.length; i++) {
+        if (pages[i].page.id == neededPageId) {
           pagesFlat.push(pages[i].page.id);
           return pagesFlat;
         }
         var inner = this.findPageTree(pages[i].childs, neededPageId);
-        if(inner.length != 0){
+        if (inner.length != 0) {
           inner.push(pages[i].page.id);
           return inner;
         }
       }
       return pagesFlat;
-    }
+    },
   },
   watch: {
     // eslint-disable-next-line
     space: async function (newValue, oldValue) {
       await this.loadHomePage();
+    },
+    pageTree: function (newValue, oldValue) {
+      if(newValue == undefined && oldValue != undefined){
+        this.pageTreeList = new Tree([]);
+        return;
+      }
+      if(newValue == undefined) return;
       this.loadPageTree();
       setTimeout(this.expandTree, 1000);
-    },
+    }
   },
   mounted: async function () {
     await this.loadHomePage();
-    this.loadPageTree();
-    setTimeout(this.expandTree, 1000);
+    if (this.pageTree != undefined) {
+      this.loadPageTree();
+      setTimeout(this.expandTree, 1000);
+    }
   },
 };
 </script>
@@ -153,11 +179,11 @@ export default {
   background-color: rgba(0, 0, 0, 0.03);
   overflow-x: hidden;
   overflow-y: auto;
-  box-shadow: inset 0 0rem .5em rgba(0,0,0,.15)!important;
+  box-shadow: inset 0 0rem 0.5em rgba(0, 0, 0, 0.15) !important;
 }
 @media (min-width: 575px) {
   .space-menu {
-    max-height: calc( 100vh - 57px);
+    max-height: calc(100vh - 57px);
     max-width: 350px;
   }
 }
@@ -201,15 +227,12 @@ export default {
   margin-right: 10px;
   margin-top: -15px;
 }
-.space-avatar-bg .b-avatar-img img {
-  background-color: white;
-}
-.space-avatar-bg .b-avatar-text {
-  background-color: white;
-}
 .space-menu-page-tree .vtl-node-content {
   height: 24px;
   overflow: hidden;
   word-break: break-all;
+}
+.space-menu-page-tree .vtl-icon-folder:before {
+  content: unset !important;
 }
 </style>

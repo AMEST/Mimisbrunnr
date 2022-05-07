@@ -4,7 +4,6 @@ import router from './router'
 import store from './services/store'
 import axios from 'axios'
 import './registerServiceWorker'
-// Import Bootstrap an BootstrapVue CSS files (order is important)
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -19,6 +18,12 @@ Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 
 Vue.config.productionTip = false
+
+// Load bootstrap theme
+let link = document.createElement('link');
+link.rel = "stylesheet";
+link.href = "/css/bootstrap.cosmo.min.css";
+document.head.appendChild(link);
 
 // Restore history
 var recentlyVisited = window.localStorage['history']

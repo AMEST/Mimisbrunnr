@@ -36,10 +36,18 @@ internal class PageManager : IPageManager
                 Name = x.Name
             })
             .ToListAsync();
+
         flatChildsList.AddRange(childs);
+        
+        var getChildTasks = new List<Task<Page[]>>();
         foreach (var child in childs)
+            getChildTasks.Add(GetAllChilds(child));
+
+        await Task.WhenAll(getChildTasks);
+
+        foreach(var innerChildsTask in getChildTasks)
         {
-            var innerChilds = await GetAllChilds(child);
+            var innerChilds = innerChildsTask.Result;
             if(innerChilds != null && innerChilds.Length > 0)
                 flatChildsList.AddRange(innerChilds);
         }

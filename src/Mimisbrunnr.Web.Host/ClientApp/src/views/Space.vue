@@ -2,7 +2,7 @@
   <b-container v-if="loaded" fluid class="text-left">
     <b-row class="h-100vh">
       <Menu :space="space" :pageTree="pageTree" :userPermissions="userPermissions"/>
-      <Page :page="page" :userPermissions="userPermissions"/>
+      <Page :space="space" :page="page" :userPermissions="userPermissions"/>
     </b-row>
     <delete-page v-if="userPermissions && userPermissions.canRemove"/>
     <copy-page v-if="userPermissions && userPermissions.canEdit"/>
@@ -38,7 +38,7 @@ export default {
       space: null,
       page: null,
       userPermissions: null,
-      pageTree: []
+      pageTree: null
     };
   },
   methods: {
@@ -46,10 +46,11 @@ export default {
       this.loaded = false;
       if(!await this.loadSpace()) return;
       if(!await this.loadPage()) return;
-      if(!await this.loadPageTree()) return;
       // eslint-disable-next-line
       console.log("Space initialized");
       this.loaded = true;
+      await this.loadPageTree();
+      console.log("Page tree loaded")
     },
     loadSpace: async function () {
       var key = this.$route.params.key;
