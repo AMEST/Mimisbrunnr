@@ -124,7 +124,7 @@ export default {
         var spaceKey = this.form.key;
         this.onReset();
         this.$bvModal.hide("space-create-modal");
-        this.$router.push("/space/" + spaceKey);
+        setTimeout((r) => r.push("/space/" + spaceKey), 1000, this.$router)
         return;
       }
       alert(JSON.stringify(response.data));
