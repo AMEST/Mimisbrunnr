@@ -23,4 +23,21 @@ internal static class MiddlewareExtensions
             }
         );
     }
+
+    public static IApplicationBuilder UseUserValidationMiddleware(this IApplicationBuilder builder)
+    {
+        return builder.UseMiddleware<ValidateUserStateMiddleware>()
+                .MapWhen(
+                    ctx => ctx.Request.Path.Value.Equals("/error/account-disabled", StringComparison.OrdinalIgnoreCase),
+                    b => b.Run(async context =>
+                    {
+                        context.Response.StatusCode = 403;
+                        context.Response.ContentType = "text/html";
+                        await context.Response.WriteAsync(@"
+                            <h2>Account has been disabled. Contact with administrators.</h2>
+                            <hr>
+                            Mimisbrunnr wiki system.
+                        ");
+                    }));
+    }
 }

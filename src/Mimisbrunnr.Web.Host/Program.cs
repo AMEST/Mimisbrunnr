@@ -45,6 +45,8 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
+app.UseUserValidationMiddleware();
+
 app.MapControllers();
 
 if (app.Environment.IsDevelopment())
