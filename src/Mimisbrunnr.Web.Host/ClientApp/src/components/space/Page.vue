@@ -10,6 +10,7 @@
         variant="outline-secondary"
         size="sm"
         class="m-2"
+        :disabled="!userPermissions.canEdit"
       >
         <b-icon icon="pencil-fill" font-scale="0.9"/>
         Edit
@@ -18,7 +19,6 @@
         variant="secondary"
         size="sm"
         class="m-2 no-arrow-dropdown"
-        :disabled="!userPermissions.canEdit"
       >
         <template #button-content>
           <b-icon icon="three-dots" />

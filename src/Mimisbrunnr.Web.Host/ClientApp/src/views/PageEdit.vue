@@ -7,9 +7,18 @@
         class="page-edit-name"
         :state="nameState"
       ></b-form-input>
-      <vue-simplemde :configs="mdeConfig" v-model="page.content" ref="markdownEditor" />
+      <vue-simplemde
+        :configs="mdeConfig"
+        v-model="page.content"
+        ref="markdownEditor"
+      />
       <div style="float: right; padding-right: 1em">
-        <b-button @click="save" variant="primary" style="margin-right: 0.5em" :disabled="!nameState">
+        <b-button
+          @click="save"
+          variant="primary"
+          style="margin-right: 0.5em"
+          :disabled="!nameState"
+        >
           Update
         </b-button>
         <b-button @click="cancel" variant="secondary"> Close </b-button>
@@ -53,14 +62,22 @@ export default {
         spellChecker: false,
       },
     };
-  },    
+  },
   computed: {
-      nameState() {
-        return this.page.name.length > 0 ? true : false
-      }
+    nameState() {
+      return this.page.name.length > 0;
     },
+    isAnonymous() {
+      return this.$store.state.application.profile == undefined;
+    },
+  },
   methods: {
     init: async function () {
+      if (this.isAnonymous) {
+        this.$router.push("/error/unauthorized");
+        return;
+      }
+      
       var pageId = this.$route.params.pageId;
 
       var pageRequest = await axios.get("/api/page/" + pageId, {
