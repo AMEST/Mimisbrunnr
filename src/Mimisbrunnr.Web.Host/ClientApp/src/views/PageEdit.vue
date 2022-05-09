@@ -65,7 +65,7 @@ export default {
   },
   computed: {
     nameState() {
-      return this.page.name.length > 0 ? true : false;
+      return this.page.name.length > 0;
     },
     isAnonymous() {
       return this.$store.state.application.profile == undefined;
