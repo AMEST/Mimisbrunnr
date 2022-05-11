@@ -43,7 +43,7 @@ export default {
       return;
     }
 
-    if (currentAccountRequest.status != 404)
+    if (currentAccountRequest.status == 200)
       this.$store.commit("changeProfile", currentAccountRequest.data);
 
     this.loaded = true;

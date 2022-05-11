@@ -43,7 +43,7 @@
       >
         <template v-slot:leafNameDisplay="slotProps">
           <span>
-            <b-link :to="'/space/' + space.key + '/' + slotProps.model.id">{{
+            <b-link :title="slotProps.model.name" :to="'/space/' + space.key + '/' + slotProps.model.id">{{
               slotProps.model.name
             }}</b-link>
           </span>
@@ -233,5 +233,9 @@ export default {
 }
 .space-menu-page-tree .vtl-icon-folder:before {
   content: unset !important;
+}
+
+.space-menu-page-tree .vtl-operation {
+  display: none;
 }
 </style>
