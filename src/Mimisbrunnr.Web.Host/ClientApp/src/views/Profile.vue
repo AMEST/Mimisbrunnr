@@ -138,6 +138,7 @@ export default {
     rgb(222, 235, 255) 100%
   );
   border: 0;
+  border-radius: unset !important;
 }
 .profile-content {
   position: relative;
