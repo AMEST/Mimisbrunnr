@@ -16,33 +16,33 @@ export default new Router({
     {
       path: '/spaces',
       name: 'spaces',
-      component: () => import(/* webpackChunkName: "about" */ './views/SpaceDirectory.vue')
+      component: () => import(/* webpackChunkName: "spaces" */ './views/SpaceDirectory.vue')
     },
     {
       path: '/space/:key',
       name: 'space',
-      component: () => import(/* webpackChunkName: "about" */ './views/Space.vue')
+      component: () => import(/* webpackChunkName: "space" */ './views/Space.vue')
     },
     {
       path: '/space/:key/:pageId',
       name: 'page',
-      component: () => import(/* webpackChunkName: "about" */ './views/Space.vue')
+      component: () => import(/* webpackChunkName: "page" */ './views/Space.vue')
     },
     {
       path: '/space/:key/:pageId/edit',
       name: 'pageEdit',
-      component: () => import(/* webpackChunkName: "about" */ './views/PageEdit.vue')
+      component: () => import(/* webpackChunkName: "editor" */ './views/PageEdit.vue')
     },
     {
       path: '/profile/:email',
       name: 'profile',
-      component: () => import(/* webpackChunkName: "about" */ './views/Profile.vue')
+      component: () => import(/* webpackChunkName: "profile" */ './views/Profile.vue')
     }
     ,
     {
       path: '/error/:err',
       name: 'error',
-      component: () => import(/* webpackChunkName: "about" */ './views/Error.vue')
+      component: () => import(/* webpackChunkName: "error" */ './views/Error.vue')
     }
   ]
 })
