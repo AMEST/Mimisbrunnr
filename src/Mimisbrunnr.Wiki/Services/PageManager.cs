@@ -1,4 +1,5 @@
-﻿using Mimisbrunnr.Wiki.Contracts;
+﻿using System.Threading.Tasks;
+using Mimisbrunnr.Wiki.Contracts;
 using Skidbladnir.Repository.Abstractions;
 
 namespace Mimisbrunnr.Wiki.Services;
@@ -6,10 +7,12 @@ namespace Mimisbrunnr.Wiki.Services;
 internal class PageManager : IPageManager
 {
     private readonly IRepository<Page> _pageRepository;
+    private readonly IAttachmentManager _attachmentManager;
 
-    public PageManager(IRepository<Page> pageRepository)
+    public PageManager(IRepository<Page> pageRepository, IAttachmentManager attachmentManager)
     {
         _pageRepository = pageRepository;
+        _attachmentManager = attachmentManager;
     }
 
     public Task<Page[]> GetAllOnSpace(Space space)
@@ -117,7 +120,8 @@ internal class PageManager : IPageManager
             child.ParentId = page.ParentId;
             await _pageRepository.Update(child);
         }
-
+        
+        await RemoveAttachments(page);
         await _pageRepository.Delete(page);
     }
 
@@ -126,9 +130,21 @@ internal class PageManager : IPageManager
         var allChilds = await GetAllChilds(page);
         foreach (var child in allChilds)
         {
+            await RemoveAttachments(child);
             await _pageRepository.Delete(child);
         }
 
+        await RemoveAttachments(page);
         await _pageRepository.Delete(page);
+    }
+
+    private async Task RemoveAttachments(Page page)
+    {
+        var attachments = await _attachmentManager.GetAttachments(page);
+        var removeTasks = new List<Task>();
+        foreach(var attachment in attachments)
+            removeTasks.Add(_attachmentManager.Remove(page, attachment.Name));
+
+        await Task.WhenAll(removeTasks);
     }
 }

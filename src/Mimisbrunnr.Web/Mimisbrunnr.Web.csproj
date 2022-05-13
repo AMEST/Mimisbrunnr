@@ -19,7 +19,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Skidbladnir.Modules" Version="1.3.3-unstalable.0.3" />
+      <PackageReference Include="MimeTypes" Version="2.4.0">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
+      <PackageReference Include="Skidbladnir.Modules" Version="1.4.1-unstalable.0.1" />
     </ItemGroup>
 
 </Project>

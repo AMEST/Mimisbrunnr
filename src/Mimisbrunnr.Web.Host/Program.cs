@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.SpaServices;
+using Mimisbrunnr.Persistent;
 using Mimisbrunnr.Storage.MongoDb;
 using Mimisbrunnr.Web.Host;
 using Mimisbrunnr.Web.Host.Configuration;
@@ -16,6 +17,8 @@ builder.Services.AddSkidbladnirModules<StartupModule>(configuration =>
     configuration.Add(mongoConfig);
     var cachingConfiguration = builder.Configuration.GetSection("Caching").Get<CachingConfiguration>();
     configuration.Add(cachingConfiguration);
+    var persistentConfig = builder.Configuration.GetSection("Persistent").Get<PersistentModuleConfiguration>();
+    configuration.Add(persistentConfig);
 }, builder.Configuration);
 
 

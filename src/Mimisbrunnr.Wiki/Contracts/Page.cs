@@ -14,8 +14,6 @@ public class Page : IHasId<string>
 
     public string Content { get; set; }
 
-    public IEnumerable<Attachment> Attachments { get; internal set; }
-
     public DateTime Created { get; internal set; }
 
     public DateTime Updated { get; internal set; }
@@ -32,7 +30,6 @@ public class Page : IHasId<string>
             ParentId = ParentId,
             Name = Name,
             Content = Content,
-            Attachments = Attachments?.ToArray(),
             Created = Created,
             Updated = Updated,
             CreatedBy = CreatedBy,

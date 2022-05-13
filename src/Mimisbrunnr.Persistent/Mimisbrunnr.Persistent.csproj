@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Skidbladnir.Modules" Version="1.4.1-unstalable.0.1" />
+    <PackageReference Include="Skidbladnir.Storage.GridFS" Version="1.4.1-unstalable.0.1" />
+    <PackageReference Include="Skidbladnir.Storage.LocalFileStorage" Version="1.4.1-unstalable.0.1" />
+    <PackageReference Include="Skidbladnir.Storage.WebDav" Version="1.4.1-unstalable.0.1" />
+  </ItemGroup>
+
+</Project>

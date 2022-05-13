@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
+using Mimisbrunnr.Persistent;
 using Mimisbrunnr.Storage.MongoDb;
 using Mimisbrunnr.Web.Host.Configuration;
 using Mimisbrunnr.Web.Host.Services;
@@ -17,7 +18,7 @@ public class StartupModule : Module
 {
     public override Type[] DependsModules => new[]
     {
-        typeof(AspNetModule), typeof(MongoDbStoreModule), typeof(WebModule), typeof(WikiModule)
+        typeof(AspNetModule), typeof(MongoDbStoreModule), typeof(WebModule), typeof(WikiModule), typeof(PersistentModule)
     };
 
     public override void Configure(IServiceCollection services)
@@ -34,10 +35,11 @@ public class StartupModule : Module
     private void ConfigureDistributedCache(IServiceCollection services)
     {
         var cacheConfiguration = Configuration.Get<CachingConfiguration>();
+        var mongoConfiguration = Configuration.Get<MongoDbStoreModuleConfiguration>();
         switch (cacheConfiguration.Type)
         {
             case CachingType.MongoDb:
-                services.UseMongoDistributedCache();
+                services.AddMongoDistributedCache(mongoConfiguration.ConnectionString);
                 break;
             case CachingType.Redis:
                 if (string.IsNullOrEmpty(cacheConfiguration.RedisConnectionString))

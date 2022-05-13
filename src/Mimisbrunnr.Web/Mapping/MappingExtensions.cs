@@ -178,4 +178,13 @@ public static class MappingExtensions
             UpdatedBy = pageUpdateEvent.UpdatedBy.ToModel()
         };
     }
+
+    public static AttachmentModel ToModel(this Attachment attachment)
+    {
+        return new AttachmentModel(){
+            Name = attachment.Name,
+            Created = attachment.Created,
+            CreatedBy = attachment.CreatedBy?.ToModel()
+        };
+    }
 }
