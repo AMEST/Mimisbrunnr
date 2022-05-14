@@ -1,5 +1,4 @@
 using System.IO.Compression;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.Services;
@@ -7,7 +6,9 @@ using Mimisbrunnr.Web.Wiki;
 using Mimisbrunnr.Web.Wiki.Import;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;
+using MongoDB.Driver;
 using ReverseMarkdown;
+using Skidbladnir.Utility.Common;
 
 namespace Mimisbrunnr.Web.Host.Services;
 
@@ -55,7 +56,7 @@ internal class ConfluenceSpaceImportService : ISpaceImportService
             var entities = await ReadEntitiesFromZip(archive);
             var entitiesDocument = XDocument.Parse(entities);
             entities = null;
-            GC.Collect();
+            GC.Collect(); // HACK: used manual gc.collect for clean memory (confluence xml haven't structure and hav so trash data )
             var attachments = ParseAttachments(entitiesDocument);
             var contents = ParseContents(entitiesDocument);
             var pages = ParsePages(entitiesDocument);
@@ -138,7 +139,8 @@ internal class ConfluenceSpaceImportService : ISpaceImportService
             await attachmentStream.CopyToAsync(ms);
         ms.Position = 0;
 
-        await _attachmentManager.Upload(actualHomePage, ms, name, updatedBy);
+        // HACK: Catch MongoWriteException because confluence export maybe include two different attachments for one page with same name
+        await Try.DoAsync(() => _attachmentManager.Upload(actualHomePage, ms, name, updatedBy), e => e is MongoWriteException);
         GC.Collect();
     }
 
