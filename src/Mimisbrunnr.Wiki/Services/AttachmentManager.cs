@@ -26,7 +26,7 @@ internal class AttachmentManager : IAttachmentManager
 
     public async Task<Stream> GetAttachmentContent(Page page, string name)
     {
-        var attachment = await _attachmentRepository.GetAll().FirstOrDefaultAsync(x => x.Name == name);
+        var attachment = await _attachmentRepository.GetAll().FirstOrDefaultAsync(x => x.PageId == page.Id && x.Name == name);
         if (attachment is null)
             return null;
 
@@ -39,7 +39,7 @@ internal class AttachmentManager : IAttachmentManager
 
     public async Task Remove(Page page, string name)
     {
-        var attachment = await _attachmentRepository.GetAll().FirstOrDefaultAsync(x => x.Name == name);
+        var attachment = await _attachmentRepository.GetAll().FirstOrDefaultAsync(x => x.PageId == page.Id && x.Name == name);
         if (attachment is null)
             return;
 
