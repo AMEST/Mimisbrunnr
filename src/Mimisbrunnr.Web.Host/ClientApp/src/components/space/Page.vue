@@ -151,6 +151,9 @@ export default {
 .page-view {
   overflow: auto;
 }
+.page-view img {
+  max-width: 100%;
+}
 @media (min-width: 575px) {
   .page-view {
     max-height: calc(100vh - 57px);
