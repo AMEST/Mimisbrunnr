@@ -140,12 +140,9 @@ internal class SpaceManager : ISpaceManager
 
     public async Task Remove(Space space)
     {
-        var spacePages = await _pageManager.GetAllOnSpace(space);
-        var pageRemoveTasks = new List<Task>();
-        foreach (var page in spacePages)
-            pageRemoveTasks.Add(_pageManager.Remove(page));
+        var spaceHomePage = await _pageManager.GetById(space.HomePageId);
+        await _pageManager.Remove(spaceHomePage, true);
 
-        await Task.WhenAll(pageRemoveTasks);
         await _spaceRepository.Delete(space);
         await DeleteSpaceFromCache(space);
     }

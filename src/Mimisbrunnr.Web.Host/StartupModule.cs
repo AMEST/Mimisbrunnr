@@ -28,7 +28,7 @@ public class StartupModule : Module
         services.AddSingleton<IAuthorizationHandler, EnsureUserAuthorizationHandler>();
         services.AddSingleton<IPermissionService, PermissionService>();
         services.AddSingleton<IFeatureService, FeatureService>();
-        services.AddSingleton<ISpaceImportService, ConfluenceSpaceImportService>();
+        services.AddScoped<ISpaceImportService, ConfluenceSpaceImportService>();
         ConfigureDistributedCache(services);
     }
 

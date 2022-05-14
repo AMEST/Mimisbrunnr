@@ -39,8 +39,10 @@ internal class AttachmentManager : IAttachmentManager
         if(attachment is null)
             return;
         
+        try{
         await _fileStorage.DeleteAsync(attachment.Path);
-
+        }catch(FileNotFoundException){}
+        
         await _attachmentRepository.Delete(attachment);
     }
 
