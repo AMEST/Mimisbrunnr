@@ -59,6 +59,9 @@ internal class AttachmentManager : IAttachmentManager
             Path = $"attachments/{Guid.NewGuid()}.bin"
         };
 
+        if(await _attachmentRepository.GetAll().AnyAsync(x => x.PageId == page.Id && x.Name == name))
+            await Remove(page, name);
+
         await _fileStorage.UploadFileAsync(content, attachment.Path);
         
         await _attachmentRepository.Create(attachment);

@@ -210,7 +210,8 @@ public class MongoDbStoreModule : RunnableModule
         var nameAndPageIdDefinition = Builders<Attachment>.IndexKeys.Ascending(x => x.PageId).Ascending(x => x.Name);
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<Attachment>(nameAndPageIdDefinition, new CreateIndexOptions()
         {
-            Background = true
+            Background = true,
+            Unique = true
         }));
     }
 }

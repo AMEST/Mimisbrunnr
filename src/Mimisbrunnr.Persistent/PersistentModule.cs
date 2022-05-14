@@ -15,6 +15,9 @@ namespace Mimisbrunnr.Persistent
             switch (configuration.Type)
             {
                 case StorageType.Local:
+                    var attachPath = Path.Combine(configuration.Local.Path, "attachments");
+                    if(!Directory.Exists(attachPath))
+                        Directory.CreateDirectory(attachPath);
                     services
                         .AddLocalFsStorage(configuration.Local)
                         .AddSingleton<IStorage>(r => r.GetService<IStorage<LocalStorageInfo>>());
