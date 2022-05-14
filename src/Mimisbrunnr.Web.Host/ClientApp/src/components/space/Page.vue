@@ -23,7 +23,12 @@
         <template #button-content>
           <b-icon icon="three-dots" />
         </template>
-        <b-dropdown-item href="#" disabled>Attachments</b-dropdown-item>
+        <b-dropdown-item
+         href="#"
+         v-b-modal.page-attachments-modal
+         :disabled="!this.$store.state.application.profile"
+        >Attachments</b-dropdown-item>
+        <b-dropdown-divider></b-dropdown-divider>
         <b-dropdown-item
           v-b-modal.page-copy-modal
           :disabled="!userPermissions.canEdit"
