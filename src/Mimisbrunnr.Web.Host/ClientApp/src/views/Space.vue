@@ -93,6 +93,7 @@ export default {
     loadPage: async function () {
       var pageId = this.$route.params.pageId;
       if (pageId == null) pageId = this.space.homePageId;
+      if (pageId == null) return;
 
       var pageRequest = await axios.get("/api/page/" + pageId, {
         validateStatus: false,
@@ -139,8 +140,7 @@ export default {
     "$route.params.pageId": function (to, from) {
       // eslint-disable-next-line
       console.log("Page id change from " + from + " to " + to);
-      if ( to != undefined)
-        this.loadPage();
+      this.loadPage();
     },
   },
 };
