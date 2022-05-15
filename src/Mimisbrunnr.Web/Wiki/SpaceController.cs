@@ -125,7 +125,6 @@ public class SpaceController : ControllerBase
 
         using var importZipStream = new MemoryStream();
         await importZip.CopyToAsync(importZipStream);
-
         var userInfo = User?.ToEntity();
 
         var createdSpace = await _spaceService.Create(createModel, userInfo);

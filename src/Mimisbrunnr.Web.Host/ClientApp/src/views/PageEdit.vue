@@ -24,16 +24,19 @@
         <b-button @click="cancel" variant="secondary"> Close </b-button>
       </div>
     </div>
+    <attachments :attachmentSelectAction="addAttachmentLink" :page="page" />
   </b-container>
 </template>
 
 <script>
+import Attachments from "@/components/space/modal/Attachments.vue";
 import VueSimplemde from "vue-simplemde";
 import axios from "axios";
 export default {
   name: "PageEdit",
   components: {
     VueSimplemde,
+    Attachments
   },
   data() {
     return {
@@ -57,6 +60,13 @@ export default {
           "table",
           "fullscreen",
           "|",
+          {
+            name: 'attachment',
+            action: this.openAttachments,
+            className: 'fa fa-paperclip',
+            title: 'Add attachment'
+          },
+          "|",
           "guide",
         ],
         spellChecker: false,
@@ -70,6 +80,9 @@ export default {
     isAnonymous() {
       return this.$store.state.application.profile == undefined;
     },
+    simplemde() {
+      return this.$refs.markdownEditor.simplemde;
+    },
   },
   methods: {
     init: async function () {
@@ -77,7 +90,7 @@ export default {
         this.$router.push("/error/unauthorized");
         return;
       }
-      
+
       var pageId = this.$route.params.pageId;
 
       var pageRequest = await axios.get("/api/page/" + pageId, {
@@ -108,6 +121,29 @@ export default {
     cancel: function () {
       this.$router.push("/space/" + this.page.spaceKey + "/" + this.page.id);
     },
+    // eslint-disable-next-line
+    openAttachments: function(editor){
+      this.$bvModal.show("page-attachments-modal");
+    },
+    addAttachmentLink: function (attachment) {
+      var linkToAttach =
+        `/api/attachment/${this.page.id}/${encodeURIComponent(attachment.name)}`;
+      var linkElement = `[${attachment.name}](${linkToAttach})`;
+
+      if (
+        attachment.name.toLowerCase().endsWith(".png") ||
+        attachment.name.toLowerCase().endsWith(".jpg") ||
+        attachment.name.toLowerCase().endsWith(".jpeg") ||
+        attachment.name.toLowerCase().endsWith(".gif") ||
+        attachment.name.toLowerCase().endsWith(".svg")
+      )
+        linkElement = `!${linkElement}`;
+
+      var cursor = this.simplemde.codemirror.getCursor();
+      this.simplemde.codemirror.setSelection(cursor, cursor);
+      this.simplemde.codemirror.replaceSelection(linkElement);
+      this.$bvModal.hide("page-attachments-modal");
+    },
   },
   mounted: function () {
     this.init();
@@ -124,11 +160,26 @@ export default {
 <style>
 @import "~simplemde/dist/simplemde.min.css";
 .vue-simplemde .CodeMirror {
-  height: calc(100vh - 240px) !important;
+  height: calc(100vh - var(--page-edit-height,240px)) !important;
 }
 .page-edit-name {
   background-color: transparent;
   border: unset;
   font-size: 1.5em;
+}
+@media (max-width: 575px) {
+  #app {
+    --page-edit-height: 278px;
+  }
+}
+@media (max-width: 497px) {
+  #app {
+    --page-edit-height: 298px;
+  }
+}
+@media (max-width: 314px) {
+  #app {
+    --page-edit-height: 318px;
+  }
 }
 </style>

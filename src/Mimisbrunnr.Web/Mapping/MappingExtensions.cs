@@ -132,13 +132,13 @@ public static class MappingExtensions
         };
     }
 
-    public static PageTreeModel ToModel(this Page[] childs, Page rootPage, Space space = null)
+    public static PageTreeModel ToModel(this IEnumerable<Page> childs, Page rootPage, Space space = null)
     {
         var pageTree = new PageTreeModel
         {
             Page = rootPage?.ToModel(space.Key)
         };
-        var childsPages = childs.Where(x => x.ParentId == rootPage?.Id).ToArray().Select(x => childs.ToModel(x, space)).ToList();
+        var childsPages = childs.Where(x => x.ParentId == rootPage?.Id).Select(x => childs.ToModel(x, space)).ToList();
         pageTree.Childs = childsPages;
         return pageTree;
     }
@@ -176,6 +176,15 @@ public static class MappingExtensions
             SpaceKey = pageUpdateEvent.SpaceKey,
             Updated = pageUpdateEvent.Updated,
             UpdatedBy = pageUpdateEvent.UpdatedBy.ToModel()
+        };
+    }
+
+    public static AttachmentModel ToModel(this Attachment attachment)
+    {
+        return new AttachmentModel(){
+            Name = attachment.Name,
+            Created = attachment.Created,
+            CreatedBy = attachment.CreatedBy?.ToModel()
         };
     }
 }

@@ -10,6 +10,7 @@ public class WikiModule : Module
     {
         services.AddSingleton<IPageManager, PageManager>()
             .AddSingleton<ISpaceManager, SpaceManager>()
-            .AddSingleton<IFeedManager, FeedManager>();
+            .AddSingleton<IFeedManager, FeedManager>()
+            .AddSingleton<IAttachmentManager, AttachmentManager>();
     }
 }

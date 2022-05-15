@@ -7,6 +7,7 @@ RUN echo $(git describe --tags --always 2>/dev/null |  sed 's/-g[a-z0-9]\{7\}//'
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
 WORKDIR /build
 COPY . ./
+COPY --from=version /version /build/version
 RUN apt-get update -yq ;\
 	apt-get install curl gnupg -yq ;\
 	curl -sL https://deb.nodesource.com/setup_14.x | bash - ;\

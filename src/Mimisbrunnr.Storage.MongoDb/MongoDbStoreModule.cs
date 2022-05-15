@@ -34,6 +34,7 @@ public class MongoDbStoreModule : RunnableModule
                 .AddEntity<Space, SpaceMap>()
                 .AddEntity<Page, PageMap>()
                 .AddEntity<PageUpdateEvent, PageUpdateEventMap>()
+                .AddEntity<Attachment, AttachmentMap>()
         );
     }
 
@@ -49,6 +50,7 @@ public class MongoDbStoreModule : RunnableModule
             await CreateSpaceIndexes(baseMongoContext);
             await CreatePageIndexes(baseMongoContext);
             await CreatePageUpdatesIndexes(baseMongoContext);
+            await CreateAttachmentIndexes(baseMongoContext);
         }
         catch (Exception e)
         {
@@ -189,6 +191,27 @@ public class MongoDbStoreModule : RunnableModule
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<PageUpdateEvent>(dateAndSpaceTypeAndEmailKeyDefinition, new CreateIndexOptions()
         {
             Background = true
+        }));
+    }
+
+    private static async Task CreateAttachmentIndexes(IMongoDbContext mongoContext)
+    {
+        var collection = mongoContext.GetCollection<Attachment>();
+        var nameKeyDefinition = Builders<Attachment>.IndexKeys.Ascending(x => x.Name);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Attachment>(nameKeyDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+        var pageIdDefinition = Builders<Attachment>.IndexKeys.Ascending(x => x.PageId);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Attachment>(pageIdDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+        var nameAndPageIdDefinition = Builders<Attachment>.IndexKeys.Ascending(x => x.PageId).Ascending(x => x.Name);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Attachment>(nameAndPageIdDefinition, new CreateIndexOptions()
+        {
+            Background = true,
+            Unique = true
         }));
     }
 }

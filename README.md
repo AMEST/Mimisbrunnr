@@ -56,3 +56,21 @@ For better responsiveness of the service, caching is used. The service supports 
 
 * `Caching:Type` - cache type (`Memory`, `MongoDb`, `Redis`)
 * `Caching:RedisConnectionString` - connection string for Redis cache type
+
+#### Persistent
+
+There are several storage options for storing page attachments and other files: 
+1. Local file system - only suitable for deployment in a single instance and not in a docker container
+2. GridFS - storing files in MongoDB
+3. WebDav - storing files in repositories with webdav interface
+
+* `Persistent:Type` - storage type (`Local`, `GridFs`, `WebDav`)
+* Local:
+  * `Persistent:Local:Path` - Path in file system where stored files
+* GridFs:
+  * `Persistent:GridFs:ConnectionString` - MongoDb ConnectionString for gridfs store
+* WebDav
+  * `Persistent:WebDav:Address` - url to WebDav server (example: `http://nextcloud.local/remote.php/dav/files/sample-username/`)
+  * `Persistent:WebDav:Username` - WebDav username
+  * `Persistent:WebDav:Password` - WebDav password
+  

@@ -21,5 +21,6 @@ public class WebModule : Module
         services.AddSingleton<IPageService, PageService>();
         services.AddSingleton<IUserService, UserService>();
         services.AddSingleton<IFeedService, FeedService>();
+        services.AddSingleton<IAttachmentService, AttachmentService>();
     }
 }

@@ -9,6 +9,7 @@
     <move-page v-if="userPermissions && userPermissions.canEdit && userPermissions.canRemove"/>
     <permissions v-if="userPermissions && userPermissions.isAdmin"/>
     <settings v-if="userPermissions && userPermissions.isAdmin" :space="space"/>
+    <attachments :page="page"/>
   </b-container>
 </template>
 
@@ -21,6 +22,7 @@ import CopyPage from "@/components/space/modal/CopyPage.vue";
 import MovePage from "@/components/space/modal/MovePage.vue";
 import Permissions from "@/components/space/modal/Permissions.vue";
 import Settings from "@/components/space/modal/Settings.vue";
+import Attachments from "@/components/space/modal/Attachments.vue";
 export default {
   name: "Space",
   components:{
@@ -30,7 +32,8 @@ export default {
     CopyPage,
     MovePage,
     Permissions,
-    Settings
+    Settings,
+    Attachments
   },
   data() {
     return {
