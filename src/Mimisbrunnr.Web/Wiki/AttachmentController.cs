@@ -64,7 +64,7 @@ public class AttachmentController : ControllerBase
     [ProducesResponseType(200)]
     [ProducesResponseType(401)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> Import([FromRoute] string pageId, [FromRoute] string name)
+    public async Task<IActionResult> Remove([FromRoute] string pageId, [FromRoute] string name)
     {
         await _attachmentService.Remove(pageId, name, User?.ToEntity());
         return Ok();
