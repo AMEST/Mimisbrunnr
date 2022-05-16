@@ -26,6 +26,7 @@ Support for the following features:
 7. Copy / move pages
 8. Tree of pages
 9. Page updates feed
+10. Attachments
 
 ## Get started
 
