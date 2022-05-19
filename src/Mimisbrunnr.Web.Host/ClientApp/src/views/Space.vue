@@ -8,7 +8,7 @@
     <copy-page v-if="userPermissions && userPermissions.canEdit"/>
     <move-page v-if="userPermissions && userPermissions.canEdit && userPermissions.canRemove"/>
     <permissions v-if="userPermissions && userPermissions.isAdmin"/>
-    <settings v-if="userPermissions && userPermissions.isAdmin" :space="space"/>
+    <settings v-if="userPermissions && userPermissions.isAdmin" :spaceUpdateCallback="init" :space="space"/>
     <attachments :page="page"/>
   </b-container>
 </template>

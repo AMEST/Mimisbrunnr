@@ -30,9 +30,17 @@
           ><b-form-checkbox v-model="permission.isAdmin"></b-form-checkbox
         ></b-td>
         <b-td class="text-right">
-          <b-icon v-on:click="save(permission)" icon="disc" style="cursor:pointer"></b-icon>
+          <b-icon
+            v-on:click="save(permission)"
+            icon="disc"
+            style="cursor: pointer"
+          ></b-icon>
           &nbsp;
-          <b-icon v-on:click="deletePermission(permission)" icon="trash" style="cursor:pointer"></b-icon>
+          <b-icon
+            v-on:click="deletePermission(permission)"
+            icon="trash"
+            style="cursor: pointer"
+          ></b-icon>
         </b-td>
       </b-tr>
       <b-tr><b-td>Add new</b-td></b-tr>
@@ -56,7 +64,7 @@
           ><b-form-checkbox v-model="newPermission.isAdmin"></b-form-checkbox
         ></b-td>
         <b-td class="text-right">
-          <b-icon @click="add" icon="disc" style="cursor:pointer"></b-icon>
+          <b-icon @click="add" icon="disc" style="cursor: pointer"></b-icon>
         </b-td>
       </b-tr>
     </b-tbody>
@@ -70,7 +78,7 @@ export default {
   props: {
     permissions: Array,
     type: String,
-    actionCallBack: Function
+    actionCallBack: Function,
   },
   data() {
     return {
@@ -88,40 +96,77 @@ export default {
       var spaceKey = this.$route.params.key;
       if (spaceKey == null) return;
       if (permission == null) return;
-      await axios.put("/api/space/"+spaceKey+"/permissions", permission)
-      await this.actionCallBack();
+      var savePermissionRequest = await axios.put(`/api/space/${spaceKey}/permissions`, permission, { validateStatus: false });
+      if (savePermissionRequest.status == 200 ) await this.actionCallBack();
+      else this.$bvToast.toast(
+          savePermissionRequest.data.message != undefined
+            ? savePermissionRequest.data.message
+            : JSON.stringify(savePermissionRequest.data),
+          {
+            title: "Error when saving permission.",
+            variant: "danger",
+            solid: true,
+          }
+        );
     },
     deletePermission: async function (permission) {
       var spaceKey = this.$route.params.key;
       if (spaceKey == null) return;
       if (permission == null) return;
-      await axios.delete("/api/space/"+spaceKey+"/permissions", {
-          data: permission
-      })
+      await axios.delete(`/api/space/${spaceKey}/permissions`, {
+        data: permission,
+      });
       await this.actionCallBack();
     },
     add: async function () {
-        var spaceKey = this.$route.params.key;
-        if (spaceKey == null) return;
-        var permission = {
-            canView: this.newPermission.canView,
-            canEdit: this.newPermission.canEdit,
-            canRemove: this.newPermission.canRemove,
-            isAdmin: this.newPermission.isAdmin,
-        }
-        if(this.type == 'Group'){
-            alert("Add group permissions not implemented")
-            return;
-        }else{
-            var profileRequest = await axios.get("/api/user/"+this.newPermission.name, { validateStatus: false });
-            if(profileRequest.status != 200){
-                alert("Error when search user. status:"+profileRequest.status+"\n"+JSON.stringify(profileRequest.data));
-                return;
+      var spaceKey = this.$route.params.key;
+      if (spaceKey == null) return;
+      var permission = {
+        canView: this.newPermission.canView,
+        canEdit: this.newPermission.canEdit,
+        canRemove: this.newPermission.canRemove,
+        isAdmin: this.newPermission.isAdmin,
+      };
+      if (this.type == "Group") {
+        alert("Add group permissions not implemented");
+        return;
+      } else {
+        var profileRequest = await axios.get(
+          "/api/user/" + this.newPermission.name,
+          { validateStatus: false }
+        );
+        if (profileRequest.status != 200) {
+          this.$bvToast.toast(
+            `status:${profileRequest.status}.${JSON.stringify(
+              profileRequest.data
+            )}`,
+            {
+              title: "Error when search user.",
+              variant: "warning",
+              solid: true,
             }
-            permission.user = profileRequest.data
+          );
+          return;
         }
-        await axios.put("/api/space/"+spaceKey+"/permissions", permission)
-        await this.actionCallBack();
+        permission.user = profileRequest.data;
+      }
+      var addPermissionRequest = await axios.put(
+        `/api/space/${spaceKey}/permissions`,
+        permission,
+        { validateStatus: false }
+      );
+      if (addPermissionRequest.status == 200) await this.actionCallBack();
+      else
+        this.$bvToast.toast(
+          addPermissionRequest.data.message != undefined
+            ? addPermissionRequest.data.message
+            : JSON.stringify(addPermissionRequest.data),
+          {
+            title: "Error when adding permission.",
+            variant: "danger",
+            solid: true,
+          }
+        );
     },
   },
 };

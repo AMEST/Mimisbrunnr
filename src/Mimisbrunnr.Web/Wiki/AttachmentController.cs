@@ -47,6 +47,7 @@ public class AttachmentController : ControllerBase
     [ProducesResponseType(200)]
     [ProducesResponseType(401)]
     [ProducesResponseType(404)]
+    [DisableRequestSizeLimit]
     public async Task<IActionResult> Upload([FromRoute] string pageId)
     {
         var uploadedFile = HttpContext.Request.Form.Files.FirstOrDefault();
