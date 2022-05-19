@@ -28,12 +28,25 @@
     </div>
     <div role="group" v-if="space.type != 'Personal'">
       <label>Space private type:</label>
-      <b-form-checkbox v-model="this.public"
+      <b-form-checkbox v-model="this.public" switch
         >&nbsp;Is public space?</b-form-checkbox
       >
       <b-form-text>Allow visible space to all users </b-form-text>
     </div>
+    <b-form-group
+        label="Space status"
+        description="Archive space for disable creating/updating/deleting pages"
+      >
+        <b-form-checkbox v-model="isArchive" switch>
+          &nbsp;Archive
+        </b-form-checkbox>
+      </b-form-group>
     <template #modal-footer>
+      <div align="left">
+        <b-button v-if="space.status == 'Archived'" variant="danger" style="float:left" @click="remove">
+          Remove
+        </b-button>
+      </div>
       <div align="right">
         <b-button variant="warning" class="mr-05em" @click="save">
           Save
@@ -50,10 +63,12 @@ export default {
   name: "Settings",
   props: {
     space: Object,
+    spaceUpdateCallback: Function
   },
   data() {
     return {
       public: false,
+      isArchive: false
     };
   },
   computed: {
@@ -71,7 +86,17 @@ export default {
         description: this.space.description,
       };
       if (this.space.type != "Personal") spaceUpdateModel.public = this.public;
-      await axios.put("/api/space/" + this.space.key, spaceUpdateModel);
+      await axios.put(`/api/space/${this.space.key}`, spaceUpdateModel);
+      if(this.isArchive)
+        await axios.post(`/api/space/${this.space.key}/archive`);
+      else
+        await axios.post(`/api/space/${this.space.key}/unarchive`);
+
+      if(this.spaceUpdateCallback != null ) await this.spaceUpdateCallback();
+    },
+    remove: async function() {
+      await axios.delete(`/api/space/${this.space.key}`);
+      this.$router.push("/");
     },
     close: function () {
       this.$bvModal.hide("space-settings-modal");
@@ -81,13 +106,18 @@ export default {
     // eslint-disable-next-line
     space: function (newValue, oldValue) {
       this.public = this.space.type == "Public";
+      this.isArchive = this.space.status == "Archived";
     },
   },
   mounted: function () {
     this.public = this.space.type == "Public";
+    this.isArchive = this.space.status == "Archived";
   },
 };
 </script>
 
 <style>
+#space-settings-modal .modal-footer {
+  justify-content: space-between !important;
+}
 </style>

@@ -113,6 +113,7 @@ public static class MappingExtensions
             Name = space.Name,
             Description = space.Description,
             Type = (SpaceTypeModel)space.Type,
+            Status = (SpaceStatusModel)space.Status,
             HomePageId = space.HomePageId
         };
     }

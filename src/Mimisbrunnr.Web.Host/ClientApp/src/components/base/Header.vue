@@ -152,11 +152,19 @@ export default {
         name: "New page",
         content: "**Page content**",
       };
-      var createPageRequest = await axios.post("/api/page", newPage);
+      var createPageRequest = await axios.post("/api/page", newPage, {
+        validateStatus: false,
+      });
       if (createPageRequest.status == 200)
         this.$router.push(
           "/space/" + spaceKey + "/" + createPageRequest.data.id + "/edit"
         );
+      else
+        this.$bvToast.toast(createPageRequest.data.message, {
+          title: 'Error creating page',
+          variant: 'danger',
+          solid: true
+        })
     },
   },
 };
@@ -218,7 +226,7 @@ export default {
     margin-left: unset;
   }
 }
-@media (max-width: 387px ) {
+@media (max-width: 387px) {
   .header-right-menu .flex-search {
     display: none !important;
   }

@@ -10,7 +10,7 @@
         variant="outline-secondary"
         size="sm"
         class="m-2"
-        :disabled="!userPermissions.canEdit"
+        :disabled="!userPermissions.canEdit || isArchived"
       >
         <b-icon icon="pencil-fill" font-scale="0.9"/>
         Edit
@@ -31,18 +31,18 @@
         <b-dropdown-divider></b-dropdown-divider>
         <b-dropdown-item
           v-b-modal.page-copy-modal
-          :disabled="!userPermissions.canEdit"
+          :disabled="!userPermissions.canEdit || isArchived"
           >Copy</b-dropdown-item
         >
         <b-dropdown-item
           v-b-modal.page-move-modal
-          :disabled="!userPermissions.canEdit && !userPermissions.canRemove"
+          :disabled="(!userPermissions.canEdit && !userPermissions.canRemove) || isArchived"
           >Move</b-dropdown-item
         >
         <b-dropdown-item
           variant="danger"
           v-b-modal.page-delete-modal
-          :disabled="!userPermissions.canRemove"
+          :disabled="!userPermissions.canRemove || isArchived"
           >Delete</b-dropdown-item
         >
       </b-dropdown>
@@ -89,6 +89,11 @@ export default {
     space: Object,
     page: Object,
     userPermissions: Object,
+  },
+  computed: {
+    isArchived() {
+      return this.space.status == "Archived";
+    },
   },
   methods: {
     initBreadcrumbs() {
