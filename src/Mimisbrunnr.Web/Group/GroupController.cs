@@ -1,0 +1,98 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Mimisbrunnr.Web.Filters;
+using Mimisbrunnr.Web.Mapping;
+using Mimisbrunnr.Web.User;
+using Mimisbrunnr.Wiki.Contracts;
+
+namespace Mimisbrunnr.Web.Group;
+
+[Route("api/[controller]")]
+[ApiController]
+[Authorize]
+[HandleGroupErrors]
+public class GroupController : ControllerBase
+{
+    private readonly GroupService _groupService;
+
+    public GroupController(GroupService groupService)
+    {
+        _groupService = groupService;
+    }
+
+    [HttpGet]
+    [ProducesResponseType(typeof(GroupModel[]), 200)]
+    [ProducesResponseType(401)]
+    public async Task<IActionResult> GetAll()
+    {
+        return Ok(await _groupService.GetAll(User.ToEntity()));
+    }
+
+    [HttpGet("{name}/users")]
+    [ProducesResponseType(typeof(UserModel[]), 200)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    public async Task<IActionResult> GetUsers([FromRoute] string name)
+    {
+        return Ok(await _groupService.GetUsers(name, User.ToEntity()));
+    }
+
+
+    [HttpPost]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    public async Task<IActionResult> Create([FromBody] GroupCreateModel model)
+    {
+        await _groupService.Create(model, User.ToEntity());
+        return Ok();
+    }
+
+    [HttpPut("{name}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> Update([FromRoute] string name, [FromBody] GroupUpdateModel model)
+    {
+        await _groupService.Update(name, model, User?.ToEntity());
+        return Ok();
+    }
+
+    [HttpDelete("{name}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> Remove([FromRoute] string name)
+    {
+        await _groupService.Remove(name, User.ToEntity());
+        return Ok();
+    }
+
+    [HttpPost("{name}/{email}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> AddToGroup([FromRoute] string name, [FromRoute] string userEmail)
+    {
+        await _groupService.AddUserToGroup(name, new UserInfo(){Email = userEmail}, User.ToEntity());
+        return Ok();
+    }
+
+    [HttpDelete("{name}/{email}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> RemoveFromGroup([FromRoute] string name, [FromRoute] string userEmail)
+    {
+        await _groupService.RemoveUserFromGroup(name, new UserInfo(){Email = userEmail}, User.ToEntity());
+        return Ok();
+    }
+}

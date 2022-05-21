@@ -6,11 +6,18 @@ internal class UserGroupManager : IUserGroupManager
 {
     private readonly IRepository<Group> _groupRepository;
     private readonly IRepository<UserGroup> _userGroupsRepository;
+    private readonly IUserManager _userManager;
 
-    public UserGroupManager(IRepository<Group> groupRepository, IRepository<UserGroup> userGroupsRepository)
+    public UserGroupManager(IRepository<Group> groupRepository, IRepository<UserGroup> userGroupsRepository, IUserManager userManager)
     {
         _groupRepository = groupRepository;
         _userGroupsRepository = userGroupsRepository;
+        _userManager = userManager;
+    }
+
+    public Task<Group[]> GetAll()
+    {
+        return _groupRepository.GetAll().ToArrayAsync();
     }
     
     public Task<Group> FindByName(string name)
@@ -83,5 +90,18 @@ internal class UserGroupManager : IUserGroupManager
         }
 
         return groups.ToArray();
+    }
+
+    public async Task<User[]> GetUsersInGroup(Group group)
+    {
+        var usersInGroups = await _userGroupsRepository.GetAll().Where(x => x.GroupId == group.Id).ToArrayAsync();
+        var users = new List<User>();
+        foreach( var userGroup in usersInGroups)
+        {
+            var user = await _userManager.GetById(userGroup.UserId);
+            if(user is not null)
+                users.Add(user);
+        }
+        return users.ToArray();
     }
 }

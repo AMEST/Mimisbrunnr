@@ -223,14 +223,14 @@ internal class SpaceService : ISpaceService
             throw new SpaceNotFoundException();
     }
 
-    private async Task<Group[]> GetUserGroups(UserInfo userInfo)
+    private async Task<Users.Group[]> GetUserGroups(UserInfo userInfo)
     {
         var user = await _userManager.GetByEmail(userInfo?.Email);
         var userGroups = await _userGroupManager.GetUserGroups(user);
         return userGroups;
     }
 
-    private static Permission FindPermission(Permission[] permissions, UserInfo user, Group[] groups)
+    private static Permission FindPermission(Permission[] permissions, UserInfo user, Users.Group[] groups)
     {
         var userPermission =
             permissions.FirstOrDefault(x => x.User != null && x.User.Equals(user));

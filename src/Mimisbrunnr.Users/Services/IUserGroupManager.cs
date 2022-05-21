@@ -2,6 +2,8 @@
 
 public interface IUserGroupManager
 {
+    Task<Group[]> GetAll();
+    
     Task<Group> FindByName(string name);
     
     Task<Group> Add(string name, string description, string ownerEmail);
@@ -15,4 +17,6 @@ public interface IUserGroupManager
     Task RemoveFromGroup(Group userGroup, User user);
 
     Task<Group[]> GetUserGroups(User user);
+
+    Task<User[]> GetUsersInGroup(Group group);
 }

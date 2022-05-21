@@ -1,11 +1,11 @@
 ﻿using System.Security.Claims;
-using Mimisbrunnr.Web.Authentication.Account;
 using Mimisbrunnr.Web.User;
 using Mimisbrunnr.Web.Infrastructure.Contracts;
 using Mimisbrunnr.Web.Quickstart;
 using Mimisbrunnr.Web.Wiki;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Web.Feed;
+using Mimisbrunnr.Web.Group;
 
 namespace Mimisbrunnr.Web.Mapping;
 
@@ -102,6 +102,16 @@ public static class MappingExtensions
         return new GroupModel()
         {
             Name = group.Name,
+        };
+    }
+
+    public static GroupModel ToModel(this Users.Group group , bool includeOwners = false)
+    {
+        return new GroupModel()
+        {
+            Name = group.Name,
+            Description = group.Description,
+            OwnerEmails = includeOwners ? group.OwnerEmails : null
         };
     }
 

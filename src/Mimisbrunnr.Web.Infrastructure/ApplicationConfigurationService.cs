@@ -26,7 +26,7 @@ internal class ApplicationConfigurationService : IApplicationConfigurationServic
     {
         var isInitialized = await IsInitialized();
         if (isInitialized)
-            throw new InvalidOperationException("Mimisbrunner alredy initialized");
+            throw new InvalidOperationException("Mimisbrunnr already initialized");
         
         await _repository.Create(configuration);
         await _userManager.ChangeRole(initializedBy, UserRole.Admin);
@@ -56,7 +56,7 @@ internal class ApplicationConfigurationService : IApplicationConfigurationServic
     {
         var isInitialized = await IsInitialized();
         if (!isInitialized)
-            throw new InvalidOperationException("Mimisbrunner not initialized");
+            throw new InvalidOperationException("Mimisbrunnr not initialized");
         await _repository.Update(configuration);
         await _distributedCache.RemoveAsync(ConfigurationCacheKey);
     }
