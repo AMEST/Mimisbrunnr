@@ -20,10 +20,10 @@ Vue.use(IconsPlugin)
 Vue.config.productionTip = false
 
 // Load bootstrap theme
-let link = document.createElement('link');
-link.rel = "stylesheet";
-link.href = "/css/bootstrap.cosmo.min.css";
-document.head.appendChild(link);
+let link = document.createElement('link')
+link.rel = 'stylesheet';
+link.href = '/css/bootstrap.cosmo.min.css';
+document.head.appendChild(link)
 
 // Restore history
 var recentlyVisited = window.localStorage['history']
@@ -46,6 +46,13 @@ var applicationInfoTask = axios.get('/api/quickstart').then(result => {
   store.commit('changeApplicationInfo', result.data)
   document.title = result.data.title
 })
+
+window.addEventListener('dragover', function (e) {
+  e.preventDefault()
+}, false)
+window.addEventListener('drop', function (e) {
+  e.preventDefault()
+}, false)
 
 // eslint-disable-next-line
 Promise.all([applicationInfoTask]).then(result => {
