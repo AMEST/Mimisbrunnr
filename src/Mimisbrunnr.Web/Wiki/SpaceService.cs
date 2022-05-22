@@ -37,23 +37,10 @@ internal class SpaceService : ISpaceService
 
         var user = await _userManager.GetByEmail(requestedBy.Email);
         if (user.Role == UserRole.Admin)
-            return spaces.ToList().Select(x => x.ToModel()).ToArray();
+            return spaces.Select(x => x.ToModel()).ToArray();
 
-        var visibleSpaces = new List<SpaceModel>();
-        var groups = await GetUserGroups(requestedBy);
-        foreach (var space in spaces)
-        {
-            if (space.Type == SpaceType.Public)
-            {
-                visibleSpaces.Add(space.ToModel());
-                continue;
-            }
-            var permission = FindPermission(space.Permissions.ToArray(), requestedBy, groups);
-            if (permission is not null)
-                visibleSpaces.Add(space.ToModel());
-        }
-
-        return visibleSpaces.ToArray();
+        var visibleSpaces = await _permissionService.FindUserVisibleSpaces(requestedBy);
+        return visibleSpaces.Select( x => x.ToModel()).ToArray();
     }
 
     public async Task<SpaceModel> GetByKey(string key, UserInfo requestedBy)

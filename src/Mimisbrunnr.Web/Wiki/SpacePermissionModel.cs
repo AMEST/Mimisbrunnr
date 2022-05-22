@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Mimisbrunnr.Web.Authentication.Account;
+using Mimisbrunnr.Web.Group;
 using Mimisbrunnr.Web.User;
 
 namespace Mimisbrunnr.Web.Wiki;

@@ -4,7 +4,7 @@ using Skidbladnir.Repository.Abstractions;
 
 namespace Mimisbrunnr.Wiki.Services;
 
-internal class PageManager : IPageManager
+internal class PageManager : IPageManager, IPageSearcher
 {
     private readonly IRepository<Page> _pageRepository;
     private readonly IAttachmentManager _attachmentManager;
@@ -23,7 +23,7 @@ internal class PageManager : IPageManager
     public Task<Page[]> FindByName(string name)
     {
         return _pageRepository.GetAll()
-            .Where(x => x.Name.Contains(name, StringComparison.OrdinalIgnoreCase)).ToArrayAsync();
+            .Where(x => x.Name.Contains(name)).ToArrayAsync();
     }
 
     public async Task<Page[]> GetAllChilds(Page page)
@@ -146,5 +146,15 @@ internal class PageManager : IPageManager
             removeTasks.Add(_attachmentManager.Remove(page, attachment.Name));
 
         await Task.WhenAll(removeTasks);
+    }
+
+    public async Task<IEnumerable<Page>> Search(string text)
+    {
+        var pages = await _pageRepository.GetAll()
+            .Where(x => x.Name.Contains(text)
+                || x.Content.Contains(text))
+            .Take(100)
+            .ToArrayAsync();
+        return pages;
     }
 }

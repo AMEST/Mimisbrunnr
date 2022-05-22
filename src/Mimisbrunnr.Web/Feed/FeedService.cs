@@ -30,7 +30,8 @@ namespace Mimisbrunnr.Web.Feed
 
             if (!string.IsNullOrEmpty(updatedByEmail))
             {
-                var userUpdates = await _feedManager.GetPageUpdates(requestedBy, new UserInfo { Email = updatedByEmail.ToLower() });
+                var visibleSpaces = await _permissionService.FindUserVisibleSpaces(requestedBy);
+                var userUpdates = await _feedManager.GetPageUpdates(requestedBy, visibleSpaces, new UserInfo { Email = updatedByEmail.ToLower() });
                 return userUpdates.Select(x => x.ToModel()).ToArray();
             }
 
@@ -41,7 +42,8 @@ namespace Mimisbrunnr.Web.Feed
                 return allUpdates.Select(x => x.ToModel()).ToArray();
             }
 
-            var updates = await _feedManager.GetPageUpdates(requestedBy);
+            var userSpaces = await _permissionService.FindUserVisibleSpaces(requestedBy);
+            var updates = await _feedManager.GetPageUpdates(requestedBy, userSpaces);
             return updates.Select(x => x.ToModel()).ToArray();
         }
     }

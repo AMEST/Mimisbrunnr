@@ -28,7 +28,7 @@
     </div>
     <div role="group" v-if="space.type != 'Personal'">
       <label>Space private type:</label>
-      <b-form-checkbox v-model="this.public" switch
+      <b-form-checkbox v-model="isPublic" switch
         >&nbsp;Is public space?</b-form-checkbox
       >
       <b-form-text>Allow visible space to all users </b-form-text>
@@ -67,7 +67,7 @@ export default {
   },
   data() {
     return {
-      public: false,
+      isPublic: false,
       isArchive: false
     };
   },
@@ -85,7 +85,7 @@ export default {
         name: this.space.name,
         description: this.space.description,
       };
-      if (this.space.type != "Personal") spaceUpdateModel.public = this.public;
+      if (this.space.type != "Personal") spaceUpdateModel.public = this.isPublic;
       await axios.put(`/api/space/${this.space.key}`, spaceUpdateModel);
       if(this.isArchive)
         await axios.post(`/api/space/${this.space.key}/archive`);
@@ -105,12 +105,12 @@ export default {
   watch: {
     // eslint-disable-next-line
     space: function (newValue, oldValue) {
-      this.public = this.space.type == "Public";
+      this.isPublic = this.space.type == "Public";
       this.isArchive = this.space.status == "Archived";
     },
   },
   mounted: function () {
-    this.public = this.space.type == "Public";
+    this.isPublic = this.space.type == "Public";
     this.isArchive = this.space.status == "Archived";
   },
 };
