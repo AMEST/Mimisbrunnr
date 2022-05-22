@@ -142,7 +142,7 @@ internal class PermissionService : IPermissionService
             await CacheExtensions.SetAsync(_distributedCache,
              cacheKey, 
              spaces, 
-             new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30) }
+             new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) }
             );
             return spaces;
         }
@@ -151,7 +151,7 @@ internal class PermissionService : IPermissionService
         await CacheExtensions.SetAsync(_distributedCache,
              cacheKey, 
              spaces, 
-             new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30) }
+             new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) }
         );
         return spaces;
     }
