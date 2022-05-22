@@ -61,6 +61,9 @@ internal class UserManager : IUserManager
         await _distributedCache.SetAsync(GetUserCacheKeyEmail(email), user, new DistributedCacheEntryOptions(){
             AbsoluteExpirationRelativeToNow = _defaultCacheTime
         });
+        await _distributedCache.SetAsync(GetUserCacheKeyId(user.Id), user, new DistributedCacheEntryOptions(){
+            AbsoluteExpirationRelativeToNow = _defaultCacheTime
+        });
     }
 
     public async Task Disable(User user)
@@ -68,6 +71,7 @@ internal class UserManager : IUserManager
         user.Enable = false;
         await _userRepository.Update(user);
         await _distributedCache.RemoveAsync(GetUserCacheKeyEmail(user.Email));
+        await _distributedCache.RemoveAsync(GetUserCacheKeyId(user.Id));
     }
 
     public async Task Enable(User user)
@@ -75,6 +79,7 @@ internal class UserManager : IUserManager
         user.Enable = true;
         await _userRepository.Update(user);
         await _distributedCache.RemoveAsync(GetUserCacheKeyEmail(user.Email));
+        await _distributedCache.RemoveAsync(GetUserCacheKeyId(user.Id));
     }
 
     public async Task ChangeRole(User user, UserRole role)
@@ -82,6 +87,7 @@ internal class UserManager : IUserManager
         user.Role = role;
         await _userRepository.Update(user);
         await _distributedCache.RemoveAsync(GetUserCacheKeyEmail(user.Email));
+        await _distributedCache.RemoveAsync(GetUserCacheKeyId(user.Id));
     }
 
     private static string GetUserCacheKeyEmail(string email) => $"user_cache_email_{email.ToLower()}";
