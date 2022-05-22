@@ -13,13 +13,20 @@ internal class SearchService : ISearchService
     private readonly IPageSearcher _pageSearcher;
     private readonly ISpaceSearcher _spaceSearcher;
     private readonly IUserManager _userManager;
+    private readonly ISpaceDisplayService _spaceDisplayService;
 
-    public SearchService(IPermissionService permissionService, IPageSearcher pageSearcher, ISpaceSearcher spaceSearcher, IUserManager userManager)
+    public SearchService(
+        IPermissionService permissionService,
+        IPageSearcher pageSearcher, 
+        ISpaceSearcher spaceSearcher, 
+        IUserManager userManager,
+        ISpaceDisplayService spaceDisplayService)
     {
         _permissionService = permissionService;
         _pageSearcher = pageSearcher;
         _spaceSearcher = spaceSearcher;
         _userManager = userManager;
+        _spaceDisplayService = spaceDisplayService;
     }
 
     public async Task<IEnumerable<PageModel>> SearchPages(string text, UserInfo searchBy)
@@ -29,7 +36,7 @@ internal class SearchService : ISearchService
         if (user.Role == UserRole.Admin)
             return pages.Select(x => x.ToModel());
 
-        var userSpaces = await _permissionService.FindUserVisibleSpaces(searchBy);
+        var userSpaces = await _spaceDisplayService.FindUserVisibleSpaces(searchBy);
         var userSpacesId = userSpaces.Select(x => x.Id);
         return pages.Where(x => userSpacesId.Contains(x.SpaceId)).Select(x => x.ToModel(userSpaces.First(s => s.Id == x.SpaceId).Key));
     }
@@ -41,7 +48,7 @@ internal class SearchService : ISearchService
         if (user.Role == UserRole.Admin)
             return spaces.Select(x => x.ToModel());
 
-        var userSpaces = (await _permissionService.FindUserVisibleSpaces(searchBy)).Select(x => x.Id);
+        var userSpaces = (await _spaceDisplayService.FindUserVisibleSpaces(searchBy)).Select(x => x.Id);
         return spaces.Where(x => userSpaces.Contains(x.Id)).Select(x => x.ToModel());
     }
 }

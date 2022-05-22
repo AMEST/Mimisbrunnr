@@ -5,6 +5,7 @@ using Mimisbrunnr.Web.Group;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Quickstart;
 using Mimisbrunnr.Web.Search;
+using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Web.User;
 using Mimisbrunnr.Web.Wiki;
 using Mimisbrunnr.Web.Wiki.Import;
@@ -20,6 +21,7 @@ public class WebModule : Module
     {
         services.AddSingleton<IQuickstartService, QuickstartService>();
         services.AddSingleton<ISpaceService, SpaceService>();
+        services.AddSingleton<ISpaceDisplayService>(r => (ISpaceDisplayService)r.GetService<ISpaceService>());
         services.AddSingleton<IPageService, PageService>();
         services.AddSingleton<IUserService, UserService>();
         services.AddSingleton<IFeedService, FeedService>();

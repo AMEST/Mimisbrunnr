@@ -1,5 +1,6 @@
 ﻿using System.IO.Compression;
 using System.Runtime.Serialization;
+using Microsoft.Extensions.Caching.Distributed;
 using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Mapping;
@@ -9,23 +10,26 @@ using Mimisbrunnr.Wiki.Services;
 
 namespace Mimisbrunnr.Web.Wiki;
 
-internal class SpaceService : ISpaceService
+internal class SpaceService : ISpaceService, ISpaceDisplayService
 {
     private readonly IPermissionService _permissionService;
     private readonly ISpaceManager _spaceManager;
     private readonly IUserManager _userManager;
     private readonly IUserGroupManager _userGroupManager;
+    private readonly IDistributedCache _distributedCache;
 
     public SpaceService(IPermissionService permissionService,
         ISpaceManager spaceManager,
         IUserManager userManager,
-        IUserGroupManager userGroupManager
+        IUserGroupManager userGroupManager,
+        IDistributedCache distributedCache
     )
     {
         _permissionService = permissionService;
         _spaceManager = spaceManager;
         _userManager = userManager;
         _userGroupManager = userGroupManager;
+        _distributedCache = distributedCache;
     }
 
     public async Task<SpaceModel[]> GetAll(UserInfo requestedBy)
@@ -39,7 +43,7 @@ internal class SpaceService : ISpaceService
         if (user.Role == UserRole.Admin)
             return spaces.Select(x => x.ToModel()).ToArray();
 
-        var visibleSpaces = await _permissionService.FindUserVisibleSpaces(requestedBy);
+        var visibleSpaces = await FindUserVisibleSpaces(requestedBy);
         return visibleSpaces.Select( x => x.ToModel()).ToArray();
     }
 
@@ -95,6 +99,7 @@ internal class SpaceService : ISpaceService
         EnsureSpaceExists(space);
 
         await _spaceManager.AddPermission(space, model.ToEntity());
+        await _distributedCache.RemoveAsync(CreateUserVisibleSpacesCacheKey(model.User.Email));
 
         return model;
     }
@@ -108,6 +113,7 @@ internal class SpaceService : ISpaceService
             throw new SpaceNotFoundException();
 
         await _spaceManager.UpdatePermission(space, model.ToEntity());
+        await _distributedCache.RemoveAsync(CreateUserVisibleSpacesCacheKey(model.User.Email));
     }
 
     public async Task RemovePermission(string key, SpacePermissionModel model, UserInfo removedBy)
@@ -118,6 +124,7 @@ internal class SpaceService : ISpaceService
         EnsureSpaceExists(space);
 
         await _spaceManager.RemovePermission(space, model.ToEntity());
+        await _distributedCache.RemoveAsync(CreateUserVisibleSpacesCacheKey(model.User.Email));
     }
 
     public async Task<SpaceModel> Create(SpaceCreateModel model, UserInfo createdBy)
@@ -198,6 +205,29 @@ internal class SpaceService : ISpaceService
         await _spaceManager.Remove(space);
     }
 
+    public async Task<IEnumerable<Space>> FindUserVisibleSpaces(UserInfo userInfo)
+    {
+        var cacheKey = CreateUserVisibleSpacesCacheKey(userInfo.Email);
+        IEnumerable<Space> spaces = await _distributedCache.GetAsync<Space[]>(cacheKey);
+        if (spaces is not null) return spaces;
+
+        var user = await _userManager.GetByEmail(userInfo.Email);
+        spaces = await _spaceManager.GetAll();
+        if (user.Role == UserRole.Admin)
+        {
+            await _distributedCache.SetAsync(cacheKey, spaces, 
+                new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1) }
+            );
+            return spaces;
+        }
+        var userGroups = await _userGroupManager.GetUserGroups(user);
+        spaces = spaces.Where( x => x.Type == SpaceType.Public || FindPermission(x.Permissions.ToArray(), userInfo, userGroups) != null);
+        await _distributedCache.SetAsync(cacheKey, spaces, 
+             new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1) }
+        );
+        return spaces;
+    }
+
     private static void EnsureIsNotAnonymous(UserInfo userInfo)
     {
         if (userInfo == null)
@@ -225,4 +255,6 @@ internal class SpaceService : ISpaceService
             x.Group != null && groups.Any(g => g.Name.Equals(x.Group.Name)));
         return userPermission ?? groupPermission;
     }
+
+    private static string CreateUserVisibleSpacesCacheKey(string email) => $"user_visible_spaces_cache_email_{email.ToLower()}";
 }
