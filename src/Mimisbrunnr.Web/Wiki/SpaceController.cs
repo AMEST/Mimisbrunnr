@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Diagnostics;
 using Mimisbrunnr.Web.Filters;
 using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.Wiki.Import;
@@ -11,6 +10,7 @@ using Mimisbrunnr.Web.Wiki.Import;
 namespace Mimisbrunnr.Web.Wiki;
 
 [Route("api/[controller]")]
+[ApiController]
 [Authorize]
 [HandleWikiErrors]
 public class SpaceController : ControllerBase

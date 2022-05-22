@@ -6,6 +6,7 @@ using Mimisbrunnr.Web.Mapping;
 namespace Mimisbrunnr.Web.Feed;
 
 [Route("api/[controller]")]
+[ApiController]
 [HandleWikiErrors]
 [Authorize]
 public class FeedController : ControllerBase 

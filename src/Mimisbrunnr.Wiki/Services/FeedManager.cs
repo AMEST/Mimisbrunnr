@@ -17,18 +17,22 @@ namespace Mimisbrunnr.Wiki.Services
             return _pageUpdatesRepository.GetAll().OrderByDescending(x => x.Updated).Take(15).ToArrayAsync();
         }
 
-        public Task<PageUpdateEvent[]> GetPageUpdates(UserInfo requestedBy, UserInfo updatedBy = null)
+        public Task<PageUpdateEvent[]> GetPageUpdates(UserInfo requestedBy, IEnumerable<Space> userSpaces = null, UserInfo updatedBy = null)
         {
             var query = _pageUpdatesRepository.GetAll().OrderByDescending(x => x.Updated);
             if (requestedBy is null)
                 return query.Where(x => x.SpaceType == SpaceType.Public).Take(15).ToArrayAsync();
 
+            if (userSpaces is null)
+                throw new ArgumentNullException(nameof(userSpaces));
+
             if (updatedBy is null)
-                return query.Where(x =>
-                    (x.SpaceType == SpaceType.Personal && x.SpaceKey == requestedBy.Email.ToUpper())
-                        || x.SpaceType == SpaceType.Public)
+            {
+                var userSpacesKeys = userSpaces.Select(x=>x.Key).ToArray();
+                return query.Where(x => userSpacesKeys.Contains(x.SpaceKey))
                 .Take(15)
                 .ToArrayAsync();
+            }
 
             if (requestedBy.Email == updatedBy.Email)
                 return query.Where(x => x.UpdatedBy.Email == updatedBy.Email).Take(15).ToArrayAsync();

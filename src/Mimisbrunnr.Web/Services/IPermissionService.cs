@@ -13,4 +13,6 @@ public interface IPermissionService
     Task EnsureRemovePermission(string spaceKey, UserInfo userInfo);
 
     Task EnsureAdminPermission(string spaceKey, UserInfo userInfo);
+
+    Task<IEnumerable<Space>> FindUserVisibleSpaces(UserInfo userInfo);
 }

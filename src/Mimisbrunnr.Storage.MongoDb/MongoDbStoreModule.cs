@@ -82,6 +82,11 @@ public class MongoDbStoreModule : RunnableModule
             Unique = true,
             Background = true
         }));
+        var ownersKeyDefinition = Builders<Group>.IndexKeys.Ascending(x => x.OwnerEmails);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Group>(ownersKeyDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
     }
 
     private static async Task CreateUserGroupIndexes(IMongoDbContext mongoContext)

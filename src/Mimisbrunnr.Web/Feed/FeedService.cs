@@ -4,45 +4,46 @@ using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;
 
-namespace Mimisbrunnr.Web.Feed
+namespace Mimisbrunnr.Web.Feed;
+
+internal class FeedService : IFeedService
 {
-    internal class FeedService : IFeedService
+    private readonly IFeedManager _feedManager;
+    private readonly IPermissionService _permissionService;
+    private readonly IUserManager _userManager;
+
+    public FeedService(IUserManager userManager, IPermissionService permissionService, IFeedManager feedManager)
     {
-        private readonly IFeedManager _feedManager;
-        private readonly IPermissionService _permissionService;
-        private readonly IUserManager _userManager;
+        _userManager = userManager;
+        _permissionService = permissionService;
+        _feedManager = feedManager;
+    }
 
-        public FeedService(IUserManager userManager, IPermissionService permissionService, IFeedManager feedManager)
+    public async Task<PageUpdateEventModel[]> GetPageUpdates(UserInfo requestedBy, string updatedByEmail = null)
+    {
+        if (requestedBy is null)
         {
-            _userManager = userManager;
-            _permissionService = permissionService;
-            _feedManager = feedManager;
+            await _permissionService.EnsureAnonymousAllowed(requestedBy);
+            var publicUpdates = await _feedManager.GetPageUpdates(requestedBy);
+            return publicUpdates.Select(x => x.ToModel()).ToArray();
         }
 
-        public async Task<PageUpdateEventModel[]> GetPageUpdates(UserInfo requestedBy, string updatedByEmail = null)
+        if (!string.IsNullOrEmpty(updatedByEmail))
         {
-            if (requestedBy is null)
-            {
-                await _permissionService.EnsureAnonymousAllowed(requestedBy);
-                var publicUpdates = await _feedManager.GetPageUpdates(requestedBy);
-                return publicUpdates.Select(x => x.ToModel()).ToArray();
-            }
-
-            if (!string.IsNullOrEmpty(updatedByEmail))
-            {
-                var userUpdates = await _feedManager.GetPageUpdates(requestedBy, new UserInfo { Email = updatedByEmail.ToLower() });
-                return userUpdates.Select(x => x.ToModel()).ToArray();
-            }
-
-            var user = await _userManager.GetByEmail(requestedBy.Email);
-            if (user.Role == UserRole.Admin)
-            {
-                var allUpdates = await _feedManager.GetAllPageUpdates();
-                return allUpdates.Select(x => x.ToModel()).ToArray();
-            }
-
-            var updates = await _feedManager.GetPageUpdates(requestedBy);
-            return updates.Select(x => x.ToModel()).ToArray();
+            var visibleSpaces = await _permissionService.FindUserVisibleSpaces(requestedBy);
+            var userUpdates = await _feedManager.GetPageUpdates(requestedBy, visibleSpaces, new UserInfo { Email = updatedByEmail.ToLower() });
+            return userUpdates.Select(x => x.ToModel()).ToArray();
         }
+
+        var user = await _userManager.GetByEmail(requestedBy.Email);
+        if (user.Role == UserRole.Admin)
+        {
+            var allUpdates = await _feedManager.GetAllPageUpdates();
+            return allUpdates.Select(x => x.ToModel()).ToArray();
+        }
+
+        var userSpaces = await _permissionService.FindUserVisibleSpaces(requestedBy);
+        var updates = await _feedManager.GetPageUpdates(requestedBy, userSpaces);
+        return updates.Select(x => x.ToModel()).ToArray();
     }
 }

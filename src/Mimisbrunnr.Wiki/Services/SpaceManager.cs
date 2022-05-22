@@ -4,8 +4,9 @@ using Skidbladnir.Repository.Abstractions;
 
 namespace Mimisbrunnr.Wiki.Services;
 
-internal class SpaceManager : ISpaceManager
+internal class SpaceManager : ISpaceManager, ISpaceSearcher
 {
+    private const string SpacesCacheKey = "space_cache";
     private readonly TimeSpan _defaultCacheTime = TimeSpan.FromHours(12);
     private readonly IRepository<Space> _spaceRepository;
     private readonly IPageManager _pageManager;
@@ -18,9 +19,16 @@ internal class SpaceManager : ISpaceManager
         _distributedCache = distributedCache;
     }
 
-    public Task<Space[]> GetAll()
+    public async Task<Space[]> GetAll()
     {
-        return _spaceRepository.GetAll().ToArrayAsync();
+        var spaces = await _distributedCache.GetAsync<Space[]>(SpacesCacheKey);
+        if (spaces is not null) return spaces;
+
+        spaces = await _spaceRepository.GetAll().ToArrayAsync();
+
+        await _distributedCache.SetAsync(SpacesCacheKey,
+         spaces, new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = _defaultCacheTime });
+        return spaces;
     }
 
     public async Task<Space> GetById(string id)
@@ -46,17 +54,15 @@ internal class SpaceManager : ISpaceManager
 
     public async Task<Space> FindPersonalSpace(UserInfo user)
     {
-        var personalSpace = await _spaceRepository.GetAll().FirstOrDefaultAsync(
-            x => x.Type != SpaceType.Personal && x.Type != SpaceType.Public
-                 && x.Permissions.Any(p => p.IsAdmin && p.User != null && p.User.Email == user.Email)
-        );
+         var personalSpace = await _spaceRepository.GetAll().FirstOrDefaultAsync(
+            x => x.Type == SpaceType.Personal && x.Key == user.Email.ToUpper());
         return personalSpace;
     }
 
     public Task<Space[]> FindByName(string name)
     {
         return _spaceRepository.GetAll()
-            .Where(x => x.Name.Contains(name, StringComparison.OrdinalIgnoreCase)).ToArrayAsync();
+            .Where(x => x.Name.Contains(name)).ToArrayAsync();
     }
 
     public async Task<Space> Create(string key, string name, string description, SpaceType type, UserInfo owner)
@@ -147,9 +153,19 @@ internal class SpaceManager : ISpaceManager
         await DeleteSpaceFromCache(space);
     }
 
+
+    public async Task<IEnumerable<Space>> Search(string text)
+    {
+        var spaces = await _spaceRepository.GetAll()
+            .Where(x => x.Name.Contains(text)
+            || x.Description.Contains(text))
+            .Take(100).ToArrayAsync();
+        return spaces;
+    }
+
     private async Task AddSpaceToCache(Space space)
     {
-        if(space is null) return;
+        if (space is null) return;
         await _distributedCache.SetAsync(GetSpaceCacheKey(space.Key), space, new DistributedCacheEntryOptions()
         {
             AbsoluteExpirationRelativeToNow = _defaultCacheTime
@@ -158,13 +174,15 @@ internal class SpaceManager : ISpaceManager
         {
             AbsoluteExpirationRelativeToNow = _defaultCacheTime
         });
+        await _distributedCache.RemoveAsync(SpacesCacheKey);
     }
 
     private async Task DeleteSpaceFromCache(Space space)
     {
-        if(space is null) return;
+        if (space is null) return;
         await _distributedCache.RemoveAsync(GetSpaceCacheKey(space.Key));
         await _distributedCache.RemoveAsync(GetSpaceCacheKeyById(space.Id));
+        await _distributedCache.RemoveAsync(SpacesCacheKey);
     }
 
     private static string GetSpaceCacheKey(string spaceKey) => $"space_cache_key_{spaceKey}";

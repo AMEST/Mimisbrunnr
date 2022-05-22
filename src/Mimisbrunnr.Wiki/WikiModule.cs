@@ -11,6 +11,8 @@ public class WikiModule : Module
         services.AddSingleton<IPageManager, PageManager>()
             .AddSingleton<ISpaceManager, SpaceManager>()
             .AddSingleton<IFeedManager, FeedManager>()
-            .AddSingleton<IAttachmentManager, AttachmentManager>();
+            .AddSingleton<IAttachmentManager, AttachmentManager>()
+            .AddSingleton<IPageSearcher>(r => (IPageSearcher)r.GetService<IPageManager>())
+            .AddSingleton<ISpaceSearcher>(r => (ISpaceSearcher)r.GetService<ISpaceManager>());
     }
 }

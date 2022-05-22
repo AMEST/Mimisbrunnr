@@ -1,11 +1,11 @@
 ﻿using System.Security.Claims;
-using Mimisbrunnr.Web.Authentication.Account;
 using Mimisbrunnr.Web.User;
 using Mimisbrunnr.Web.Infrastructure.Contracts;
 using Mimisbrunnr.Web.Quickstart;
 using Mimisbrunnr.Web.Wiki;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Web.Feed;
+using Mimisbrunnr.Web.Group;
 
 namespace Mimisbrunnr.Web.Mapping;
 
@@ -93,7 +93,28 @@ public static class MappingExtensions
         {
             Email = user.Email.ToLower(),
             Name = user.Name,
+            AvatarUrl = user.AvatarUrl,
+        };
+    }
+
+    public static UserProfileModel ToProfileModel(this Mimisbrunnr.Users.User user)
+    {
+        return new UserProfileModel()
+        {
+            Email = user.Email.ToLower(),
+            Name = user.Name,
             AvatarUrl = user.AvatarUrl
+        };
+    }
+
+    public static UserViewModel ToViewModel(this Mimisbrunnr.Users.User user)
+    {
+        return new UserViewModel()
+        {
+            Email = user.Email.ToLower(),
+            Name = user.Name,
+            AvatarUrl = user.AvatarUrl,
+            IsAdmin = user.Role == Users.UserRole.Admin
         };
     }
 
@@ -102,6 +123,15 @@ public static class MappingExtensions
         return new GroupModel()
         {
             Name = group.Name,
+        };
+    }
+
+    public static GroupModel ToModel(this Users.Group group , bool includeOwners = false)
+    {
+        return new GroupModel()
+        {
+            Name = group.Name,
+            Description = group.Description
         };
     }
 

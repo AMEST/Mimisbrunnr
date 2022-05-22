@@ -1,9 +1,8 @@
 using Mimisbrunnr.Wiki.Contracts;
 
-namespace Mimisbrunnr.Web.Feed
+namespace Mimisbrunnr.Web.Feed;
+
+public interface IFeedService
 {
-    public interface IFeedService
-    {
-         Task<PageUpdateEventModel[]> GetPageUpdates(UserInfo requestedBy, string updatedByEmail = null);
-    }
+    Task<PageUpdateEventModel[]> GetPageUpdates(UserInfo requestedBy, string updatedByEmail = null);
 }
