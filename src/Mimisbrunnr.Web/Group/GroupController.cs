@@ -13,9 +13,9 @@ namespace Mimisbrunnr.Web.Group;
 [HandleGroupErrors]
 public class GroupController : ControllerBase
 {
-    private readonly GroupService _groupService;
+    private readonly IGroupService _groupService;
 
-    public GroupController(GroupService groupService)
+    public GroupController(IGroupService groupService)
     {
         _groupService = groupService;
     }
@@ -78,9 +78,9 @@ public class GroupController : ControllerBase
     [ProducesResponseType(401)]
     [ProducesResponseType(403)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> AddToGroup([FromRoute] string name, [FromRoute] string userEmail)
+    public async Task<IActionResult> AddToGroup([FromRoute] string name, [FromRoute] string email)
     {
-        await _groupService.AddUserToGroup(name, new UserInfo(){Email = userEmail}, User.ToEntity());
+        await _groupService.AddUserToGroup(name, new UserInfo(){Email = email}, User.ToEntity());
         return Ok();
     }
 
@@ -90,9 +90,9 @@ public class GroupController : ControllerBase
     [ProducesResponseType(401)]
     [ProducesResponseType(403)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> RemoveFromGroup([FromRoute] string name, [FromRoute] string userEmail)
+    public async Task<IActionResult> RemoveFromGroup([FromRoute] string name, [FromRoute] string email)
     {
-        await _groupService.RemoveUserFromGroup(name, new UserInfo(){Email = userEmail}, User.ToEntity());
+        await _groupService.RemoveUserFromGroup(name, new UserInfo(){Email = email}, User.ToEntity());
         return Ok();
     }
 }

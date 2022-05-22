@@ -131,8 +131,7 @@ public static class MappingExtensions
         return new GroupModel()
         {
             Name = group.Name,
-            Description = group.Description,
-            OwnerEmails = includeOwners ? group.OwnerEmails : null
+            Description = group.Description
         };
     }
 
