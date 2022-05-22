@@ -9,7 +9,7 @@ namespace Mimisbrunnr.Web.User;
 [Authorize]
 public class UserController : ControllerBase
 {
-    private IUserService _userService;
+    private readonly IUserService _userService;
 
     public UserController(IUserService userService)
     {
@@ -17,12 +17,12 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("current")]
-    public IActionResult GetCurrentUser()
+    public async Task<IActionResult> GetCurrentUser()
     {
-        var user = User.ToEntity();
+        var user = await _userService.GetCurrent(User.ToEntity());
         if (user == null)
             return NotFound();
-        return Ok(user.ToModel());
+        return Ok(user);
     }
 
     [HttpGet("{email}")]

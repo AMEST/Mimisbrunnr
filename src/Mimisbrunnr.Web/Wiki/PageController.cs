@@ -6,6 +6,7 @@ using Mimisbrunnr.Web.Mapping;
 namespace Mimisbrunnr.Web.Wiki;
 
 [Route("api/[controller]")]
+[ApiController]
 [Authorize]
 [HandleWikiErrors]
 public class PageController : ControllerBase 

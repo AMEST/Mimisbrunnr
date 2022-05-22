@@ -6,6 +6,7 @@ using Mimisbrunnr.Web.Wiki;
 namespace Mimisbrunnr.Web.Search;
 
 [Route("api/[controller]")]
+[ApiController]
 [Authorize]
 public class SearchController : ControllerBase
 {

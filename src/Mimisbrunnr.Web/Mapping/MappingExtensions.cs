@@ -93,7 +93,28 @@ public static class MappingExtensions
         {
             Email = user.Email.ToLower(),
             Name = user.Name,
+            AvatarUrl = user.AvatarUrl,
+        };
+    }
+
+    public static UserProfileModel ToProfileModel(this Mimisbrunnr.Users.User user)
+    {
+        return new UserProfileModel()
+        {
+            Email = user.Email.ToLower(),
+            Name = user.Name,
             AvatarUrl = user.AvatarUrl
+        };
+    }
+
+    public static UserViewModel ToViewModel(this Mimisbrunnr.Users.User user)
+    {
+        return new UserViewModel()
+        {
+            Email = user.Email.ToLower(),
+            Name = user.Name,
+            AvatarUrl = user.AvatarUrl,
+            IsAdmin = user.Role == Users.UserRole.Admin
         };
     }
 
