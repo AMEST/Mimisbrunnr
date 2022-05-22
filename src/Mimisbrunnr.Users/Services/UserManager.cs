@@ -29,6 +29,9 @@ internal class UserManager : IUserManager
         await _distributedCache.SetAsync(GetUserCacheKeyEmail(email), user, new DistributedCacheEntryOptions(){
             AbsoluteExpirationRelativeToNow = _defaultCacheTime
         });
+        await _distributedCache.SetAsync(GetUserCacheKeyId(user.Id), user, new DistributedCacheEntryOptions(){
+            AbsoluteExpirationRelativeToNow = _defaultCacheTime
+        });
         return user;
     }
 
@@ -43,6 +46,10 @@ internal class UserManager : IUserManager
             return user;
 
         await _distributedCache.SetAsync(GetUserCacheKeyId(id), user, new DistributedCacheEntryOptions(){
+            AbsoluteExpirationRelativeToNow = _defaultCacheTime
+        });
+        
+        await _distributedCache.SetAsync(GetUserCacheKeyEmail(user.Email), user, new DistributedCacheEntryOptions(){
             AbsoluteExpirationRelativeToNow = _defaultCacheTime
         });
         return user;
