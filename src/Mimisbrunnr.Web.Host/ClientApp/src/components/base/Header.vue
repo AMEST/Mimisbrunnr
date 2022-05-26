@@ -30,9 +30,9 @@
         <b-navbar-nav class="header-right-menu">
           <b-nav-form class="flex-search invisibleComponentBorder">
             <b-input-group size="sm">
-              <b-form-input placeholder="Search" disabled></b-form-input>
+              <b-form-input class="search-input" placeholder="Search" disabled></b-form-input>
               <b-input-group-append>
-                <b-button size="sm" text="Button" variant="success" disabled
+                <b-button class="search-input-button" size="sm" text="Button" variant="success" disabled
                   ><b-icon icon="search"
                 /></b-button>
               </b-input-group-append>
@@ -171,6 +171,15 @@ export default {
 </script>
 
 <style scoped>
+.search-input {
+  color: white!important;
+  background-color: #1974d9 !important;
+  border: unset!important;
+}
+.search-input-button{
+  background-color: #1974d9!important;
+  border-color: #1974d9!important;
+}
 .create-button {
   margin-left: 7px;
   height: 32px;
