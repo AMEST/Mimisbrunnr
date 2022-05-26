@@ -30,6 +30,7 @@
             </h5>
             <br />
             <MySpaces />
+            <version/>
           </template>
 
           <Updates />
@@ -44,12 +45,14 @@
 import Updates from "@/components/home/Updates.vue";
 import RecentlyVisited from "@/components/home/RecentlyVisited.vue";
 import MySpaces from "@/components/home/MySpaces.vue";
+import Version from '@/components/home/Version.vue';
 export default {
   name: "home",
   components: {
     Updates,
     RecentlyVisited,
     MySpaces,
+    Version,
   },
   data() {
     return {
