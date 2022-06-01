@@ -2,6 +2,8 @@
 
 public interface IUserManager
 {
+    Task<User[]> GetUsers();
+    
     Task<User> GetByEmail(string email);
 
     Task<User> GetById(string id);

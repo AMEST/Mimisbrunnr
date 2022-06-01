@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Mimisbrunnr.Web.Filters;
 using Mimisbrunnr.Web.Mapping;
 
 namespace Mimisbrunnr.Web.User;
@@ -14,6 +15,13 @@ public class UserController : ControllerBase
     public UserController(IUserService userService)
     {
         _userService = userService;
+    }
+
+    [HttpGet]
+    [RequiredAdminRole]
+    public Task<IEnumerable<UserViewModel>> GetAll()
+    {
+        return _userService.GetUsers(User.ToEntity());
     }
 
     [HttpGet("current")]
@@ -32,5 +40,37 @@ public class UserController : ControllerBase
         if (user == null)
             return NotFound();
         return Ok(user);
+    }
+
+    [HttpPost("{email}/disable")]
+    [RequiredAdminRole]
+    public async Task<IActionResult> Disable([FromRoute] string email)
+    {
+        await _userService.Disable(email, User.ToEntity());
+        return Ok();
+    }
+
+    [HttpPost("{email}/enable")]
+    [RequiredAdminRole]
+    public async Task<IActionResult> Enable([FromRoute] string email)
+    {
+        await _userService.Enable(email, User.ToEntity());
+        return Ok();
+    }
+
+    [HttpPost("{email}/promote")]
+    [RequiredAdminRole]
+    public async Task<IActionResult> Promote([FromRoute] string email)
+    {
+        await _userService.Promote(email, User.ToEntity());
+        return Ok();
+    }
+
+    [HttpPost("{email}/demote")]
+    [RequiredAdminRole]
+    public async Task<IActionResult> Demote([FromRoute] string email)
+    {
+        await _userService.Demote(email, User.ToEntity());
+        return Ok();
     }
 }

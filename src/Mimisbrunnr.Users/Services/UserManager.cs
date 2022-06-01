@@ -16,6 +16,11 @@ internal class UserManager : IUserManager
         _distributedCache = distributedCache;
     }
     
+    public Task<User[]> GetUsers()
+    {
+        return _userRepository.GetAll().ToArrayAsync();
+    } 
+
     public async Task<User> GetByEmail(string email)
     {
         var user = await _distributedCache.GetAsync<User>(GetUserCacheKeyEmail(email));
