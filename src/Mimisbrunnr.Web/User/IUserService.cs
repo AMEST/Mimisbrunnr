@@ -4,7 +4,7 @@ namespace Mimisbrunnr.Web.User
 {
     public interface IUserService
     {
-        Task<IEnumerable<UserViewModel>> GetUsers(UserInfo requestedBy)
+        Task<IEnumerable<UserViewModel>> GetUsers(UserInfo requestedBy);
 
         Task<UserViewModel> GetCurrent(UserInfo requestedBy);
 

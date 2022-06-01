@@ -6,9 +6,9 @@ internal class FeatureService : IFeatureService
 {
     public const string ApplicationFeaturePrefix = "appconfig_";
 
-    private readonly IApplicationConfigurationService _applicationConfigurationService;
+    private readonly IApplicationConfigurationManager _applicationConfigurationService;
 
-    public FeatureService(IApplicationConfigurationService applicationConfigurationService)
+    public FeatureService(IApplicationConfigurationManager applicationConfigurationService)
     {
         _applicationConfigurationService = applicationConfigurationService;
     }

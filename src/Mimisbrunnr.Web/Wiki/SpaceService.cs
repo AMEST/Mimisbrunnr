@@ -1,6 +1,7 @@
 ﻿using System.IO.Compression;
 using System.Runtime.Serialization;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Mapping;
@@ -17,12 +18,14 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
     private readonly IUserManager _userManager;
     private readonly IUserGroupManager _userGroupManager;
     private readonly IDistributedCache _distributedCache;
+    private readonly ILogger<SpaceService> _logger;
 
     public SpaceService(IPermissionService permissionService,
         ISpaceManager spaceManager,
         IUserManager userManager,
         IUserGroupManager userGroupManager,
-        IDistributedCache distributedCache
+        IDistributedCache distributedCache,
+        ILogger<SpaceService> logger
     )
     {
         _permissionService = permissionService;
@@ -30,6 +33,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         _userManager = userManager;
         _userGroupManager = userGroupManager;
         _distributedCache = distributedCache;
+        _logger = logger;
     }
 
     public async Task<SpaceModel[]> GetAll(UserInfo requestedBy)
@@ -203,6 +207,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
             throw new InvalidOperationException("Only archived spaces allowed for removing");
 
         await _spaceManager.Remove(space);
+        _logger.LogInformation("User `{User}` remove space `{SpaceKey}`", removedBy.Email, key);
     }
 
     public async Task<IEnumerable<Space>> FindUserVisibleSpaces(UserInfo userInfo)

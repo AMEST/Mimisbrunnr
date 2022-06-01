@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Mimisbrunnr.Users;
+using Mimisbrunnr.Web.Administration;
 using Mimisbrunnr.Web.Feed;
 using Mimisbrunnr.Web.Group;
 using Mimisbrunnr.Web.Infrastructure;
@@ -28,5 +29,6 @@ public class WebModule : Module
         services.AddSingleton<IAttachmentService, AttachmentService>();
         services.AddSingleton<ISearchService, SearchService>();
         services.AddSingleton<IGroupService, GroupService>();
+        services.AddSingleton<IApplicationConfigurationService, ApplicationConfigurationService>();
     }
 }
