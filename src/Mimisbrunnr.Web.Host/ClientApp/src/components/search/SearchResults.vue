@@ -2,6 +2,7 @@
   <b-overlay :show="overlayState" rounded="sm">
     <div class="text-left search-results">
         <h2 v-if="searchResults.length == 0"> No results</h2>
+        <h2 v-else>results {{searchResults.length}}</h2>
       <b-card
         class="updates-card"
         v-for="result in searchResults"
@@ -77,7 +78,7 @@ export default {
       this.$router.push(route);
     },
     getFoundedContent: function (result) {
-      var searchTextPosition = result.content.indexOf(this.textForSearch);
+      var searchTextPosition = result.content.toLowerCase().indexOf(this.textForSearch.toLowerCase());
       if (searchTextPosition <= 25) return result.content.substring(0, 128);
       return result.content.substring(
         searchTextPosition - 20,

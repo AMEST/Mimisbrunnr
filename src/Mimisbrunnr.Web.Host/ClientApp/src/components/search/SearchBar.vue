@@ -1,15 +1,16 @@
 <template>
-    <b-sidebar class="search-sidebar" id="search-sidebar" title="Search" right backdrop-variant="dark" no-header backdrop shadow>
-      <b-form-input class="search-field" id="search-input" v-model="searchText" size="lg" placeholder="Search"></b-form-input>
+    <b-sidebar class="search-sidebar" id="search-sidebar" title="Search..." right backdrop-variant="dark" no-header backdrop shadow>
+      <b-form-input class="search-field" id="search-input" v-model="searchText" size="lg" placeholder="Search" autofocus></b-form-input>
+      <b-form-checkbox class="search-type-switch" switch size="sm" v-model="searchSpaces">Search space</b-form-checkbox>
       <recently-visited class="pt-3" v-if="searchText == null || searchText == ''"/>
-      <search-results v-else :textForSearch="searchText" :searchType="'page'"/>
+      <search-results v-else :textForSearch="searchText" :searchType="searchSpaces ? 'space' : 'page'"/>
     </b-sidebar>
 </template>
 
 <script>
 import RecentlyVisited from "@/components/home/RecentlyVisited.vue";
 import SearchResults from "@/components/search/SearchResults.vue";
-export default {
+export default { 
     name: "SearchBar",
     components: {
         RecentlyVisited,
@@ -17,7 +18,8 @@ export default {
     },
     data() {
         return {
-            searchText: null
+            searchText: null,
+            searchSpaces: false
         }
     },
 }
@@ -25,7 +27,7 @@ export default {
 
 <style>
 #search-sidebar {
-    width: 37em;
+    width: 40em;
     background-color: white!important;
 }
 #search-sidebar h2 {
@@ -41,6 +43,9 @@ export default {
 </style>
 
 <style scoped>
+.search-type-switch {
+    float: right;
+}
 .search-sidebar .tab-pane {
     display: unset !important;
 }
