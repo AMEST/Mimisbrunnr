@@ -8,6 +8,7 @@ using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Skidbladnir.Modules;
 using Skidbladnir.Repository.MongoDB;
+using Mimisbrunnr.Wiki.Services;
 
 namespace Mimisbrunnr.Storage.MongoDb;
 
@@ -36,6 +37,7 @@ public class MongoDbStoreModule : RunnableModule
                 .AddEntity<PageUpdateEvent, PageUpdateEventMap>()
                 .AddEntity<Attachment, AttachmentMap>()
         );
+        services.AddSingleton<IPageSearcher, PageSearcher>();
     }
 
     public override async Task StartAsync(IServiceProvider provider, CancellationToken cancellationToken)

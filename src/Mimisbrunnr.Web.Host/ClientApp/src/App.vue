@@ -8,6 +8,7 @@
       <Quickstart />
     </div>
     <SpaceCreateModal />
+    <search-bar/>
   </div>
 </template>
 
@@ -16,11 +17,13 @@ import Header from "@/components/base/Header.vue";
 import SpaceCreateModal from "@/components/base/SpaceCreateModal.vue";
 import Quickstart from "@/components/quickstart/Quickstart.vue";
 import axios from "axios";
+import SearchBar from '@/components/search/SearchBar.vue';
 export default {
   components: {
     Header,
     SpaceCreateModal,
     Quickstart,
+    SearchBar,
   },
   data: () => ({
     loaded: false,

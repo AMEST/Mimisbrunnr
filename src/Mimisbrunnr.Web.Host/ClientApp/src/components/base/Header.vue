@@ -29,7 +29,7 @@
         <!-- Right aligned nav items -->
         <b-navbar-nav class="header-right-menu">
           <b-nav-form class="flex-search invisibleComponentBorder">
-            <b-input-group size="sm">
+            <b-input-group v-b-toggle.search-sidebar size="sm">
               <b-form-input class="search-input" placeholder="Search" disabled></b-form-input>
               <b-input-group-append>
                 <b-button class="search-input-button" size="sm" text="Button" variant="success" disabled
