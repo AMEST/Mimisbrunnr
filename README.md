@@ -27,6 +27,7 @@ Support for the following features:
 8. Tree of pages
 9. Page updates feed
 10. Attachments
+11. Search pages and spaces
 
 ## Get started
 
