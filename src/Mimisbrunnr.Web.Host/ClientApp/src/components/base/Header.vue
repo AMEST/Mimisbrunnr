@@ -28,7 +28,7 @@
         </b-navbar-nav>
         <!-- Right aligned nav items -->
         <b-navbar-nav class="header-right-menu">
-          <b-nav-form class="flex-search invisibleComponentBorder">
+          <b-nav-form v-if="this.$store.state.application.profile" class="flex-search invisibleComponentBorder">
             <b-input-group v-b-toggle.search-sidebar size="sm">
               <b-form-input class="search-input" placeholder="Search" disabled></b-form-input>
               <b-input-group-append>
