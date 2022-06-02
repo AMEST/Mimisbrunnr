@@ -33,9 +33,6 @@ internal class SearchService : ISearchService
     {
         var user = await _userManager.GetByEmail(searchBy.Email);
         var pages = await _pageSearcher.Search(text);
-        if (user.Role == UserRole.Admin)
-            return pages.Select(x => x.ToModel());
-
         var userSpaces = await _spaceDisplayService.FindUserVisibleSpaces(searchBy);
         var userSpacesId = userSpaces.Select(x => x.Id);
         return pages.Where(x => userSpacesId.Contains(x.SpaceId)).Select(x => x.ToModel(userSpaces.First(s => s.Id == x.SpaceId).Key));
