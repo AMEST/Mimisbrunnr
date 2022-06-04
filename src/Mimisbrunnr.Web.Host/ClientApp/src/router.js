@@ -21,28 +21,32 @@ export default new Router({
     {
       path: '/space/:key',
       name: 'space',
-      component: () => import(/* webpackChunkName: "space" */ './views/Space.vue')
+      component: () => import(/* webpackChunkName: "space" */ './views/Wiki/Space.vue')
     },
     {
       path: '/space/:key/:pageId',
       name: 'page',
-      component: () => import(/* webpackChunkName: "page" */ './views/Space.vue')
+      component: () => import(/* webpackChunkName: "page" */ './views/Wiki/Space.vue')
     },
     {
       path: '/space/:key/:pageId/edit',
       name: 'pageEdit',
-      component: () => import(/* webpackChunkName: "editor" */ './views/PageEdit.vue')
+      component: () => import(/* webpackChunkName: "editor" */ './views/Wiki/PageEdit.vue')
     },
     {
       path: '/profile/:email',
       name: 'profile',
-      component: () => import(/* webpackChunkName: "profile" */ './views/Profile.vue')
-    }
-    ,
+      component: () => import(/* webpackChunkName: "profile" */ './views/People/Profile.vue')
+    },
     {
       path: '/error/:err',
       name: 'error',
       component: () => import(/* webpackChunkName: "error" */ './views/Error.vue')
+    },
+    {
+      path: '/admin',
+      name: 'GeneralConfiguration',
+      component: () => import(/* webpackChunkName: "adminGeneral" */ './views/Admin/GeneralConfiguration.vue')
     }
   ]
 })

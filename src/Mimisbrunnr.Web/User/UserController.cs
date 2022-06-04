@@ -18,7 +18,6 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    [RequiredAdminRole]
     public Task<IEnumerable<UserViewModel>> GetAll()
     {
         return _userService.GetUsers(User.ToEntity());

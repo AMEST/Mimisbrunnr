@@ -62,4 +62,14 @@ export default {
   margin-top: 3px;
   margin-right: 5px;
 }
+.profile-worked-on .card {
+    background-color: #f4f5f7 !important;
+    border: unset;
+}
+.profile-worked-on .card-body {
+    padding-top: unset;
+}
+.profile-worked-on h5 {
+    padding-left: 1em;
+}
 </style>
