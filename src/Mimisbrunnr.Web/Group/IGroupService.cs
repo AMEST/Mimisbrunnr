@@ -6,6 +6,8 @@ namespace Mimisbrunnr.Web.Group;
 public interface IGroupService
 {
      Task<GroupModel[]> GetAll(UserInfo requestedBy);
+     
+     Task<GroupModel> Get(string name, UserInfo requestedBy);
 
      Task<GroupModel> Create(GroupCreateModel createModel, UserInfo createdBy);
 

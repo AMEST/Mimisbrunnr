@@ -48,6 +48,13 @@ internal class GroupService : IGroupService
         return groups.Select(x => x.ToModel(user.Role == UserRole.Admin)).ToArray();
     }
 
+    public async Task<GroupModel> Get(string name, UserInfo requestedBy)
+    {
+        var user = await _userManager.GetByEmail(requestedBy.Email);
+        var group = await _userGroupManager.FindByName(name);
+        return group.ToModel(user.Role == UserRole.Admin);
+    }
+    
     public async Task<UserModel[]> GetUsers(string name, UserInfo requestedBy)
     {
         var group = await _userGroupManager.FindByName(name);
