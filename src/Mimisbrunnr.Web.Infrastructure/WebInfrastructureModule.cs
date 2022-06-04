@@ -7,6 +7,6 @@ public class WebInfrastructureModule : Module
 {
     public override void Configure(IServiceCollection services)
     {
-        services.AddSingleton<IApplicationConfigurationService, ApplicationConfigurationService>();
+        services.AddSingleton<IApplicationConfigurationManager, ApplicationConfigurationManager>();
     }
 }

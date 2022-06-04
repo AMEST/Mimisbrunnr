@@ -10,13 +10,13 @@ namespace Mimisbrunnr.Web.Host.Services;
 
 internal class PermissionService : IPermissionService
 {
-    private readonly IApplicationConfigurationService _applicationConfigurationService;
+    private readonly IApplicationConfigurationManager _applicationConfigurationService;
     private readonly ISpaceManager _spaceManager;
     private readonly IUserManager _userManager;
     private readonly IUserGroupManager _userGroupManager;
 
     public PermissionService(
-        IApplicationConfigurationService applicationConfigurationService,
+        IApplicationConfigurationManager applicationConfigurationService,
         ISpaceManager spaceManager,
         IUserManager userManager,
         IUserGroupManager userGroupManager

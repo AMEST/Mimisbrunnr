@@ -6,6 +6,7 @@ using Mimisbrunnr.Web.Wiki;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Web.Feed;
 using Mimisbrunnr.Web.Group;
+using Mimisbrunnr.Web.Administration;
 
 namespace Mimisbrunnr.Web.Mapping;
 
@@ -66,7 +67,7 @@ public static class MappingExtensions
         };
     }
 
-    public static QuickstartModel ToModel(this ApplicationConfiguration model)
+    public static QuickstartModel ToQuickStartModel(this ApplicationConfiguration model)
     {
         return new QuickstartModel()
         {
@@ -218,4 +219,15 @@ public static class MappingExtensions
             CreatedBy = attachment.CreatedBy?.ToModel()
         };
     }
+
+    public static ApplicationConfigurationModel ToModel(this ApplicationConfiguration applicationConfiguration)
+    {
+        return new ApplicationConfigurationModel(){
+            Title = applicationConfiguration.Title,
+            AllowAnonymous = applicationConfiguration.AllowAnonymous,
+            AllowHtml = applicationConfiguration.AllowHtml,
+            SwaggerEnabled = applicationConfiguration.SwaggerEnabled
+        };
+    }
+
 }

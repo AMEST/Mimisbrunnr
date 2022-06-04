@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Wiki.Contracts;
@@ -7,10 +8,22 @@ namespace Mimisbrunnr.Web.User
     internal class UserService : IUserService
     {
         private readonly IUserManager _userManager;
-        public UserService(IUserManager userManager)
+        private readonly ILogger<UserService> _logger;
+        public UserService(IUserManager userManager, ILogger<UserService> logger)
         {
+            _logger = logger;
             _userManager = userManager;
 
+        }
+
+        public async Task<IEnumerable<UserModel>> GetUsers(UserInfo requestedBy)
+        {
+            var requestedByUser = await _userManager.GetByEmail(requestedBy.Email);
+            var users = await _userManager.GetUsers();
+
+            return requestedByUser.Role == UserRole.Admin
+                ? users.Select(x => x.ToViewModel())
+                : users.Select(x => x.ToModel());
         }
 
         public async Task<UserViewModel> GetCurrent(UserInfo requestedBy)
@@ -23,6 +36,34 @@ namespace Mimisbrunnr.Web.User
         {
             var user = await _userManager.GetByEmail(email);
             return user?.ToProfileModel();
+        }
+
+        public async Task Disable(string email, UserInfo disabledBy)
+        {
+            var user = await _userManager.GetByEmail(email);
+            await _userManager.Disable(user);
+            _logger.LogInformation("User `{User}` disabled by `{RequestedBy}`", user.Email, disabledBy.Email);
+        }
+
+        public async Task Enable(string email, UserInfo enabledBy)
+        {
+            var user = await _userManager.GetByEmail(email);
+            await _userManager.Enable(user);
+            _logger.LogInformation("User `{User}` disabled by `{RequestedBy}`", user.Email, enabledBy.Email);
+        }
+
+        public async Task Promote(string email, UserInfo promotedBy)
+        {
+            var user = await _userManager.GetByEmail(email);
+            await _userManager.ChangeRole(user, UserRole.Admin);
+            _logger.LogInformation("User `{User}` disabled by `{RequestedBy}`", user.Email, promotedBy.Email);
+        }
+
+        public async Task Demote(string email, UserInfo demotedBy)
+        {
+            var user = await _userManager.GetByEmail(email);
+            await _userManager.ChangeRole(user, UserRole.Employee);
+            _logger.LogInformation("User `{User}` disabled by `{RequestedBy}`", user.Email, demotedBy.Email);
         }
     }
 }

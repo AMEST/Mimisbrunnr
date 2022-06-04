@@ -1,8 +1,10 @@
+using System.Runtime.CompilerServices;
 using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.User;
 using Mimisbrunnr.Wiki.Contracts;
+using Mimisbrunnr.Wiki.Services;
 
 namespace Mimisbrunnr.Web.Group;
 
@@ -11,9 +13,11 @@ internal class GroupService : IGroupService
     private readonly IUserManager _userManager;
 
     private readonly IUserGroupManager _userGroupManager;
+    private readonly ISpaceManager _spaceManager;
 
-    public GroupService(IUserManager userManager, IUserGroupManager userGroupManager)
+    public GroupService(IUserManager userManager, IUserGroupManager userGroupManager, ISpaceManager spaceManager)
     {
+        _spaceManager = spaceManager;
         _userManager = userManager;
         _userGroupManager = userGroupManager;
     }
@@ -60,7 +64,15 @@ internal class GroupService : IGroupService
         var group = await _userGroupManager.FindByName(name);
         if (group is null) throw new GroupNotFoundException();
         var deletedByUser = await _userManager.GetByEmail(removedBy.Email);
-        if (!group.OwnerEmails.Contains(removedBy.Email) && deletedByUser.Role != UserRole.Admin) throw new UserHasNotPermissionException();
+        if (deletedByUser.Role != UserRole.Admin) throw new UserHasNotPermissionException();
+
+        var removeGroupPermissionTasks = new List<Task>();
+        var spaces = await _spaceManager.GetAll();
+        foreach (var space in spaces)
+            if (space.Permissions.Any(x => x.Group?.Name == name))
+                removeGroupPermissionTasks.Add(_spaceManager.RemovePermission(space, new Permission() { Group = new GroupInfo() { Name = name } }));
+
+        await Task.WhenAll(removeGroupPermissionTasks);
 
         await _userGroupManager.Remove(group);
     }
@@ -84,7 +96,6 @@ internal class GroupService : IGroupService
         if (!group.OwnerEmails.Contains(updatedBy.Email) && updatedByUser.Role != UserRole.Admin) throw new UserHasNotPermissionException();
 
         group.Description = model.Description;
-        group.Name = model.Name;
         await _userGroupManager.Update(group);
     }
 }

@@ -7,11 +7,11 @@ namespace Mimisbrunnr.Web.Quickstart;
 
 internal class QuickstartService : IQuickstartService
 {
-    private readonly IApplicationConfigurationService _applicationConfigurationService;
+    private readonly IApplicationConfigurationManager _applicationConfigurationService;
     private readonly IUserManager _userManager;
 
     public QuickstartService(
-        IApplicationConfigurationService applicationConfigurationService,
+        IApplicationConfigurationManager applicationConfigurationService,
         IUserManager userManager
     )
     {
@@ -21,7 +21,7 @@ internal class QuickstartService : IQuickstartService
 
     public async Task<QuickstartModel> Get()
     {
-        return (await _applicationConfigurationService.Get()).ToModel();
+        return (await _applicationConfigurationService.Get()).ToQuickStartModel();
     }
 
     public Task<bool> IsInitialized()

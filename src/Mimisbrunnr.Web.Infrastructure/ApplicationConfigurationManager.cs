@@ -5,7 +5,7 @@ using Skidbladnir.Repository.Abstractions;
 
 namespace Mimisbrunnr.Web.Infrastructure;
 
-internal class ApplicationConfigurationService : IApplicationConfigurationService
+internal class ApplicationConfigurationManager : IApplicationConfigurationManager
 {
     private const string ConfigurationCacheKey = "ApplicationConfigurationCache";
     private readonly TimeSpan _defaultCacheTime = TimeSpan.FromMinutes(10);
@@ -13,7 +13,7 @@ internal class ApplicationConfigurationService : IApplicationConfigurationServic
     private readonly IUserManager _userManager;
     private readonly IDistributedCache _distributedCache;
 
-    public ApplicationConfigurationService(IRepository<ApplicationConfiguration> repository, 
+    public ApplicationConfigurationManager(IRepository<ApplicationConfiguration> repository, 
         IUserManager userManager,
         IDistributedCache distributedCache)
     {

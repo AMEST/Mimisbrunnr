@@ -3,7 +3,7 @@ using Mimisbrunnr.Web.Infrastructure.Contracts;
 
 namespace Mimisbrunnr.Web.Infrastructure;
 
-public interface IApplicationConfigurationService
+public interface IApplicationConfigurationManager
 {
     Task Initialize(ApplicationConfiguration configuration, User administator);
     

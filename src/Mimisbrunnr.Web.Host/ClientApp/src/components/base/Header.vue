@@ -60,17 +60,25 @@
               }}</span>
             </b-dropdown-text>
             <b-dropdown-divider></b-dropdown-divider>
-            <b-dropdown-item @click="goToPersonalSpace"
-              >Personal space</b-dropdown-item
-            >
+            <b-dropdown-item @click="goToPersonalSpace">
+                Personal space
+            </b-dropdown-item>
             <b-dropdown-divider></b-dropdown-divider>
             <b-dropdown-item
+              v-if="this.$store.state.application.profile.isAdmin"
+              to="/admin"
+            >
+              <b-icon icon="gear"/> Administration
+            </b-dropdown-item>
+            <b-dropdown-divider v-if="this.$store.state.application.profile.isAdmin"></b-dropdown-divider>
+            <b-dropdown-item
               :to="'/profile/' + $store.state.application.profile.email"
-              >Profile</b-dropdown-item
-            >
-            <b-dropdown-item href="/api/account/logout"
-              >Sign Out</b-dropdown-item
-            >
+              >
+              Profile
+            </b-dropdown-item>
+            <b-dropdown-item href="/api/account/logout">
+                Sign Out
+            </b-dropdown-item>
           </b-nav-item-dropdown>
         </b-navbar-nav>
       </b-container>
