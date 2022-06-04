@@ -18,9 +18,9 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    public Task<IEnumerable<UserViewModel>> GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        return _userService.GetUsers(User.ToEntity());
+        return Ok( await _userService.GetUsers(User.ToEntity()));
     }
 
     [HttpGet("current")]

@@ -16,10 +16,14 @@ namespace Mimisbrunnr.Web.User
 
         }
 
-        public async Task<IEnumerable<UserViewModel>> GetUsers(UserInfo requestedBy)
+        public async Task<IEnumerable<UserModel>> GetUsers(UserInfo requestedBy)
         {
+            var requestedByUser = await _userManager.GetByEmail(requestedBy.Email);
             var users = await _userManager.GetUsers();
-            return users.Select(x => x.ToViewModel());
+
+            return requestedByUser.Role == UserRole.Admin
+                ? users.Select(x => x.ToViewModel())
+                : users.Select(x => x.ToModel());
         }
 
         public async Task<UserViewModel> GetCurrent(UserInfo requestedBy)
