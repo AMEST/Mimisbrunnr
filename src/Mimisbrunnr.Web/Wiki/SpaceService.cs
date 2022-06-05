@@ -212,25 +212,37 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
 
     public async Task<IEnumerable<Space>> FindUserVisibleSpaces(UserInfo userInfo)
     {
-        var cacheKey = CreateUserVisibleSpacesCacheKey(userInfo.Email);
+        var cacheKey = CreateUserVisibleSpacesCacheKey(userInfo?.Email ?? "Anonymous");
         IEnumerable<Space> spaces = await _distributedCache.GetAsync<Space[]>(cacheKey);
         if (spaces is not null) return spaces;
 
-        var user = await _userManager.GetByEmail(userInfo.Email);
         spaces = await _spaceManager.GetAll();
+        if(userInfo == null)
+        {
+            spaces = spaces.Where(x => x.Type == SpaceType.Public);
+            await AddVisibleSpacesToCache(cacheKey, spaces);
+            return spaces;
+        }
+
+        var user = await _userManager.GetByEmail(userInfo.Email);
         if (user.Role == UserRole.Admin)
         {
-            await _distributedCache.SetAsync(cacheKey, spaces, 
-                new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1) }
-            );
+            await AddVisibleSpacesToCache(cacheKey, spaces);
             return spaces;
         }
         var userGroups = await _userGroupManager.GetUserGroups(user);
         spaces = spaces.Where( x => x.Type == SpaceType.Public || FindPermission(x.Permissions.ToArray(), userInfo, userGroups) != null);
-        await _distributedCache.SetAsync(cacheKey, spaces, 
-             new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1) }
-        );
+        await AddVisibleSpacesToCache(cacheKey, spaces);
         return spaces;
+    }
+
+    private Task AddVisibleSpacesToCache(string cacheKey, IEnumerable<Space> spaces)
+    {
+        return _distributedCache.SetAsync(cacheKey, spaces, 
+                new DistributedCacheEntryOptions() {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2) 
+                }
+        );
     }
 
     private static void EnsureIsNotAnonymous(UserInfo userInfo)

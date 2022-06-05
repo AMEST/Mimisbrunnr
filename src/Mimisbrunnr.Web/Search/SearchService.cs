@@ -31,7 +31,8 @@ internal class SearchService : ISearchService
 
     public async Task<IEnumerable<PageModel>> SearchPages(string text, UserInfo searchBy)
     {
-        var user = await _userManager.GetByEmail(searchBy.Email);
+        await _permissionService.EnsureAnonymousAllowed(searchBy);
+
         var pages = await _pageSearcher.Search(text);
         var userSpaces = await _spaceDisplayService.FindUserVisibleSpaces(searchBy);
         var userSpacesId = userSpaces.Select(x => x.Id);
@@ -40,9 +41,11 @@ internal class SearchService : ISearchService
 
     public async Task<IEnumerable<SpaceModel>> SearchSpaces(string text, UserInfo searchBy)
     {
-        var user = await _userManager.GetByEmail(searchBy.Email);
+        await _permissionService.EnsureAnonymousAllowed(searchBy);
+
+        var user = await _userManager.GetByEmail(searchBy?.Email);
         var spaces = await _spaceSearcher.Search(text);
-        if (user.Role == UserRole.Admin)
+        if (user?.Role == UserRole.Admin)
             return spaces.Select(x => x.ToModel());
 
         var userSpaces = (await _spaceDisplayService.FindUserVisibleSpaces(searchBy)).Select(x => x.Id);

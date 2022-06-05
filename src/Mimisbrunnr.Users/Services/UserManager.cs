@@ -23,6 +23,9 @@ internal class UserManager : IUserManager
 
     public async Task<User> GetByEmail(string email)
     {
+        if(string.IsNullOrEmpty(email))
+            return null;
+
         var user = await _distributedCache.GetAsync<User>(GetUserCacheKeyEmail(email));
         if( user is not null)
             return user;

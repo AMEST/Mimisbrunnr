@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Mimisbrunnr.Web.Filters;
 using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.Wiki;
 
@@ -7,7 +8,7 @@ namespace Mimisbrunnr.Web.Search;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[HandleSearchErrors]
 public class SearchController : ControllerBase
 {
     private readonly ISearchService _searchService;
@@ -22,7 +23,7 @@ public class SearchController : ControllerBase
     [ProducesResponseType(401)]
     public Task<IEnumerable<SpaceModel>> SearchSpace([FromQuery] string search)
     {
-        return _searchService.SearchSpaces(search, User.ToEntity());
+        return _searchService.SearchSpaces(search, User?.ToEntity());
     }
 
     [HttpGet("page")]
@@ -30,6 +31,6 @@ public class SearchController : ControllerBase
     [ProducesResponseType(401)]
     public Task<IEnumerable<PageModel>> SearchPage([FromQuery] string search)
     {
-        return _searchService.SearchPages(search, User.ToEntity());
+        return _searchService.SearchPages(search, User?.ToEntity());
     }
 }
