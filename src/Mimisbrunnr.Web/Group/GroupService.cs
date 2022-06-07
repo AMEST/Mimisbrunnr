@@ -41,11 +41,19 @@ internal class GroupService : IGroupService
         return group.ToModel(true);
     }
 
-    public async Task<GroupModel[]> GetAll(UserInfo requestedBy)
+    public async Task<IEnumerable<GroupModel>> GetAll(GroupFilterModel filter, UserInfo requestedBy)
     {
         var user = await _userManager.GetByEmail(requestedBy.Email);
-        var groups = await _userGroupManager.GetAll();
-        return groups.Select(x => x.ToModel(user.Role == UserRole.Admin)).ToArray();
+        if(!string.IsNullOrEmpty(filter?.OwnerEmail)
+            && !filter.OwnerEmail.Equals(requestedBy.Email) 
+            && user.Role != UserRole.Admin)
+            return Array.Empty<GroupModel>();
+
+        IEnumerable<Users.Group> groups = await _userGroupManager.GetAll();
+        if(!string.IsNullOrEmpty(filter?.OwnerEmail))
+            groups = groups.Where(x => x.OwnerEmails.Contains(filter.OwnerEmail));
+
+        return groups.Select(x => x.ToModel(user.Role == UserRole.Admin || x.OwnerEmails.Contains(requestedBy.Email)));
     }
 
     public async Task<GroupModel> Get(string name, UserInfo requestedBy)
@@ -55,7 +63,7 @@ internal class GroupService : IGroupService
         return group.ToModel(user.Role == UserRole.Admin);
     }
     
-    public async Task<UserModel[]> GetUsers(string name, UserInfo requestedBy)
+    public async Task<IEnumerable<UserModel>> GetUsers(string name, UserInfo requestedBy)
     {
         var group = await _userGroupManager.FindByName(name);
         if (group is null) throw new GroupNotFoundException();
@@ -63,7 +71,7 @@ internal class GroupService : IGroupService
         if (!group.OwnerEmails.Contains(requestedBy.Email) && requestedByUser.Role != UserRole.Admin) throw new UserHasNotPermissionException();
 
         var users = await _userGroupManager.GetUsersInGroup(group);
-        return users.Select(x => x.ToModel()).ToArray();
+        return users.Select(x => x.ToModel());
     }
 
     public async Task Remove(string name, UserInfo removedBy)

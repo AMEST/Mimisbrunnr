@@ -1,3 +1,4 @@
+using Mimisbrunnr.Web.Group;
 using Mimisbrunnr.Wiki.Contracts;
 
 namespace Mimisbrunnr.Web.User
@@ -7,6 +8,8 @@ namespace Mimisbrunnr.Web.User
         Task<IEnumerable<UserModel>> GetUsers(UserInfo requestedBy);
 
         Task<UserViewModel> GetCurrent(UserInfo requestedBy);
+
+        Task<IEnumerable<GroupModel>> GetUserGroups(string email, UserInfo requestedBy);
 
         Task<UserProfileModel> GetByEmail(string email, UserInfo requestedBy);
 

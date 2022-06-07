@@ -5,7 +5,7 @@ namespace Mimisbrunnr.Web.Group;
 
 public interface IGroupService
 {
-     Task<GroupModel[]> GetAll(UserInfo requestedBy);
+     Task<IEnumerable<GroupModel>> GetAll(GroupFilterModel filter, UserInfo requestedBy);
      
      Task<GroupModel> Get(string name, UserInfo requestedBy);
 
@@ -15,7 +15,7 @@ public interface IGroupService
 
      Task Update(string name, GroupUpdateModel model, UserInfo updatedBy);
 
-     Task<UserModel[]> GetUsers(string name, UserInfo requestedBy);
+     Task<IEnumerable<UserModel>> GetUsers(string name, UserInfo requestedBy);
 
      Task AddUserToGroup(string name, UserInfo user, UserInfo addedBy);
 
