@@ -4,6 +4,7 @@
       <b-form-input v-model="page.name" placeholder="PageName" class="page-edit-name" :state="nameState"></b-form-input>
       <vue-simplemde :configs="mdeConfig" v-model="page.content" ref="markdownEditor" />
       <div style="float: right; padding-right: 1em">
+        <b-form-checkbox class="side-by-side-switch" size="lg" switch @change="toggleSideBySide">Side-By-Side</b-form-checkbox>
         <b-button @click="save" variant="primary" style="margin-right: 0.5em" :disabled="!nameState">
           Update
         </b-button>
@@ -44,7 +45,6 @@ export default {
           "link",
           "image",
           "table",
-          "fullscreen",
           "|",
           {
             name: "attachment",
@@ -56,6 +56,14 @@ export default {
           "guide",
         ],
         spellChecker: false,
+        previewRender: function(plainText) {
+          var md = require('markdown-it')({
+            html: true,
+            linkify: true,
+            typographer: true
+          });
+          return md.render(plainText);
+        },
       },
     };
   },
@@ -89,7 +97,9 @@ export default {
 
       this.page = pageRequest.data;
       this.loaded = true;
-      setTimeout((self) => self.simplemde.codemirror.on("drop", self.dragAndDrop), 1000, this);
+      setTimeout((self) => {
+          self.simplemde.codemirror.on("drop", self.dragAndDrop);
+        }, 1000, this);
     },
     save: async function () {
       var pageSaveRequest = await axios.put(
@@ -163,6 +173,58 @@ export default {
         data.toLowerCase().endsWith(".gif") ||
         data.toLowerCase().endsWith(".svg");
     },
+    toggleSideBySide: function toggleSideBySide() {
+        var editor = this.simplemde;
+        var cm = this.simplemde.codemirror;
+        var wrapper = cm.getWrapperElement();
+        var preview = wrapper.nextSibling;
+        var useSideBySideListener = false;
+        if(/editor-preview-active-side/.test(preview.className)) {
+            preview.className = preview.className.replace(
+                /\s*editor-preview-active-side\s*/g, ""
+            );
+            wrapper.className = wrapper.className.replace(/\s*CodeMirror-sided\s*/g, " ");
+        } else {
+            // When the preview button is clicked for the first time,
+            // give some time for the transition from editor.css to fire and the view to slide from right to left,
+            // instead of just appearing.
+            setTimeout(function() {
+                preview.className += " editor-preview-active-side";
+            }, 1);
+            wrapper.className += " CodeMirror-sided";
+            useSideBySideListener = true;
+        }
+
+        // Hide normal preview if active
+        var previewNormal = wrapper.lastChild;
+        if(/editor-preview-active/.test(previewNormal.className)) {
+            previewNormal.className = previewNormal.className.replace(
+                /\s*editor-preview-active\s*/g, ""
+            );
+            var toolbar = editor.toolbarElements.preview;
+            var toolbar_div = wrapper.previousSibling;
+            toolbar.className = toolbar.className.replace(/\s*active\s*/g, "");
+            toolbar_div.className = toolbar_div.className.replace(/\s*disabled-for-preview*/g, "");
+        }
+
+        var sideBySideRenderingFunction = function() {
+            preview.innerHTML = editor.options.previewRender(editor.value(), preview);
+        };
+
+        if(!cm.sideBySideRenderingFunction) {
+            cm.sideBySideRenderingFunction = sideBySideRenderingFunction;
+        }
+
+        if(useSideBySideListener) {
+            preview.innerHTML = editor.options.previewRender(editor.value(), preview);
+            cm.on("update", cm.sideBySideRenderingFunction);
+        } else {
+            cm.off("update", cm.sideBySideRenderingFunction);
+        }
+
+        // Refresh to fix selection being off (#309)
+        cm.refresh();
+    }
   },
   mounted: function () {
     this.init();
@@ -204,6 +266,21 @@ export default {
 @media (max-width: 314px) {
   #app {
     --page-edit-height: 318px;
+  }
+}
+.editor-preview-side {
+    height: calc(100vh - var(--page-edit-height, 240px));
+    top: 152.75px;
+}
+.side-by-side-switch {
+    display: inline-block;
+    margin-right: 2em;
+    position: relative;
+    top: -3px;
+}
+@media (max-width: 575px) {
+  .side-by-side-switch {
+    display: none !important;
   }
 }
 </style>
