@@ -1,10 +1,18 @@
 <template>
-  <div class="home">
+  <div
+    v-touch:swipe.left="swipeCloseMenu"
+    v-touch:swipe.right="swipeOpenMenu"
+    class="home"
+  >
     <b-container fluid class="full-size-container">
       <b-card no-body class="h-100vh">
-        <b-badge @click="switchMenu" href="#" class="fixed-tabs-badge" variant="primary"
-                ><b-icon icon="arrow-right-short"/>
-              </b-badge>
+        <b-badge
+          @click="switchMenu"
+          href="#"
+          class="fixed-tabs-badge"
+          variant="primary"
+          ><b-icon icon="arrow-right-short" />
+        </b-badge>
         <b-tabs
           pills
           card
@@ -16,8 +24,12 @@
             <br />
             <h5 style="text-align: left">
               DISCOVER
-              <b-badge @click="switchMenu" href="#" class="tabs-badge" variant="primary"
-                ><b-icon icon="arrow-left-short"/>
+              <b-badge
+                @click="switchMenu"
+                href="#"
+                class="tabs-badge"
+                variant="primary"
+                ><b-icon icon="arrow-left-short" />
               </b-badge>
             </h5>
             <br />
@@ -30,7 +42,7 @@
             </h5>
             <br />
             <MySpaces />
-            <version/>
+            <version />
           </template>
 
           <Updates />
@@ -45,7 +57,7 @@
 import Updates from "@/components/home/Updates.vue";
 import RecentlyVisited from "@/components/home/RecentlyVisited.vue";
 import MySpaces from "@/components/home/MySpaces.vue";
-import Version from '@/components/home/Version.vue';
+import Version from "@/components/home/Version.vue";
 export default {
   name: "home",
   components: {
@@ -56,24 +68,37 @@ export default {
   },
   data() {
     return {
-      menuClosed: false
-    }
+      menuClosed: false,
+    };
+  },
+  computed: {
+    isSmallScreen() {
+      return window.innerWidth < 860;
+    },
   },
   methods: {
-    switchMenu: function(){
+    swipeOpenMenu: function () {
+      if (!this.menuClosed || !this.isSmallScreen) return;
+      this.switchMenu();
+    },
+    swipeCloseMenu: function () {
+      if (this.menuClosed || !this.isSmallScreen) return;
+      this.switchMenu();
+    },
+    switchMenu: function () {
       this.menuClosed = !this.menuClosed;
-      this.$store.commit('changeHomeMenuClose', this.menuClosed);
-      document.getElementsByClassName('home-nav')[0].hidden = this.menuClosed;
-    }
+      this.$store.commit("changeHomeMenuClose", this.menuClosed);
+      document.getElementsByClassName("home-nav")[0].hidden = this.menuClosed;
+    },
   },
-  mounted: function(){
-    if(window.innerWidth > 860){
-      this.$store.commit('changeHomeMenuClose', false);
+  mounted: function () {
+    if (window.innerWidth > 860) {
+      this.$store.commit("changeHomeMenuClose", false);
       return;
     }
     this.menuClosed = this.$store.state.application.homeMenuClosed;
-    document.getElementsByClassName('home-nav')[0].hidden = this.menuClosed;
-  }
+    document.getElementsByClassName("home-nav")[0].hidden = this.menuClosed;
+  },
 };
 </script>
 <style>

@@ -9,7 +9,11 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 // Vue tree list
 import VueTreeList from 'vue-tree-list'
+// Vue touchscreen events
+import Vue2TouchEvents from 'vue2-touch-events'
 
+// Vue touchscreen events plugin
+Vue.use(Vue2TouchEvents)
 // TreeList plugin
 Vue.use(VueTreeList)
 // Make BootstrapVue available throughout your project
