@@ -19,7 +19,7 @@ public class SpaceCreateModel : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if(Key.Contains('@'))
+        if(Key.Contains('@') && Type != SpaceTypeModel.Personal)
             return new []{new ValidationResult("Creating space with email as key allowed only for personal spaces.", new []{nameof(Key)})};
 
         return new []{ValidationResult.Success};
