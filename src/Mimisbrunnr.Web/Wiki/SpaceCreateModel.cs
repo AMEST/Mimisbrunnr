@@ -5,7 +5,7 @@ namespace Mimisbrunnr.Web.Wiki;
 public class SpaceCreateModel : IValidatableObject
 {
     [Required]
-    [MaxLength(24)]
+    [MaxLength(64)]
     [RegularExpression("^[a-zA-Z0-9@\\.\\-_]*$", ErrorMessage = "Only Alphabets, Numbers, @, . , _ and - allowed.")]
     public string Key { get; set; }
 
