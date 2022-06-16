@@ -13,4 +13,6 @@ public class ApplicationConfiguration : IHasId<string>
     public bool SwaggerEnabled { get; set; }
 
     public bool AllowHtml { get; set; }
+
+    public bool CustomHomepageEnabled { get; set; }
 }

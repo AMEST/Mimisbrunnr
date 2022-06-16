@@ -74,7 +74,8 @@ public static class MappingExtensions
             Title = model?.Title ?? "Mimisbrunnr",
             AllowAnonymous = model?.AllowAnonymous ?? false,
             AllowHtml = model?.AllowHtml ?? true,
-            SwaggerEnabled = model?.SwaggerEnabled ?? false
+            SwaggerEnabled = model?.SwaggerEnabled ?? false,
+            CustomHomepageEnabled = model?.CustomHomepageEnabled ?? false
         };
     }
 

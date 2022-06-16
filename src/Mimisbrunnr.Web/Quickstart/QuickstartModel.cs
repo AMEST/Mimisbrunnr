@@ -16,4 +16,8 @@ public class QuickstartModel
 
     [Required]
     public bool AllowHtml { get; set; }
+
+    public bool CustomHomepageEnabled { get; set; }
+
+    public bool CustomHomepageKey { get; set; }
 }
