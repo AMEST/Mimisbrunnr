@@ -23,7 +23,7 @@
           <template #tabs-start>
             <br />
             <h5 style="text-align: left">
-              DISCOVER
+              {{$t("home.menu.discover")}}
               <b-badge
                 @click="switchMenu"
                 href="#"
@@ -37,8 +37,8 @@
           <template #tabs-end v-if="this.$store.state.application.profile">
             <br />
             <h5 style="text-align: left">
-              MY SPACES
-              <b-link class="favorites-all-link" to="/favorites">ALL</b-link>
+              {{$t("home.menu.mySpaces")}}
+              <b-link class="favorites-all-link" to="/favorites">{{$t("home.menu.allFavoritesSpaces")}}</b-link>
             </h5>
             <br />
             <MySpaces />

@@ -1,0 +1,68 @@
+{
+    "en": {
+        "header":{
+            "spacesDropdown": {
+                "title": "Spaces",
+                "list": "Space directory",
+                "create": "Create Space"
+            },
+            "pageCreateButton": "Create",
+            "search": "Search",
+            "login": "Log in",
+            "lang": "Language",
+            "profileDropdown": {
+                "personalSpace": "Personal space",
+                "admin": "Administration",
+                "profile": "Profile",
+                "signOut": "Sign out"
+            }
+        },
+        "home":{
+            "menu": {
+                "discover": "DISCOVER",
+                "mySpaces": "MY SPACES",
+                "allFavoritesSpaces": "ALL"
+            },
+            "updates":{
+                "title": "Updates",
+                "emptyUpdates": "There are no recent updates."
+            },
+            "recentlyVisited": {
+                "title": "Recently visited"
+            }
+        }
+    },
+    "ru": {
+        "header":{
+            "spacesDropdown": {
+                "title": "Пространства",
+                "list": "Список",
+                "create": "Создать"
+            },
+            "pageCreateButton": "Создать",
+            "search": "Поиск",
+            "login": "Вход",
+            "lang": "Язык",
+            "profileDropdown": {
+                "personalSpace": "Персональное пространство",
+                "admin": "Администрирование",
+                "profile": "Профиль",
+                "signOut": "Выход"
+            }
+        },
+        "home":{
+            "menu": {
+                "discover": "ОТКРОЙТЕ ДЛЯ СЕБЯ",
+                "mySpaces": "МОИ ПРОСТРАНСТВА",
+                "allFavoritesSpaces": "ВСЕ"
+            },
+            "updates":{
+                "title": "Обновления",
+                "emptyUpdates": "За последнее время, никаких обновлений не было."
+            },
+            "recentlyVisited": {
+                "title": "Ранее посещенные"
+            }
+        }
+    }
+}
