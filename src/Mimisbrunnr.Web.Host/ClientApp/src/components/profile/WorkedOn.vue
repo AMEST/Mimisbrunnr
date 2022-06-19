@@ -1,7 +1,7 @@
 <template>
   <b-col sm="9" class="text-left">
     <div class="profile-worked-on">
-      <h5>Worked on</h5>
+      <h5>{{$t('profile.workedOn.title')}}</h5>
       <b-card>
         <b-card-text v-if="!this.loaded">
           <b-list-group-item button v-for="h in [1, 2, 3, 4, 5, 6]" :key="h">
@@ -15,7 +15,7 @@
               <b-link :to="'/space/'+work.spaceKey+'/'+work.pageId">{{ work.pageTitle }}</b-link>
               <span class="text-muted work-date">{{new Date(work.updated).toLocaleString()}}</span>
           </b-list-group-item>
-          <b-list-group-item v-if="this.workedOn.length == 0">There are no recent updates.</b-list-group-item>
+          <b-list-group-item v-if="this.workedOn.length == 0">{{$t('profile.workedOn.emptyUpdates')}}</b-list-group-item>
         </b-card-text>
       </b-card>
     </div>

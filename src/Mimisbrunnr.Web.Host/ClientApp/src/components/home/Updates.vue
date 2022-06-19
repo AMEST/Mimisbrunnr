@@ -2,9 +2,9 @@
   <b-tab active class="max-tab-pane" style="text-align: left">
     <template #title>
       <b-icon icon="compass" class="text-secondary"></b-icon>
-      <strong class="text-secondary"> Updates</strong>
+      <strong class="text-secondary"> {{$t("home.updates.title")}}</strong>
     </template>
-    <h2>Updates</h2>
+    <h2>{{$t("home.updates.title")}}</h2>
     <div v-if="!loaded">
       <b-card v-for="n in 10" :key="n" class="updates-card">
         <b-skeleton type="avatar" class="updates-avatar"></b-skeleton>
@@ -15,7 +15,7 @@
       </b-card>
     </div>
     <div v-else>
-      <b-alert v-if="this.updates.length == 0" show variant="light">There are no recent updates.</b-alert>
+      <b-alert v-if="this.updates.length == 0" show variant="light">{{$t("home.updates.emptyUpdates")}}</b-alert>
       <b-card
         class="updates-card"
         v-for="pageEvent in this.updates"

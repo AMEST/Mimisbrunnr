@@ -23,7 +23,7 @@
           <template #tabs-start>
             <br />
             <h5 style="text-align: left">
-              DISCOVER
+              {{$t("home.menu.discover")}}
               <b-badge
                 @click="switchMenu"
                 href="#"
@@ -37,8 +37,8 @@
           <template #tabs-end v-if="this.$store.state.application.profile">
             <br />
             <h5 style="text-align: left">
-              MY SPACES
-              <b-link class="favorites-all-link" to="/favorites">ALL</b-link>
+              {{$t("home.menu.mySpaces")}}
+              <b-link class="favorites-all-link" to="/favorites">{{$t("home.menu.allFavoritesSpaces")}}</b-link>
             </h5>
             <br />
             <MySpaces />
@@ -106,7 +106,7 @@ export default {
   height: 100%;
 }
 .home-nav {
-  width: 250px !important;
+  width: 280px !important;
   text-align: left;
   box-shadow: inset 0 0rem 0.5em rgba(0, 0, 0, 0.15) !important;
   background-color: rgb(247 247 247) !important;

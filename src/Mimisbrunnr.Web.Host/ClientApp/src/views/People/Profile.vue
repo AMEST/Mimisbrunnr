@@ -10,8 +10,8 @@
                     <span class="text-muted"> {{ this.profile.email }} </span>
                 </div>
                 <div class="profile-actions" v-if="this.itsMe">
-                    <b-button class="profile-actions-button" block variant="light">Settings</b-button>
-                    <b-button class="profile-actions-button" block variant="light">Favorites</b-button>
+                    <b-button class="profile-actions-button" block variant="light">{{$t("profile.settings")}}</b-button>
+                    <b-button class="profile-actions-button" block variant="light">{{$t("profile.favorites")}}</b-button>
                 </div>
                 <additional-info :itsMe="this.itsMe" />
             </b-col>

@@ -7,13 +7,15 @@
         }}</b-navbar-brand>
 
         <b-navbar-nav class="mr-auto">
-          <b-nav-item-dropdown text="Spaces" right>
-            <b-dropdown-item to="/spaces">Space directory</b-dropdown-item>
+          <b-nav-item-dropdown :text="$t('header.spacesDropdown.title')" right>
+            <b-dropdown-item to="/spaces">{{
+              $t("header.spacesDropdown.list")
+            }}</b-dropdown-item>
             <b-dropdown-item
               href="#"
               v-b-modal.space-create-modal
               :disabled="!this.$store.state.application.profile"
-              >Create Space</b-dropdown-item
+              >{{ $t("header.spacesDropdown.create") }}</b-dropdown-item
             >
           </b-nav-item-dropdown>
           <b-button
@@ -23,16 +25,25 @@
             @click="create"
             size="sm"
           >
-            Create
+            {{ $t("header.pageCreateButton") }}
           </b-button>
         </b-navbar-nav>
         <!-- Right aligned nav items -->
         <b-navbar-nav class="header-right-menu">
           <b-nav-form class="flex-search invisibleComponentBorder">
             <b-input-group v-b-toggle.search-sidebar size="sm">
-              <b-form-input class="search-input" placeholder="Search" disabled></b-form-input>
+              <b-form-input
+                class="search-input"
+                :placeholder="$t('header.search')"
+                disabled
+              ></b-form-input>
               <b-input-group-append>
-                <b-button class="search-input-button" size="sm" text="Button" variant="success" disabled
+                <b-button
+                  class="search-input-button"
+                  size="sm"
+                  text="Button"
+                  variant="success"
+                  disabled
                   ><b-icon icon="search"
                 /></b-button>
               </b-input-group-append>
@@ -40,9 +51,23 @@
           </b-nav-form>
 
           <div v-if="!this.$store.state.application.profile">
-            <b-button class="text-light" variant="link" @click="auth"
-              >Log in</b-button
-            >
+            <b-nav-item-dropdown style="display: inline-block" :text="$t('header.lang')" right>
+              <b-dropdown-item v-on:click="$i18n.locale = 'en'">
+                {{
+                  $i18n.locale == "en" ? "⏵" : "&nbsp;&nbsp;&nbsp;&nbsp;"
+                }}
+                English
+              </b-dropdown-item>
+              <b-dropdown-item v-on:click="$i18n.locale = 'ru'">
+                {{
+                  $i18n.locale == "ru" ? "⏵" : "&nbsp;&nbsp;&nbsp;&nbsp;"
+                }}
+                Русский
+              </b-dropdown-item>
+            </b-nav-item-dropdown>
+            <b-button style="display: inline-block" class="text-light" variant="link" @click="auth">{{
+              $t("header.login")
+            }}</b-button>
           </div>
           <b-nav-item-dropdown v-else right class="custom-dropdown">
             <!-- Using 'button-content' slot -->
@@ -54,30 +79,37 @@
               ></b-avatar>
             </template>
             <b-dropdown-text style="width: 240px">
-              Signed as
               <span class="username">{{
                 $store.state.application.profile.name
               }}</span>
             </b-dropdown-text>
             <b-dropdown-divider></b-dropdown-divider>
+            <b-form-select
+              v-model="$i18n.locale"
+              :options="langs"
+              class="header-lang-select"
+            ></b-form-select>
+            <b-dropdown-divider></b-dropdown-divider>
             <b-dropdown-item @click="goToPersonalSpace">
-                Personal space
+              {{ $t("header.profileDropdown.personalSpace") }}
             </b-dropdown-item>
             <b-dropdown-divider></b-dropdown-divider>
             <b-dropdown-item
               v-if="this.$store.state.application.profile.isAdmin"
               to="/admin"
             >
-              <b-icon icon="gear"/> Administration
+              <b-icon icon="gear" /> {{ $t("header.profileDropdown.admin") }}
             </b-dropdown-item>
-            <b-dropdown-divider v-if="this.$store.state.application.profile.isAdmin"></b-dropdown-divider>
+            <b-dropdown-divider
+              v-if="this.$store.state.application.profile.isAdmin"
+            ></b-dropdown-divider>
             <b-dropdown-item
               :to="'/profile/' + $store.state.application.profile.email"
-              >
-              Profile
+            >
+              {{ $t("header.profileDropdown.profile") }}
             </b-dropdown-item>
             <b-dropdown-item href="/api/account/logout">
-                Sign Out
+              {{ $t("header.profileDropdown.signOut") }}
             </b-dropdown-item>
           </b-nav-item-dropdown>
         </b-navbar-nav>
@@ -91,7 +123,18 @@ import axios from "axios";
 export default {
   name: "Header",
   data: function () {
-    return {};
+    return {
+      langs: [
+        { value: "ru", text: "Русский" },
+        { value: "en", text: "English" },
+      ],
+    };
+  },
+  watch: {
+    // eslint-disable-next-line
+    "$i18n.locale": function (to, from) {
+      window.localStorage["lang"] = to;
+    },
   },
   methods: {
     getInitials: function () {
@@ -169,10 +212,10 @@ export default {
         );
       else
         this.$bvToast.toast(createPageRequest.data.message, {
-          title: 'Error creating page',
-          variant: 'danger',
-          solid: true
-        })
+          title: "Error creating page",
+          variant: "danger",
+          solid: true,
+        });
     },
   },
 };
@@ -180,13 +223,13 @@ export default {
 
 <style scoped>
 .search-input {
-  color: white!important;
+  color: white !important;
   background-color: #1974d9 !important;
-  border: unset!important;
+  border: unset !important;
 }
-.search-input-button{
-  background-color: #1974d9!important;
-  border-color: #1974d9!important;
+.search-input-button {
+  background-color: #1974d9 !important;
+  border-color: #1974d9 !important;
 }
 .create-button {
   margin-left: 7px;
@@ -247,5 +290,9 @@ export default {
   .header-right-menu .flex-search {
     display: none !important;
   }
+}
+.header-lang-select {
+  border: unset !important;
+  padding-left: 1.5rem !important;
 }
 </style>

@@ -2,9 +2,9 @@
   <b-tab class="max-tab-pane text-left">
     <template #title>
       <b-icon icon="clock-history" class="text-secondary"></b-icon>
-      <strong class="text-secondary"> Recently visited</strong>
+      <strong class="text-secondary"> {{$t("home.recentlyVisited.title")}}</strong>
     </template>
-    <h2>Recently visited</h2>
+    <h2>{{$t("home.recentlyVisited.title")}}</h2>
     <b-list-group class="pt-3">
       <b-list-group-item 
         button 

@@ -1,0 +1,528 @@
+{
+    "en": {
+        "header": {
+            "spacesDropdown": {
+                "title": "Spaces",
+                "list": "Space directory",
+                "create": "Create Space"
+            },
+            "pageCreateButton": "Create",
+            "search": "Search",
+            "login": "Log in",
+            "lang": "Language",
+            "profileDropdown": {
+                "personalSpace": "Personal space",
+                "admin": "Administration",
+                "profile": "Profile",
+                "signOut": "Sign out"
+            }
+        },
+        "spaceCreate": {
+            "title": "Create space",
+            "create": "Create",
+            "reset": "Reset",
+            "fields": {
+                "key": {
+                    "label": "Space key:",
+                    "description": "Come up with a unique short space key that does not contain spaces",
+                    "placeholder": "Enter space key",
+                    "invalid": "Space key length need more then 2 symbols and lower then 64 symbols"
+                },
+                "name": {
+                    "label": "Your space display name:",
+                    "placeholder": "Enter name"
+                },
+                "type": {
+                    "label": "Space type:"
+                },
+                "description": {
+                    "label": "Space description",
+                    "description": "Write description about space",
+                    "placeholder": "Enter description"
+                },
+                "import": {
+                    "description": "Create new space and import pages from export file",
+                    "placeholder": "Choose a confluence space export zip",
+                    "dropPlaceholder": "Drop file here...",
+                    "content": "Import pages from confluence?"
+                }
+            }
+        },
+        "home": {
+            "menu": {
+                "discover": "DISCOVER",
+                "mySpaces": "MY SPACES",
+                "allFavoritesSpaces": "ALL"
+            },
+            "updates": {
+                "title": "Updates",
+                "emptyUpdates": "There are no recent updates."
+            },
+            "recentlyVisited": {
+                "title": "Recently visited"
+            }
+        },
+        "quickStart": {
+            "title": "Welcome to Mimisbrunnr wiki. For use own instance, you will need to initialize with some configurations",
+            "init": "Initialization",
+            "fields": {
+                "title": {
+                    "label": "Enter title",
+                    "description": "The title of your wiki instance."
+                },
+                "anonymous": {
+                    "label": "Publish mode",
+                    "description": "Allow unauthorized (anonymous) users to read public wiki information",
+                    "content": "Allow anonymous access"
+                },
+                "markdown": {
+                    "label": "Markdown settings",
+                    "description": "Allow using html inside markdown on pages",
+                    "content": "Allow html"
+                },
+                "swagger": {
+                    "label": "Application swagger",
+                    "description": "Enable swagger for view application api",
+                    "content": "Enable swagger"
+                }
+            }
+        },
+        "admin": {
+            "general": {
+                "title": "General settings Mimisbrunnr wiki",
+                "save": "Save",
+                "fields": {
+                    "title": {
+                        "label": "Enter title",
+                        "description": "The title of your wiki instance."
+                    },
+                    "anonymous": {
+                        "label": "Publish mode",
+                        "description": "Allow unauthorized (anonymous) users to read public wiki information",
+                        "content": "Allow anonymous access"
+                    },
+                    "markdown": {
+                        "label": "Markdown settings",
+                        "description": "Allow using html inside markdown on pages",
+                        "content": "Allow html"
+                    },
+                    "swagger": {
+                        "label": "Application swagger",
+                        "description": "Enable swagger for view application api",
+                        "content": "Enable swagger"
+                    },
+                    "customCss": {
+                        "label": "Custom css",
+                        "description": "Add custom css to instance",
+                        "placeholder": ".custom-css{}"
+                    },
+                    "customHome": {
+                        "label": "Custom homepage",
+                        "description": "Use custom home html page instead of default dashboard",
+                        "switch": "Enable Custom homepage"
+                    }
+                }
+            }
+        },
+        "profile": {
+            "settings": "Settings",
+            "favorites": "Favorites",
+            "additional": {
+                "title": "Additional information",
+                "post": "Post",
+                "department": "Department",
+                "organization": "Organization",
+                "location": "Location"
+            },
+            "workedOn": {
+                "title": "Worked on",
+                "emptyUpdates": "There are no recent updates."
+            }
+        },
+        "search": {
+            "title": "Search...",
+            "placeholder": "Search",
+            "searchInSpaces": "Search space",
+            "results": {
+                "hasResults": "results",
+                "noResults": "No results"
+            }
+        },
+        "spaceDirectory": {
+            "title": "Space Directory",
+            "all": "All spaces",
+            "name": "Name",
+            "description": "Description",
+            "action": "Action"
+        },
+        "pageEditor": {
+            "placeholder": "Page Name",
+            "update": "Update",
+            "close": "Close",
+            "sideBySide": "Side-By-Side"
+        },
+        "page": {
+            "edit": "Edit",
+            "attachments": {
+                "title": "Attachments",
+                "upload": "Upload",
+                "browse": "Browse",
+                "placeholder": "Choose a file"
+            },
+            "copy": {
+                "title": "Copy",
+                "copy": "Copy",
+                "cancel": "Cancel",
+                "type": {
+                    "label": "Destination type",
+                    "description": "Parent page or space"
+                },
+                "destination": {
+                    "label": "Destination",
+                    "description": "Parent page id or space key",
+                    "placeholder": "Enter pageid or space key"
+                }
+            },
+            "move": {
+                "title": "Move",
+                "move": "Move",
+                "cancel": "Cancel",
+                "type": {
+                    "label": "Destination type",
+                    "description": "Parent page or space"
+                },
+                "destination": {
+                    "label": "Destination",
+                    "description": "Parent page id or space key",
+                    "placeholder": "Enter pageid or space key"
+                }
+            },
+            "delete": {
+                "button": "Delete",
+                "title": "Are you shure delete page?",
+                "content": "Delete page and all children",
+                "delete": "Delete",
+                "cancel": "Cancel"
+            },
+            "date": {
+                "created": "Created by",
+                "updated": "Updated by",
+                "at": "at"
+            }
+        },
+        "space": {
+            "description": "Description",
+            "actions": {
+                "title": "Space actions",
+                "profile": "Profile",
+                "permissions": "Permissions",
+                "settings": "Settings"
+            },
+            "tree": "Page tree",
+            "permissions": {
+                "title": "Space Permissions",
+                "groups": "Groups",
+                "user": "Individual user",
+                "cancel": "Cancel",
+                "table": {
+                    "name": "Name",
+                    "canView": "Can View",
+                    "canEdit": "Can Edit",
+                    "canDelete": "Can Delete",
+                    "admin": "Admin",
+                    "action": "Action",
+                    "add": "Add new"
+                }
+            },
+            "settings": {
+                "title": "Space settings",
+                "remove": "Remove",
+                "save": "Save",
+                "cancel": "Cancel",
+                "name": {
+                    "label": "Space name",
+                    "placeholder": "Enter space name",
+                    "description": "Space display name"
+                },
+                "description": {
+                    "label": "Space description",
+                    "placeholder": "Enter space description",
+                    "description": "Space description"
+                },
+                "privateType": {
+                    "label": "Space private type",
+                    "description": "Allow visible space to all users",
+                    "content": "Is public space?"
+                },
+                "status": {
+                    "label": "Space status",
+                    "description": "Archive space for disable creating/updating/deleting pages",
+                    "content": "Archive"
+                }
+            }
+        }
+    },
+    "ru": {
+        "header": {
+            "spacesDropdown": {
+                "title": "Пространства",
+                "list": "Список",
+                "create": "Создать"
+            },
+            "pageCreateButton": "Создать",
+            "search": "Поиск",
+            "login": "Вход",
+            "lang": "Язык",
+            "profileDropdown": {
+                "personalSpace": "Персональное пространство",
+                "admin": "Администрирование",
+                "profile": "Профиль",
+                "signOut": "Выход"
+            }
+        },
+        "spaceCreate": {
+            "title": "Создание пространства",
+            "create": "Создать",
+            "reset": "Сбросить",
+            "fields": {
+                "key": {
+                    "label": "Ключ пространства:",
+                    "description": "Придумайте уникальный ключ пространства, не содержащую пробелов.",
+                    "placeholder": "Укажите ключ пространства",
+                    "invalid": "Ключ пространства должен быть более 2 символов и менее 64 символов"
+                },
+                "name": {
+                    "label": "Имя пространства:",
+                    "placeholder": "Укажите имя пространства"
+                },
+                "type": {
+                    "label": "Тип пространства:"
+                },
+                "description": {
+                    "label": "Описание пространства",
+                    "description": "Опешите ваше пространство",
+                    "placeholder": "Укажите пространство"
+                },
+                "import": {
+                    "description": "Создать новое пространство и импортировать страницы из экспорта",
+                    "placeholder": "Выберите архив экспортированного пространства из confluence",
+                    "dropPlaceholder": "Бросьте файлы сюда...",
+                    "content": "Импортировать страницы из confluence?"
+                }
+            }
+        },
+        "home": {
+            "menu": {
+                "discover": "ОТКРОЙТЕ ДЛЯ СЕБЯ",
+                "mySpaces": "МОИ ПРОСТРАНСТВА",
+                "allFavoritesSpaces": "ВСЕ"
+            },
+            "updates": {
+                "title": "Обновления",
+                "emptyUpdates": "За последнее время, никаких обновлений не было."
+            },
+            "recentlyVisited": {
+                "title": "Ранее посещенные"
+            }
+        },
+        "quickStart": {
+            "title": "Добро пожаловать Mimisbrunnr wiki. Для использования, вы должны выбрать предварительные настройки сервиса и инициализировать его.",
+            "init": "Инициализация",
+            "fields": {
+                "title": {
+                    "label": "Введите заголовок",
+                    "description": "Заголовок вашего экземпляра вики."
+                },
+                "anonymous": {
+                    "label": "Режим доступности",
+                    "description": "Разрешить неавторизованный (анонимный) доступ к чтению публичной информации из вики",
+                    "content": "Разрешить анонимный доступ"
+                },
+                "markdown": {
+                    "label": "Настройки Markdown",
+                    "description": "Разрешить использование html внутри Markdown разметки на странице",
+                    "content": "Разрешить html"
+                },
+                "swagger": {
+                    "label": "Swagger документация",
+                    "description": "Включить swagger для просмотра api приложения",
+                    "content": "Включить swagger"
+                }
+            }
+        },
+        "admin": {
+            "general": {
+                "title": "Основные настройки Mimisbrunnr wiki",
+                "save": "Сохранить",
+                "fields": {
+                    "title": {
+                        "label": "Введите заголовок",
+                        "description": "Заголовок вашего экземпляра вики."
+                    },
+                    "anonymous": {
+                        "label": "Режим доступности",
+                        "description": "Разрешить неавторизованный (анонимный) доступ к чтению публичной информации из вики",
+                        "content": "Разрешить анонимный доступ"
+                    },
+                    "markdown": {
+                        "label": "Настройки Markdown",
+                        "description": "Разрешить использование html внутри Markdown разметки на странице",
+                        "content": "Разрешить html"
+                    },
+                    "swagger": {
+                        "label": "Swagger документация",
+                        "description": "Включить swagger для просмотра api приложения",
+                        "content": "Включить swagger"
+                    },
+                    "customCss": {
+                        "label": "Пользовательский CSS",
+                        "description": "Добавить пользовательские стили (CSS)",
+                        "placeholder": ".custom-css{}"
+                    },
+                    "customHome": {
+                        "label": "Пользовательская главная страница",
+                        "description": "Использовать пользовательскую домашнюю HTML-страницу вместо панели инструментов по умолчанию",
+                        "switch": "Включить пользовательскую домашнюю страницу"
+                    }
+                }
+            }
+        },
+        "profile": {
+            "settings": "Настройки",
+            "favorites": "Избранное",
+            "additional": {
+                "title": "Дополнительная информация",
+                "post": "Должность",
+                "department": "Отдел",
+                "organization": "Организация",
+                "location": "Местоположение"
+            },
+            "workedOn": {
+                "title": "Недавно работал",
+                "emptyUpdates": "За последнее время, никаких обновлений не было."
+            }
+        },
+        "search": {
+            "title": "Поиск...",
+            "placeholder": "Поиск",
+            "searchInSpaces": "Поиск пространств",
+            "results": {
+                "hasResults": "найдено",
+                "noResults": "ничего не найдено"
+            }
+        },
+        "spaceDirectory": {
+            "title": "Список пространств",
+            "all": "Все пространства",
+            "name": "Имя",
+            "description": "Описание",
+            "action": "Действия"
+        },
+        "pageEditor": {
+            "placeholder": "Имя страницы",
+            "update": "Сохранить",
+            "close": "Закрыть",
+            "sideBySide": "Сплит-режим"
+        },
+        "page": {
+            "edit": "Редактировать",
+            "attachments": {
+                "title": "Вложения",
+                "upload": "Загрузить",
+                "browse": "Выбрать",
+                "placeholder": "Выберите файл"
+            },
+            "copy": {
+                "title": "Копировать",
+                "copy": "Копировать",
+                "cancel": "Отмена",
+                "type": {
+                    "label": "Тип назначения",
+                    "description": "Родительская страница или пространство"
+                },
+                "destination": {
+                    "label": "Куда копировать",
+                    "description": "Родительская страница или пространство",
+                    "placeholder": "Введите id страницы or ключ пространства"
+                }
+            },
+            "move": {
+                "title": "Перемещение",
+                "move": "Перемещение",
+                "cancel": "Отмена",
+                "type": {
+                    "label": "Тип назначения",
+                    "description": "Родительская страница или пространство"
+                },
+                "destination": {
+                    "label": "Куда перемещать",
+                    "description": "Родительская страница или пространство",
+                    "placeholder": "Введите id страницы or ключ пространства"
+                }
+            },
+            "delete": {
+                "button": "Удалить",
+                "title": "Вы уверены, что хотите удалить страницу?",
+                "content": "Удаление страницы и всех дочерних страниц",
+                "delete": "Удалить",
+                "cancel": "Отмена"
+            },
+            "date": {
+                "created": "Создал",
+                "updated": "Обновил",
+                "at": "в"
+            }
+        },
+        "space": {
+            "description": "Описание",
+            "actions": {
+                "title": "Действия в пространстве",
+                "profile": "Профиль",
+                "permissions": "Разрешения",
+                "settings": "Настройки"
+            },
+            "tree": "Древо страниц",
+            "permissions": {
+                "title": "Разрешения пространств",
+                "groups": "Группы",
+                "user": "Индивидуальные",
+                "cancel": "Отмена",
+                "table": {
+                    "name": "Имя",
+                    "canView": "Может просматривать",
+                    "canEdit": "Может редактировать",
+                    "canDelete": "Может удалять",
+                    "admin": "Админ",
+                    "action": "Действия",
+                    "add": "Добавить"
+                }
+            },
+            "settings": {
+                "title": "Настройки пространства",
+                "remove": "Удалить",
+                "save": "Сохранить",
+                "cancel": "Отмена",
+                "name": {
+                    "label": "Имя пространства",
+                    "placeholder": "Введите имя пространства",
+                    "description": "Отображаемое имя пространства"
+                },
+                "description": {
+                    "label": "Описание пространства",
+                    "placeholder": "Введите описание",
+                    "description": "Описание пространства"
+                },
+                "privateType": {
+                    "label": "Уровень доступности пространства",
+                    "description": "Разрешить всем пользователям видеть пространство",
+                    "content": "Это публичное пространство?"
+                },
+                "status": {
+                    "label": "Статус пространство",
+                    "description": "Архивация пространства для отключения создания/обновления/удаления страниц",
+                    "content": "В архиве"
+                }
+            }
+        }
+    }
+}

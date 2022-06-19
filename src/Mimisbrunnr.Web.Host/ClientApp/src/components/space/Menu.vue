@@ -5,33 +5,33 @@
       <b-link :to="'/space/' + this.space.key">{{ this.space.name }}</b-link>
     </div>
     <div class="mt-3 pb-3 space-menu-bottom-line">
-      <i class="text-muted">Description: {{ this.space.description }}</i>
+      <i class="text-muted">{{$t("space.description")}}: {{ this.space.description }}</i>
     </div>
     <div class="mt-3 pb-3 space-actions-menu space-menu-bottom-line">
-      <i class="text-muted">Space actions</i>
+      <i class="text-muted">{{$t("space.actions.title")}}</i>
       <b-list-group class="mt-1">
         <b-list-group-item
           v-if="this.homePage && this.space.type == 'Personal'"
           :to="'/profile/' + this.homePage.createdBy.email"
         >
-          <b-icon icon="person-fill" />&nbsp; Profile
+          <b-icon icon="person-fill" />&nbsp; {{$t("space.actions.profile")}}
         </b-list-group-item>
         <b-list-group-item
           v-b-modal.space-permissions-modal
           v-if="userPermissions.isAdmin"
         >
-          <b-icon icon="shield-lock-fill" />&nbsp; Permissions
+          <b-icon icon="shield-lock-fill" />&nbsp; {{$t("space.actions.permissions")}}
         </b-list-group-item>
         <b-list-group-item
           v-b-modal.space-settings-modal
           v-if="userPermissions.isAdmin"
         >
-          <b-icon icon="gear-fill" />&nbsp; Settings
+          <b-icon icon="gear-fill" />&nbsp; {{$t("space.actions.settings")}}
         </b-list-group-item>
       </b-list-group>
     </div>
     <div class="mt-3 space-menu-page-tree">
-      <i class="text-muted">Page tree</i>
+      <i class="text-muted">{{$t("space.tree")}}</i>
       <div class="text-center" v-if="this.pageTree == undefined">
         <b-spinner variant="secondary"></b-spinner>
       </div>
