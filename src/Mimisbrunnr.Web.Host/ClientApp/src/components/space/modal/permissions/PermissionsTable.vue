@@ -2,12 +2,12 @@
   <b-table-simple style="text-align: left">
     <b-thead>
       <b-tr>
-        <b-th>Name</b-th>
-        <b-th>Can View</b-th>
-        <b-th>Can Edit</b-th>
-        <b-th>Can Delete</b-th>
-        <b-th>Admin</b-th>
-        <b-th class="text-right">Action</b-th>
+        <b-th>{{$t("space.permissions.table.name")}}</b-th>
+        <b-th>{{$t("space.permissions.table.canView")}}</b-th>
+        <b-th>{{$t("space.permissions.table.canEdit")}}</b-th>
+        <b-th>{{$t("space.permissions.table.canDelete")}}</b-th>
+        <b-th>{{$t("space.permissions.table.admin")}}</b-th>
+        <b-th class="text-right">{{$t("space.permissions.table.action")}}</b-th>
       </b-tr>
     </b-thead>
     <b-tbody>
@@ -43,7 +43,7 @@
           ></b-icon>
         </b-td>
       </b-tr>
-      <b-tr><b-td>Add new</b-td></b-tr>
+      <b-tr><b-td>{{$t("space.permissions.table.add")}}</b-td></b-tr>
       <b-tr>
         <b-td
           ><b-form-input

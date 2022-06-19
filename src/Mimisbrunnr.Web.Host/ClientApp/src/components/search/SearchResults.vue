@@ -1,8 +1,8 @@
 <template>
   <b-overlay :show="overlayState" rounded="sm">
     <div class="text-left search-results">
-        <h2 v-if="searchResults.length == 0"> No results</h2>
-        <h2 v-else>results {{searchResults.length}}</h2>
+        <h2 v-if="searchResults.length == 0"> {{$t("search.results.noResults")}}</h2>
+        <h2 v-else>{{$t("search.results.hasResults")}} {{searchResults.length}}</h2>
       <b-card
         class="updates-card"
         v-for="result in searchResults"

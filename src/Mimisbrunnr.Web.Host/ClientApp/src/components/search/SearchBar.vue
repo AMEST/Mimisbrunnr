@@ -1,7 +1,7 @@
 <template>
-    <b-sidebar class="search-sidebar" id="search-sidebar" title="Search..." right backdrop-variant="dark" no-header backdrop shadow>
-      <b-form-input class="search-field" id="search-input" v-model="searchText" size="lg" placeholder="Search" autofocus></b-form-input>
-      <b-form-checkbox class="search-type-switch" switch size="sm" v-model="searchSpaces">Search space</b-form-checkbox>
+    <b-sidebar class="search-sidebar" id="search-sidebar" :title="$t('search.title')" right backdrop-variant="dark" no-header backdrop shadow>
+      <b-form-input class="search-field" id="search-input" v-model="searchText" size="lg" :placeholder="$t('search.placeholder')" autofocus></b-form-input>
+      <b-form-checkbox class="search-type-switch" switch size="sm" v-model="searchSpaces">{{$t("search.searchInSpaces")}}</b-form-checkbox>
       <recently-visited class="pt-3" v-if="searchText == null || searchText == ''"/>
       <search-results v-else :textForSearch="searchText" :searchType="searchSpaces ? 'space' : 'page'"/>
     </b-sidebar>

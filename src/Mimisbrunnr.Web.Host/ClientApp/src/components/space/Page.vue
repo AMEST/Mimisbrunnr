@@ -13,7 +13,7 @@
         :disabled="!userPermissions.canEdit || isArchived"
       >
         <b-icon icon="pencil-fill" font-scale="0.9"/>
-        Edit
+        {{$t("page.edit")}}
       </b-button>
       <b-dropdown
         variant="secondary"
@@ -27,38 +27,38 @@
          href="#"
          v-b-modal.page-attachments-modal
          :disabled="!this.$store.state.application.profile"
-        >Attachments</b-dropdown-item>
+        >{{$t("page.attachments.title")}}</b-dropdown-item>
         <b-dropdown-divider></b-dropdown-divider>
         <b-dropdown-item
           v-b-modal.page-copy-modal
           :disabled="!userPermissions.canEdit || isArchived"
-          >Copy</b-dropdown-item
+          >{{$t("page.copy.title")}}</b-dropdown-item
         >
         <b-dropdown-item
           v-b-modal.page-move-modal
           :disabled="(!userPermissions.canEdit && !userPermissions.canRemove) || isArchived"
-          >Move</b-dropdown-item
+          >{{$t("page.move.title")}}</b-dropdown-item
         >
         <b-dropdown-item
           variant="danger"
           v-b-modal.page-delete-modal
           :disabled="!userPermissions.canRemove || isArchived"
-          >Delete</b-dropdown-item
+          >{{$t("page.delete.button")}}</b-dropdown-item
         >
       </b-dropdown>
     </div>
     <div class="pb-2 page-title">
       <h2>{{ this.page.name }}</h2>
       <p class="text-muted page-title-dates">
-        Created by
+        {{$t("page.date.created")}}
         <b-link :to="'/profile/' + this.page.createdBy.email">{{
           this.page.createdBy.name
         }}</b-link>
-        at {{ new Date(this.page.created).toLocaleString() }}. Updated by
+        {{$t("page.date.at")}} {{ new Date(this.page.created).toLocaleString() }}. {{$t("page.date.updated")}}
         <b-link :to="'/profile/' + this.page.updatedBy.email">{{
           this.page.updatedBy.name
         }}</b-link>
-        at {{ new Date(this.page.updated).toLocaleString() }}.
+        {{$t("page.date.at")}} {{ new Date(this.page.updated).toLocaleString() }}.
       </p>
     </div>
     <div>

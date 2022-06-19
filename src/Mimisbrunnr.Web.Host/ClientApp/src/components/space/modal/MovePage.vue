@@ -3,11 +3,11 @@
     @shown="onShow"
     id="page-move-modal"
     centered
-    title="Move page"
+    :title="$t('page.move.title')"
     hide-header-close
   >
     <div role="group">
-      <label>Destination type:</label>
+      <label>{{$t("page.move.type.label")}}:</label>
       <b-form-select 
         v-model="destinationType" 
         class="form-select"
@@ -15,23 +15,23 @@
         :state="typeState"
         required
       ></b-form-select>
-      <b-form-text>Parent page or space</b-form-text>
+      <b-form-text>{{$t("page.move.type.description")}}</b-form-text>
     </div>
     <div role="group">
-      <label>Destination:</label>
+      <label>{{$t("page.move.destination.label")}}:</label>
       <b-form-input
         v-model="destination"
         required
-        placeholder="Enter pageId or space key"
+        :placeholder="$t('page.move.destination.placeholder')"
         :state="destinationState"
         trim
       ></b-form-input>
-      <b-form-text>Parent page or space</b-form-text>
+      <b-form-text>{{$t("page.move.destination.description")}}</b-form-text>
     </div>
     <template #modal-footer>
       <div align="right">
-        <b-button variant="warning" class="mr-05em" @click="pageAction">Move</b-button>
-        <b-button variant="secondary" @click="close">Cancel</b-button>
+        <b-button variant="warning" class="mr-05em" @click="pageAction">{{$t("page.move.move")}}</b-button>
+        <b-button variant="secondary" @click="close">{{$t("page.move.cancel")}}</b-button>
       </div>
     </template>
   </b-modal>

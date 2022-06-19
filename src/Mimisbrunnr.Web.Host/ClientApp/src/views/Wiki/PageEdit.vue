@@ -1,14 +1,14 @@
 <template>
   <b-container v-if="loaded" fluid class="full-size-container text-left">
     <div class="h-100vh">
-      <b-form-input v-model="page.name" placeholder="PageName" class="page-edit-name" :state="nameState"></b-form-input>
+      <b-form-input v-model="page.name" :placeholder="$t('pageEditor.placeholder')" class="page-edit-name" :state="nameState"></b-form-input>
       <vue-simplemde :configs="mdeConfig" v-model="page.content" ref="markdownEditor" />
       <div style="float: right; padding-right: 1em">
-        <b-form-checkbox class="side-by-side-switch" size="lg" switch @change="toggleSideBySide">Side-By-Side</b-form-checkbox>
+        <b-form-checkbox class="side-by-side-switch" size="lg" switch @change="toggleSideBySide">{{$t('pageEditor.sideBySide')}}</b-form-checkbox>
         <b-button @click="save" variant="primary" style="margin-right: 0.5em" :disabled="!nameState">
-          Update
+          {{$t('pageEditor.update')}}
         </b-button>
-        <b-button @click="cancel" variant="secondary"> Close </b-button>
+        <b-button @click="cancel" variant="secondary"> {{$t('pageEditor.close')}} </b-button>
       </div>
     </div>
     <attachments :attachmentSelectAction="addAttachmentLink" :page="page" />

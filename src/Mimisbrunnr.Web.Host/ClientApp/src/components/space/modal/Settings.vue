@@ -2,56 +2,56 @@
   <b-modal
     id="space-settings-modal"
     centered
-    title="Space settings"
+    :title="$t('space.settings.title')"
     hide-header-close
   >
     <div role="group">
-      <label>Space name:</label>
+      <label>{{$t("space.settings.name.label")}}:</label>
       <b-form-input
         v-model="space.name"
         required
-        placeholder="Enter space name"
+        :placeholder="$t('space.settings.name.placeholder')"
         :state="spaceNameState"
         trim
       ></b-form-input>
-      <b-form-text>Display space name</b-form-text>
+      <b-form-text>{{$t("space.settings.name.description")}}</b-form-text>
     </div>
     <div role="group">
-      <label>Space description:</label>
+      <label>{{$t("space.settings.description.label")}}:</label>
       <b-form-textarea
         v-model="space.description"
         required
-        placeholder="Enter space description"
+        :placeholder="$t('space.settings.description.placeholder')"
         :state="spaceDescriptionState"
       ></b-form-textarea>
-      <b-form-text>Display space name</b-form-text>
+      <b-form-text>{{$t("space.settings.description.description")}}</b-form-text>
     </div>
     <div role="group" v-if="space.type != 'Personal'">
-      <label>Space private type:</label>
+      <label>{{$t("space.settings.privateType.label")}}:</label>
       <b-form-checkbox v-model="isPublic" switch
-        >&nbsp;Is public space?</b-form-checkbox
+        >&nbsp;{{$t("space.settings.privateType.content")}}</b-form-checkbox
       >
-      <b-form-text>Allow visible space to all users </b-form-text>
+      <b-form-text>{{$t("space.settings.privateType.description")}}</b-form-text>
     </div>
     <b-form-group
-        label="Space status"
-        description="Archive space for disable creating/updating/deleting pages"
+        :label="$t('space.settings.status.label')"
+        :description="$t('space.settings.status.description')"
       >
         <b-form-checkbox v-model="isArchive" switch>
-          &nbsp;Archive
+          &nbsp;{{$t("space.settings.status.content")}}
         </b-form-checkbox>
       </b-form-group>
     <template #modal-footer>
       <div align="left">
         <b-button v-if="space.status == 'Archived'" variant="danger" style="float:left" @click="remove">
-          Remove
+          {{$t("space.settings.remove")}}
         </b-button>
       </div>
       <div align="right">
         <b-button variant="warning" class="mr-05em" @click="save">
-          Save
+          {{$t("space.settings.save")}}
         </b-button>
-        <b-button variant="secondary" @click="close">Cancel</b-button>
+        <b-button variant="secondary" @click="close">{{$t("space.settings.cancel")}}</b-button>
       </div>
     </template>
   </b-modal>
