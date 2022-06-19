@@ -106,7 +106,7 @@ export default {
   height: 100%;
 }
 .home-nav {
-  width: 250px !important;
+  width: 280px !important;
   text-align: left;
   box-shadow: inset 0 0rem 0.5em rgba(0, 0, 0, 0.15) !important;
   background-color: rgb(247 247 247) !important;

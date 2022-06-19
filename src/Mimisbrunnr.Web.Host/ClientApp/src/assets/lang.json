@@ -17,6 +17,38 @@
                 "signOut": "Sign out"
             }
         },
+        "spaceCreate":{ 
+            "title": "Create space",
+            "create": "Create",
+            "reset": "Reset",
+            "fields":{
+                "key": {
+                    "label": "Space key:",
+                    "description": "Come up with a unique short space key that does not contain spaces",
+                    "placeholder": "Enter space key",
+                    "invalid": "Space key length need more then 2 symbols and lower then 64 symbols"
+                },
+                "name": {
+                    "label": "Your space display name:",
+                    "placeholder": "Enter name"
+                }
+                ,
+                "type": {
+                    "label": "Space type:"
+                },
+                "description": {
+                    "label": "Space description",
+                    "description": "Write description about space",
+                    "placeholder": "Enter description"
+                },
+                "import": {
+                    "description": "Create new space and import pages from export file",
+                    "placeholder": "Choose a confluence space export zip",
+                    "dropPlaceholder": "Drop file here...",
+                    "content": "Import pages from confluence?"
+                }
+            }
+        },
         "home":{
             "menu": {
                 "discover": "DISCOVER",
@@ -29,6 +61,46 @@
             },
             "recentlyVisited": {
                 "title": "Recently visited"
+            },
+            "quickStart": {
+                "title": "Welcome to Mimisbrunnr wiki. For use own instance, you will need to initialize with some configurations",
+                "init": "Initialization",
+                "fields": {
+                    "title": {
+                        "label":"Enter title",
+                        "description":"The title of your wiki instance."
+                    },
+                    "anonymous": {
+                        "label":"Publish mode",
+                        "description":"Allow unauthorized (anonymous) users to read public wiki information",
+                        "content": "Allow anonymous access"
+                    },
+                    "markdown": {
+                        "label":"Markdown settings",
+                        "description":"Allow using html inside markdown on pages",
+                        "content": "Allow html"
+                    },
+                    "swagger": {
+                        "label":"Application swagger",
+                        "description":"Enable swagger for view application api",
+                        "content": "Enable swagger"
+                    }
+                }
+            },
+            "profile": {
+                "settings": "Settings",
+                "favorites": "Favorites",
+                "additional": {
+                    "title": "Additional information",
+                    "post": "Post",
+                    "department": "Department",
+                    "organization": "Organization",
+                    "location": "Location"
+                },
+                "workedOn": {
+                    "title": "Worked on",
+                    "emptyUpdates": "There are no recent updates."
+                }
             }
         }
     },
@@ -50,6 +122,38 @@
                 "signOut": "Выход"
             }
         },
+        "spaceCreate":{ 
+            "title": "Создание пространства",
+            "create": "Создать",
+            "reset": "Сбросить",
+            "fields":{
+                "key": {
+                    "label": "Ключ пространства:",
+                    "description": "Придумайте уникальный ключ пространства, не содержащую пробелов.",
+                    "placeholder": "Укажите ключ пространства",
+                    "invalid": "Ключ пространства должен быть более 2 символов и менее 64 символов"
+                },
+                "name": {
+                    "label": "Имя пространства:",
+                    "placeholder": "Укажите имя пространства"
+                }
+                ,
+                "type": {
+                    "label": "Тип пространства:"
+                },
+                "description": {
+                    "label": "Описание пространства",
+                    "description": "Опешите ваше пространство",
+                    "placeholder": "Укажите пространство"
+                },
+                "import": {
+                    "description": "Создать новое пространство и импортировать страницы из экспорта",
+                    "placeholder": "Выберите архив экспортированного пространства из confluence",
+                    "dropPlaceholder": "Бросьте файлы сюда...",
+                    "content": "Импортировать страницы из confluence?"
+                }
+            }
+        },
         "home":{
             "menu": {
                 "discover": "ОТКРОЙТЕ ДЛЯ СЕБЯ",
@@ -62,6 +166,46 @@
             },
             "recentlyVisited": {
                 "title": "Ранее посещенные"
+            }
+        },
+        "quickStart": {
+            "title": "Добро пожаловать Mimisbrunnr wiki. Для использования, вы должны выбрать предварительные настройки сервиса и инициализировать его.",
+            "init": "Инициализация",
+            "fields": {
+                "title": {
+                    "label":"Введите заголовок",
+                    "description":"Заголовок вашего экземпляра вики."
+                },
+                "anonymous": {
+                    "label":"Режим доступности",
+                    "description":"Разрешить неавторизованный (анонимный) доступ к чтению публичной информации из вики",
+                    "content": "Разрешить анонимный доступ"
+                },
+                "markdown": {
+                    "label":"Настройки Markdown",
+                    "description":"Разрешить использование html внутри Markdown разметки на странице",
+                    "content": "Разрешить html"
+                },
+                "swagger": {
+                    "label":"Swagger документация",
+                    "description":"Включить swagger для просмотра api приложения",
+                    "content": "Включить swagger"
+                }
+            }
+        },
+        "profile": {
+            "settings": "Настройки",
+            "favorites": "Избранное",
+            "additional": {
+                "title": "Дополнительная информация",
+                "post": "Должность",
+                "department": "Отдел",
+                "organization": "Организация",
+                "location": "Местоположение"
+            },
+            "workedOn": {
+                "title": "Недавно работал",
+                "emptyUpdates": "За последнее время, никаких обновлений не было."
             }
         }
     }

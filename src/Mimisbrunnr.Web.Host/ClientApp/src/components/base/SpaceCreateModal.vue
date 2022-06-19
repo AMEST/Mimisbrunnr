@@ -3,39 +3,39 @@
     @shown="onReset"
     id="space-create-modal"
     hide-footer
-    title="Create space"
+    :title="$t('spaceCreate.title')"
   >
     <b-overlay :show="processing">
       <b-form @submit="onSubmit" @reset="onReset" v-if="show">
         <b-form-group
           id="input-group-1"
-          label="Space key:"
-          description="Come up with a unique short space key that does not contain spaces"
+          :label="$t('spaceCreate.fields.key.label')"
+          :description="$t('spaceCreate.fields.key.description')"
         >
           <b-form-input
             id="create-space-key"
             v-model="form.key"
-            placeholder="Enter space key"
+            :placeholder="$t('spaceCreate.fields.key.placeholder')"
             :state="keyValidation"
             aria-describedby="create-space-key-live-feedback"
             :disabled="form.type == 'Personal'"
           ></b-form-input>
           <b-form-invalid-feedback id="create-space-key-live-feedback">
-            Space key length need more then 2 symbols and lower then 12 symbols
+            {{$t("spaceCreate.fields.key.invalid")}}
           </b-form-invalid-feedback>
         </b-form-group>
 
-        <b-form-group label="Your space display name:">
+        <b-form-group :label="$t('spaceCreate.fields.name.label')">
           <b-form-input
             id="create-space-name"
             v-model="form.name"
-            placeholder="Enter name"
+            :placeholder="$t('spaceCreate.fields.name.placeholder')"
             :disabled="form.type == 'Personal'"
             required
           ></b-form-input>
         </b-form-group>
 
-        <b-form-group label="Space type:">
+        <b-form-group :label="$t('spaceCreate.fields.type.label')">
           <b-form-select
             id="create-space-types"
             class="form-select"
@@ -46,36 +46,36 @@
         </b-form-group>
 
         <b-form-group
-          label="Space description"
-          description="Write description about space"
+          :label="$t('spaceCreate.fields.description.label')"
+          :description="$t('spaceCreate.fields.description.description')"
           class="mb-0"
         >
           <b-form-textarea
             id="create-space-description"
             v-model="form.description"
-            placeholder="Enter description"
+            :placeholder="$t('spaceCreate.fields.description.placeholder')"
           ></b-form-textarea>
         </b-form-group>
 
         <b-form-group
-          description="Create new space and import pages from export file"
+          :description="$t('spaceCreate.fields.import.description')"
           class="mb-0"
         >
           <b-form-checkbox v-model="importEnabled">
-            &nbsp;Import pages from confluence?
+            &nbsp;{{$t('spaceCreate.fields.import.content')}}
           </b-form-checkbox>
 
           <b-form-file
             v-if="importEnabled"
             v-model="importFile"
-            placeholder="Choose a confluence space export zip"
-            drop-placeholder="Drop file here..."
+            :placeholder="$t('spaceCreate.fields.import.placeholder')"
+            :drop-placeholder="$t('spaceCreate.fields.import.dropPlaceholder')"
             accept=".zip"
           ></b-form-file>
         </b-form-group>
 
-        <b-button type="submit" variant="primary">Create</b-button>
-        <b-button type="reset" variant="danger">Reset</b-button>
+        <b-button type="submit" variant="primary">{{$t('spaceCreate.create')}}</b-button>
+        <b-button type="reset" variant="danger">{{$t('spaceCreate.reset')}}</b-button>
       </b-form>
     </b-overlay>
   </b-modal>
