@@ -78,11 +78,11 @@ internal static class ConfluenceContentPreprocessing
                 filename.ToLower().EndsWith(".gif") ||
                 filename.ToLower().EndsWith(".svg"))
             {
-                processingContent = processingContent.Replace(foundedString, $"<img src=\"/api/attachment/%%pageId%%/{HttpUtility.UrlEncode(filename)}\"/>");
+                processingContent = processingContent.Replace(foundedString, $"<img src=\"/api/attachment/%%pageId%%/{filename.UrlEncode()}\"/>");
             }
             else
             {
-                processingContent = processingContent.Replace(foundedString, $"<a target=\"_blank\" href=\"/api/attachment/%%pageId%%/{HttpUtility.UrlEncode(filename)}\"/>");
+                processingContent = processingContent.Replace(foundedString, $"<a target=\"_blank\" href=\"/api/attachment/%%pageId%%/{filename.UrlEncode()}\"/>");
             }
         }
         return processingContent;
@@ -102,5 +102,10 @@ internal static class ConfluenceContentPreprocessing
             processingContent = processingContent.Replace(foundedString, $"<img src=\"/api/attachment/%%pageId%%/{diagramName}.{diagramPreviewExtension}\"/>");
         }
         return processingContent;
+    }
+
+    private static string UrlEncode(this string text)
+    {
+        return HttpUtility.UrlEncode(text).Replace("+","%20");
     }
 }
