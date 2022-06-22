@@ -17,17 +17,48 @@ Mímisbrunnr is the source of knowledge. A wiki system for storing knowledge to 
 
 Support for the following features:
 
-1. Spaces (personal, private, public)
-2. _Import pages from **Confluence** when creating new space_
-3. Permissions for spaces (issuing permissions to users (groups _in progress_) to be able to view / edit / delete or administer a space)
-4. Enabling anonymous access (permission to read public spaces)
-5. Markdown page editor (with the ability to insert html code or disable rendering html inside markdown global in service)
-6. Highlight code blocks on pages
-7. Copy / move pages
-8. Tree of pages
-9. Page updates feed
-10. Attachments
-11. Search pages and spaces
+- Spaces
+  - Create personal, private or public spaces
+  - Import pages from **Confluence** when creating new space
+  - Configure permissions: allow view / edit / delete pages for individual users or groups _(Groups Not implemented)_ __(Groups Work In Progress)__
+  - Space directory with list user visible spaces
+  - Tree of pages
+  - Space configuration
+- Pages
+  - Highlight code blocks on pages
+  - Add attachments to pages ( and simplify drag&drop files / images in editor)
+  - Markdown page editor (with the ability to insert html code or disable rendering html inside markdown global in service)
+  - Copy / move pages in space or between spaces
+- Base
+  - Page updates feed on home page
+  - Recently visited pages
+  - Search pages and spaces
+  - Multi Language EN or RU
+- Profile
+  - Profile page with avatar and last worked on
+  - Settings _(Not implemented)_
+  - Favorites _(Not implemented)_
+- Administration
+  - Change wiki instance title
+  - Enabling anonymous access (permission to read public spaces and access to wiki without authentication)
+  - Enable / Disable html in markdown
+  - Enable / Disable swagger api documentation
+  - Custom home page (use any public space home page as home page wiki instance) _(Not implemented)_ __(Work In Progress)__
+  - Custom css _(Not implemented)_ __(Work In Progress)__
+  - Manage users
+    - Promote to admin
+    - Demote
+    - Disable
+    - Enable
+  - Manage groups
+- Hosting
+  - Simple scalable
+  - Three types of caching (one for single node and two for multiple nodes)
+  - Three types of persistent storage (file storage)
+
+## Screenshots
+
+![2022-06-22 23-29-48.gif](https://wiki.nb-47.ml/api/attachment/62b36221590e68370bd76125/2022-06-22%2023-29-48.gif)
 
 ## Get started
 
