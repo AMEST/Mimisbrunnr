@@ -227,6 +227,7 @@ export default {
         // Refresh to fix selection being off (#309)
         cm.refresh();
     },
+    // eslint-disable-next-line
     previewRender: function(plainText) {
         return this.renderedMarkdown;
     },
