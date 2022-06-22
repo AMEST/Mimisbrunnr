@@ -12,17 +12,25 @@
       </div>
     </div>
     <attachments :attachmentSelectAction="addAttachmentLink" :page="page" />
+    <vue-markdown
+        :html="this.$store.state.application.info.allowHtml"
+        :source="this.page.content"
+        :postrender="renderMarkdown"
+        style="display: none;"
+      ></vue-markdown>
   </b-container>
 </template>
 
 <script>
 import Attachments from "@/components/space/modal/Attachments.vue";
 import VueSimplemde from "vue-simplemde";
+import VueMarkdown from "vue-markdown";
 import axios from "axios";
 export default {
   name: "PageEdit",
   components: {
     VueSimplemde,
+    VueMarkdown,
     Attachments,
   },
   data() {
@@ -56,14 +64,8 @@ export default {
           "guide",
         ],
         spellChecker: false,
-        previewRender: function(plainText) {
-          var md = require('markdown-it')({
-            html: true,
-            linkify: true,
-            typographer: true
-          });
-          return md.render(plainText);
-        },
+        renderedMarkdown: "",
+        previewRender: this.previewRender,
       },
     };
   },
@@ -76,7 +78,7 @@ export default {
     },
     simplemde() {
       return this.$refs.markdownEditor.simplemde;
-    },
+    }
   },
   methods: {
     init: async function () {
@@ -224,6 +226,13 @@ export default {
 
         // Refresh to fix selection being off (#309)
         cm.refresh();
+    },
+    previewRender: function(plainText) {
+        return this.renderedMarkdown;
+    },
+    renderMarkdown: function(html){
+        this.renderedMarkdown = html;
+        return html;
     }
   },
   mounted: function () {

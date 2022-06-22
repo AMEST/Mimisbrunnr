@@ -113,6 +113,7 @@ public class SpaceController : ControllerBase
     [ProducesResponseType(401)]
     [ProducesResponseType(404)]
     [DisableRequestSizeLimit]
+    [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
     public async Task<IActionResult> Import()
     {
         var createModelForm = HttpContext.Request.Form.FirstOrDefault(x => x.Key.Equals("model", StringComparison.OrdinalIgnoreCase));
