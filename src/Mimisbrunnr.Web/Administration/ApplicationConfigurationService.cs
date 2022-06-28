@@ -29,6 +29,9 @@ namespace Mimisbrunnr.Web.Administration
             configuration.AllowAnonymous = model.AllowAnonymous;
             configuration.AllowHtml = model.AllowHtml;
             configuration.SwaggerEnabled = model.SwaggerEnabled;
+            configuration.CustomCss = model.CustomCss;
+            configuration.CustomHomepageEnabled = model.CustomHomepageEnabled;
+            configuration.CustomHomepageSpaceKey = model.CustomHomepageSpaceKey;
             await _configurationManager.Configure(configuration);
             
             _logger.LogInformation("Application configuration updated by `{User}`", updatedBy.Email);

@@ -227,7 +227,10 @@ public static class MappingExtensions
             Title = applicationConfiguration.Title,
             AllowAnonymous = applicationConfiguration.AllowAnonymous,
             AllowHtml = applicationConfiguration.AllowHtml,
-            SwaggerEnabled = applicationConfiguration.SwaggerEnabled
+            SwaggerEnabled = applicationConfiguration.SwaggerEnabled,
+            CustomCss = applicationConfiguration.CustomCss,
+            CustomHomepageEnabled = applicationConfiguration.CustomHomepageEnabled,
+            CustomHomepageSpaceKey = applicationConfiguration.CustomHomepageSpaceKey
         };
     }
 

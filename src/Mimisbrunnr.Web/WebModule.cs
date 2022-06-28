@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Administration;
+using Mimisbrunnr.Web.Customization;
 using Mimisbrunnr.Web.Feed;
 using Mimisbrunnr.Web.Group;
 using Mimisbrunnr.Web.Infrastructure;
@@ -9,7 +10,6 @@ using Mimisbrunnr.Web.Search;
 using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Web.User;
 using Mimisbrunnr.Web.Wiki;
-using Mimisbrunnr.Web.Wiki.Import;
 using Skidbladnir.Modules;
 
 namespace Mimisbrunnr.Web;
@@ -30,5 +30,6 @@ public class WebModule : Module
         services.AddSingleton<ISearchService, SearchService>();
         services.AddSingleton<IGroupService, GroupService>();
         services.AddSingleton<IApplicationConfigurationService, ApplicationConfigurationService>();
+        services.AddSingleton<ICustomizationService, CustomizationService>();
     }
 }

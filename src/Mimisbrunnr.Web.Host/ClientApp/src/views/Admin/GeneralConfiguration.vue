@@ -26,7 +26,13 @@
                 </b-form-group>
                 <br />
                 <b-form-group description="Add custom css to instance" label="Custom css">
-                    <b-form-textarea size="sm" placeholder=".custom-css{}" disabled></b-form-textarea>
+                    <b-form-textarea 
+                    size="sm" 
+                    placeholder=".custom-css{}" 
+                    v-model="info.customCss"
+                    rows="5"
+                    max-rows="8"
+                    ></b-form-textarea>
                 </b-form-group>
                 <br />
                 <b-form-group description="Use custom home html page instead of default dashboard"
@@ -64,7 +70,8 @@ export default {
             title: "",
             allowAnonymous: false,
             allowHtml: true,
-            swaggerEnabled: true
+            swaggerEnabled: true,
+            customCss: "",
         },
     }),
     methods: {

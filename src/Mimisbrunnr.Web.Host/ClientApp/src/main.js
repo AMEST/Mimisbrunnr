@@ -24,10 +24,15 @@ Vue.use(IconsPlugin)
 Vue.config.productionTip = false
 
 // Load bootstrap theme
-let link = document.createElement('link')
+let link = document.createElement('link');
 link.rel = 'stylesheet';
 link.href = '/css/bootstrap.cosmo.min.css';
-document.head.appendChild(link)
+document.head.appendChild(link);
+// Load custom css
+let customCss = document.createElement('link');
+customCss.rel = 'stylesheet';
+customCss.href = '/api/customization/css';
+document.head.appendChild(customCss);
 
 // Restore history
 var recentlyVisited = window.localStorage['history']
