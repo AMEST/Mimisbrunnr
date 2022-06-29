@@ -18,6 +18,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
     private readonly IUserManager _userManager;
     private readonly IUserGroupManager _userGroupManager;
     private readonly IDistributedCache _distributedCache;
+    private readonly IApplicationConfigurationManager _applicationConfigurationManager;
     private readonly ILogger<SpaceService> _logger;
 
     public SpaceService(IPermissionService permissionService,
@@ -25,6 +26,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         IUserManager userManager,
         IUserGroupManager userGroupManager,
         IDistributedCache distributedCache,
+        IApplicationConfigurationManager applicationConfigurationManager,
         ILogger<SpaceService> logger
     )
     {
@@ -33,6 +35,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         _userManager = userManager;
         _userGroupManager = userGroupManager;
         _distributedCache = distributedCache;
+        _applicationConfigurationManager = applicationConfigurationManager;
         _logger = logger;
     }
 
@@ -163,6 +166,14 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         var space = await _spaceManager.GetByKey(key);
         EnsureSpaceExists(space);
 
+        var appConfig = await _applicationConfigurationManager.Get();
+        if(appConfig.CustomHomepageEnabled 
+            && appConfig.CustomHomepageSpaceKey.Equals(key, StringComparison.OrdinalIgnoreCase)
+            && model.Public.HasValue
+            && !model.Public.Value
+            && space.Type == SpaceType.Public)
+            throw new InvalidOperationException("Cannot change space visible type to private, because space homepage used for wiki homepage");
+
         space.Name = model.Name;
         space.Description = model.Description;
         if (space.Type != SpaceType.Personal && model.Public is not null)
@@ -202,6 +213,12 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
 
         var space = await _spaceManager.GetByKey(key);
         EnsureSpaceExists(space);
+
+        var appConfig = await _applicationConfigurationManager.Get();
+        if(appConfig.CustomHomepageEnabled 
+            && appConfig.CustomHomepageSpaceKey.Equals(key, StringComparison.OrdinalIgnoreCase)
+            && space.Type == SpaceType.Public)
+            throw new InvalidOperationException("Cannot remove space, because space homepage used for wiki homepage");
 
         if (space.Status != SpaceStatus.Archived)
             throw new InvalidOperationException("Only archived spaces allowed for removing");

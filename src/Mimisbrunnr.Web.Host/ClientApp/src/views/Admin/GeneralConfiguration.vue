@@ -37,18 +37,12 @@
                 <br />
                 <b-form-group description="Use custom home html page instead of default dashboard"
                     label="Custom homepage">
-                    <b-form-checkbox switch disabled>
+                    <b-form-checkbox switch v-model="info.customHomepageEnabled">
                         &nbsp;Enable Custom homepage
                     </b-form-checkbox>
-                    <b-form-textarea 
-                        class="mt-1"
-                        size="sm" 
-                        rows="3"
-                        placeholder="# Welcome to wiki 
-                        <hr> 
-                        <h3> allowed html code </h3>" 
-                        disabled>
-                    </b-form-textarea>
+                    <b-form-select v-model="info.customHomepageSpaceKey" :options="spaces" class="mr-3 mt-2" :disabled="!info.customHomepageEnabled">
+                        <b-form-select-option :value="null" disabled>-- Please select space --</b-form-select-option>
+                    </b-form-select>
                 </b-form-group>
             </b-card-text>
             <br />
@@ -72,7 +66,10 @@ export default {
             allowHtml: true,
             swaggerEnabled: true,
             customCss: "",
+            customHomepageEnabled: false,
+            customHomepageSpaceKey: null
         },
+        spaces: []
     }),
     methods: {
         save: async function () {
@@ -84,6 +81,11 @@ export default {
         if(!this.$store.state.application.profile || !this.$store.state.application.profile.isAdmin){
             this.$router.push("/error/unauthorized");
             return;
+        }
+        var spacesRequest = await axios.get("/api/space")
+        for (let spaceIndex in spacesRequest.data){
+            if(spacesRequest.data[spaceIndex].type != "Public") continue;
+            this.spaces.push({ value: spacesRequest.data[spaceIndex].key, text: `${spacesRequest.data[spaceIndex].name} (${spacesRequest.data[spaceIndex].key})` })
         }
         var configurationRequest = await axios.get("/api/admin/applicationConfiguration");
         this.info = configurationRequest.data;

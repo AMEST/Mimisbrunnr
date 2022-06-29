@@ -1,5 +1,6 @@
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Services;
+using Mimisbrunnr.Web.Wiki;
 using Mimisbrunnr.Wiki.Contracts;
 
 namespace Mimisbrunnr.Web.Customization
@@ -8,14 +9,17 @@ namespace Mimisbrunnr.Web.Customization
     {
         private readonly IPermissionService _permissionService;
         private readonly IApplicationConfigurationManager _configurationManager;
+        private readonly ISpaceService _spaceService;
 
         public CustomizationService(
             IPermissionService permissionService,
-            IApplicationConfigurationManager configurationManager
+            IApplicationConfigurationManager configurationManager,
+            ISpaceService spaceService
         )
         {
             _permissionService = permissionService;
             _configurationManager = configurationManager;
+            _spaceService = spaceService;
         }
 
         public async Task<string> GetCustomCss()
@@ -33,8 +37,11 @@ namespace Mimisbrunnr.Web.Customization
             if (!configuration.CustomHomepageEnabled)
                 return null;
 
+            var space = await _spaceService.GetByKey(configuration.CustomHomepageSpaceKey, requestedBy);
+
             return new CustomHomepageModel(){
-                HomepageSpaceKey = configuration.CustomHomepageSpaceKey
+                HomepageSpaceKey = configuration.CustomHomepageSpaceKey,
+                HomepageId = space.HomePageId
             };
         }
     }
