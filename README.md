@@ -58,7 +58,7 @@ Support for the following features:
 
 ## Screenshots
 
-![2022-06-22 23-29-48.gif](https://wiki.nb-47.ml/api/attachment/62b36221590e68370bd76125/2022-06-22%2023-29-48.gif)
+![2022-06-22 23-29-48.gif](https://wiki.nb-47.ml/api/attachment/62b36221590e68370bd76125/2022-06-22%2023-29-48.gif?v=2)
 
 ## Get started
 
