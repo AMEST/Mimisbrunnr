@@ -43,7 +43,9 @@
           <b-form-textarea
             size="sm"
             :placeholder="$t('admin.general.fields.customCss.placeholder')"
-            disabled
+            v-model="info.customCss"
+            rows="5"
+            max-rows="8"
           ></b-form-textarea>
         </b-form-group>
         <br />
@@ -51,23 +53,25 @@
           :label="$t('admin.general.fields.customHome.label')"
           :description="$t('admin.general.fields.customHome.description')"
         >
-          <b-form-checkbox switch disabled>
-            &nbsp;{{$t('admin.general.fields.customHome.switch')}}
+          <b-form-checkbox switch v-model="info.customHomepageEnabled">
+            &nbsp;{{ $t("admin.general.fields.customHome.switch") }}
           </b-form-checkbox>
-          <b-form-textarea
-            class="mt-1"
-            size="sm"
-            rows="3"
-            placeholder="# Welcome to wiki 
-                        <hr> 
-                        <h3> allowed html code </h3>"
-            disabled
+          <b-form-select
+            v-model="info.customHomepageSpaceKey"
+            :options="spaces"
+            class="mr-3 mt-2"
+            :disabled="!info.customHomepageEnabled"
           >
-          </b-form-textarea>
+            <b-form-select-option :value="null" disabled>
+            -- {{ $t("admin.general.fields.customHome.select") }} --
+            </b-form-select-option>
+          </b-form-select>
         </b-form-group>
       </b-card-text>
       <br />
-      <b-button @click="save" variant="primary" size="sm"> {{$t('admin.general.save')}} </b-button>
+      <b-button @click="save" variant="primary" size="sm">
+        {{ $t("admin.general.save") }}
+      </b-button>
     </b-card>
   </b-container>
 </template>
@@ -86,7 +90,11 @@ export default {
       allowAnonymous: false,
       allowHtml: true,
       swaggerEnabled: true,
+      customCss: "",
+      customHomepageEnabled: false,
+      customHomepageSpaceKey: null,
     },
+    spaces: [],
   }),
   methods: {
     save: async function () {
@@ -101,6 +109,14 @@ export default {
     ) {
       this.$router.push("/error/unauthorized");
       return;
+    }
+    var spacesRequest = await axios.get("/api/space");
+    for (let spaceIndex in spacesRequest.data) {
+      if (spacesRequest.data[spaceIndex].type != "Public") continue;
+      this.spaces.push({
+        value: spacesRequest.data[spaceIndex].key,
+        text: `${spacesRequest.data[spaceIndex].name} (${spacesRequest.data[spaceIndex].key})`,
+      });
     }
     var configurationRequest = await axios.get(
       "/api/admin/applicationConfiguration"

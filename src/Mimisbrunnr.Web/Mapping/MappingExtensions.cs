@@ -74,7 +74,8 @@ public static class MappingExtensions
             Title = model?.Title ?? "Mimisbrunnr",
             AllowAnonymous = model?.AllowAnonymous ?? false,
             AllowHtml = model?.AllowHtml ?? true,
-            SwaggerEnabled = model?.SwaggerEnabled ?? false
+            SwaggerEnabled = model?.SwaggerEnabled ?? false,
+            CustomHomepageEnabled = model?.CustomHomepageEnabled ?? false
         };
     }
 
@@ -226,7 +227,10 @@ public static class MappingExtensions
             Title = applicationConfiguration.Title,
             AllowAnonymous = applicationConfiguration.AllowAnonymous,
             AllowHtml = applicationConfiguration.AllowHtml,
-            SwaggerEnabled = applicationConfiguration.SwaggerEnabled
+            SwaggerEnabled = applicationConfiguration.SwaggerEnabled,
+            CustomCss = applicationConfiguration.CustomCss,
+            CustomHomepageEnabled = applicationConfiguration.CustomHomepageEnabled,
+            CustomHomepageSpaceKey = applicationConfiguration.CustomHomepageSpaceKey
         };
     }
 

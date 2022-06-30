@@ -15,7 +15,8 @@ export default new Vuex.Store({
         title: 'Mimisbrunnr',
         allowAnonymous: false,
         allowHtml: true,
-        swaggerEnabled: true
+        swaggerEnabled: true,
+        customHomePageEnabled: false
       },
       history: [],
       theme: '',
