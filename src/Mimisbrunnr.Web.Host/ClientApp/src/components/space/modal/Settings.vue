@@ -46,27 +46,27 @@
           &nbsp;{{ $t("space.settings.status.content") }}
         </b-form-checkbox>
       </b-form-group>
-      <template #modal-footer>
-        <div align="left">
-          <b-button
-            v-if="space.status == 'Archived'"
-            variant="danger"
-            style="float: left"
-            @click="remove"
-          >
-            {{ $t("space.settings.remove") }}
-          </b-button>
-        </div>
-        <div align="right">
-          <b-button variant="warning" class="mr-05em" @click="save">
-            {{ $t("space.settings.save") }}
-          </b-button>
-          <b-button variant="secondary" @click="close">{{
-            $t("space.settings.cancel")
-          }}</b-button>
-        </div>
-      </template>
     </b-overlay>
+    <template #modal-footer>
+      <div align="left">
+        <b-button
+          v-if="space.status == 'Archived'"
+          variant="danger"
+          style="float: left"
+          @click="remove"
+        >
+          {{ $t("space.settings.remove") }}
+        </b-button>
+      </div>
+      <div align="right">
+        <b-button variant="warning" class="mr-05em" @click="save">
+          {{ $t("space.settings.save") }}
+        </b-button>
+        <b-button variant="secondary" @click="close">{{
+          $t("space.settings.cancel")
+        }}</b-button>
+      </div>
+    </template>
   </b-modal>
 </template>
 
@@ -82,7 +82,7 @@ export default {
     return {
       isPublic: false,
       isArchive: false,
-      processing: false
+      processing: false,
     };
   },
   computed: {
