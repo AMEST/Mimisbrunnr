@@ -119,7 +119,8 @@
                     "customHome": {
                         "label": "Custom homepage",
                         "description": "Use custom home html page instead of default dashboard",
-                        "switch": "Enable Custom homepage"
+                        "switch": "Enable Custom homepage",
+                        "select": "Please select space"
                     }
                 }
             }
@@ -382,7 +383,8 @@
                     "customHome": {
                         "label": "Пользовательская главная страница",
                         "description": "Использовать пользовательскую домашнюю HTML-страницу вместо панели инструментов по умолчанию",
-                        "switch": "Включить пользовательскую домашнюю страницу"
+                        "switch": "Включить пользовательскую домашнюю страницу",
+                        "select": "Please select space"
                     }
                 }
             }

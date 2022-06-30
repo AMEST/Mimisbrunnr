@@ -48,23 +48,32 @@
             max-rows="8"
           ></b-form-textarea>
         </b-form-group>
-                <br />
-       <b-form-group
+        <br />
+        <b-form-group
           :label="$t('admin.general.fields.customHome.label')"
           :description="$t('admin.general.fields.customHome.description')"
         >
-                    <b-form-checkbox switch v-model="info.customHomepageEnabled">
-                        &nbsp;{{$t('admin.general.fields.customHome.switch')}}
-                    </b-form-checkbox>
-                    <b-form-select v-model="info.customHomepageSpaceKey" :options="spaces" class="mr-3 mt-2" :disabled="!info.customHomepageEnabled">
-                        <b-form-select-option :value="null" disabled>-- Please select space --</b-form-select-option>
-                    </b-form-select>
-                </b-form-group>
-            </b-card-text>
-            <br />
-            <b-button @click="save" variant="primary" size="sm"> {{$t('admin.general.save')}} </b-button>
-        </b-card>
-    </b-container>
+          <b-form-checkbox switch v-model="info.customHomepageEnabled">
+            &nbsp;{{ $t("admin.general.fields.customHome.switch") }}
+          </b-form-checkbox>
+          <b-form-select
+            v-model="info.customHomepageSpaceKey"
+            :options="spaces"
+            class="mr-3 mt-2"
+            :disabled="!info.customHomepageEnabled"
+          >
+            <b-form-select-option :value="null" disabled>
+            -- {{ $t("admin.general.fields.customHome.select") }} --
+            </b-form-select-option>
+          </b-form-select>
+        </b-form-group>
+      </b-card-text>
+      <br />
+      <b-button @click="save" variant="primary" size="sm">
+        {{ $t("admin.general.save") }}
+      </b-button>
+    </b-card>
+  </b-container>
 </template>
 
 <script>
@@ -75,34 +84,39 @@ export default {
   components: {
     Menu,
   },
-    data: () => ({
-        info: {
-            title: "",
-            allowAnonymous: false,
-            allowHtml: true,
-            swaggerEnabled: true,
-            customCss: "",
-            customHomepageEnabled: false,
-            customHomepageSpaceKey: null
-        },
-        spaces: []
-    }),
-    methods: {
-        save: async function () {
-            await axios.put("/api/admin/applicationConfiguration", this.info);
-            window.location.reload();
-        },
+  data: () => ({
+    info: {
+      title: "",
+      allowAnonymous: false,
+      allowHtml: true,
+      swaggerEnabled: true,
+      customCss: "",
+      customHomepageEnabled: false,
+      customHomepageSpaceKey: null,
     },
-    mounted: async function () {
-        if(!this.$store.state.application.profile || !this.$store.state.application.profile.isAdmin){
-            this.$router.push("/error/unauthorized");
-            return;
-        }
-        var spacesRequest = await axios.get("/api/space")
-        for (let spaceIndex in spacesRequest.data){
-            if(spacesRequest.data[spaceIndex].type != "Public") continue;
-            this.spaces.push({ value: spacesRequest.data[spaceIndex].key, text: `${spacesRequest.data[spaceIndex].name} (${spacesRequest.data[spaceIndex].key})` })
-        }
+    spaces: [],
+  }),
+  methods: {
+    save: async function () {
+      await axios.put("/api/admin/applicationConfiguration", this.info);
+      window.location.reload();
+    },
+  },
+  mounted: async function () {
+    if (
+      !this.$store.state.application.profile ||
+      !this.$store.state.application.profile.isAdmin
+    ) {
+      this.$router.push("/error/unauthorized");
+      return;
+    }
+    var spacesRequest = await axios.get("/api/space");
+    for (let spaceIndex in spacesRequest.data) {
+      if (spacesRequest.data[spaceIndex].type != "Public") continue;
+      this.spaces.push({
+        value: spacesRequest.data[spaceIndex].key,
+        text: `${spacesRequest.data[spaceIndex].name} (${spacesRequest.data[spaceIndex].key})`,
+      });
     }
     var configurationRequest = await axios.get(
       "/api/admin/applicationConfiguration"
