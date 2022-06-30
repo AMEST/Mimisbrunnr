@@ -26,12 +26,10 @@
 import hljs from "highlight.js";
 import "highlight.js/styles/github.css";
 import VueMarkdown from "vue-markdown";
-import Version from "@/components/home/Version.vue";
 import axios from "axios";
 export default {
   name: "CustomHome",
   components: {
-    Version,
     VueMarkdown,
   },
   data() {
