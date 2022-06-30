@@ -3,16 +3,16 @@
     id="space-permissions-modal"
     centered
     size="lg"
-    title="Space Permissions"
+    :title="$t('space.permissions.title')"
     hide-header-close
   >
-    <h6>Groups</h6>
+    <h6>{{$t("space.permissions.groups")}}</h6>
     <permissions-table :permissions="permissions.filter( x=> x.group )" :type="'Group'" :actionCallBack="getPermissions"/>
-    <h6>Individual user</h6>
+    <h6>{{$t("space.permissions.user")}}</h6>
     <permissions-table :permissions="permissions.filter( x=> x.user )" :type="'User'" :actionCallBack="getPermissions"/>
     <template #modal-footer >
         <div align="right">
-            <b-button variant="secondary" @click="close">Cancel</b-button>
+            <b-button variant="secondary" @click="close">{{$t("space.permissions.cancel")}}</b-button>
         </div>
     </template>
   </b-modal>

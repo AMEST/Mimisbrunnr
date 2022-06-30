@@ -1,16 +1,16 @@
 <template>
   <b-container fluid class="text-left full-size-container">
     <b-card>
-      <h2>Space Directory</h2>
+      <h2>{{$t("spaceDirectory.title")}}</h2>
     </b-card>
     <br>
-    <h5>&nbsp;All spaces</h5>
+    <h5>&nbsp;{{$t("spaceDirectory.all")}}</h5>
     <b-table-simple style="text-align: left">
       <b-thead>
         <b-tr>
-          <b-th>Name</b-th>
-          <b-th>Description</b-th>
-          <b-th class="text-right">Action</b-th>
+          <b-th>{{$t("spaceDirectory.name")}}</b-th>
+          <b-th>{{$t("spaceDirectory.description")}}</b-th>
+          <b-th class="text-right">{{$t("spaceDirectory.action")}}</b-th>
         </b-tr>
       </b-thead>
       <b-tbody>

@@ -1,10 +1,10 @@
 <template>
-  <b-modal @shown="onShow" id="page-delete-modal" centered title="Are you shure delete page?" hide-header-close>
-    <b-form-checkbox v-model="recursive">&nbsp;Delete page and all children</b-form-checkbox>
+  <b-modal @shown="onShow" id="page-delete-modal" centered :title="$t('page.delete.title')" hide-header-close>
+    <b-form-checkbox v-model="recursive">&nbsp;{{$t("page.delete.content")}}</b-form-checkbox>
     <template #modal-footer >
         <div align="right">
-            <b-button variant="danger" class="mr-05em" @click="deletePage">Delete</b-button>
-            <b-button variant="secondary" @click="close">Cancel</b-button>
+            <b-button variant="danger" class="mr-05em" @click="deletePage">{{$t("page.delete.delete")}}</b-button>
+            <b-button variant="secondary" @click="close">{{$t("page.delete.cancel")}}</b-button>
         </div>
     </template>
   </b-modal>

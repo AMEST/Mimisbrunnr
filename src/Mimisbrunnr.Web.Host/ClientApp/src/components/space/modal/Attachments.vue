@@ -3,7 +3,7 @@
     @shown="init"
     id="page-attachments-modal"
     centered
-    title="Attachment manager"
+    :title="$t('page.attachments.title')"
   >
     <b-list-group-item
       button
@@ -25,7 +25,7 @@
       <div style="width: 100%">
         <b-form-file
           v-model="newAttachment"
-          placeholder="Choose a file"
+          :placeholder="$t('page.attachments.placeholder')"
           drop-placeholder="Drop file here..."
           style="width: 80%"
         ></b-form-file>
@@ -33,7 +33,7 @@
           @click="uploadAttachment"
           style="margin-top: 0.5em"
           variant="primary"
-          >Upload</b-button
+          >{{$t('page.attachments.upload')}}</b-button
         >
       </div>
     </template>

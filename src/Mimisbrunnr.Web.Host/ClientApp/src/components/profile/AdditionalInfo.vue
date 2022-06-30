@@ -1,30 +1,30 @@
 <template>
   <b-card class="profile-info">
-    <span class="text-muted"> Additional information </span>
+    <span class="text-muted"> {{$t("profile.additional.title")}} </span>
     <b-card-text>
       <b-input-group-prepend is-text>
         <b-icon icon="bag-fill" /> &nbsp;
-        <b-form-input :disabled="!this.itsMe" placeholder="Post"></b-form-input>
+        <b-form-input :disabled="!this.itsMe" :placeholder="$t('profile.additional.post')"></b-form-input>
       </b-input-group-prepend>
       <b-input-group-prepend is-text>
         <b-icon icon="diagram2" /> &nbsp;
         <b-form-input
           :disabled="!this.itsMe"
-          placeholder="Department"
+          :placeholder="$t('profile.additional.department')"
         ></b-form-input>
       </b-input-group-prepend>
       <b-input-group-prepend is-text>
         <b-icon icon="building" /> &nbsp;
         <b-form-input
           :disabled="!this.itsMe"
-          placeholder="Organization"
+          :placeholder="$t('profile.additional.organization')"
         ></b-form-input>
       </b-input-group-prepend>
       <b-input-group-prepend is-text>
         <b-icon icon="geo-alt" /> &nbsp;
         <b-form-input
           :disabled="!this.itsMe"
-          placeholder="Location"
+          :placeholder="$t('profile.additional.location')"
         ></b-form-input>
       </b-input-group-prepend>
     </b-card-text>

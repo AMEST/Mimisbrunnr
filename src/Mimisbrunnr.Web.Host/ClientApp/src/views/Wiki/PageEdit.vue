@@ -1,28 +1,36 @@
 <template>
   <b-container v-if="loaded" fluid class="full-size-container text-left">
     <div class="h-100vh">
-      <b-form-input v-model="page.name" placeholder="PageName" class="page-edit-name" :state="nameState"></b-form-input>
+      <b-form-input v-model="page.name" :placeholder="$t('pageEditor.placeholder')" class="page-edit-name" :state="nameState"></b-form-input>
       <vue-simplemde :configs="mdeConfig" v-model="page.content" ref="markdownEditor" />
       <div style="float: right; padding-right: 1em">
-        <b-form-checkbox class="side-by-side-switch" size="lg" switch @change="toggleSideBySide">Side-By-Side</b-form-checkbox>
+        <b-form-checkbox class="side-by-side-switch" size="lg" switch @change="toggleSideBySide">{{$t('pageEditor.sideBySide')}}</b-form-checkbox>
         <b-button @click="save" variant="primary" style="margin-right: 0.5em" :disabled="!nameState">
-          Update
+          {{$t('pageEditor.update')}}
         </b-button>
-        <b-button @click="cancel" variant="secondary"> Close </b-button>
+        <b-button @click="cancel" variant="secondary"> {{$t('pageEditor.close')}} </b-button>
       </div>
     </div>
     <attachments :attachmentSelectAction="addAttachmentLink" :page="page" />
+    <vue-markdown
+        :html="this.$store.state.application.info.allowHtml"
+        :source="this.page.content"
+        :postrender="renderMarkdown"
+        style="display: none;"
+      ></vue-markdown>
   </b-container>
 </template>
 
 <script>
 import Attachments from "@/components/space/modal/Attachments.vue";
 import VueSimplemde from "vue-simplemde";
+import VueMarkdown from "vue-markdown";
 import axios from "axios";
 export default {
   name: "PageEdit",
   components: {
     VueSimplemde,
+    VueMarkdown,
     Attachments,
   },
   data() {
@@ -56,14 +64,8 @@ export default {
           "guide",
         ],
         spellChecker: false,
-        previewRender: function(plainText) {
-          var md = require('markdown-it')({
-            html: true,
-            linkify: true,
-            typographer: true
-          });
-          return md.render(plainText);
-        },
+        renderedMarkdown: "",
+        previewRender: this.previewRender,
       },
     };
   },
@@ -76,7 +78,7 @@ export default {
     },
     simplemde() {
       return this.$refs.markdownEditor.simplemde;
-    },
+    }
   },
   methods: {
     init: async function () {
@@ -224,6 +226,14 @@ export default {
 
         // Refresh to fix selection being off (#309)
         cm.refresh();
+    },
+    // eslint-disable-next-line
+    previewRender: function(plainText) {
+        return this.renderedMarkdown;
+    },
+    renderMarkdown: function(html){
+        this.renderedMarkdown = html;
+        return html;
     }
   },
   mounted: function () {
