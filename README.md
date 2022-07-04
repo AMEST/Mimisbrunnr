@@ -43,8 +43,8 @@ Support for the following features:
   - Enabling anonymous access (permission to read public spaces and access to wiki without authentication)
   - Enable / Disable html in markdown
   - Enable / Disable swagger api documentation
-  - Custom home page (use any public space home page as home page wiki instance) _(Not implemented)_ __(Work In Progress)__
-  - Custom css _(Not implemented)_ __(Work In Progress)__
+  - Custom home page (use any public space home page as home page wiki instance)
+  - Custom css
   - Manage users
     - Promote to admin
     - Demote
@@ -83,7 +83,7 @@ Mimisbrunnr use MongoDB as persistent data storage.
 #### Caching
 
 For better responsiveness of the service, caching is used. The service supports several caching modes:
-1. In memory - suitable for working in only 1 copy, or for development. (DO NOT RECOMMEND USING THIS TYPE FOR 2 or more service instances)
+1. In memory - suitable for working in only 1 copy, or for development. _**(DO NOT RECOMMEND USING THIS TYPE FOR 2 OR MORE SERVICE INSTANCES)**_
 2. In MongoDB - does not give a special performance boost, but allows you to cache aggregated data without making many queries each time (for example, the space page tree is quite hard to calculate)
 3. In Redis - the most productive and recommended mode.
 
