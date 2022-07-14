@@ -128,11 +128,27 @@ export default {
         isAdmin: this.newPermission.isAdmin,
       };
       if (this.type == "Group") {
-        alert("Add group permissions not implemented");
-        return;
+        var groupSearchRequest = await axios.get(
+          `/api/group/${this.newPermission.name}`,
+          { validateStatus: false }
+        );
+        if(groupSearchRequest.status != 200){
+            this.$bvToast.toast(
+            `status:${groupSearchRequest.status}.${JSON.stringify(
+              groupSearchRequest.data
+            )}`,
+            {
+              title: "Error when search group.",
+              variant: "warning",
+              solid: true,
+            }
+          );
+          return;
+        }
+        permission.group = groupSearchRequest.data;
       } else {
         var profileRequest = await axios.get(
-          "/api/user/" + this.newPermission.name,
+          `/api/user/${this.newPermission.name}`,
           { validateStatus: false }
         );
         if (profileRequest.status != 200) {
@@ -150,7 +166,7 @@ export default {
         }
         permission.user = profileRequest.data;
       }
-      var addPermissionRequest = await axios.put(
+      var addPermissionRequest = await axios.post(
         `/api/space/${spaceKey}/permissions`,
         permission,
         { validateStatus: false }

@@ -60,7 +60,8 @@ internal class GroupService : IGroupService
     {
         var user = await _userManager.GetByEmail(requestedBy.Email);
         var group = await _userGroupManager.FindByName(name);
-        return group.ToModel(user.Role == UserRole.Admin);
+        if (group is null) throw new GroupNotFoundException();
+        return group.ToModel(user.Role == UserRole.Admin || group.OwnerEmails.Contains(requestedBy.Email) );
     }
     
     public async Task<IEnumerable<UserModel>> GetUsers(string name, UserInfo requestedBy)
@@ -79,7 +80,7 @@ internal class GroupService : IGroupService
         var group = await _userGroupManager.FindByName(name);
         if (group is null) throw new GroupNotFoundException();
         var deletedByUser = await _userManager.GetByEmail(removedBy.Email);
-        if (deletedByUser.Role != UserRole.Admin) throw new UserHasNotPermissionException();
+        if (!group.OwnerEmails.Contains(removedBy.Email) && deletedByUser.Role != UserRole.Admin ) throw new UserHasNotPermissionException();
 
         var removeGroupPermissionTasks = new List<Task>();
         var spaces = await _spaceManager.GetAll();

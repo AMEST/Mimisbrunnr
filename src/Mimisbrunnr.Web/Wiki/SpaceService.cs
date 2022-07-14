@@ -1,8 +1,10 @@
 ﻿using System.IO.Compression;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Mimisbrunnr.Users;
+using Mimisbrunnr.Web.Group;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.Services;
@@ -106,7 +108,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         EnsureSpaceExists(space);
 
         await _spaceManager.AddPermission(space, model.ToEntity());
-        await _distributedCache.RemoveAsync(CreateUserVisibleSpacesCacheKey(model.User.Email));
+        await ClearUserVisibleSpacesAfterChangingPermissions(model);
 
         return model;
     }
@@ -120,7 +122,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
             throw new SpaceNotFoundException();
 
         await _spaceManager.UpdatePermission(space, model.ToEntity());
-        await _distributedCache.RemoveAsync(CreateUserVisibleSpacesCacheKey(model.User.Email));
+        await ClearUserVisibleSpacesAfterChangingPermissions(model);
     }
 
     public async Task RemovePermission(string key, SpacePermissionModel model, UserInfo removedBy)
@@ -131,7 +133,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         EnsureSpaceExists(space);
 
         await _spaceManager.RemovePermission(space, model.ToEntity());
-        await _distributedCache.RemoveAsync(CreateUserVisibleSpacesCacheKey(model.User.Email));
+        await ClearUserVisibleSpacesAfterChangingPermissions(model);
     }
 
     public async Task<SpaceModel> Create(SpaceCreateModel model, UserInfo createdBy)
@@ -251,6 +253,24 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         spaces = spaces.Where( x => x.Type == SpaceType.Public || FindPermission(x.Permissions.ToArray(), userInfo, userGroups) != null);
         await AddVisibleSpacesToCache(cacheKey, spaces);
         return spaces;
+    }
+
+    private async Task ClearUserVisibleSpacesAfterChangingPermissions(SpacePermissionModel permissionModel)
+    {
+        if(permissionModel?.User is not null){
+            await _distributedCache.RemoveAsync(CreateUserVisibleSpacesCacheKey(permissionModel.User.Email));
+            return;
+        }
+
+        var group = await _userGroupManager.FindByName(permissionModel?.Group.Name);
+        if( group is null) throw new GroupNotFoundException();
+
+        var usersInGroup = await _userGroupManager.GetUsersInGroup(group);
+        var clearTasks = new List<Task>();
+        foreach(var user in usersInGroup)
+            clearTasks.Add(_distributedCache.RemoveAsync(CreateUserVisibleSpacesCacheKey(user.Email)));
+
+        await Task.WhenAll(clearTasks);
     }
 
     private Task AddVisibleSpacesToCache(string cacheKey, IEnumerable<Space> spaces)
