@@ -11,8 +11,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Skidbladnir.Modules" Version="1.4.1-unstalable.0.1" />
-      <PackageReference Include="Skidbladnir.Repository.MongoDB" Version="1.4.1-unstalable.0.1" />
+      <PackageReference Include="Skidbladnir.Modules" Version="1.4.1-unstalable.0.2" />
+      <PackageReference Include="Skidbladnir.Repository.MongoDB" Version="1.4.1-unstalable.0.2" />
     </ItemGroup>
 
 </Project>
