@@ -2,7 +2,7 @@
 
 public interface IUserManager
 {
-    Task<User[]> GetUsers();
+    Task<User[]> GetUsers(int? offset = null);
     
     Task<User> GetByEmail(string email);
 

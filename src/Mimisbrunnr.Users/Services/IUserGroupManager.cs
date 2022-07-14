@@ -2,7 +2,7 @@
 
 public interface IUserGroupManager
 {
-    Task<Group[]> GetAll();
+    Task<Group[]> GetAll(int? offset = null);
     
     Task<Group> FindByName(string name);
     

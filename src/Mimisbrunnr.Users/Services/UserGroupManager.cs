@@ -4,6 +4,7 @@ namespace Mimisbrunnr.Users;
 
 internal class UserGroupManager : IUserGroupManager
 {
+    private const int DefaultMaxGroupsCount = 15;
     private readonly IRepository<Group> _groupRepository;
     private readonly IRepository<UserGroup> _userGroupsRepository;
     private readonly IUserManager _userManager;
@@ -15,9 +16,15 @@ internal class UserGroupManager : IUserGroupManager
         _userManager = userManager;
     }
 
-    public Task<Group[]> GetAll()
+    public Task<Group[]> GetAll(int? offset = null)
     {
-        return _groupRepository.GetAll().ToArrayAsync();
+        if(offset is null)
+            return _groupRepository.GetAll().ToArrayAsync();
+
+        return _groupRepository.GetAll()
+            .Skip(offset.Value)
+            .Take(DefaultMaxGroupsCount)
+            .ToArrayAsync();
     }
     
     public Task<Group> FindByName(string name)

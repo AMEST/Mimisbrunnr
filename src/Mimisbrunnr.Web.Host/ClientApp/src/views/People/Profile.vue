@@ -22,8 +22,8 @@
 
 <script>
 import axios from 'axios';
-import WorkedOn from "@/components/profile/WorkedOn.vue";
-import AdditionalInfo from "@/components/profile/AdditionalInfo.vue";
+import WorkedOn from "@/components/people/profile/WorkedOn.vue";
+import AdditionalInfo from "@/components/people/profile/AdditionalInfo.vue";
 export default {
     components: { WorkedOn, AdditionalInfo },
     name: "Profile",

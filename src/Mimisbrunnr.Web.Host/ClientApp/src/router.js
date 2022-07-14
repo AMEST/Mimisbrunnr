@@ -45,6 +45,11 @@ export default new Router({
       component: () => import(/* webpackChunkName: "profile" */ './views/People/Profile.vue')
     },
     {
+        path: '/people',
+        name: 'Discovery',
+        component: () => import(/* webpackChunkName: "profile" */ './views/People/Discovery.vue')
+      },
+    {
       path: '/error/:err',
       name: 'error',
       component: () => import(/* webpackChunkName: "error" */ './views/Error.vue')

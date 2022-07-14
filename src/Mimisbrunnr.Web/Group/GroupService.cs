@@ -49,7 +49,7 @@ internal class GroupService : IGroupService
             && user.Role != UserRole.Admin)
             return Array.Empty<GroupModel>();
 
-        IEnumerable<Users.Group> groups = await _userGroupManager.GetAll();
+        IEnumerable<Users.Group> groups = await _userGroupManager.GetAll(filter?.Offset);
         if(!string.IsNullOrEmpty(filter?.OwnerEmail))
             groups = groups.Where(x => x.OwnerEmails.Contains(filter.OwnerEmail));
 

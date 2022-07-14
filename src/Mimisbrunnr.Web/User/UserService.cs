@@ -22,10 +22,10 @@ namespace Mimisbrunnr.Web.User
             _userGroupManager = userGroupManager;
         }
 
-        public async Task<IEnumerable<UserModel>> GetUsers(UserInfo requestedBy)
+        public async Task<IEnumerable<UserModel>> GetUsers(UserInfo requestedBy, int? offset = null)
         {
             var requestedByUser = await _userManager.GetByEmail(requestedBy.Email);
-            var users = await _userManager.GetUsers();
+            var users = await _userManager.GetUsers(offset);
 
             return requestedByUser.Role == UserRole.Admin
                 ? users.Select(x => x.ToViewModel())

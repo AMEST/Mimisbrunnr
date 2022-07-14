@@ -6,6 +6,7 @@
                 "list": "Space directory",
                 "create": "Create Space"
             },
+            "people": "People",
             "pageCreateButton": "Create",
             "search": "Search",
             "login": "Log in",
@@ -140,6 +141,15 @@
                 "emptyUpdates": "There are no recent updates."
             }
         },
+        "people":{
+            "search":{
+                "placeholder":"Search users and groups"
+            },
+            "users": {
+                "title": "People",
+                "loadMore": "Load more"
+            }
+        },
         "search": {
             "title": "Search...",
             "placeholder": "Search",
@@ -271,6 +281,7 @@
                 "list": "Список",
                 "create": "Создать"
             },
+            "people": "Пользователи",
             "pageCreateButton": "Создать",
             "search": "Поиск",
             "login": "Вход",
@@ -403,6 +414,15 @@
             "workedOn": {
                 "title": "Недавно работал",
                 "emptyUpdates": "За последнее время, никаких обновлений не было."
+            }
+        },
+        "people":{
+            "search":{
+                "placeholder":"Поиск пользователей и групп"
+            },
+            "users": {
+                "title": "Пользователи",
+                "loadMore": "Загрузить еще"
             }
         },
         "search": {

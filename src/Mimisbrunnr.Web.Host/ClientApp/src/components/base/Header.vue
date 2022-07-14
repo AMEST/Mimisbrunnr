@@ -18,6 +18,9 @@
               >{{ $t("header.spacesDropdown.create") }}</b-dropdown-item
             >
           </b-nav-item-dropdown>
+          <b-nav-item to="/people">
+              {{ $t("header.people") }}
+          </b-nav-item>
           <b-button
             variant="light"
             class="create-button"
