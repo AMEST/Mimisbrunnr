@@ -5,6 +5,7 @@ using Mimisbrunnr.Storage.MongoDb;
 using Mimisbrunnr.Web.Host.Configuration;
 using Mimisbrunnr.Web.Host.Services;
 using Mimisbrunnr.Web.Host.Services.Features;
+using Mimisbrunnr.Web.Host.Services.Metrics;
 using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Web.Wiki.Import;
 using Mimisbrunnr.Wiki;
@@ -18,7 +19,8 @@ public class StartupModule : Module
 {
     public override Type[] DependsModules => new[]
     {
-        typeof(AspNetModule), typeof(MongoDbStoreModule), typeof(WebModule), typeof(WikiModule), typeof(PersistentModule)
+        typeof(AspNetModule), typeof(MongoDbStoreModule), typeof(WebModule), typeof(WikiModule), typeof(PersistentModule),
+        typeof(MetricsModule)
     };
 
     public override void Configure(IServiceCollection services)

@@ -5,6 +5,7 @@ using Mimisbrunnr.Storage.MongoDb;
 using Mimisbrunnr.Web.Host;
 using Mimisbrunnr.Web.Host.Configuration;
 using Mimisbrunnr.Web.Host.Middlewares;
+using Mimisbrunnr.Web.Host.Services.Metrics;
 using Skidbladnir.Modules;
 using VueCliMiddleware;
 
@@ -19,6 +20,8 @@ builder.Services.AddSkidbladnirModules<StartupModule>(configuration =>
     configuration.Add(cachingConfiguration);
     var persistentConfig = builder.Configuration.GetSection("Persistent").Get<PersistentModuleConfiguration>();
     configuration.Add(persistentConfig);
+    var metricsConfiguration = builder.Configuration.GetSection("Metrics").Get<MetricsConfiguration>();
+    configuration.Add(metricsConfiguration);
 }, builder.Configuration);
 
 
@@ -40,6 +43,8 @@ app.UseSwaggerFeature();
 app.UseSpaStaticFiles();
 
 app.UseRouting();
+
+app.UseMetrics();
 
 app.UseAuthentication();
 
