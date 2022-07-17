@@ -220,6 +220,7 @@
                 "settings": "Settings"
             },
             "tree": "Page tree",
+            "emptyTree": "Empty",
             "permissions": {
                 "title": "Space Permissions",
                 "groups": "Groups",
@@ -484,6 +485,7 @@
                 "settings": "Настройки"
             },
             "tree": "Древо страниц",
+            "emptyTree": "Пусто",
             "permissions": {
                 "title": "Разрешения пространств",
                 "groups": "Группы",

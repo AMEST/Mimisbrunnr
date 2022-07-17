@@ -4,10 +4,13 @@
       <b-avatar class="space-avatar-bg" :text="getInitials()"></b-avatar>
       <b-link :to="'/space/' + this.space.key">{{ this.space.name }}</b-link>
     </div>
-    <div class="mt-3 pb-3 space-menu-bottom-line">
+    <div class="mt-3 pb-3 space-menu-bottom-line" v-if="this.space.description">
       <i class="text-muted">{{$t("space.description")}}: {{ this.space.description }}</i>
     </div>
-    <div class="mt-3 pb-3 space-actions-menu space-menu-bottom-line">
+    <div 
+        class="mt-3 pb-3 space-actions-menu space-menu-bottom-line"
+        v-if="this.space.type == 'Personal' || userPermissions.isAdmin"
+    >
       <i class="text-muted">{{$t("space.actions.title")}}</i>
       <b-list-group class="mt-1">
         <b-list-group-item
@@ -32,6 +35,7 @@
     </div>
     <div class="mt-3 space-menu-page-tree">
       <i class="text-muted">{{$t("space.tree")}}</i>
+      <i class="text-center text-muted" v-if="this.pageTree && this.pageTree.childs.length == 0">: {{$t("space.emptyTree")}}</i>
       <div class="text-center" v-if="this.pageTree == undefined">
         <b-spinner variant="secondary"></b-spinner>
       </div>
