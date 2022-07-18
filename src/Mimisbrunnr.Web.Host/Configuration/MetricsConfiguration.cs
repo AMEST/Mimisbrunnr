@@ -19,7 +19,7 @@ namespace Mimisbrunnr.Web.Host.Configuration
         /// <summary>
         /// Is basic authentication enabled
         /// </summary>
-        public bool BasicAuth {get; set;}
+        public bool BasicAuth { get; set; }
 
         /// <summary>
         /// Basic username
@@ -30,5 +30,20 @@ namespace Mimisbrunnr.Web.Host.Configuration
         /// Basic password
         /// </summary>
         public string Password { get; set; }
+
+        /// <summary>
+        ///     Push metrics to PushGateway enabled flag
+        /// </summary>
+        public bool PushGatewayEnabled { get; set; }
+
+        /// <summary>
+        ///     PushGateway endpoint
+        /// </summary>
+        public string PushGatewayEndpoint {get; set;}
+
+        /// <summary>
+        ///     PushGateway job name
+        /// </summary>
+        public string PushGatewayJob { get; set; } = "AppTelemetry";
     }
 }
