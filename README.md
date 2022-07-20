@@ -55,6 +55,7 @@ Support for the following features:
   - Simple scalable
   - Three types of caching (one for single node and two for multiple nodes)
   - Three types of persistent storage (file storage)
+  - Prometheus like metrics with PushGateway support
 
 ## Screenshots
 
@@ -111,3 +112,19 @@ There are several storage options for storing page attachments and other files:
   * `Persistent:WebDav:Username` - WebDav username
   * `Persistent:WebDav:Password` - WebDav password
   
+#### Metrics
+
+To monitor the state of the application, you can enable the collection of metrics.
+Metrics are given in prometheus format by default in `/api/metrics` path. Collected metrics: AspNetCore and DotNetRuntime.
+
+* `Metrics:Enabled` - (default `false`) enable/disable collecting metrics and prometheus endpoint (/api/metrics)
+* `Metrics:Endpoint` - (default `/api/metrics`) path to prometheus metrics endpoint
+* `Metrics:BasicAuth` - (default `false`) enable/disable basic authorization on prometheus endpoint
+* `Metrics:Username` - username for basic authorization
+* `Metrics:Password` - password for basic authorization
+
+Optional, you can configure PushGateway for send metrics from application to prometheus (if service have dynamic topology).
+
+* `Metrics:PushGatewayEnabled` - (default `false`) enable/disable pushing metrics to PushGateway
+* `Metrics:PushGatewayEndpoint` - endpoint where pushing metrics
+* `Metrics:PushGatewayJob` - job name for pushed metrics
