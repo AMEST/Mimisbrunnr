@@ -55,6 +55,7 @@ Support for the following features:
   - Simple scalable
   - Three types of caching (one for single node and two for multiple nodes)
   - Three types of persistent storage (file storage)
+  - Prometheus like metrics with PushGateway support
 
 ## Screenshots
 
