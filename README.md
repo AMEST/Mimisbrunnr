@@ -128,3 +128,71 @@ Optional, you can configure PushGateway for send metrics from application to pro
 * `Metrics:PushGatewayEnabled` - (default `false`) enable/disable pushing metrics to PushGateway
 * `Metrics:PushGatewayEndpoint` - endpoint where pushing metrics
 * `Metrics:PushGatewayJob` - job name for pushed metrics
+
+### Deploy
+
+####  Docker compose (swarm)
+
+```yml
+version: '3.8'
+
+services:
+  host:
+    image: eluki/mimisbrunnr-wiki:main
+    environment:
+      - "Storage:ConnectionString=mongodb+srv://app:password@mongo-local/mimisbrunnr?retryWrites=true"
+      - "Openid:ClientSecret=[Google client secret]"
+      - "Openid:ClientId=[google client id]"
+      - "Caching:Type=Redis"
+      - "Caching:RedisConnectionString=redis-local"
+      - "Persistent:Type=GridFs"
+      - "Persistent:GridFs:ConnectionString=mongodb+srv://app:password@mongo-local/mimisbrunnr?retryWrites=true"
+    ports:
+     - target: 80
+       published: 80
+       protocol: tcp
+       mode: host
+    deploy:
+      replicas: 1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "3m"
+        max-file: "3"
+
+  mongo-local:
+    image: mongo:5.0.9-focal
+    environment:
+      - "MONGO_INITDB_ROOT_PASSWORD=password"
+      - "MONGO_INITDB_ROOT_USERNAME=app"
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.60'
+          memory: 512M
+    volumes:
+      - /opt/mongoData:/data/db
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "3m"
+        max-file: "3"
+				
+redis-local:
+    image: redis:6.2.4-alpine
+    command: 
+      - "redis-server"
+      - '--maxmemory 120mb'
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 120M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "3m"
+        max-file: "3"
+
+```
