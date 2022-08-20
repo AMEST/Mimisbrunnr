@@ -25,6 +25,12 @@ export default {
                     disabled: true
                 },
                 {
+                    name: "Groups",
+                    to: "/admin/groups",
+                    active: false,
+                    disabled: false
+                },
+                {
                     name: "Plugins",
                     to: "/admin/plugins",
                     active: false,

@@ -124,6 +124,18 @@
                         "select": "Please select space"
                     }
                 }
+            },
+            "groups":{
+                "table":{
+                    "fields":{
+                        "name": "Name",
+                        "description": "Description",
+                        "actions": "Actions"
+                    },
+                    "expand": "Expand",
+                    "delete": "Delete"
+                },
+                "loadMore": "Load more"
             }
         },
         "profile": {
@@ -143,7 +155,7 @@
         },
         "people":{
             "search":{
-                "placeholder":"Search users and groups"
+                "placeholder":"Search users..."
             },
             "users": {
                 "title": "People",
@@ -399,6 +411,18 @@
                         "select": "Please select space"
                     }
                 }
+            },
+            "groups":{
+                "table":{
+                    "fields":{
+                        "name": "Имя",
+                        "description": "Описание",
+                        "actions": "Действия"
+                    },
+                    "expand": "Развернуть",
+                    "delete": "Удалить"
+                },
+                "loadMore": "Загрузить еще"
             }
         },
         "profile": {
@@ -418,7 +442,7 @@
         },
         "people":{
             "search":{
-                "placeholder":"Поиск пользователей и групп"
+                "placeholder":"Поиск пользователей..."
             },
             "users": {
                 "title": "Пользователи",

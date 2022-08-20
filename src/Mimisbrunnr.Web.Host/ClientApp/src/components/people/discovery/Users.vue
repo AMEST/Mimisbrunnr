@@ -24,7 +24,7 @@
           font-scale="6"
           class="mt-3"
         ></b-icon>
-        <b-card-text class="pt-2">
+        <b-card-text>
           {{ $t("people.users.loadMore") }}
         </b-card-text>
       </b-card>
