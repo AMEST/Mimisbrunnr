@@ -20,7 +20,7 @@ Support for the following features:
 - Spaces
   - Create personal, private or public spaces
   - Import pages from **Confluence** when creating new space
-  - Configure permissions: allow view / edit / delete pages for individual users or groups _(Groups Not implemented)_ __(Groups Work In Progress)__
+  - Configure permissions: allow view / edit / delete pages for individual users or groups
   - Space directory with list user visible spaces
   - Tree of pages
   - Space configuration
@@ -50,7 +50,7 @@ Support for the following features:
     - Demote
     - Disable
     - Enable
-  - Manage groups
+  - Manage groups 
 - Hosting
   - Simple scalable
   - Three types of caching (one for single node and two for multiple nodes)
