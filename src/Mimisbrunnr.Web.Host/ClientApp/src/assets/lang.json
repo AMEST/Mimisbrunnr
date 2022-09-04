@@ -126,6 +126,7 @@
                 }
             },
             "groups":{
+                "title": "Group management",
                 "table":{
                     "fields":{
                         "name": "Name",
@@ -133,7 +134,21 @@
                         "actions": "Actions"
                     },
                     "expand": "Expand",
-                    "delete": "Delete"
+                    "delete": "Delete",
+                    "details": {
+                        "members": "Group members list",
+                        "add": "Add",
+                        "remove": "Remove",
+                        "fields":{
+                            "name": "Name",
+                            "email": "Email"
+                        }
+                    }
+                },
+                "modal": {
+                    "title": "Group",
+                    "name": "Name",
+                    "description": "Description"
                 },
                 "loadMore": "Load more"
             }
@@ -413,6 +428,7 @@
                 }
             },
             "groups":{
+                "title": "Управление группами",
                 "table":{
                     "fields":{
                         "name": "Имя",
@@ -420,7 +436,21 @@
                         "actions": "Действия"
                     },
                     "expand": "Развернуть",
-                    "delete": "Удалить"
+                    "delete": "Удалить",
+                    "details": {
+                        "members": "Список участников группы",
+                        "add": "Добавить",
+                        "remove": "Удалить",
+                        "fields":{
+                            "name": "Имя",
+                            "email": "Email"
+                        }
+                    }
+                },
+                "modal": {
+                    "title": "Группа",
+                    "name": "Имя",
+                    "description": "Описание"
                 },
                 "loadMore": "Загрузить еще"
             }

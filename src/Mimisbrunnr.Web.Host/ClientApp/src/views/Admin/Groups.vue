@@ -1,98 +1,159 @@
 <template>
   <b-container>
     <Menu activeMenuItem="Groups" />
-    <b-table :items="groups" :fields="fields" striped responsive="sm">
+    <b-card :title="$t('admin.groups.title')" class="admin-group-card">
+      <b-button size="sm" class="group-add-button" variant="success" @click="$bvModal.show('group-modal')">+</b-button>
+      <b-table
+        :items="groups"
+        :fields="fields"
+        striped
+        responsive="sm"
+        class="text-left"
+      >
         <template #cell(actions)="row">
-            <b-button size="sm" @click="row.toggleDetails" class="mr-2">
-                {{ $t("admin.groups.table.expand") }}
+          <div class="text-right">
+            <b-button size="sm" v-on:click="row.toggleDetails()" class="mr-2">
+              {{ $t("admin.groups.table.expand") }}
             </b-button>
-            <b-button size="sm" variant="danger">
-                {{ $t("admin.groups.table.delete") }}
+            <b-button size="sm" variant="danger" v-on:click="removeGroup(row.item['name'])">
+              {{ $t("admin.groups.table.delete") }}
             </b-button>
+          </div>
         </template>
         <template #row-details="row">
-            <span>more</span>
+          <group-members :group="row.item['name']" />
         </template>
-    </b-table>
-    <b-button variant="light" class="load-more-button" @click="loadGroups">
+      </b-table>
+      <b-button variant="light" class="load-more-button" @click="loadGroups">
         <b-icon
           icon="arrow-clockwise"
           :animation="loading ? 'spin' : 'none'"
           font-scale="1"
         ></b-icon>
         {{ $t("admin.groups.loadMore") }}
-    </b-button>
+      </b-button>
+    </b-card>
+    <group-modal/>
   </b-container>
 </template>
 
 <script>
 import Menu from "@/components/admin/Menu.vue";
 import axios from "axios";
+import GroupMembers from "@/components/admin/GroupMembers.vue";
+import GroupModal from '@/components/admin/modals/GroupModal.vue';
 export default {
-    name: "GroupsAdministration",
-    components: {
-        Menu
-    },
-    data() {
-        return {
-            groups: [],
-            loading: false
-        }
-    },
-    computed: {
-        fields() {
-            return [{
-                key: "name",
-                label: this.$t("admin.groups.table.fields.name")
-            },
-            {
-                key: "description",
-                label: this.$t("admin.groups.table.fields.description")
-            },
-            {
-                key: "actions",
-                label: this.$t("admin.groups.table.fields.actions")
-            }] 
-        }
-    },
-    methods: {
-        loadGroups: async function () {
-            this.loading = true;
-            var groupRequest = await axios.get(
-                `/api/group?offset=${this.groups.length}`,
-                { validateStatus: false }
-            );
-            if (groupRequest.status != 200) {
-                this.$bvToast.toast(
-                `status:${groupRequest.status}.${JSON.stringify(groupRequest.data)}`,
-                {
-                    title: "Error when getting groups.",
-                    variant: "warning",
-                    solid: true,
-                }
-                );
-                this.loading = false;
-                return;
-            }
-            for (let group of groupRequest.data) this.groups.push(group);
-            this.loading = false;
+  name: "GroupsAdministration",
+  components: {
+    Menu,
+    GroupMembers,
+    GroupModal,
+  },
+  data() {
+    return {
+      groups: [],
+      loading: false,
+    };
+  },
+  computed: {
+    fields() {
+      return [
+        {
+          key: "name",
+          label: this.$t("admin.groups.table.fields.name"),
         },
+        {
+          key: "description",
+          label: this.$t("admin.groups.table.fields.description"),
+        },
+        {
+          key: "actions",
+          label: this.$t("admin.groups.table.fields.actions"),
+        },
+      ];
     },
-    mounted () {
-        if (
-            !this.$store.state.application.profile ||
-            !this.$store.state.application.profile.isAdmin
-        ) {
-            this.$router.push("/error/unauthorized");
-            return;
+  },
+  methods: {
+    loadGroups: async function () {
+      this.loading = true;
+      var groupRequest = await axios.get(
+        `/api/group?offset=${this.groups.length}`,
+        { validateStatus: false }
+      );
+      if (groupRequest.status != 200) {
+        this.$bvToast.toast(
+          `status:${groupRequest.status}.${JSON.stringify(groupRequest.data)}`,
+          {
+            title: "Error when getting groups.",
+            variant: "warning",
+            solid: true,
+          }
+        );
+        this.loading = false;
+        return;
+      }
+      for (let group of groupRequest.data) {
+        this.groups.push(group);
+      }
+      this.loading = false;
+    },
+    removeGroup: async function(group){
+        var request = await axios.delete(
+        `/api/Group/${group}`,
+        {
+          validateStatus: false,
         }
-        this.loadGroups();
-    },
-}
+      );
+      if (request.status != 200) {
+        this.$bvToast.toast(
+          `status:${request.status}.${JSON.stringify(request.data)}`,
+          {
+            title: "Error when deleting group.",
+            variant: "warning",
+            solid: true,
+          }
+        );
+        return;
+      }
+    }
+  },
+  mounted() {
+    if (
+      !this.$store.state.application.profile ||
+      !this.$store.state.application.profile.isAdmin
+    ) {
+      this.$router.push("/error/unauthorized");
+      return;
+    }
+    this.loadGroups();
+  },
+};
 </script>
 
-<style>
+<style scoped>
+.admin-group-card {
+  border-top: unset !important;
+  border-top-left-radius: unset !important;
+  border-top-right-radius: unset !important;
+  text-align: right;
+}
+
+.admin-group-card .card-title {
+  text-align: left;
+}
+
+.admin-group-card p {
+  text-align: left;
+}
+
+.admin-group-card .card-body {
+  margin: 2.25rem 2.25rem 2.25rem 2.25rem;
+}
+.group-add-button {
+    float: right;
+    margin-top: -3em;
+}
 .load-more-button {
-    width: 100%;
+  width: 100%;
 }
 </style>

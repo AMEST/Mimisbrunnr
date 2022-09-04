@@ -14,7 +14,8 @@ internal class PageSearcher : IPageSearcher
     public PageSearcher(BaseMongoDbContext mongoDbContext)
     {
         _mongoDbContext = mongoDbContext;
-        _pageCollection = mongoDbContext.GetCollection<Page>();
+        _pageCollection = mongoDbContext.GetCollection<Page>()
+            .WithReadPreference(ReadPreference.SecondaryPreferred);
     }
 
     public async Task<IEnumerable<Page>> Search(string text)
