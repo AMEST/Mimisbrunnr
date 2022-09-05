@@ -151,6 +151,23 @@
                     "description": "Description"
                 },
                 "loadMore": "Load more"
+            },
+            "users":{
+                "title": "User management",
+                "table":{
+                    "fields":{
+                        "name": "Name",
+                        "email": "Email",
+                        "actions": "Actions"
+                    },
+                    "expand": "Expand",
+                    "remove": "Remove",
+                    "disable": "Disable",
+                    "enable": "Enable",
+                    "promote": "Promote",
+                    "demote": "Demote"
+                },
+                "loadMore": "Load more"
             }
         },
         "profile": {
@@ -451,6 +468,23 @@
                     "title": "Группа",
                     "name": "Имя",
                     "description": "Описание"
+                },
+                "loadMore": "Загрузить еще"
+            },
+            "users":{
+                "title": "Управление пользователями",
+                "table":{
+                    "fields":{
+                        "name": "Имя",
+                        "email": "Email",
+                        "actions": "Действия"
+                    },
+                    "expand": "Развернуть",
+                    "remove": "Удалить",
+                    "disable": "Выключить",
+                    "enable": "Включить",
+                    "promote": "Повысить",
+                    "demote": "Понизить"
                 },
                 "loadMore": "Загрузить еще"
             }

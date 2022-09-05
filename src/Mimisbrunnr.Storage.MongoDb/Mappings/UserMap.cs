@@ -11,7 +11,10 @@ public class UserMap : EntityMapClass<User>
     {
         ToCollection("Users");
         MapMember(x => x.Role)
-        .SetSerializer(new EnumSerializer<UserRole>(BsonType.String))
-        .SetIgnoreIfDefault(false);
+            .SetSerializer(new EnumSerializer<UserRole>(BsonType.String))
+            .SetIgnoreIfDefault(false);
+        MapMember(x => x.Enable)
+            .SetIgnoreIfDefault(false)
+            .SetIgnoreIfNull(false);
     }
 }

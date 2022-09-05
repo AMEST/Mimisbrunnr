@@ -116,7 +116,8 @@ public static class MappingExtensions
             Email = user.Email.ToLower(),
             Name = user.Name,
             AvatarUrl = user.AvatarUrl,
-            IsAdmin = user.Role == Users.UserRole.Admin
+            IsAdmin = user.Role == Users.UserRole.Admin,
+            Enable = user.Enable
         };
     }
 

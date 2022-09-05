@@ -22,7 +22,7 @@ export default {
                     name: "Users",
                     to: "/admin/users",
                     active: false,
-                    disabled: true
+                    disabled: false
                 },
                 {
                     name: "Groups",

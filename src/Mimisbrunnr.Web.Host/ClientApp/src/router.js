@@ -63,6 +63,11 @@ export default new Router({
             path: '/admin/groups',
             name: 'GroupsAdministration',
             component: () => import(/* webpackChunkName: "adminGroups" */ './views/Admin/Groups.vue')
+        },
+        {
+            path: '/admin/users',
+            name: 'UsersAdministration',
+            component: () => import(/* webpackChunkName: "adminUsers" */ './views/Admin/Users.vue')
         }
     ]
 })
