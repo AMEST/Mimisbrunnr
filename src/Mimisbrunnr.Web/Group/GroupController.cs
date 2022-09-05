@@ -23,9 +23,17 @@ public class GroupController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(GroupModel[]), 200)]
     [ProducesResponseType(401)]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] GroupFilterModel filter = null )
     {
-        return Ok(await _groupService.GetAll(User.ToEntity()));
+        return Ok(await _groupService.GetAll(filter, User.ToEntity()));
+    }
+
+    [HttpGet("{name}")]
+    [ProducesResponseType(typeof(GroupModel), 200)]
+    [ProducesResponseType(401)]
+    public async Task<IActionResult> Get([FromRoute] string name)
+    {
+        return Ok(await _groupService.Get(name, User.ToEntity()));
     }
 
     [HttpGet("{name}/users")]

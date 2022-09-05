@@ -6,6 +6,7 @@ namespace Mimisbrunnr.Users;
 
 internal class UserManager : IUserManager
 {
+    private const int DefaultMaxUserGet = 15;
     private readonly TimeSpan _defaultCacheTime = TimeSpan.FromMinutes(10);
     private readonly IRepository<User> _userRepository;
     private readonly IDistributedCache _distributedCache;
@@ -16,9 +17,15 @@ internal class UserManager : IUserManager
         _distributedCache = distributedCache;
     }
     
-    public Task<User[]> GetUsers()
+    public Task<User[]> GetUsers(int? offset = null)
     {
-        return _userRepository.GetAll().ToArrayAsync();
+        if(offset is null)
+            return _userRepository.GetAll().ToArrayAsync();
+
+        return _userRepository.GetAll()
+            .Skip(offset.Value)
+            .Take(DefaultMaxUserGet)
+            .ToArrayAsync();
     } 
 
     public async Task<User> GetByEmail(string email)

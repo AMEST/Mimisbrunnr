@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Mimisbrunnr.Users;
+using Mimisbrunnr.Web.Group;
 using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Wiki.Contracts;
 
@@ -8,18 +9,23 @@ namespace Mimisbrunnr.Web.User
     internal class UserService : IUserService
     {
         private readonly IUserManager _userManager;
+        private readonly IUserGroupManager _userGroupManager;
         private readonly ILogger<UserService> _logger;
-        public UserService(IUserManager userManager, ILogger<UserService> logger)
+        public UserService(
+            IUserManager userManager,
+            IUserGroupManager userGroupManager,
+            ILogger<UserService> logger
+         )
         {
             _logger = logger;
             _userManager = userManager;
-
+            _userGroupManager = userGroupManager;
         }
 
-        public async Task<IEnumerable<UserModel>> GetUsers(UserInfo requestedBy)
+        public async Task<IEnumerable<UserModel>> GetUsers(UserInfo requestedBy, int? offset = null)
         {
             var requestedByUser = await _userManager.GetByEmail(requestedBy.Email);
-            var users = await _userManager.GetUsers();
+            var users = await _userManager.GetUsers(offset);
 
             return requestedByUser.Role == UserRole.Admin
                 ? users.Select(x => x.ToViewModel())
@@ -36,6 +42,25 @@ namespace Mimisbrunnr.Web.User
         {
             var user = await _userManager.GetByEmail(email);
             return user?.ToProfileModel();
+        }
+
+
+        public async Task<IEnumerable<GroupModel>> GetUserGroups(string email, UserInfo requestedBy)
+        {
+            if (string.IsNullOrEmpty(email)) 
+                return Array.Empty<GroupModel>();
+
+            var user = await _userManager.GetByEmail(email);
+            var requestedByUser = requestedBy.Email.Equals(email, StringComparison.OrdinalIgnoreCase)
+                ? user
+                : await _userManager.GetByEmail(requestedBy.Email);
+
+            if(!requestedBy.Email.Equals(email, StringComparison.OrdinalIgnoreCase)
+                && requestedByUser.Role != UserRole.Admin)
+                return Array.Empty<GroupModel>();
+
+            var groups = await _userGroupManager.GetUserGroups(user);
+            return groups.Select(x => x.ToModel());
         }
 
         public async Task Disable(string email, UserInfo disabledBy)

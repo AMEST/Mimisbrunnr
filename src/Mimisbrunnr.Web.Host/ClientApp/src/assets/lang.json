@@ -6,6 +6,7 @@
                 "list": "Space directory",
                 "create": "Create Space"
             },
+            "people": "People",
             "pageCreateButton": "Create",
             "search": "Search",
             "login": "Log in",
@@ -123,6 +124,50 @@
                         "select": "Please select space"
                     }
                 }
+            },
+            "groups":{
+                "title": "Group management",
+                "table":{
+                    "fields":{
+                        "name": "Name",
+                        "description": "Description",
+                        "actions": "Actions"
+                    },
+                    "expand": "Expand",
+                    "delete": "Delete",
+                    "details": {
+                        "members": "Group members list",
+                        "add": "Add",
+                        "remove": "Remove",
+                        "fields":{
+                            "name": "Name",
+                            "email": "Email"
+                        }
+                    }
+                },
+                "modal": {
+                    "title": "Group",
+                    "name": "Name",
+                    "description": "Description"
+                },
+                "loadMore": "Load more"
+            },
+            "users":{
+                "title": "User management",
+                "table":{
+                    "fields":{
+                        "name": "Name",
+                        "email": "Email",
+                        "actions": "Actions"
+                    },
+                    "expand": "Expand",
+                    "remove": "Remove",
+                    "disable": "Disable",
+                    "enable": "Enable",
+                    "promote": "Promote",
+                    "demote": "Demote"
+                },
+                "loadMore": "Load more"
             }
         },
         "profile": {
@@ -138,6 +183,15 @@
             "workedOn": {
                 "title": "Worked on",
                 "emptyUpdates": "There are no recent updates."
+            }
+        },
+        "people":{
+            "search":{
+                "placeholder":"Search users..."
+            },
+            "users": {
+                "title": "People",
+                "loadMore": "Load more"
             }
         },
         "search": {
@@ -271,6 +325,7 @@
                 "list": "Список",
                 "create": "Создать"
             },
+            "people": "Пользователи",
             "pageCreateButton": "Создать",
             "search": "Поиск",
             "login": "Вход",
@@ -388,6 +443,50 @@
                         "select": "Please select space"
                     }
                 }
+            },
+            "groups":{
+                "title": "Управление группами",
+                "table":{
+                    "fields":{
+                        "name": "Имя",
+                        "description": "Описание",
+                        "actions": "Действия"
+                    },
+                    "expand": "Развернуть",
+                    "delete": "Удалить",
+                    "details": {
+                        "members": "Список участников группы",
+                        "add": "Добавить",
+                        "remove": "Удалить",
+                        "fields":{
+                            "name": "Имя",
+                            "email": "Email"
+                        }
+                    }
+                },
+                "modal": {
+                    "title": "Группа",
+                    "name": "Имя",
+                    "description": "Описание"
+                },
+                "loadMore": "Загрузить еще"
+            },
+            "users":{
+                "title": "Управление пользователями",
+                "table":{
+                    "fields":{
+                        "name": "Имя",
+                        "email": "Email",
+                        "actions": "Действия"
+                    },
+                    "expand": "Развернуть",
+                    "remove": "Удалить",
+                    "disable": "Выключить",
+                    "enable": "Включить",
+                    "promote": "Повысить",
+                    "demote": "Понизить"
+                },
+                "loadMore": "Загрузить еще"
             }
         },
         "profile": {
@@ -403,6 +502,15 @@
             "workedOn": {
                 "title": "Недавно работал",
                 "emptyUpdates": "За последнее время, никаких обновлений не было."
+            }
+        },
+        "people":{
+            "search":{
+                "placeholder":"Поиск пользователей..."
+            },
+            "users": {
+                "title": "Пользователи",
+                "loadMore": "Загрузить еще"
             }
         },
         "search": {

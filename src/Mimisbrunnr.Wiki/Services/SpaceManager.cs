@@ -122,9 +122,10 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
         if (space.Type == SpaceType.Personal && permission.IsAdmin)
             throw new InvalidOperationException("Cannot remove administrators from personal space");
 
-        var newPermissions = space.Permissions.Where(x => permission.User != null
-            ? !x.User.Equals(permission.User)
-            : !x.Group.Equals(permission.Group));
+        var newPermissions = space.Permissions.Where(x => 
+            permission.User != null
+            ? x.User is null || !x.User.Equals(permission.User)
+            : x.Group is null || !x.Group.Equals(permission.Group));
         space.Permissions = newPermissions;
         await Update(space);
         await DeleteSpaceFromCache(space);

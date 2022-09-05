@@ -1,12 +1,15 @@
+using Mimisbrunnr.Web.Group;
 using Mimisbrunnr.Wiki.Contracts;
 
 namespace Mimisbrunnr.Web.User
 {
     public interface IUserService
     {
-        Task<IEnumerable<UserModel>> GetUsers(UserInfo requestedBy);
+        Task<IEnumerable<UserModel>> GetUsers(UserInfo requestedBy,int? offset = null);
 
         Task<UserViewModel> GetCurrent(UserInfo requestedBy);
+
+        Task<IEnumerable<GroupModel>> GetUserGroups(string email, UserInfo requestedBy);
 
         Task<UserProfileModel> GetByEmail(string email, UserInfo requestedBy);
 

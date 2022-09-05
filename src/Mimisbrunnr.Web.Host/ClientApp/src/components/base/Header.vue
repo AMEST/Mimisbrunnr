@@ -18,6 +18,9 @@
               >{{ $t("header.spacesDropdown.create") }}</b-dropdown-item
             >
           </b-nav-item-dropdown>
+          <b-nav-item v-if="this.$store.state.application.profile" to="/people" >
+              {{ $t("header.people") }}
+          </b-nav-item>
           <b-button
             variant="light"
             class="create-button"

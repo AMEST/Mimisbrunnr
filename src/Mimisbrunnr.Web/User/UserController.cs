@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Mimisbrunnr.Web.Filters;
+using Mimisbrunnr.Web.Group;
 using Mimisbrunnr.Web.Mapping;
 
 namespace Mimisbrunnr.Web.User;
@@ -18,9 +19,9 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(int? offset = null)
     {
-        return Ok( await _userService.GetUsers(User.ToEntity()));
+        return Ok( await _userService.GetUsers(User.ToEntity(), offset));
     }
 
     [HttpGet("current")]
@@ -32,6 +33,7 @@ public class UserController : ControllerBase
         return Ok(user);
     }
 
+
     [HttpGet("{email}")]
     public async Task<IActionResult> Get([FromRoute] string email)
     {
@@ -39,6 +41,13 @@ public class UserController : ControllerBase
         if (user == null)
             return NotFound();
         return Ok(user);
+    }
+
+    [HttpGet("{email}/groups")]
+    public async Task<IEnumerable<GroupModel>> GetUserGroups([FromRoute] string email)
+    {
+        var groups = await _userService.GetUserGroups(email, User.ToEntity());
+        return groups;
     }
 
     [HttpPost("{email}/disable")]
