@@ -12,6 +12,7 @@ public class WikiModule : Module
             .AddSingleton<ISpaceManager, SpaceManager>()
             .AddSingleton<IFeedManager, FeedManager>()
             .AddSingleton<IAttachmentManager, AttachmentManager>()
-            .AddSingleton<ISpaceSearcher>(r => (ISpaceSearcher)r.GetService<ISpaceManager>());
+            .AddSingleton<ISpaceSearcher>(r => (ISpaceSearcher)r.GetService<ISpaceManager>())
+            .AddSingleton<IDraftManager, DraftManager>();
     }
 }
