@@ -6,7 +6,7 @@ public interface IDraftManager
 {
     Task<Draft> GetByPageId(string pageId);
 
-    Task<Draft> Create(string pageId, string name, string content, UserInfo updatedBy);
+    Task<Draft> Create(string pageId, string name, string content, UserInfo createdBy);
 
     Task Update(Draft draft, UserInfo updatedBy);
 

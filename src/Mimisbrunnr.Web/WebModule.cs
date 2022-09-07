@@ -31,5 +31,6 @@ public class WebModule : Module
         services.AddSingleton<IGroupService, GroupService>();
         services.AddSingleton<IApplicationConfigurationService, ApplicationConfigurationService>();
         services.AddSingleton<ICustomizationService, CustomizationService>();
+        services.AddSingleton<IDraftService, DraftService>();
     }
 }
