@@ -178,8 +178,8 @@ services:
       options:
         max-size: "3m"
         max-file: "3"
-				
-redis-local:
+
+  redis-local:
     image: redis:6.2.4-alpine
     command: 
       - "redis-server"
