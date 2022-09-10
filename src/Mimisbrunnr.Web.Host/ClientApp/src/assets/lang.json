@@ -214,7 +214,14 @@
             "placeholder": "Page Name",
             "update": "Update",
             "close": "Close",
-            "sideBySide": "Side-By-Side"
+            "sideBySide": "Side-By-Side",
+            "draftModal":{
+                "title": "There are pending changes.",
+                "content": "There are pending changes for the current page. Changes are in draft. You can continue editing the draft, or reset the changes and edit the page from scratch.",
+                "changed": "Last changes from {FIO} were made on {DATE}",
+                "continue": "Continue editing",
+                "reset": "Reset changes"
+            }
         },
         "page": {
             "edit": "Edit",
@@ -533,7 +540,14 @@
             "placeholder": "Имя страницы",
             "update": "Сохранить",
             "close": "Закрыть",
-            "sideBySide": "Сплит-режим"
+            "sideBySide": "Сплит-режим",
+            "draftModal":{
+                "title": "Есть несохраненные изменения",
+                "content": "Для текущей страницы есть незаконченные изменения. Изменения находятся в черновике. Вы можете продолжить редактирование черновика или сбросить изменения и редактировать страницу с нуля.",
+                "changed": "Последние изменения от {FIO} произведены {DATE}",
+                "continue": "Продолжить редактирование",
+                "reset": "Сбросить изменения"
+            }
         },
         "page": {
             "edit": "Редактировать",

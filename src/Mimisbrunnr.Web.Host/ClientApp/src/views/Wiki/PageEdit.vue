@@ -1,24 +1,54 @@
 <template>
-  <b-container v-if="loaded" fluid class="full-size-container text-left">
-    <div class="h-100vh">
-      <b-form-input v-model="page.name" :placeholder="$t('pageEditor.placeholder')" class="page-edit-name" :state="nameState"></b-form-input>
-      <vue-simplemde :configs="mdeConfig" v-model="page.content" ref="markdownEditor" />
-      <div style="float: right; padding-right: 1em">
-        <b-form-checkbox class="side-by-side-switch" size="lg" switch @change="toggleSideBySide">{{$t('pageEditor.sideBySide')}}</b-form-checkbox>
-        <b-button @click="save" variant="primary" style="margin-right: 0.5em" :disabled="!nameState">
-          {{$t('pageEditor.update')}}
-        </b-button>
-        <b-button @click="cancel" variant="secondary"> {{$t('pageEditor.close')}} </b-button>
+  <div>
+    <b-container v-if="loaded" fluid class="full-size-container text-left">
+      <div class="h-100vh">
+        <b-form-input
+          v-model="page.name"
+          :placeholder="$t('pageEditor.placeholder')"
+          class="page-edit-name"
+          :state="nameState"
+        ></b-form-input>
+        <vue-simplemde
+          :configs="mdeConfig"
+          v-model="page.content"
+          ref="markdownEditor"
+        />
+        <div style="float: right; padding-right: 1em">
+          <b-form-checkbox
+            class="side-by-side-switch"
+            size="lg"
+            switch
+            @change="toggleSideBySide"
+            >{{ $t("pageEditor.sideBySide") }}</b-form-checkbox
+          >
+          <b-button
+            @click="save"
+            variant="primary"
+            style="margin-right: 0.5em"
+            :disabled="!nameState"
+          >
+            {{ $t("pageEditor.update") }}
+          </b-button>
+          <b-button @click="cancel" variant="secondary">
+            {{ $t("pageEditor.close") }}
+          </b-button>
+        </div>
       </div>
-    </div>
-    <attachments :attachmentSelectAction="addAttachmentLink" :page="page" />
-    <vue-markdown
+      <attachments :attachmentSelectAction="addAttachmentLink" :page="page" />
+      <vue-markdown
         :html="this.$store.state.application.info.allowHtml"
         :source="this.page.content"
         :postrender="renderMarkdown"
-        style="display: none;"
+        style="display: none"
       ></vue-markdown>
-  </b-container>
+    </b-container>
+    <draft-modal
+      v-if="draft != null"
+      :draft="draft"
+      :continueCallBack="continueDraft"
+      :resetCallBack="resetDraft"
+    />
+  </div>
 </template>
 
 <script>
@@ -26,16 +56,20 @@ import Attachments from "@/components/space/modal/Attachments.vue";
 import VueSimplemde from "vue-simplemde";
 import VueMarkdown from "vue-markdown";
 import axios from "axios";
+import { debounce } from "@/services/Utils.js";
+import DraftModal from "@/components/pageEditor/DraftModal.vue";
 export default {
   name: "PageEdit",
   components: {
     VueSimplemde,
     VueMarkdown,
     Attachments,
+    DraftModal,
   },
   data() {
     return {
       page: { content: "" },
+      draft: null,
       loaded: false,
       mdeConfig: {
         toolbar: [
@@ -78,7 +112,7 @@ export default {
     },
     simplemde() {
       return this.$refs.markdownEditor.simplemde;
-    }
+    },
   },
   methods: {
     init: async function () {
@@ -87,21 +121,54 @@ export default {
         return;
       }
 
-      var pageId = this.$route.params.pageId;
-
-      var pageRequest = await axios.get("/api/page/" + pageId, {
+      await this.loadPage();
+      await this.loadDraft();
+      if (this.draft != null) {
+        this.$bvModal.show("draft-modal");
+      } else {
+        this.loaded = true;
+        this.initHandlers();
+      }
+    },
+    continueDraft: async function () {
+      this.page.name = this.draft.name;
+      this.page.content = this.draft.content;
+      this.$bvModal.hide("draft-modal");
+      this.loaded = true;
+      this.initHandlers();
+    },
+    resetDraft: async function () {
+      this.$bvModal.hide("draft-modal");
+      this.draft = null;
+      await axios.delete(`/api/draft/${this.$route.params.pageId}`, {
         validateStatus: false,
       });
-      if (pageRequest.status != 200) {
+      this.loaded = true;
+      this.initHandlers();
+    },
+    loadPage: async function () {
+      var request = await axios.get(`/api/page/${this.$route.params.pageId}`, {
+        validateStatus: false,
+      });
+      if (request.status != 200) {
         this.$router.push("/error/unauthorized");
         return;
       }
 
-      this.page = pageRequest.data;
-      this.loaded = true;
-      setTimeout((self) => {
-          self.simplemde.codemirror.on("drop", self.dragAndDrop);
-        }, 1000, this);
+      this.page = request.data;
+    },
+    loadDraft: async function () {
+      var request = await axios.get(`/api/draft/${this.$route.params.pageId}`, {
+        validateStatus: false,
+      });
+
+      if (request.status == 404) return;
+      if (request.status != 200) {
+        this.$router.push("/error/unauthorized");
+        return;
+      }
+
+      this.draft = request.data;
     },
     save: async function () {
       var pageSaveRequest = await axios.put(
@@ -117,6 +184,11 @@ export default {
       }
       this.$router.push("/space/" + this.page.spaceKey + "/" + this.page.id);
     },
+    saveDraft: debounce(async function () {
+      await axios.put("/api/draft/" + this.page.id, this.page, {
+        validateStatus: false,
+      });
+    }, 1000),
     cancel: function () {
       this.$router.push("/space/" + this.page.spaceKey + "/" + this.page.id);
     },
@@ -136,6 +208,17 @@ export default {
       this.simplemde.codemirror.setSelection(cursor, cursor);
       this.simplemde.codemirror.replaceSelection(linkElement);
       this.$bvModal.hide("page-attachments-modal");
+    },
+    initHandlers: function () {
+      setTimeout(
+        (self) => {
+          self.simplemde.codemirror.on("drop", self.dragAndDrop);
+          // eslint-disable-next-line
+          self.simplemde.codemirror.on("change", (cm, ev) => self.saveDraft());
+        },
+        1000,
+        this
+      );
     },
     dragAndDrop: async function (codeMirror, dropEvent) {
       var self = this;
@@ -169,72 +252,88 @@ export default {
       }
     },
     isImageFile(data) {
-      return data.toLowerCase().endsWith(".png") ||
+      return (
+        data.toLowerCase().endsWith(".png") ||
         data.toLowerCase().endsWith(".jpg") ||
         data.toLowerCase().endsWith(".jpeg") ||
         data.toLowerCase().endsWith(".gif") ||
-        data.toLowerCase().endsWith(".svg");
+        data.toLowerCase().endsWith(".svg")
+      );
     },
     toggleSideBySide: function toggleSideBySide() {
-        var editor = this.simplemde;
-        var cm = this.simplemde.codemirror;
-        var wrapper = cm.getWrapperElement();
-        var preview = wrapper.nextSibling;
-        var useSideBySideListener = false;
-        if(/editor-preview-active-side/.test(preview.className)) {
-            preview.className = preview.className.replace(
-                /\s*editor-preview-active-side\s*/g, ""
-            );
-            wrapper.className = wrapper.className.replace(/\s*CodeMirror-sided\s*/g, " ");
-        } else {
-            // When the preview button is clicked for the first time,
-            // give some time for the transition from editor.css to fire and the view to slide from right to left,
-            // instead of just appearing.
-            setTimeout(function() {
-                preview.className += " editor-preview-active-side";
-            }, 1);
-            wrapper.className += " CodeMirror-sided";
-            useSideBySideListener = true;
-        }
+      var editor = this.simplemde;
+      var cm = this.simplemde.codemirror;
+      var wrapper = cm.getWrapperElement();
+      var preview = wrapper.nextSibling;
+      var useSideBySideListener = false;
+      if (/editor-preview-active-side/.test(preview.className)) {
+        preview.className = preview.className.replace(
+          /\s*editor-preview-active-side\s*/g,
+          ""
+        );
+        wrapper.className = wrapper.className.replace(
+          /\s*CodeMirror-sided\s*/g,
+          " "
+        );
+      } else {
+        // When the preview button is clicked for the first time,
+        // give some time for the transition from editor.css to fire and the view to slide from right to left,
+        // instead of just appearing.
+        setTimeout(function () {
+          preview.className += " editor-preview-active-side";
+        }, 1);
+        wrapper.className += " CodeMirror-sided";
+        useSideBySideListener = true;
+      }
 
-        // Hide normal preview if active
-        var previewNormal = wrapper.lastChild;
-        if(/editor-preview-active/.test(previewNormal.className)) {
-            previewNormal.className = previewNormal.className.replace(
-                /\s*editor-preview-active\s*/g, ""
-            );
-            var toolbar = editor.toolbarElements.preview;
-            var toolbar_div = wrapper.previousSibling;
-            toolbar.className = toolbar.className.replace(/\s*active\s*/g, "");
-            toolbar_div.className = toolbar_div.className.replace(/\s*disabled-for-preview*/g, "");
-        }
+      // Hide normal preview if active
+      var previewNormal = wrapper.lastChild;
+      if (/editor-preview-active/.test(previewNormal.className)) {
+        previewNormal.className = previewNormal.className.replace(
+          /\s*editor-preview-active\s*/g,
+          ""
+        );
+        var toolbar = editor.toolbarElements.preview;
+        var toolbar_div = wrapper.previousSibling;
+        toolbar.className = toolbar.className.replace(/\s*active\s*/g, "");
+        toolbar_div.className = toolbar_div.className.replace(
+          /\s*disabled-for-preview*/g,
+          ""
+        );
+      }
 
-        var sideBySideRenderingFunction = function() {
-            preview.innerHTML = editor.options.previewRender(editor.value(), preview);
-        };
+      var sideBySideRenderingFunction = function () {
+        preview.innerHTML = editor.options.previewRender(
+          editor.value(),
+          preview
+        );
+      };
 
-        if(!cm.sideBySideRenderingFunction) {
-            cm.sideBySideRenderingFunction = sideBySideRenderingFunction;
-        }
+      if (!cm.sideBySideRenderingFunction) {
+        cm.sideBySideRenderingFunction = sideBySideRenderingFunction;
+      }
 
-        if(useSideBySideListener) {
-            preview.innerHTML = editor.options.previewRender(editor.value(), preview);
-            cm.on("update", cm.sideBySideRenderingFunction);
-        } else {
-            cm.off("update", cm.sideBySideRenderingFunction);
-        }
+      if (useSideBySideListener) {
+        preview.innerHTML = editor.options.previewRender(
+          editor.value(),
+          preview
+        );
+        cm.on("update", cm.sideBySideRenderingFunction);
+      } else {
+        cm.off("update", cm.sideBySideRenderingFunction);
+      }
 
-        // Refresh to fix selection being off (#309)
-        cm.refresh();
+      // Refresh to fix selection being off (#309)
+      cm.refresh();
     },
     // eslint-disable-next-line
-    previewRender: function(plainText) {
-        return this.renderedMarkdown;
+    previewRender: function (plainText) {
+      return this.renderedMarkdown;
     },
-    renderMarkdown: function(html){
-        this.renderedMarkdown = html;
-        return html;
-    }
+    renderMarkdown: function (html) {
+      this.renderedMarkdown = html;
+      return html;
+    },
   },
   mounted: function () {
     this.init();
@@ -279,14 +378,14 @@ export default {
   }
 }
 .editor-preview-side {
-    height: calc(100vh - var(--page-edit-height, 240px));
-    top: 152.75px;
+  height: calc(100vh - var(--page-edit-height, 240px));
+  top: 152.75px;
 }
 .side-by-side-switch {
-    display: inline-block;
-    margin-right: 2em;
-    position: relative;
-    top: -3px;
+  display: inline-block;
+  margin-right: 2em;
+  position: relative;
+  top: -3px;
 }
 @media (max-width: 575px) {
   .side-by-side-switch {
