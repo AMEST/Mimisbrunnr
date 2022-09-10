@@ -34,6 +34,7 @@ public class MongoDbStoreModule : RunnableModule
                 .AddEntity<UserGroup, UserGroupMap>()
                 .AddEntity<Space, SpaceMap>()
                 .AddEntity<Page, PageMap>()
+                .AddEntity<Draft, DraftMap>()
                 .AddEntity<PageUpdateEvent, PageUpdateEventMap>()
                 .AddEntity<Attachment, AttachmentMap>()
         );
@@ -51,6 +52,7 @@ public class MongoDbStoreModule : RunnableModule
             await CreateUserGroupIndexes(baseMongoContext);
             await CreateSpaceIndexes(baseMongoContext);
             await CreatePageIndexes(baseMongoContext);
+            await CreatePageDraftIndexes(baseMongoContext);
             await CreatePageUpdatesIndexes(baseMongoContext);
             await CreateAttachmentIndexes(baseMongoContext);
         }
@@ -163,6 +165,17 @@ public class MongoDbStoreModule : RunnableModule
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<Page>(contentTitleFullTextSearch, new CreateIndexOptions()
         {
             Background = true
+        }));
+    }
+
+    private static async Task CreatePageDraftIndexes(IMongoDbContext mongoContext)
+    {
+        var collection = mongoContext.GetCollection<Draft>();
+        var pageDraftDefinition = Builders<Draft>.IndexKeys.Ascending(x => x.OriginalPageId);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Draft>(pageDraftDefinition, new CreateIndexOptions()
+        {
+            Background = true,
+            Unique = true
         }));
     }
 

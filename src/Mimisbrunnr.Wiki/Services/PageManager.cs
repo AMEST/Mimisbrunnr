@@ -8,11 +8,16 @@ internal class PageManager : IPageManager
 {
     private readonly IRepository<Page> _pageRepository;
     private readonly IAttachmentManager _attachmentManager;
+    private readonly IDraftManager _draftManager;
 
-    public PageManager(IRepository<Page> pageRepository, IAttachmentManager attachmentManager)
+    public PageManager(IRepository<Page> pageRepository,
+        IAttachmentManager attachmentManager,
+        IDraftManager draftManager
+    )
     {
         _pageRepository = pageRepository;
         _attachmentManager = attachmentManager;
+        _draftManager = draftManager;
     }
 
     public Task<Page[]> GetAllOnSpace(Space space)
@@ -80,11 +85,12 @@ internal class PageManager : IPageManager
         return page;
     }
 
-    public Task Update(Page page, UserInfo updatedBy)
+    public async Task Update(Page page, UserInfo updatedBy)
     {
         page.UpdatedBy = updatedBy;
         page.Updated = DateTime.UtcNow;
-        return _pageRepository.Update(page);
+        await _pageRepository.Update(page);
+        await _draftManager.Remove(page.Id);
     }
 
     public async Task<Page> Copy(Page source, Page destinationParentPage)
@@ -108,7 +114,7 @@ internal class PageManager : IPageManager
     public Task Remove(Page page, bool deleteChild = false)
     {
         if (deleteChild)
-            return RemoveRecuesively(page);
+            return RemoveRecursively(page);
         return RemoveOnlyPage(page);
     }
 
@@ -122,19 +128,22 @@ internal class PageManager : IPageManager
         }
         
         await RemoveAttachments(page);
+        await _draftManager.Remove(page.Id);
         await _pageRepository.Delete(page);
     }
 
-    private async Task RemoveRecuesively(Page page)
+    private async Task RemoveRecursively(Page page)
     {
         var allChilds = await GetAllChilds(page);
         foreach (var child in allChilds)
         {
             await RemoveAttachments(child);
+            await _draftManager.Remove(child.Id);
             await _pageRepository.Delete(child);
         }
 
         await RemoveAttachments(page);
+        await _draftManager.Remove(page.Id);
         await _pageRepository.Delete(page);
     }
 

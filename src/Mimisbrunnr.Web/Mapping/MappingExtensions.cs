@@ -177,6 +177,17 @@ public static class MappingExtensions
         return pageTree;
     }
 
+        public static DraftModel ToModel(this Draft draft)
+    {
+        return new DraftModel()
+        {
+            Name = draft.Name,
+            Content = draft.Content,
+            Updated = draft.Updated,
+            UpdatedBy = draft.UpdatedBy?.ToModel()
+        };
+    }
+
     public static UserPermissionModel ToModel(this Permission permission)
     {
         return new UserPermissionModel()
