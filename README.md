@@ -29,6 +29,7 @@ Support for the following features:
   - Add attachments to pages ( and simplify drag&drop files / images in editor)
   - Markdown page editor (with the ability to insert html code or disable rendering html inside markdown global in service)
   - Copy / move pages in space or between spaces
+  - Save changes to draft when editing a page (allows you to keep changes without publishing them and save changes in case of failure)
 - Base
   - Page updates feed on home page
   - Recently visited pages
