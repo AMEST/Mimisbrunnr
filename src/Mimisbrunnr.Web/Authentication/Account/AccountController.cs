@@ -10,6 +10,13 @@ namespace Mimisbrunnr.Web.Authentication.Account;
 [Authorize]
 public class AccountController : ControllerBase
 {
+    private readonly ITokenService _tokenService;
+
+    public AccountController(ITokenService tokenService)
+    {
+        _tokenService = tokenService;
+    }
+
     [HttpGet("login")]
     [AllowAnonymous]
     public IActionResult Login([FromQuery] string redirectUri = null)
@@ -34,5 +41,36 @@ public class AccountController : ControllerBase
     {
         await HttpContext.SignOutAsync();
         return Redirect("/");
+    }
+
+    [HttpGet("token")]
+    [ProducesResponseType(typeof(IEnumerable<TokenModel>), 200)]
+    [ProducesResponseType(401)]
+    public async Task<IActionResult> GetTokens()
+    {
+        var tokens = await _tokenService.GetUserTokens(User.ToEntity());
+        return Ok(tokens);
+    }
+
+    [HttpPost("token")]
+    [ProducesResponseType(typeof(TokenCreateResult), 200)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> CreateToken([FromBody] TokenCreateRequest request)
+    {
+        var token = await _tokenService.CreateUserToken(request, User.ToEntity());
+        if(token is null)
+            return BadRequest();
+
+        return Ok(token);
+    }
+
+    [HttpDelete("token/{id}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(401)]
+    public async Task<IActionResult> CreateToken([FromRoute] string id)
+    {
+        await _tokenService.Revoke(id, User.ToEntity());
+        return Ok();
     }
 }

@@ -1,25 +1,25 @@
-﻿using System.IO;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Net.Http.Headers;
+using Mimisbrunnr.Web.Host.Configuration;
 using Skidbladnir.Modules;
 
 namespace Mimisbrunnr.Web.Host.Services;
 
 public class AspNetModule : Module
 {
+    private const string JwtOrCookeSchemeName = "JWT_OR_COOKIE";
     public override void Configure(IServiceCollection services)
     {
+        var bearerConfiguration = Configuration.Get<BearerTokenConfiguration>();
         services.AddAuthentication(options =>
             {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.RequireAuthenticatedSignIn = false;
+                options.DefaultScheme = JwtOrCookeSchemeName;
+                options.DefaultChallengeScheme = JwtOrCookeSchemeName;
             })
-            .AddCookie(options =>
+            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
             {
                 options.Cookie.Name = "Mimisbrunnr";
                 options.Events.OnRedirectToAccessDenied =
@@ -29,9 +29,26 @@ public class AspNetModule : Module
                         return Task.FromResult<object>(null);
                     };
             })
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                options.TokenValidationParameters = TokenValidationParametersFactory.Create(bearerConfiguration);
+            })
             .AddOpenIdConnect(options =>
             {
                 Configuration.AppConfiguration.GetSection("Openid").Bind(options);
+            })
+            .AddPolicyScheme(JwtOrCookeSchemeName, JwtOrCookeSchemeName, options =>
+            {
+                options.ForwardDefaultSelector = context =>
+                {
+                    // filter by auth type
+                    string authorization = context.Request.Headers[HeaderNames.Authorization];
+                    if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith("Bearer "))
+                        return JwtBearerDefaults.AuthenticationScheme;
+
+                    // otherwise always check for cookie auth
+                    return CookieAuthenticationDefaults.AuthenticationScheme;
+                };
             });
         services.AddMemoryCache();
         services.AddControllers()

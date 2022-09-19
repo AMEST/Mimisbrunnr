@@ -37,6 +37,7 @@ public class MongoDbStoreModule : RunnableModule
                 .AddEntity<Draft, DraftMap>()
                 .AddEntity<PageUpdateEvent, PageUpdateEventMap>()
                 .AddEntity<Attachment, AttachmentMap>()
+                .AddEntity<UserToken, UserTokenMap>()
         );
         services.AddSingleton<IPageSearcher, PageSearcher>();
     }
@@ -55,6 +56,7 @@ public class MongoDbStoreModule : RunnableModule
             await CreatePageDraftIndexes(baseMongoContext);
             await CreatePageUpdatesIndexes(baseMongoContext);
             await CreateAttachmentIndexes(baseMongoContext);
+            await CreateUserTokenIndexes(baseMongoContext);
         }
         catch (Exception e)
         {
@@ -232,6 +234,17 @@ public class MongoDbStoreModule : RunnableModule
         {
             Background = true,
             Unique = true
+        }));
+    }
+
+    
+    private static async Task CreateUserTokenIndexes(IMongoDbContext mongoContext)
+    {
+        var collection = mongoContext.GetCollection<UserToken>();
+        var userTokenDefinition = Builders<UserToken>.IndexKeys.Ascending(x => x.UserId);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<UserToken>(userTokenDefinition, new CreateIndexOptions()
+        {
+            Background = true
         }));
     }
 }

@@ -7,6 +7,7 @@ using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Web.Feed;
 using Mimisbrunnr.Web.Group;
 using Mimisbrunnr.Web.Administration;
+using Mimisbrunnr.Web.Authentication.Account;
 
 namespace Mimisbrunnr.Web.Mapping;
 
@@ -129,7 +130,7 @@ public static class MappingExtensions
         };
     }
 
-    public static GroupModel ToModel(this Users.Group group , bool includeOwners = false)
+    public static GroupModel ToModel(this Users.Group group, bool includeOwners = false)
     {
         return new GroupModel()
         {
@@ -177,7 +178,7 @@ public static class MappingExtensions
         return pageTree;
     }
 
-        public static DraftModel ToModel(this Draft draft)
+    public static DraftModel ToModel(this Draft draft)
     {
         return new DraftModel()
         {
@@ -196,6 +197,22 @@ public static class MappingExtensions
             CanRemove = permission.CanRemove,
             CanView = permission.CanView,
             IsAdmin = permission.IsAdmin
+        };
+    }
+
+    public static IEnumerable<TokenModel> ToModel(this IEnumerable<UserToken> token)
+    {
+        return token.Select(x => x.ToModel());
+    }
+
+    public static TokenModel ToModel(this UserToken token)
+    {
+        return new TokenModel()
+        {
+            Id = token.Id,
+            Created = token.Created,
+            Expired = token.Expired,
+            Revoked = token.Revoked
         };
     }
 
@@ -226,7 +243,8 @@ public static class MappingExtensions
 
     public static AttachmentModel ToModel(this Attachment attachment)
     {
-        return new AttachmentModel(){
+        return new AttachmentModel()
+        {
             Name = attachment.Name,
             Created = attachment.Created,
             CreatedBy = attachment.CreatedBy?.ToModel()
@@ -235,7 +253,8 @@ public static class MappingExtensions
 
     public static ApplicationConfigurationModel ToModel(this ApplicationConfiguration applicationConfiguration)
     {
-        return new ApplicationConfigurationModel(){
+        return new ApplicationConfigurationModel()
+        {
             Title = applicationConfiguration.Title,
             AllowAnonymous = applicationConfiguration.AllowAnonymous,
             AllowHtml = applicationConfiguration.AllowHtml,
