@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Net.Http.Headers;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
 using Mimisbrunnr.Web.Host.Configuration;
 using Skidbladnir.Modules;
 
@@ -16,7 +18,7 @@ public class AspNetModule : Module
         var bearerConfiguration = Configuration.Get<BearerTokenConfiguration>();
         if(string.IsNullOrEmpty(bearerConfiguration.SymmetricKey))
             throw new ApplicationException("Bearer:SymmetricKey can't be null or empty");
-            
+
         services.AddAuthentication(options =>
             {
                 options.DefaultScheme = JwtOrCookeSchemeName;
@@ -67,6 +69,11 @@ public class AspNetModule : Module
             configuration.RootPath = "ClientApp/dist";
         });
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(options => {
+            options.MapType<TimeSpan>(() => new OpenApiSchema(){
+                Type = "string",
+                Example = new OpenApiString("02:00:00")
+            });
+        });
     }
 }
