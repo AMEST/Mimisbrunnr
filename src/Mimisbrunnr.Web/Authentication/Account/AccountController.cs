@@ -54,8 +54,8 @@ public class AccountController : ControllerBase
 
     [HttpPost("token")]
     [ProducesResponseType(typeof(TokenCreateResult), 200)]
+    [ProducesResponseType(400)]
     [ProducesResponseType(401)]
-    [ProducesResponseType(404)]
     public async Task<IActionResult> CreateToken([FromBody] TokenCreateRequest request)
     {
         var token = await _tokenService.CreateUserToken(request, User.ToEntity());

@@ -14,6 +14,9 @@ public class AspNetModule : Module
     public override void Configure(IServiceCollection services)
     {
         var bearerConfiguration = Configuration.Get<BearerTokenConfiguration>();
+        if(string.IsNullOrEmpty(bearerConfiguration.SymmetricKey))
+            throw new ApplicationException("Bearer:SymmetricKey can't be null or empty");
+            
         services.AddAuthentication(options =>
             {
                 options.DefaultScheme = JwtOrCookeSchemeName;

@@ -35,6 +35,7 @@ Support for the following features:
   - Recently visited pages
   - Search pages and spaces
   - Multi Language EN or RU
+  - Generating user tokens for token authentication (for direct access to api)
 - Profile
   - Profile page with avatar and last worked on
   - Settings _(Not implemented)_
@@ -79,6 +80,12 @@ All configuration may be configured in `appsettings.json` or in Environment vari
 * `Openid:ClientSecret` - client secret in openid provider 
 * `Openid:ResponseType` - oidc authentication response type (example: `code`)
 * `Openid:Scope` - array with oidc scope requested when authenticate. By default in index 0,1,2 values ("openid","profile","email") 
+
+Token authentication:
+
+* `Bearer:SymmetricKey` - symmetric key for jwt token sign
+* `Bearer:Issuer` - token issuer (default: `Mimisbrunnr`)
+* `Bearer:Audience` - token audience (default: `WebApi`)
 
 #### Database
 
@@ -144,6 +151,7 @@ services:
       - "Storage:ConnectionString=mongodb+srv://app:password@mongo-local/mimisbrunnr?retryWrites=true"
       - "Openid:ClientSecret=[Google client secret]"
       - "Openid:ClientId=[google client id]"
+      - "Bearer:SymmetricKey=McJmB7dRrfAg9pz6gbSufsds"
       - "Caching:Type=Redis"
       - "Caching:RedisConnectionString=redis-local"
       - "Persistent:Type=GridFs"
