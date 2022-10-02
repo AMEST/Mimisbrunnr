@@ -38,7 +38,7 @@ Support for the following features:
   - Generating user tokens for token authentication (for direct access to api)
 - Profile
   - Profile page with avatar and last worked on
-  - Settings _(Not implemented)_
+  - Settings (Manage personal api tokens, Profile settings _(Not implemented)_, Other settings _(Not implemented)_)
   - Favorites _(Not implemented)_
 - Administration
   - Change wiki instance title
