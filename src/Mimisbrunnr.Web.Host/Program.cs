@@ -22,6 +22,8 @@ builder.Services.AddSkidbladnirModules<StartupModule>(configuration =>
     configuration.Add(persistentConfig);
     var metricsConfiguration = builder.Configuration.GetSection("Metrics").Get<MetricsConfiguration>();
     configuration.Add(metricsConfiguration);
+    var bearerConfiguration = builder.Configuration.GetSection("Bearer").Get<BearerTokenConfiguration>();
+    configuration.Add(bearerConfiguration);
 }, builder.Configuration);
 
 

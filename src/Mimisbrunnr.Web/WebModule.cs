@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Administration;
+using Mimisbrunnr.Web.Authentication.Account;
 using Mimisbrunnr.Web.Customization;
 using Mimisbrunnr.Web.Feed;
 using Mimisbrunnr.Web.Group;
@@ -32,5 +33,6 @@ public class WebModule : Module
         services.AddSingleton<IApplicationConfigurationService, ApplicationConfigurationService>();
         services.AddSingleton<ICustomizationService, CustomizationService>();
         services.AddSingleton<IDraftService, DraftService>();
+        services.AddSingleton<ITokenService, TokenService>();
     }
 }

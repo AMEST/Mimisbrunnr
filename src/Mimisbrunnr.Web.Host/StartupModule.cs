@@ -6,6 +6,7 @@ using Mimisbrunnr.Web.Host.Configuration;
 using Mimisbrunnr.Web.Host.Services;
 using Mimisbrunnr.Web.Host.Services.Features;
 using Mimisbrunnr.Web.Host.Services.Metrics;
+using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Web.Wiki.Import;
 using Mimisbrunnr.Wiki;
@@ -26,11 +27,14 @@ public class StartupModule : Module
     public override void Configure(IServiceCollection services)
     {
         var mongoStoreConfiguration = Configuration.Get<MongoDbStoreModuleConfiguration>();
+        var bearerConfiguration = Configuration.Get<BearerTokenConfiguration>();
+        services.AddSingleton(bearerConfiguration);
         services.AddDataProtectionMongoDb(mongoStoreConfiguration.ConnectionString);
         services.AddSingleton<IAuthorizationHandler, EnsureUserAuthorizationHandler>();
         services.AddSingleton<IPermissionService, PermissionService>();
         services.AddSingleton<IFeatureService, FeatureService>();
         services.AddScoped<ISpaceImportService, ConfluenceSpaceImportService>();
+        services.AddSingleton<ISecurityTokenService, SecurityTokenService>();
         ConfigureDistributedCache(services);
     }
 

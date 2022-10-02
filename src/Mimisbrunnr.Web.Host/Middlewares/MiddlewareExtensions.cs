@@ -27,6 +27,7 @@ internal static class MiddlewareExtensions
     public static IApplicationBuilder UseUserValidationMiddleware(this IApplicationBuilder builder)
     {
         return builder.UseMiddleware<ValidateUserStateMiddleware>()
+                .UseMiddleware<ValidateTokenNotRevokedMiddleware>()
                 .MapWhen(
                     ctx => ctx.Request.Path.Value.Equals("/error/account-disabled", StringComparison.OrdinalIgnoreCase),
                     b => b.Run(async context =>
