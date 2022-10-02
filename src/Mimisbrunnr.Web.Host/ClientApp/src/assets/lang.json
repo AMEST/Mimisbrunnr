@@ -171,7 +171,25 @@
             }
         },
         "profile": {
-            "settings": "Settings",
+            "settings": {
+                "title": "Settings",
+                "tokens": {
+                    "title": "API tokens",
+                    "description": "Create and manage personal access tokens, for use api in script or automation's",
+                    "notBefore": "Valid from",
+                    "notAfter": "to",
+                    "revoke": "Revoke",
+                    "createNewDescription": "To issue a new token, specify its validity period in days. After issuance, keep the token with you as it will only appear once",
+                    "days": "Days",
+                    "create": "Create"
+                },
+                "profile": {
+                    "title": "Profile"
+                },
+                "other": {
+                    "title": "Other"
+                }
+            },
             "favorites": "Favorites",
             "additional": {
                 "title": "Additional information",
@@ -497,7 +515,25 @@
             }
         },
         "profile": {
-            "settings": "Настройки",
+            "settings": {
+                "title": "Настройки",
+                "tokens": {
+                    "title": "API Токены",
+                    "description": "Создавайте и управляйте персональными токенами доступа для использования API в скриптах или средствах автоматизации.",
+                    "notBefore": "Действителен с",
+                    "notAfter": "до",
+                    "revoke": "Отозвать",
+                    "createNewDescription": "Для выпуска нового токена, укажите время его действия в днях. После выпуска, сохраните токен у себя так как он отобразится только один раз",
+                    "days": "Дней",
+                    "create": "Создать"
+                },
+                "profile": {
+                    "title": "Профиль"
+                },
+                "other": {
+                    "title": "Прочее"
+                }
+            },
             "favorites": "Избранное",
             "additional": {
                 "title": "Дополнительная информация",
