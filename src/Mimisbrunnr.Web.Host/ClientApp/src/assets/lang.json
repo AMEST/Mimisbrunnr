@@ -181,7 +181,8 @@
                     "revoke": "Revoke",
                     "createNewDescription": "To issue a new token, specify its validity period in days. After issuance, keep the token with you as it will only appear once",
                     "days": "Days",
-                    "create": "Create"
+                    "create": "Create",
+                    "empty": "There are no issued tokens"
                 },
                 "profile": {
                     "title": "Profile"
@@ -247,7 +248,8 @@
                 "title": "Attachments",
                 "upload": "Upload",
                 "browse": "Browse",
-                "placeholder": "Choose a file"
+                "placeholder": "Choose a file",
+                "empty": "No attachments on this page"
             },
             "copy": {
                 "title": "Copy",
@@ -525,7 +527,8 @@
                     "revoke": "Отозвать",
                     "createNewDescription": "Для выпуска нового токена, укажите время его действия в днях. После выпуска, сохраните токен у себя так как он отобразится только один раз",
                     "days": "Дней",
-                    "create": "Создать"
+                    "create": "Создать",
+                    "empty": "Нет ни одного выпущенного токена"
                 },
                 "profile": {
                     "title": "Профиль"
@@ -591,7 +594,8 @@
                 "title": "Вложения",
                 "upload": "Загрузить",
                 "browse": "Выбрать",
-                "placeholder": "Выберите файл"
+                "placeholder": "Выберите файл",
+                "empty": "На этой странице нет вложений"
             },
             "copy": {
                 "title": "Копировать",

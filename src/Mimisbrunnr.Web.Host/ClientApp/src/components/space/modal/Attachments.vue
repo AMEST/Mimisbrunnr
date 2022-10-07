@@ -5,6 +5,7 @@
     centered
     :title="$t('page.attachments.title')"
   >
+    <b-alert v-if="this.attachments.length == 0" show variant="light">{{$t('page.attachments.empty')}}</b-alert>
     <b-list-group-item
       button
       v-for="attachment in this.attachments"

@@ -4,6 +4,7 @@
       :title="$t('profile.settings.tokens.title')"
       :sub-title="$t('profile.settings.tokens.description')"
     >
+      <b-alert v-if="this.tokens.length == 0" show variant="light">{{$t('profile.settings.tokens.empty')}}</b-alert>
       <b-list-group>
         <b-list-group-item
           button
