@@ -181,12 +181,15 @@ internal class PageService : IPageService
 
         await _permissionService.EnsureEditPermission(sourceSpace.Key, movedBy);
 
+        if (sourceSpace.HomePageId == sourcePage.Id)
+            throw new InvalidOperationException("Cannot move home page of space. Only copy allowed");
+
         var destinationSpace = sourcePage.SpaceId == destinationParentPage.SpaceId
             ? sourceSpace
             : await _spaceManager.GetById(destinationParentPage.SpaceId);
 
         if (sourceSpace.Status == SpaceStatus.Archived)
-            throw new InvalidOperationException("Can't move page because source space archived");
+            throw new InvalidOperationException("Can't move page because source space archived. Only copy allowed");
 
         if (destinationSpace.Status == SpaceStatus.Archived)
             throw new InvalidOperationException("Can't move page because destination space archived");
