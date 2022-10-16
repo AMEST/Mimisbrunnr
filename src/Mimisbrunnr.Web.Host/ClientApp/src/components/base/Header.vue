@@ -18,8 +18,8 @@
               >{{ $t("header.spacesDropdown.create") }}</b-dropdown-item
             >
           </b-nav-item-dropdown>
-          <b-nav-item v-if="this.$store.state.application.profile" to="/people" >
-              {{ $t("header.people") }}
+          <b-nav-item v-if="this.$store.state.application.profile" to="/people">
+            {{ $t("header.people") }}
           </b-nav-item>
           <b-button
             variant="light"
@@ -54,30 +54,34 @@
           </b-nav-form>
 
           <div v-if="!this.$store.state.application.profile">
-            <b-nav-item-dropdown style="display: inline-block" :text="$t('header.lang')" right>
+            <b-nav-item-dropdown
+              style="display: inline-block"
+              :text="$t('header.lang')"
+              right
+            >
               <b-dropdown-item v-on:click="$i18n.locale = 'en'">
-                {{
-                  $i18n.locale == "en" ? "⏵" : "&nbsp;&nbsp;&nbsp;&nbsp;"
-                }}
+                {{ $i18n.locale == "en" ? "⏵" : "&nbsp;&nbsp;&nbsp;&nbsp;" }}
                 English
               </b-dropdown-item>
               <b-dropdown-item v-on:click="$i18n.locale = 'ru'">
-                {{
-                  $i18n.locale == "ru" ? "⏵" : "&nbsp;&nbsp;&nbsp;&nbsp;"
-                }}
+                {{ $i18n.locale == "ru" ? "⏵" : "&nbsp;&nbsp;&nbsp;&nbsp;" }}
                 Русский
               </b-dropdown-item>
             </b-nav-item-dropdown>
-            <b-button style="display: inline-block" class="text-light" variant="link" @click="auth">{{
-              $t("header.login")
-            }}</b-button>
+            <b-button
+              style="display: inline-block"
+              class="text-light"
+              variant="link"
+              @click="auth"
+              >{{ $t("header.login") }}</b-button
+            >
           </div>
           <b-nav-item-dropdown v-else right class="custom-dropdown">
             <!-- Using 'button-content' slot -->
             <template #button-content>
               <b-avatar
                 class="avatar-bg"
-                :text="getInitials()"
+                :text="getUserInitials()"
                 :src="$store.state.application.profile.avatarUrl"
               ></b-avatar>
             </template>
@@ -123,6 +127,8 @@
 
 <script>
 import axios from "axios";
+import { getOrCreatePersonalSpace } from "@/services/profileService";
+import { getInitials } from "@/services/Utils";
 export default {
   name: "Header",
   data: function () {
@@ -140,64 +146,32 @@ export default {
     },
   },
   methods: {
-    getInitials: function () {
-      if (!this.$store.state.application.profile.name) return "";
-      var splited = this.$store.state.application.profile.name.split(" ");
-      if (splited.length > 1) return splited[0][0] + splited[1][0];
-      return splited[0][0];
-    },
     auth: function () {
       window.location.href =
         "/api/account/login?redirectUri=" + window.location.pathname;
     },
+    getUserInitials: function () {
+        return getInitials(this.$store.state.application.profile);
+    },
     goToPersonalSpace: async function () {
-      var personalSpaceKey = await this.getOrCreatePersonalSpace();
+      var personalSpaceKey = await getOrCreatePersonalSpace(
+        this.$store.state.application.profile
+      );
       this.$router.push("/space/" + personalSpaceKey);
     },
     create: async function () {
       var spaceKey = this.$route.params.key;
       var pageId = this.$route.params.pageId;
       if (spaceKey == null) {
-        spaceKey = await this.getOrCreatePersonalSpace();
+        spaceKey = await getOrCreatePersonalSpace(
+          this.$store.state.application.profile
+        );
       }
       if (pageId == null) {
         var spaceHomePageRequest = await axios.get("/api/space/" + spaceKey);
         pageId = spaceHomePageRequest.data.homePageId;
       }
       await this.createPage(spaceKey, pageId);
-    },
-    getOrCreatePersonalSpace: async function () {
-      var personalSpaceKey =
-        this.$store.state.application.profile.email.toUpperCase();
-      var getPersonalSpaceRequest = await axios.get(
-        "/api/space/" + personalSpaceKey,
-        {
-          validateStatus: false,
-        }
-      );
-      if (getPersonalSpaceRequest.status == 200) return personalSpaceKey;
-      var createPersonalSpaceRequest = await axios.post(
-        "/api/space",
-        {
-          key: personalSpaceKey,
-          name: this.$store.state.application.profile.name,
-          type: "Personal",
-          description: "my personal space",
-        },
-        {
-          validateStatus: false,
-        }
-      );
-      if (createPersonalSpaceRequest.status != 200) {
-        alert(
-          createPersonalSpaceRequest.statusText +
-            "\n" +
-            createPersonalSpaceRequest.data
-        );
-        // eslint-disable-next-line
-        throw new Exception();
-      }
-      return personalSpaceKey;
     },
     createPage: async function (spaceKey, parentPageId) {
       var newPage = {

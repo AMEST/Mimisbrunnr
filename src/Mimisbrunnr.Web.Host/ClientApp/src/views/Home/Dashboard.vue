@@ -22,31 +22,32 @@
         >
           <template #tabs-start>
             <br />
-            <h5 style="text-align: left">
-              {{$t("home.menu.discover")}}
-              <b-badge
-                @click="switchMenu"
-                href="#"
-                class="tabs-badge"
-                variant="primary"
-                ><b-icon icon="arrow-left-short" />
-              </b-badge>
-            </h5>
-            <br />
+            <b-badge
+              @click="switchMenu"
+              href="#"
+              class="tabs-badge"
+              variant="primary"
+              ><b-icon icon="arrow-left-short" />
+            </b-badge>
+            <ProfileBlock />
           </template>
-          <template #tabs-end v-if="this.$store.state.application.profile">
+
+          <Updates />
+          <RecentlyVisited />
+
+          <template #tabs-end>
+            <div class="nav-end"></div>
+            <!-- Temporary disable skeleton while my spaces not implemented
             <br />
             <h5 style="text-align: left">
               {{$t("home.menu.mySpaces")}}
               <b-link class="favorites-all-link" to="/favorites">{{$t("home.menu.allFavoritesSpaces")}}</b-link>
             </h5>
             <br />
-            <MySpaces />
+            <MySpaces /> 
+            -->
             <version />
           </template>
-
-          <Updates />
-          <RecentlyVisited />
         </b-tabs>
       </b-card>
     </b-container>
@@ -56,15 +57,15 @@
 <script>
 import Updates from "@/components/home/Updates.vue";
 import RecentlyVisited from "@/components/home/RecentlyVisited.vue";
-import MySpaces from "@/components/home/MySpaces.vue";
 import Version from "@/components/home/Version.vue";
+import ProfileBlock from "@/components/home/ProfileBlock.vue";
 export default {
   name: "Dashboard",
   components: {
     Updates,
     RecentlyVisited,
-    MySpaces,
     Version,
+    ProfileBlock,
   },
   data() {
     return {
@@ -111,6 +112,16 @@ export default {
   box-shadow: inset 0 0rem 0.5em rgba(0, 0, 0, 0.15) !important;
   background-color: rgb(247 247 247) !important;
 }
+.home-nav .nav-item {
+  background-color: #fff;
+  background-clip: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-top: unset;
+  border-bottom: unset;
+}
+.home-nav .nav-item .nav-link {
+    border-radius: unset;
+}
 @media (max-width: 860px) {
   .home-nav {
     position: fixed;
@@ -121,6 +132,10 @@ export default {
   background-color: rgba(9, 30, 66, 0.08) !important;
   color: #42526e !important;
 }
+.nav-end {
+    border-bottom: 1px solid rgba(0,0,0,.125);
+    width:100%;
+}
 .favorites-all-link {
   text-decoration: none;
   float: right;
@@ -129,6 +144,9 @@ export default {
   width: 35px;
   float: right;
   color: white !important;
+  position: relative;
+  top: -0.5em;
+  left: 21.5em;
 }
 .fixed-tabs-badge {
   position: fixed;
