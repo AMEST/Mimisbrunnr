@@ -34,6 +34,7 @@ import axios from "axios";
 import WorkedOn from "@/components/people/profile/WorkedOn.vue";
 import AdditionalInfo from "@/components/people/profile/AdditionalInfo.vue";
 import SettingsModal from "@/components/people/profile/SettingsModal.vue";
+import { getInitials } from "@/services/Utils";
 export default {
   components: { 
     WorkedOn,
@@ -56,10 +57,7 @@ export default {
   },
   methods: {
     getInitials: function () {
-      if (!this.profile.name) return "";
-      var splited = this.profile.name.split(" ");
-      if (splited.length > 1) return splited[0][0] + splited[1][0];
-      return splited[0][0];
+      return getInitials(this.profile);
     },
     loadProfile: async function () {
       if (!this.$route.params.email) return "";
@@ -161,6 +159,7 @@ export default {
   height: 8em;
   margin-top: -4em;
   background-color: #373a3c !important;
+  box-shadow: 0 0 0 5px #f4f5f7;
 }
 
 .profile-avatar-bg .b-avatar-text {
