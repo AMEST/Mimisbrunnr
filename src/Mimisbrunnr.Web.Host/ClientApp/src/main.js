@@ -51,8 +51,10 @@ if (recentlyVisited !== undefined) {
 // Restore Home menu close state
 var homeMenuClosed = window.localStorage['homeMenuClosed']
 if (homeMenuClosed !== undefined) {
-  var parsedHomeMenuClosed = JSON.parse(homeMenuClosed)
-  store.commit('changeHomeMenuClose', parsedHomeMenuClosed)
+    var parsedHomeMenuClosed = JSON.parse(homeMenuClosed)
+    store.commit('changeHomeMenuClose', parsedHomeMenuClosed)
+}else {
+    store.commit('changeHomeMenuClose', window.innerWidth <= 860)
 }
 var applicationInfoTask = axios.get('/api/quickstart').then(result => {
   if (result.data == null || result.status !== 200) {

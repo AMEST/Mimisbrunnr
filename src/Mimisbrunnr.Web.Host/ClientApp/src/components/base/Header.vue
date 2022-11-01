@@ -18,8 +18,9 @@
               >{{ $t("header.spacesDropdown.create") }}</b-dropdown-item
             >
           </b-nav-item-dropdown>
-          <b-nav-item v-if="this.$store.state.application.profile" to="/people">
-            {{ $t("header.people") }}
+          <b-nav-item v-if="this.$store.state.application.profile" to="/people" class="people">
+            <b-icon class="people-icon" icon="people-fill"></b-icon>
+            <span>{{ $t("header.people") }}</span>
           </b-nav-item>
           <b-button
             variant="light"
@@ -28,7 +29,8 @@
             @click="create"
             size="sm"
           >
-            {{ $t("header.pageCreateButton") }}
+            <b-icon class="create-icon" icon="plus"></b-icon>
+            <span>{{ $t("header.pageCreateButton") }}</span>
           </b-button>
         </b-navbar-nav>
         <!-- Right aligned nav items -->
@@ -151,7 +153,7 @@ export default {
         "/api/account/login?redirectUri=" + window.location.pathname;
     },
     getUserInitials: function () {
-        return getInitials(this.$store.state.application.profile);
+      return getInitials(this.$store.state.application.profile);
     },
     goToPersonalSpace: async function () {
       var personalSpaceKey = await getOrCreatePersonalSpace(
@@ -212,6 +214,31 @@ export default {
   margin-left: 7px;
   height: 32px;
   margin-top: 0.2em;
+}
+.create-button .create-icon {
+  display: none;
+}
+.create-button span {
+  padding-top: 0.5em;
+}
+@media (max-width: 834px) {
+  .create-button .create-icon {
+    display: unset;
+  }
+  .create-button span {
+    display: none;
+  }
+}
+.people .people-icon {
+    display: none;
+}
+@media (max-width: 764px) {
+  .people .people-icon {
+    display: unset;
+  }
+  .people span {
+    display: none;
+  }
 }
 </style>
 

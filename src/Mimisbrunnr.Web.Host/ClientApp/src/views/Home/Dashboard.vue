@@ -6,29 +6,28 @@
   >
     <b-container fluid class="full-size-container">
       <b-card no-body class="h-100vh">
-        <b-badge
+        <a
+          v-if="menuClosed"
           @click="switchMenu"
           href="#"
-          class="fixed-tabs-badge"
-          variant="primary"
-          ><b-icon icon="arrow-right-short" />
-        </b-badge>
+          class="circle-little-link fixed-tabs-badge"
+          ><b-icon width="1.7em" height="1.7em" icon="arrow-right-short" />
+        </a>
         <b-tabs
           pills
           card
           vertical
-          nav-class="home-nav"
+          :nav-class="['home-nav', menuClosed ? 'home-nav-closed':'']"
           active-nav-item-class="home-nav-active-item"
         >
           <template #tabs-start>
             <br />
-            <b-badge
+            <a
               @click="switchMenu"
               href="#"
-              class="tabs-badge"
-              variant="primary"
-              ><b-icon icon="arrow-left-short" />
-            </b-badge>
+              class="circle-little-link tabs-badge"
+              ><b-icon width="1.7em" height="1.7em"  icon="arrow-left-short" />
+            </a>
             <ProfileBlock />
           </template>
 
@@ -89,16 +88,10 @@ export default {
     switchMenu: function () {
       this.menuClosed = !this.menuClosed;
       this.$store.commit("changeHomeMenuClose", this.menuClosed);
-      document.getElementsByClassName("home-nav")[0].hidden = this.menuClosed;
     },
   },
   mounted: function () {
-    if (window.innerWidth > 860) {
-      this.$store.commit("changeHomeMenuClose", false);
-      return;
-    }
     this.menuClosed = this.$store.state.application.homeMenuClosed;
-    document.getElementsByClassName("home-nav")[0].hidden = this.menuClosed;
   },
 };
 </script>
@@ -111,6 +104,11 @@ export default {
   text-align: left;
   box-shadow: inset 0 0rem 0.5em rgba(0, 0, 0, 0.15) !important;
   background-color: rgb(247 247 247) !important;
+}
+.home-nav-closed {
+    max-width: 0.5em !important;
+    content-visibility: hidden !important;
+    position: initial !important;
 }
 .home-nav .nav-item {
   background-color: #fff;
@@ -140,28 +138,27 @@ export default {
   text-decoration: none;
   float: right;
 }
+.circle-little-link 
+{
+    display: block;
+    width: 25px;
+    height: 25px;
+    border-radius: 25px;
+    background-color: #2780e3;
+    line-height: 25px;
+}
 .tabs-badge {
-  width: 35px;
   float: right;
   color: white !important;
   position: relative;
   top: -0.5em;
-  left: 21.5em;
+  left: 16.5em;
 }
 .fixed-tabs-badge {
   position: fixed;
   z-index: 5;
-  width: 35px;
   color: white !important;
   margin-top: 2.5em;
-  margin-left: 0.3em;
-}
-@media (min-width: 860px) {
-  .tabs-badge {
-    display: none !important;
-  }
-  .fixed-tabs-badge {
-    display: none !important;
-  }
+  margin-left: 0.4em;
 }
 </style>
