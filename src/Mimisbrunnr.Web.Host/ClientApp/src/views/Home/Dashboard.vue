@@ -91,6 +91,7 @@ export default {
     },
   },
   mounted: function () {
+    document.title = `Dashboard - ${this.$store.state.application.info.title}`;
     this.menuClosed = this.$store.state.application.homeMenuClosed;
   },
 };
@@ -148,6 +149,7 @@ export default {
     line-height: 25px;
 }
 .tabs-badge {
+  z-index: 5;
   float: right;
   color: white !important;
   position: relative;

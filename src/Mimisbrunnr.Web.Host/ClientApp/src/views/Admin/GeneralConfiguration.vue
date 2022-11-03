@@ -103,6 +103,7 @@ export default {
     },
   },
   mounted: async function () {
+    document.title = `${this.$store.state.application.info.title}`;
     if (
       !this.$store.state.application.profile ||
       !this.$store.state.application.profile.isAdmin

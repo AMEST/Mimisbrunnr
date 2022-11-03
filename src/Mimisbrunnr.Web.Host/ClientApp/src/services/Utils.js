@@ -11,8 +11,12 @@ export function debounce(fn, delay) {
 }
 
 export function getInitials(profile) {
-    if (!profile.name) return "";
-    var splited = profile.name.split(" ");
+    return getNameInitials(profile.name);
+}
+
+export function getNameInitials(name) {
+    if (!name) return "";
+    var splited = name.split(" ");
     if (splited.length > 1) return splited[0][0] + splited[1][0];
     return splited[0][0];
 }

@@ -1,7 +1,7 @@
 <template>
   <b-col sm="4" md="auto" class="space-menu">
     <div class="space-menu-title space-menu-bottom-line">
-      <b-avatar class="space-avatar-bg" :text="getInitials()"></b-avatar>
+      <b-avatar class="space-avatar-bg" :text="getSpaceNameInitials()"></b-avatar>
       <b-link :to="'/space/' + this.space.key">{{ this.space.name }}</b-link>
     </div>
     <div class="mt-3 pb-3 space-menu-bottom-line" v-if="this.space.description">
@@ -60,7 +60,7 @@
 <script>
 import axios from "axios";
 import { VueTreeList, Tree } from "vue-tree-list";
-
+import { getInitials } from "@/services/Utils";
 export default {
   name: "Menu",
   components: {
@@ -78,11 +78,9 @@ export default {
     userPermissions: Object,
   },
   methods: {
-    getInitials: function () {
+    getSpaceNameInitials: function () {
       if (!this.space) return "";
-      var splited = this.space.name.split(" ");
-      if (splited.length > 1) return splited[0][0] + splited[1][0];
-      return splited[0][0];
+      return getInitials(this.space.name);
     },
     loadHomePage: async function () {
       var homePageRequest = await axios.get(

@@ -33,6 +33,7 @@ export default {
     },
     mounted: function () {
         this.ensureAnonymous();
+        document.title = `${this.$store.state.application.info.title}`;
     }
 }
 </script>

@@ -23,7 +23,10 @@ export default {
                     return "Unknown error";
             }
         },
-    }
+    },
+    mounted () {
+        document.title = `Error - ${this.$store.state.application.info.title}`;
+    },
 }
 </script>
 

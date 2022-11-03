@@ -145,6 +145,7 @@ export default {
       });
       this.loaded = true;
       this.initHandlers();
+      document.title = `${this.page.name} - ${this.$store.state.application.info.title}`;
     },
     loadPage: async function () {
       var request = await axios.get(`/api/page/${this.$route.params.pageId}`, {

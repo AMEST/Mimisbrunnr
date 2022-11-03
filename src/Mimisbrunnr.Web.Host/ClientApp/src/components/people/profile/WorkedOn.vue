@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import { getUserFeed } from '@/services/feedService';
 export default {
   name: "WorkedOn",
   data() {
@@ -35,8 +35,7 @@ export default {
   methods: {
     init: async function () {
       if (this.$route.params.email == null) return;
-      var feedRequest = await axios.get("/api/feed/" + this.$route.params.email);
-      this.workedOn = feedRequest.data;
+      this.workedOn = await getUserFeed(this.$route.params.email);
       this.loaded = true;
     },
   },

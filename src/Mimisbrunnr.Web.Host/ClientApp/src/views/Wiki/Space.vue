@@ -110,7 +110,8 @@ export default {
         key: this.page.spaceKey,
         date: Date.now(),
         type: "Page"
-      })
+      });
+      this.changePageTitle();
       return true;
     },
     loadPageTree: async function () {
@@ -125,8 +126,16 @@ export default {
       this.pageTree = pageTreeRequest.data;
       return true;
     },
+    changePageTitle: function(){
+      if(!this.space && !this.page) return;
+      if(this.space.homePageId == this.page.id)
+        document.title = `${this.space.name} - ${this.$store.state.application.info.title}`;
+      else
+        document.title = `${this.page.name} - ${this.$store.state.application.info.title}`;
+    }
   },
   mounted: function () {
+    document.title = `Space - ${this.$store.state.application.info.title}`;
     this.init();
   },
   watch: {
@@ -140,8 +149,9 @@ export default {
     "$route.params.pageId": function (to, from) {
       // eslint-disable-next-line
       console.log("Page id change from " + from + " to " + to);
-      if(this.loaded)
+      if(this.loaded){
         this.loadPage();
+      }
     },
   },
 };

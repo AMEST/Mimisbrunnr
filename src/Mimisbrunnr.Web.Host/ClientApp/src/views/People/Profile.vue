@@ -74,6 +74,7 @@ export default {
         return;
       }
       this.profile = profileRequest.data;
+      document.title = `${this.profile.name} - ${this.$store.state.application.info.title}`;
     },
     ensureAnonymous: function () {
       if (this.isAnonymous) {

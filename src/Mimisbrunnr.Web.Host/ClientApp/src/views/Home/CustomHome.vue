@@ -43,6 +43,8 @@ export default {
       return;
     }
 
+    document.title = this.$store.state.application.info.title;
+
     var customHomeRequest = await axios.get("/api/Customization/homepage", {
       validateStatus: false,
     });
