@@ -54,6 +54,7 @@
             id="create-space-description"
             v-model="form.description"
             :placeholder="$t('spaceCreate.fields.description.placeholder')"
+            required
           ></b-form-textarea>
         </b-form-group>
 
@@ -107,9 +108,7 @@ export default {
   },
   computed: {
     keyValidation() {
-      return this.form.key.length > 1 && this.form.key.length <= 24
-        ? true
-        : false;
+      return this.form.key.length > 1 && this.form.key.length <= 24;
     },
   },
   methods: {

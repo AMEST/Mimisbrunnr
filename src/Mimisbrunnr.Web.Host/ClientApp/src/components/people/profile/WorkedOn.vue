@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { getUserFeed } from '@/services/feedService';
+import FeedService from "@/services/feedService";
 export default {
   name: "WorkedOn",
   data() {
@@ -35,7 +35,7 @@ export default {
   methods: {
     init: async function () {
       if (this.$route.params.email == null) return;
-      this.workedOn = await getUserFeed(this.$route.params.email);
+      this.workedOn = await FeedService.getUserFeed(this.$route.params.email);
       this.loaded = true;
     },
   },

@@ -145,7 +145,6 @@ export default {
       });
       this.loaded = true;
       this.initHandlers();
-      document.title = `${this.page.name} - ${this.$store.state.application.info.title}`;
     },
     loadPage: async function () {
       var request = await axios.get(`/api/page/${this.$route.params.pageId}`, {
@@ -211,6 +210,7 @@ export default {
       this.$bvModal.hide("page-attachments-modal");
     },
     initHandlers: function () {
+      document.title = `${this.page.name} - ${this.$store.state.application.info.title}`;
       setTimeout(
         (self) => {
           self.simplemde.codemirror.on("drop", self.dragAndDrop);

@@ -60,7 +60,9 @@ export default {
     document.title = `${this.$t("spaceDirectory.title")} - ${
       this.$store.state.application.info.title
     }`;
-    var spacesRequest = await axios.get("/api/space");
+    var spacesRequest = await axios.get("/api/space", {
+        validateStatus: false,
+    });
     if (spacesRequest.status == 200) this.spaces = spacesRequest.data;
   },
 };

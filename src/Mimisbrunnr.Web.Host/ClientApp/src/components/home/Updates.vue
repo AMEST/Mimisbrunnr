@@ -44,7 +44,7 @@
 
 <script>
 import { getNameInitials } from "@/services/Utils";
-import { getFeed } from "@/services/feedService";
+import FeedService from "@/services/feedService";
 export default {
   name: "Updates",
   data() {
@@ -59,7 +59,7 @@ export default {
     },
   },
   mounted: async function () {
-    this.updates = await getFeed();
+    this.updates = await FeedService.getFeed();
     this.loaded = true;
   },
 };

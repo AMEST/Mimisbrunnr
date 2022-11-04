@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { getOrCreatePersonalSpace } from "@/services/profileService";
+import ProfileService from "@/services/profileService";
 import { getInitials } from "@/services/Utils";
 export default {
   name: "ProfileBlock",
@@ -52,7 +52,7 @@ export default {
       return getInitials(this.$store.state.application.profile);
     },
     goToPersonalSpace: async function () {
-      var personalSpaceKey = await getOrCreatePersonalSpace(
+      var personalSpaceKey = await ProfileService.getOrCreatePersonalSpace(
         this.$store.state.application.profile
       );
       this.$router.push("/space/" + personalSpaceKey);

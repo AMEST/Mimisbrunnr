@@ -8,7 +8,7 @@
     <b-list-group class="pt-3">
       <b-list-group-item 
         button 
-        v-for="h in this.$store.state.application.history" 
+        v-for="h in visited" 
         :key="h.id"
         v-on:click="go('/space/' + h.key + ( h.type == 'Space' ? '' : '/' + h.id ))"
         >
@@ -24,10 +24,18 @@
 <script>
 export default {
   name: "RecentlyVisited",
+  computed: {
+    visited() {
+        return this.$store.state.application.history.slice(0).sort(this.sortDateAsc);
+    }
+  },
   methods: {
     go: function(route) {
       this.$router.push(route)
     },
+    sortDateAsc: function(a, b) {
+        return b.date - a.date;
+    }
   },
 };
 </script>
