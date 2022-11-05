@@ -52,8 +52,8 @@ export default new Vuex.Store({
       for (let h of state.application.history) {
         if (payload.id === h.id) return
       }
-      if (state.application.history.length > 15) {
-        var sliceAt = state.application.history.length - 15
+      if (state.application.history.length > 31) {
+        var sliceAt = state.application.history.length - 31
         state.application.history = state.application.history.slice(sliceAt, state.application.history.length)
       }
       state.application.history.push(payload)

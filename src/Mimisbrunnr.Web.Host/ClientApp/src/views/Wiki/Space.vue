@@ -23,6 +23,7 @@ import MovePage from "@/components/space/modal/MovePage.vue";
 import Permissions from "@/components/space/modal/Permissions.vue";
 import Settings from "@/components/space/modal/Settings.vue";
 import Attachments from "@/components/space/modal/Attachments.vue";
+import { showToast } from "@/services/Utils";
 export default {
   name: "Space",
   components:{
@@ -75,7 +76,7 @@ export default {
       var permissionsRequest = await axios.get("/api/space/" + key + "/permission", {
         validateStatus: false,
       });
-      if (spacesRequest.status != 200) {
+      if (permissionsRequest.status != 200) {
         this.$router.push("/error/unauthorized");
         return false;
       }
@@ -99,7 +100,7 @@ export default {
         validateStatus: false,
       });
       if (pageRequest.status != 200 || pageRequest.data.spaceKey != this.space.key) {
-        this.$router.push("/error/unknown");
+        this.$router.push("/error/notfound");
         return false;
       }
 
@@ -119,7 +120,8 @@ export default {
         validateStatus: false,
       });
       if (pageTreeRequest.status != 200) {
-        this.$router.push("/error/unknown");
+        showToast(`${pageTreeRequest.statusText} (${pageTreeRequest.status})`,
+            "Can't load page tree for this space", "danger");
         return false;
       }
 
