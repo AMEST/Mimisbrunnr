@@ -33,7 +33,8 @@
 </template>
 
 <script>
-import axios from "axios";
+import ProfileService from "@/services/profileService";
+import { getNameInitials } from "@/services/Utils";
 export default {
   name: "Users",
   data() {
@@ -44,30 +45,13 @@ export default {
   },
   methods: {
     getInitials: function (username) {
-      if (!username) return "";
-      var splited = username.split(" ");
-      if (splited.length > 1) return splited[0][0] + splited[1][0];
-      return splited[0][0];
+        return getNameInitials(username);
     },
     loadUsers: async function () {
       this.loading = true;
-      var usersRequest = await axios.get(
-        `/api/user?offset=${this.users.length}`,
-        { validateStatus: false }
-      );
-      if (usersRequest.status != 200) {
-        this.$bvToast.toast(
-          `status:${usersRequest.status}.${JSON.stringify(usersRequest.data)}`,
-          {
-            title: "Error when getting users.",
-            variant: "warning",
-            solid: true,
-          }
-        );
-        this.loading = false;
-        return;
-      }
-      for (let user of usersRequest.data) this.users.push(user);
+      var usersList = await ProfileService.getUsers(this.users.length);
+      if(usersList == null) return;
+      for (let user of usersList) this.users.push(user);
       this.loading = false;
     },
   },
@@ -90,6 +74,7 @@ export default {
   margin-right: 1em;
   margin-top: 1em;
   cursor: pointer;
+  overflow: hidden;
 }
 .people-card .avatar-bg {
   width: 72px;

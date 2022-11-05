@@ -23,7 +23,7 @@ internal class ValidateTokenNotRevokedMiddleware
             return;
         }
 
-        if(await securityTokenService.EnsureTokenNotRevoked(authorization.Replace("Bearer ", "")))
+        if (await securityTokenService.EnsureTokenNotRevoked(authorization.Replace("Bearer ", "")))
         {
             await _next(context);
             return;

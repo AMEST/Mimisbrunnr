@@ -4,7 +4,7 @@
       <Menu :space="space" :pageTree="pageTree" :userPermissions="userPermissions"/>
       <Page :space="space" :page="page" :userPermissions="userPermissions"/>
     </b-row>
-    <delete-page v-if="userPermissions && userPermissions.canRemove"/>
+    <delete-page v-if="userPermissions && userPermissions.canRemove" :pageDeletedCallback="loadPageTree"/>
     <copy-page v-if="userPermissions && userPermissions.canEdit"/>
     <move-page v-if="userPermissions && userPermissions.canEdit && userPermissions.canRemove"/>
     <permissions v-if="userPermissions && userPermissions.isAdmin"/>

@@ -1,3 +1,6 @@
+import { BToast } from 'bootstrap-vue'
+var bootStrapToaster = null;
+
 export function debounce(fn, delay) {
     var timeoutID = null
     return function () {
@@ -19,4 +22,15 @@ export function getNameInitials(name) {
     var splited = name.split(" ");
     if (splited.length > 1) return splited[0][0] + splited[1][0];
     return splited[0][0];
+}
+
+export function showToast(message, title, variant){
+    if(bootStrapToaster == null)
+        bootStrapToaster = new BToast();
+
+    bootStrapToaster.$bvToast.toast(message, {
+        title: title,
+        variant: variant,
+        solid: true
+      });
 }
