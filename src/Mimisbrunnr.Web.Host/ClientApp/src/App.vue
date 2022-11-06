@@ -18,6 +18,7 @@ import SpaceCreateModal from "@/components/base/SpaceCreateModal.vue";
 import Quickstart from "@/components/quickstart/Quickstart.vue";
 import axios from "axios";
 import SearchBar from '@/components/search/SearchBar.vue';
+import ProfileService from "@/services/profileService";
 export default {
   components: {
     Header,
@@ -31,13 +32,8 @@ export default {
   }),
   created: async function () {
     var initializedRequest = await axios.get("/api/quickstart/initialize");
-    var currentAccountRequest = await axios.get("/api/user/current", {
-      validateStatus: false,
-    });
-
-    if (
-      (currentAccountRequest.status == 401 ||
-        currentAccountRequest.status == 404) &&
+    var currentAccount = await ProfileService.getCurrentUser();
+    if (currentAccount == null &&
       (!initializedRequest.data.isInitialized ||
         !this.$store.state.application.info.allowAnonymous)
     ) {
@@ -46,8 +42,7 @@ export default {
       return;
     }
 
-    if (currentAccountRequest.status == 200)
-      this.$store.commit("changeProfile", currentAccountRequest.data);
+    this.$store.commit("changeProfile", currentAccount);
 
     this.loaded = true;
     this.initialized = initializedRequest.data.isInitialized;

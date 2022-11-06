@@ -79,6 +79,7 @@
 <script>
 import Menu from "@/components/admin/Menu.vue";
 import axios from "axios";
+import ProfileService from "@/services/profileService";
 export default {
   name: "GeneralConfiguration",
   components: {
@@ -103,10 +104,8 @@ export default {
     },
   },
   mounted: async function () {
-    if (
-      !this.$store.state.application.profile ||
-      !this.$store.state.application.profile.isAdmin
-    ) {
+    document.title = `${this.$store.state.application.info.title}`;
+    if (!ProfileService.isAdmin()) {
       this.$router.push("/error/unauthorized");
       return;
     }

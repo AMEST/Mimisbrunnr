@@ -18,12 +18,15 @@ export default {
                 case "notfound":
                     return "404 Resource not found";
                 case "unauthorized":
-                    return "Not found or user has no permissions";
+                    return "User not authorized or user hasn't permissions";
                 default:
                     return "Unknown error";
             }
         },
-    }
+    },
+    mounted () {
+        document.title = `Error - ${this.$store.state.application.info.title}`;
+    },
 }
 </script>
 

@@ -4,7 +4,7 @@
       <Menu :space="space" :pageTree="pageTree" :userPermissions="userPermissions"/>
       <Page :space="space" :page="page" :userPermissions="userPermissions"/>
     </b-row>
-    <delete-page v-if="userPermissions && userPermissions.canRemove"/>
+    <delete-page v-if="userPermissions && userPermissions.canRemove" :pageDeletedCallback="loadPageTree"/>
     <copy-page v-if="userPermissions && userPermissions.canEdit"/>
     <move-page v-if="userPermissions && userPermissions.canEdit && userPermissions.canRemove"/>
     <permissions v-if="userPermissions && userPermissions.isAdmin"/>
@@ -23,6 +23,7 @@ import MovePage from "@/components/space/modal/MovePage.vue";
 import Permissions from "@/components/space/modal/Permissions.vue";
 import Settings from "@/components/space/modal/Settings.vue";
 import Attachments from "@/components/space/modal/Attachments.vue";
+import { showToast } from "@/services/Utils";
 export default {
   name: "Space",
   components:{
@@ -75,7 +76,7 @@ export default {
       var permissionsRequest = await axios.get("/api/space/" + key + "/permission", {
         validateStatus: false,
       });
-      if (spacesRequest.status != 200) {
+      if (permissionsRequest.status != 200) {
         this.$router.push("/error/unauthorized");
         return false;
       }
@@ -99,7 +100,7 @@ export default {
         validateStatus: false,
       });
       if (pageRequest.status != 200 || pageRequest.data.spaceKey != this.space.key) {
-        this.$router.push("/error/unknown");
+        this.$router.push("/error/notfound");
         return false;
       }
 
@@ -110,7 +111,8 @@ export default {
         key: this.page.spaceKey,
         date: Date.now(),
         type: "Page"
-      })
+      });
+      this.changePageTitle();
       return true;
     },
     loadPageTree: async function () {
@@ -118,15 +120,24 @@ export default {
         validateStatus: false,
       });
       if (pageTreeRequest.status != 200) {
-        this.$router.push("/error/unknown");
+        showToast(`${pageTreeRequest.statusText} (${pageTreeRequest.status})`,
+            "Can't load page tree for this space", "danger");
         return false;
       }
 
       this.pageTree = pageTreeRequest.data;
       return true;
     },
+    changePageTitle: function(){
+      if(!this.space && !this.page) return;
+      if(this.space.homePageId == this.page.id)
+        document.title = `${this.space.name} - ${this.$store.state.application.info.title}`;
+      else
+        document.title = `${this.page.name} - ${this.$store.state.application.info.title}`;
+    }
   },
   mounted: function () {
+    document.title = `Space - ${this.$store.state.application.info.title}`;
     this.init();
   },
   watch: {
@@ -140,8 +151,9 @@ export default {
     "$route.params.pageId": function (to, from) {
       // eslint-disable-next-line
       console.log("Page id change from " + from + " to " + to);
-      if(this.loaded)
+      if(this.loaded){
         this.loadPage();
+      }
     },
   },
 };

@@ -30,10 +30,11 @@
 </template>
 
 <script>
-import axios from "axios";
 import WorkedOn from "@/components/people/profile/WorkedOn.vue";
 import AdditionalInfo from "@/components/people/profile/AdditionalInfo.vue";
 import SettingsModal from "@/components/people/profile/SettingsModal.vue";
+import UserService from "@/services/userService";
+import ProfileService from "@/services/profileService";
 import { getInitials } from "@/services/Utils";
 export default {
   components: { 
@@ -51,47 +52,39 @@ export default {
     itsMe() {
       return this.$store.state.application.profile.email == this.profile.email;
     },
-    isAnonymous() {
-      return this.$store.state.application.profile == undefined;
-    },
   },
   methods: {
     getInitials: function () {
       return getInitials(this.profile);
     },
     loadProfile: async function () {
-      if (!this.$route.params.email) return "";
-      var profileRequest = await axios.get(
-        "/api/user/" + this.$route.params.email,
-        { validateStatus: false }
-      );
-      if (profileRequest.status == 404) {
+      if (!this.$route.params.email) return;
+      var profile = await UserService.getUser(this.$route.params.email);
+      if (profile == null) {
         this.$router.push("/error/notfound");
         return;
       }
-      if (profileRequest.status != 200) {
-        this.$router.push("/error/unknown");
-        return;
-      }
-      this.profile = profileRequest.data;
+      this.profile = profile;
+      document.title = `${profile.name} - ${this.$store.state.application.info.title}`;
     },
     ensureAnonymous: function () {
-      if (this.isAnonymous) {
+      if (ProfileService.isAnonymous()) {
         this.$router.push("/error/unauthorized");
-        return;
+        return true;
       }
+      return false;
     },
   },
   watch: {
     // eslint-disable-next-line
     "$route.params.email": function (to, from) {
       // eslint-disable-next-line
-      this.ensureAnonymous();
+      if(this.ensureAnonymous()) return;
       this.loadProfile();
     },
   },
   mounted: function () {
-    this.ensureAnonymous();
+    if(this.ensureAnonymous()) return;
     this.loadProfile();
   },
 };

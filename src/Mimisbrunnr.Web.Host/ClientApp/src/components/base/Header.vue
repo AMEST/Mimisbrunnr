@@ -129,7 +129,7 @@
 
 <script>
 import axios from "axios";
-import { getOrCreatePersonalSpace } from "@/services/profileService";
+import ProfileService from "@/services/profileService";
 import { getInitials } from "@/services/Utils";
 export default {
   name: "Header",
@@ -156,7 +156,7 @@ export default {
       return getInitials(this.$store.state.application.profile);
     },
     goToPersonalSpace: async function () {
-      var personalSpaceKey = await getOrCreatePersonalSpace(
+      var personalSpaceKey = await ProfileService.getOrCreatePersonalSpace(
         this.$store.state.application.profile
       );
       this.$router.push("/space/" + personalSpaceKey);
@@ -165,7 +165,7 @@ export default {
       var spaceKey = this.$route.params.key;
       var pageId = this.$route.params.pageId;
       if (spaceKey == null) {
-        spaceKey = await getOrCreatePersonalSpace(
+        spaceKey = await ProfileService.getOrCreatePersonalSpace(
           this.$store.state.application.profile
         );
       }

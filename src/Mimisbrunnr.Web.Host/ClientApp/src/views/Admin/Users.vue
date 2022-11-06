@@ -70,7 +70,8 @@
 
 <script>
 import Menu from "@/components/admin/Menu.vue";
-import axios from "axios";
+import ProfileService from "@/services/profileService";
+import UserService from "@/services/userService";
 export default {
   name: "UsersAdministration",
   components: {
@@ -103,100 +104,38 @@ export default {
   methods: {
     loadUsers: async function () {
       this.loading = true;
-      var request = await axios.get(`/api/user?offset=${this.users.length}`, {
-        validateStatus: false,
-      });
-      if (request.status != 200) {
-        this.$bvToast.toast(
-          `status:${request.status}.${JSON.stringify(request.data)}`,
-          {
-            title: "Error when getting users.",
-            variant: "warning",
-            solid: true,
-          }
-        );
+      var usersList = await UserService.getUsers(this.users.length);
+      if(usersList == null) {
         this.loading = false;
         return;
       }
-      for (let user of request.data) {
-        this.users.push(user);
-      }
+      for (let user of usersList) this.users.push(user);
       this.loading = false;
     },
     promote: async function (email) {
-        var request = await axios.post(`/api/user/${email}/promote`, {
-            validateStatus: false,
-        });
-        if(request.status == 200){
-            this.users.filter( x => x.email == email)[0].isAdmin = true;
-            return;
-        }
-        this.$bvToast.toast(
-          `status:${request.status}.${JSON.stringify(request.data)}`,
-          {
-            title: "Error when promote user.",
-            variant: "warning",
-            solid: true,
-          }
-        );
+        var promoted = await UserService.promote(email);
+        if(!promoted) return;
+        this.users.filter( x => x.email == email)[0].isAdmin = true;
     },
     demote: async function (email) {
-        var request = await axios.post(`/api/user/${email}/demote`, {
-            validateStatus: false,
-        });
-        if(request.status == 200){
-            this.users.filter( x => x.email == email)[0].isAdmin = false;
-            return;
-        }
-        this.$bvToast.toast(
-          `status:${request.status}.${JSON.stringify(request.data)}`,
-          {
-            title: "Error when demote user.",
-            variant: "warning",
-            solid: true,
-          }
-        );
+        var demoted = await UserService.demote(email);
+        if(!demoted) return;
+        this.users.filter( x => x.email == email)[0].isAdmin = false;
     },
     enable: async function (email) {
-        var request = await axios.post(`/api/user/${email}/enable`, {
-            validateStatus: false,
-        });
-        if(request.status == 200){
-            this.users.filter( x => x.email == email)[0].enable = true;
-            return;
-        }
-        this.$bvToast.toast(
-          `status:${request.status}.${JSON.stringify(request.data)}`,
-          {
-            title: "Error when enable user.",
-            variant: "warning",
-            solid: true,
-          }
-        );
+        var enabled = await UserService.enable(email);
+        if(!enabled) return;
+        this.users.filter( x => x.email == email)[0].enable = true;
     },
     disable: async function (email) {
-        var request = await axios.post(`/api/user/${email}/disable`, {
-            validateStatus: false,
-        });
-        if(request.status == 200){
-            this.users.filter( x => x.email == email)[0].enable = false;
-            return;
-        }
-        this.$bvToast.toast(
-          `status:${request.status}.${JSON.stringify(request.data)}`,
-          {
-            title: "Error when disable user.",
-            variant: "warning",
-            solid: true,
-          }
-        );
+        var disabled = await UserService.disable(email);
+        if(!disabled) return;
+        this.users.filter( x => x.email == email)[0].enable = false;
     },
   },
   mounted() {
-    if (
-      !this.$store.state.application.profile ||
-      !this.$store.state.application.profile.isAdmin
-    ) {
+    document.title = `${this.$store.state.application.info.title}`;
+    if (!ProfileService.isAdmin()) {
       this.$router.push("/error/unauthorized");
       return;
     }

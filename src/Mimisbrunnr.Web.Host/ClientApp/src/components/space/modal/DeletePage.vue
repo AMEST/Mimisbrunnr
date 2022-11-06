@@ -20,14 +20,18 @@ export default {
             pageId: null
         }
     },
+    props: {
+        pageDeletedCallback: Function
+    },
     methods: {
         deletePage: async function(){
             if(this.pageId == null) return;
             await axios.delete("/api/page/"+this.pageId + '?recursively='+this.recursive.toString());
             this.$bvModal.hide("page-delete-modal");
             var spaceKey = this.$route.params.key;
-            if(spaceKey != null) this.$router.push("/space/"+spaceKey);
-
+            if(spaceKey == null) return;
+            this.$router.push("/space/"+spaceKey);
+            this.pageDeletedCallback();
         },
         close: function(){
             this.$bvModal.hide("page-delete-modal");

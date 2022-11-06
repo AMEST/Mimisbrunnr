@@ -23,7 +23,7 @@
       >
         <b-avatar
           class="updates-avatar"
-          :text="getInitials(pageEvent.updatedBy.name)"
+          :text="getUserInitials(pageEvent.updatedBy.name)"
           :src="pageEvent.updatedBy.avatarUrl"
         ></b-avatar>
         <b-link
@@ -43,7 +43,8 @@
 </template>
 
 <script>
-import axios from "axios";
+import { getNameInitials } from "@/services/Utils";
+import FeedService from "@/services/feedService";
 export default {
   name: "Updates",
   data() {
@@ -53,16 +54,12 @@ export default {
     };
   },
   methods: {
-    getInitials: function (name) {
-      if (!name) return "";
-      var splited = name.split(" ");
-      if (splited.length > 1) return splited[0][0] + splited[1][0];
-      return splited[0][0];
+    getUserInitials: function (name) {
+      return getNameInitials(name);
     },
   },
   mounted: async function () {
-    var feedRequest = await axios.get("/api/feed");
-    this.updates = feedRequest.data;
+    this.updates = await FeedService.getFeed();
     this.loaded = true;
   },
 };

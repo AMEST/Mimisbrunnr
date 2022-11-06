@@ -58,6 +58,7 @@ import VueMarkdown from "vue-markdown";
 import axios from "axios";
 import { debounce } from "@/services/Utils.js";
 import DraftModal from "@/components/pageEditor/DraftModal.vue";
+import ProfileService from "@/services/profileService";
 export default {
   name: "PageEdit",
   components: {
@@ -107,16 +108,13 @@ export default {
     nameState() {
       return this.page.name.length > 0;
     },
-    isAnonymous() {
-      return this.$store.state.application.profile == undefined;
-    },
     simplemde() {
       return this.$refs.markdownEditor.simplemde;
     },
   },
   methods: {
     init: async function () {
-      if (this.isAnonymous) {
+      if (ProfileService.isAnonymous()) {
         this.$router.push("/error/unauthorized");
         return;
       }
@@ -210,6 +208,7 @@ export default {
       this.$bvModal.hide("page-attachments-modal");
     },
     initHandlers: function () {
+      document.title = `${this.page.name} - ${this.$store.state.application.info.title}`;
       setTimeout(
         (self) => {
           self.simplemde.codemirror.on("drop", self.dragAndDrop);

@@ -31,18 +31,18 @@
         <b-dropdown-divider></b-dropdown-divider>
         <b-dropdown-item
           v-b-modal.page-copy-modal
-          :disabled="!userPermissions.canEdit || isArchived"
+          :disabled="!userPermissions.canEdit"
           >{{$t("page.copy.title")}}</b-dropdown-item
         >
         <b-dropdown-item
           v-b-modal.page-move-modal
-          :disabled="(!userPermissions.canEdit && !userPermissions.canRemove) || isArchived"
+          :disabled="isSpaceHomePage || (!userPermissions.canEdit && !userPermissions.canRemove) || isArchived"
           >{{$t("page.move.title")}}</b-dropdown-item
         >
         <b-dropdown-item
           variant="danger"
           v-b-modal.page-delete-modal
-          :disabled="!userPermissions.canRemove || isArchived"
+          :disabled="isSpaceHomePage || !userPermissions.canRemove || isArchived"
           >{{$t("page.delete.button")}}</b-dropdown-item
         >
       </b-dropdown>
@@ -94,6 +94,9 @@ export default {
     isArchived() {
       return this.space.status == "Archived";
     },
+    isSpaceHomePage(){
+        return this.space.homePageId == this.page.id;
+    }
   },
   methods: {
     initBreadcrumbs() {
@@ -109,7 +112,7 @@ export default {
         to: "/space/" + this.space.key,
       };
       this.breadcrumbs.push(spaceBreadcrumb);
-      if (this.space.homePageId == this.page.id) {
+      if (this.isSpaceHomePage) {
         spaceBreadcrumb.active = true;
         return;
       }

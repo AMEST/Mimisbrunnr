@@ -8,6 +8,7 @@
 
 <script>
 import Users from '@/components/people/discovery/Users.vue';
+import ProfileService from '@/services/profileService';
 export default {
     name: "Discovery",
     components: { 
@@ -25,14 +26,13 @@ export default {
     },
     methods: {
         ensureAnonymous: function () {
-            if (this.isAnonymous) {
-                this.$router.push("/error/unauthorized");
-                return;
-            }
+            if (!ProfileService.isAnonymous()) return;
+            this.$router.push("/error/unauthorized");
         }
     },
     mounted: function () {
         this.ensureAnonymous();
+        document.title = `${this.$store.state.application.info.title}`;
     }
 }
 </script>
