@@ -19,30 +19,6 @@ var ProfileService = {
             validateStatus: false,
         });
     },
-    getUser: async function (email) {
-        var request = await axios.get(
-            "/api/user/" + email,
-            { validateStatus: false }
-        );
-        if (request.status == 200)
-            return request.data;
-
-        showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
-            "Error when getting user.", "warning");
-        return null;
-    },
-    getUsers: async function (offset) {
-        var request = await axios.get(
-            `/api/user?offset=${offset}`,
-            { validateStatus: false }
-        );
-        if (request.status == 200)
-            return request.data;
-
-        showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
-            "Error when getting users.", "warning");
-        return null;
-    },
     getOrCreatePersonalSpace: async function (profile) {
         var personalSpaceKey = profile.email.toUpperCase();
         var getPersonalSpaceRequest = await axios.get(

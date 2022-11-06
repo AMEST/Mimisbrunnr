@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import ProfileService from "@/services/profileService";
+import UserService from "@/services/userService";
 import { getNameInitials } from "@/services/Utils";
 export default {
   name: "Users",
@@ -49,7 +49,7 @@ export default {
     },
     loadUsers: async function () {
       this.loading = true;
-      var usersList = await ProfileService.getUsers(this.users.length);
+      var usersList = await UserService.getUsers(this.users.length);
       if(usersList == null) return;
       for (let user of usersList) this.users.push(user);
       this.loading = false;

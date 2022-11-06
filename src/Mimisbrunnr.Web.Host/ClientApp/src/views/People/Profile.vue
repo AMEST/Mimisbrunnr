@@ -33,6 +33,7 @@
 import WorkedOn from "@/components/people/profile/WorkedOn.vue";
 import AdditionalInfo from "@/components/people/profile/AdditionalInfo.vue";
 import SettingsModal from "@/components/people/profile/SettingsModal.vue";
+import UserService from "@/services/userService";
 import ProfileService from "@/services/profileService";
 import { getInitials } from "@/services/Utils";
 export default {
@@ -58,7 +59,7 @@ export default {
     },
     loadProfile: async function () {
       if (!this.$route.params.email) return;
-      var profile = await ProfileService.getUser(this.$route.params.email);
+      var profile = await UserService.getUser(this.$route.params.email);
       if (profile == null) {
         this.$router.push("/error/notfound");
         return;

@@ -2,7 +2,13 @@
   <b-container>
     <Menu activeMenuItem="Groups" />
     <b-card :title="$t('admin.groups.title')" class="admin-group-card">
-      <b-button size="sm" class="group-add-button" variant="success" @click="$bvModal.show('group-modal')">+</b-button>
+      <b-button
+        size="sm"
+        class="group-add-button"
+        variant="success"
+        @click="$bvModal.show('group-modal')"
+        >+</b-button
+      >
       <b-table
         :items="groups"
         :fields="fields"
@@ -15,7 +21,11 @@
             <b-button size="sm" v-on:click="row.toggleDetails()" class="mr-2">
               {{ $t("admin.groups.table.expand") }}
             </b-button>
-            <b-button size="sm" variant="danger" v-on:click="removeGroup(row.item['name'])">
+            <b-button
+              size="sm"
+              variant="danger"
+              v-on:click="removeGroup(row.item['name'])"
+            >
               {{ $t("admin.groups.table.delete") }}
             </b-button>
           </div>
@@ -33,16 +43,16 @@
         {{ $t("admin.groups.loadMore") }}
       </b-button>
     </b-card>
-    <group-modal/>
+    <group-modal />
   </b-container>
 </template>
 
 <script>
 import Menu from "@/components/admin/Menu.vue";
-import axios from "axios";
 import GroupMembers from "@/components/admin/GroupMembers.vue";
-import GroupModal from '@/components/admin/modals/GroupModal.vue';
+import GroupModal from "@/components/admin/modals/GroupModal.vue";
 import ProfileService from "@/services/profileService";
+import GroupService from "@/services/groupService";
 export default {
   name: "GroupsAdministration",
   components: {
@@ -77,46 +87,17 @@ export default {
   methods: {
     loadGroups: async function () {
       this.loading = true;
-      var groupRequest = await axios.get(
-        `/api/group?offset=${this.groups.length}`,
-        { validateStatus: false }
-      );
-      if (groupRequest.status != 200) {
-        this.$bvToast.toast(
-          `status:${groupRequest.status}.${JSON.stringify(groupRequest.data)}`,
-          {
-            title: "Error when getting groups.",
-            variant: "warning",
-            solid: true,
-          }
-        );
+      var groupsList = await GroupService.getGroups(this.groups.length);
+      if (groupsList == null) {
         this.loading = false;
         return;
       }
-      for (let group of groupRequest.data) {
-        this.groups.push(group);
-      }
+      for (let group of groupsList) this.groups.push(group);
       this.loading = false;
     },
-    removeGroup: async function(group){
-        var request = await axios.delete(
-        `/api/Group/${group}`,
-        {
-          validateStatus: false,
-        }
-      );
-      if (request.status != 200) {
-        this.$bvToast.toast(
-          `status:${request.status}.${JSON.stringify(request.data)}`,
-          {
-            title: "Error when deleting group.",
-            variant: "warning",
-            solid: true,
-          }
-        );
-        return;
-      }
-    }
+    removeGroup: async function (group) {
+      await GroupService.deleteGroup(group);
+    },
   },
   mounted() {
     document.title = `${this.$store.state.application.info.title}`;
@@ -149,8 +130,8 @@ export default {
   margin: 2.25rem 2.25rem 2.25rem 2.25rem;
 }
 .group-add-button {
-    float: right;
-    margin-top: -3em;
+  float: right;
+  margin-top: -3em;
 }
 .load-more-button {
   width: 100%;

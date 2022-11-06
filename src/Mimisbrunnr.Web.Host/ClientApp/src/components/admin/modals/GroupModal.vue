@@ -6,16 +6,10 @@
   >
     <b-form @submit.stop.prevent>
       <b-form-group :label="$t('admin.groups.modal.name')">
-        <b-form-input
-          v-model="name"
-          required
-        ></b-form-input>
+        <b-form-input v-model="name" required></b-form-input>
       </b-form-group>
       <b-form-group :label="$t('admin.groups.modal.description')">
-        <b-form-textarea
-          v-model="description"
-          required
-        ></b-form-textarea>
+        <b-form-textarea v-model="description" required></b-form-textarea>
       </b-form-group>
     </b-form>
     <template #modal-footer="{ cancel }">
@@ -26,7 +20,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import GroupService from "@/services/groupService";
 export default {
   name: "GroupModal",
   data() {
@@ -37,28 +31,9 @@ export default {
   },
   methods: {
     ok: async function () {
-      var request = await axios.post(
-        `/api/group`,
-        {
-          name: this.name,
-          description: this.description,
-        },
-        { validateStatus: false }
-      );
-      if (request.status == 200) {
+      var created = await GroupService.createGroup(this.name, this.description);
+      if (created)
         this.$bvModal.hide("group-modal");
-        return;
-      }
-      this.$bvToast.toast(
-        `status:${request.status}.${JSON.stringify(
-            request.data
-        )}`,
-        {
-          title: "Error when adding group.",
-          variant: "warning",
-          solid: true,
-        }
-      );
     },
     onShow: function () {
       this.name = "";

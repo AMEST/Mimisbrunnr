@@ -73,6 +73,9 @@
 
 <script>
 import axios from "axios";
+import UserService from "@/services/userService";
+import GroupService from "@/services/groupService";
+import {showToast} from "@/services/Utils";
 export default {
   name: "PermissionsTable",
   props: {
@@ -98,16 +101,10 @@ export default {
       if (permission == null) return;
       var savePermissionRequest = await axios.put(`/api/space/${spaceKey}/permissions`, permission, { validateStatus: false });
       if (savePermissionRequest.status == 200 ) await this.actionCallBack();
-      else this.$bvToast.toast(
-          savePermissionRequest.data.message != undefined
+      else showToast(savePermissionRequest.data.message != undefined
             ? savePermissionRequest.data.message
-            : JSON.stringify(savePermissionRequest.data),
-          {
-            title: "Error when saving permission.",
-            variant: "danger",
-            solid: true,
-          }
-        );
+            : JSON.stringify(savePermissionRequest.data), 
+            "Error when saving permission.", "danger")
     },
     deletePermission: async function (permission) {
       var spaceKey = this.$route.params.key;
@@ -128,43 +125,21 @@ export default {
         isAdmin: this.newPermission.isAdmin,
       };
       if (this.type == "Group") {
-        var groupSearchRequest = await axios.get(
-          `/api/group/${this.newPermission.name}`,
-          { validateStatus: false }
-        );
-        if(groupSearchRequest.status != 200){
-            this.$bvToast.toast(
-            `status:${groupSearchRequest.status}.${JSON.stringify(
-              groupSearchRequest.data
-            )}`,
-            {
-              title: "Error when search group.",
-              variant: "warning",
-              solid: true,
-            }
-          );
+        var group = await GroupService.getGroup(this.newPermission.name);
+        if(group == null){
+            showToast(`Group with name ${this.newPermission.name} not found`,
+                "Error when search group.", "warning");
           return;
         }
-        permission.group = groupSearchRequest.data;
+        permission.group = group;
       } else {
-        var profileRequest = await axios.get(
-          `/api/user/${this.newPermission.name}`,
-          { validateStatus: false }
-        );
-        if (profileRequest.status != 200) {
-          this.$bvToast.toast(
-            `status:${profileRequest.status}.${JSON.stringify(
-              profileRequest.data
-            )}`,
-            {
-              title: "Error when search user.",
-              variant: "warning",
-              solid: true,
-            }
-          );
+        var profileRequest = await UserService.getUser(this.newPermission.name);
+        if (profileRequest == null) {
+            showToast(`Profile with email ${this.newPermission.name} not found.`,
+            "Error when search user.", "warning");
           return;
         }
-        permission.user = profileRequest.data;
+        permission.user = profileRequest;
       }
       var addPermissionRequest = await axios.post(
         `/api/space/${spaceKey}/permissions`,
@@ -173,16 +148,10 @@ export default {
       );
       if (addPermissionRequest.status == 200) await this.actionCallBack();
       else
-        this.$bvToast.toast(
-          addPermissionRequest.data.message != undefined
+        showToast(addPermissionRequest.data.message != undefined
             ? addPermissionRequest.data.message
             : JSON.stringify(addPermissionRequest.data),
-          {
-            title: "Error when adding permission.",
-            variant: "danger",
-            solid: true,
-          }
-        );
+            "Error when adding permission.", "danger");
     },
   },
 };
