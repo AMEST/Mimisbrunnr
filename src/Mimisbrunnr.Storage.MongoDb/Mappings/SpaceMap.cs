@@ -10,6 +10,7 @@ public class SpaceMap : EntityMapClass<Space>
     public SpaceMap()
     {
         ToCollection("Spaces");
+        MapId(x => x.Id, BsonType.String);
         MapMember(x => x.Status)
         .SetSerializer(new EnumSerializer<SpaceStatus>(BsonType.String))
         .SetIgnoreIfDefault(false);
