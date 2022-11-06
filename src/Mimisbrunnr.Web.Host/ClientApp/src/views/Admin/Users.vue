@@ -70,7 +70,6 @@
 
 <script>
 import Menu from "@/components/admin/Menu.vue";
-import axios from "axios";
 import ProfileService from "@/services/profileService";
 import UserService from "@/services/userService";
 export default {
