@@ -69,7 +69,7 @@ Support for the following features:
 
 <div align=center> 
 
-![preview.gif](https://github.com/AMEST/Mimisbrunnr/raw/main/docs/perview.gif)
+![preview.gif](https://github.com/AMEST/Mimisbrunnr/raw/main/docs/preview.gif)
 
 </div>    
     
