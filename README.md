@@ -5,7 +5,7 @@
 
 <div align=center>
 	
-![apple-touch-icon-180x180.png](/api/attachment/62b361b2423dc93aed61450d/apple-touch-icon-180x180.png)
+![apple-touch-icon-180x180.png](https://github.com/AMEST/Mimisbrunnr/raw/main/src/Mimisbrunnr.Web.Host/ClientApp/public/img/icons/android-chrome-192x192.png) 
 
 # Mimisbrunnr - wiki system (like confluence) 
 
@@ -69,7 +69,7 @@ Support for the following features:
 
 <div align=center> 
 
-![preview.gif](https://github.com/AMEST/Mimisbrunnr/raw/main/src/Mimisbrunnr.Web.Host/ClientApp/public/img/icons/android-chrome-192x192.png)
+![preview.gif](https://github.com/AMEST/Mimisbrunnr/raw/main/docs/perview.gif)
 
 </div>    
     
