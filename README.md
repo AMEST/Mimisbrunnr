@@ -3,7 +3,13 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/amest/Mimisbrunnr)
 ![GitHub](https://img.shields.io/github/license/amest/Mimisbrunnr)
 
-# Mimisbrunnr - wiki system (like confluence)
+<div align=center>
+	
+![apple-touch-icon-180x180.png](/api/attachment/62b361b2423dc93aed61450d/apple-touch-icon-180x180.png)
+
+# Mimisbrunnr - wiki system (like confluence) 
+
+</div>
 
 ## Links
 * **[Try Mimisbrunnr](https://wiki.nb-47.ml)**  
@@ -63,7 +69,7 @@ Support for the following features:
 
 <div align=center> 
 
-![2022-06-22 23-29-48.gif](https://wiki.nb-47.ml/api/attachment/62b36221590e68370bd76125/2022-06-22%2023-29-48.gif?v=2)
+![preview.gif](https://github.com/AMEST/Mimisbrunnr/raw/main/src/Mimisbrunnr.Web.Host/ClientApp/public/img/icons/android-chrome-192x192.png)
 
 </div>    
     
