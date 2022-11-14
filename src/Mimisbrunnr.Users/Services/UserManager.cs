@@ -4,7 +4,7 @@ using Skidbladnir.Repository.Abstractions;
 
 namespace Mimisbrunnr.Users;
 
-internal class UserManager : IUserManager
+internal class UserManager : IUserManager, IUserSearcher
 {
     private const int DefaultMaxUserGet = 15;
     private readonly TimeSpan _defaultCacheTime = TimeSpan.FromMinutes(10);
@@ -16,35 +16,37 @@ internal class UserManager : IUserManager
         _userRepository = userRepository;
         _distributedCache = distributedCache;
     }
-    
+
     public Task<User[]> GetUsers(int? offset = null)
     {
-        if(offset is null)
+        if (offset is null)
             return _userRepository.GetAll().ToArrayAsync();
 
         return _userRepository.GetAll()
             .Skip(offset.Value)
             .Take(DefaultMaxUserGet)
             .ToArrayAsync();
-    } 
+    }
 
     public async Task<User> GetByEmail(string email)
     {
-        if(string.IsNullOrEmpty(email))
+        if (string.IsNullOrEmpty(email))
             return null;
 
         var user = await _distributedCache.GetAsync<User>(GetUserCacheKeyEmail(email));
-        if( user is not null)
+        if (user is not null)
             return user;
 
         user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Email == email.ToLower());
-        if(user is null)
+        if (user is null)
             return user;
 
-        await _distributedCache.SetAsync(GetUserCacheKeyEmail(email), user, new DistributedCacheEntryOptions(){
+        await _distributedCache.SetAsync(GetUserCacheKeyEmail(email), user, new DistributedCacheEntryOptions()
+        {
             AbsoluteExpirationRelativeToNow = _defaultCacheTime
         });
-        await _distributedCache.SetAsync(GetUserCacheKeyId(user.Id), user, new DistributedCacheEntryOptions(){
+        await _distributedCache.SetAsync(GetUserCacheKeyId(user.Id), user, new DistributedCacheEntryOptions()
+        {
             AbsoluteExpirationRelativeToNow = _defaultCacheTime
         });
         return user;
@@ -53,18 +55,20 @@ internal class UserManager : IUserManager
     public async Task<User> GetById(string id)
     {
         var user = await _distributedCache.GetAsync<User>(GetUserCacheKeyId(id));
-        if( user is not null)
+        if (user is not null)
             return user;
 
         user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id.ToLower());
-        if(user is null)
+        if (user is null)
             return user;
 
-        await _distributedCache.SetAsync(GetUserCacheKeyId(id), user, new DistributedCacheEntryOptions(){
+        await _distributedCache.SetAsync(GetUserCacheKeyId(id), user, new DistributedCacheEntryOptions()
+        {
             AbsoluteExpirationRelativeToNow = _defaultCacheTime
         });
-        
-        await _distributedCache.SetAsync(GetUserCacheKeyEmail(user.Email), user, new DistributedCacheEntryOptions(){
+
+        await _distributedCache.SetAsync(GetUserCacheKeyEmail(user.Email), user, new DistributedCacheEntryOptions()
+        {
             AbsoluteExpirationRelativeToNow = _defaultCacheTime
         });
         return user;
@@ -80,10 +84,12 @@ internal class UserManager : IUserManager
             Role = role
         };
         await _userRepository.Create(user);
-        await _distributedCache.SetAsync(GetUserCacheKeyEmail(email), user, new DistributedCacheEntryOptions(){
+        await _distributedCache.SetAsync(GetUserCacheKeyEmail(email), user, new DistributedCacheEntryOptions()
+        {
             AbsoluteExpirationRelativeToNow = _defaultCacheTime
         });
-        await _distributedCache.SetAsync(GetUserCacheKeyId(user.Id), user, new DistributedCacheEntryOptions(){
+        await _distributedCache.SetAsync(GetUserCacheKeyId(user.Id), user, new DistributedCacheEntryOptions()
+        {
             AbsoluteExpirationRelativeToNow = _defaultCacheTime
         });
     }
@@ -110,6 +116,17 @@ internal class UserManager : IUserManager
         await _userRepository.Update(user);
         await _distributedCache.RemoveAsync(GetUserCacheKeyEmail(user.Email));
         await _distributedCache.RemoveAsync(GetUserCacheKeyId(user.Id));
+    }
+
+    public async Task<IEnumerable<User>> Search(string text)
+    {
+        var textLower = text.ToLower();
+        var users = await _userRepository.GetAll()
+            .Where(x => x.Name.ToLower().Contains(textLower)
+                || x.Email.ToLower().Contains(textLower))
+            .Take(20)
+            .ToArrayAsync();
+        return users;
     }
 
     private static string GetUserCacheKeyEmail(string email) => $"user_cache_email_{email.ToLower()}";

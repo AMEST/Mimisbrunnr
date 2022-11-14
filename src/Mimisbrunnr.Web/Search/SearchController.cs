@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Mimisbrunnr.Web.Filters;
 using Mimisbrunnr.Web.Mapping;
+using Mimisbrunnr.Web.User;
 using Mimisbrunnr.Web.Wiki;
 
 namespace Mimisbrunnr.Web.Search;
@@ -21,16 +22,34 @@ public class SearchController : ControllerBase
     [HttpGet("space")]
     [ProducesResponseType(typeof(IEnumerable<SpaceModel>), 200)]
     [ProducesResponseType(401)]
-    public Task<IEnumerable<SpaceModel>> SearchSpace([FromQuery] string search)
+    public async Task<IEnumerable<SpaceModel>> SearchSpaces([FromQuery] string search)
     {
-        return _searchService.SearchSpaces(search, User?.ToEntity());
+        if (string.IsNullOrEmpty(search))
+            return Array.Empty<SpaceModel>();
+
+        return await _searchService.SearchSpaces(search, User?.ToEntity());
     }
 
     [HttpGet("page")]
     [ProducesResponseType(typeof(IEnumerable<PageModel>), 200)]
     [ProducesResponseType(401)]
-    public Task<IEnumerable<PageModel>> SearchPage([FromQuery] string search)
+    public async Task<IEnumerable<PageModel>> SearchPages([FromQuery] string search)
     {
-        return _searchService.SearchPages(search, User?.ToEntity());
+        if (string.IsNullOrEmpty(search))
+            return Array.Empty<PageModel>();
+            
+        return await _searchService.SearchPages(search, User?.ToEntity());
+    }
+
+    [HttpGet("user")]
+    [Authorize]
+    [ProducesResponseType(typeof(IEnumerable<UserModel>), 200)]
+    [ProducesResponseType(401)]
+    public async Task<IEnumerable<UserModel>> SearchUsers([FromQuery] string search)
+    {
+        if (string.IsNullOrEmpty(search))
+            return Array.Empty<UserModel>();
+            
+        return await _searchService.SearchUsers(search, User?.ToEntity());
     }
 }

@@ -1,6 +1,8 @@
 using Mimisbrunnr.Users;
+using Mimisbrunnr.Users.Services;
 using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.Services;
+using Mimisbrunnr.Web.User;
 using Mimisbrunnr.Web.Wiki;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;
@@ -13,12 +15,14 @@ internal class SearchService : ISearchService
     private readonly IPageSearcher _pageSearcher;
     private readonly ISpaceSearcher _spaceSearcher;
     private readonly IUserManager _userManager;
+    private readonly IUserSearcher _userSearcher;
     private readonly ISpaceDisplayService _spaceDisplayService;
 
     public SearchService(
         IPermissionService permissionService,
         IPageSearcher pageSearcher, 
         ISpaceSearcher spaceSearcher, 
+        IUserSearcher userSearcher,
         IUserManager userManager,
         ISpaceDisplayService spaceDisplayService)
     {
@@ -26,6 +30,7 @@ internal class SearchService : ISearchService
         _pageSearcher = pageSearcher;
         _spaceSearcher = spaceSearcher;
         _userManager = userManager;
+        _userSearcher = userSearcher;
         _spaceDisplayService = spaceDisplayService;
     }
 
@@ -50,5 +55,13 @@ internal class SearchService : ISearchService
 
         var userSpaces = (await _spaceDisplayService.FindUserVisibleSpaces(searchBy)).Select(x => x.Id);
         return spaces.Where(x => userSpaces.Contains(x.Id)).Select(x => x.ToModel());
+    }
+
+    public async Task<IEnumerable<UserModel>> SearchUsers(string text, UserInfo searchBy)
+    {
+        await _permissionService.EnsureAnonymousAllowed(searchBy);
+
+        var users = await _userSearcher.Search(text);
+        return users.Select(x => x.ToModel());
     }
 }

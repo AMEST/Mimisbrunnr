@@ -17,7 +17,7 @@
           <b-link :to="`/profile/${user.email}`">{{ user.name }}</b-link>
         </b-card-text>
       </b-card>
-      <b-card class="people-card" @click="loadUsers">
+      <b-card class="people-card" @click="loadUsers" v-if="!textForSearch">
         <b-icon
           icon="arrow-clockwise"
           :animation="loading ? 'spin' : 'none'"
@@ -34,7 +34,8 @@
 
 <script>
 import UserService from "@/services/userService";
-import { getNameInitials } from "@/services/Utils";
+import SearchService from "@/services/searchService";
+import { getNameInitials, debounce } from "@/services/Utils";
 export default {
   name: "Users",
   data() {
@@ -43,16 +44,31 @@ export default {
       loading: false,
     };
   },
+  props: {
+    textForSearch: String,
+  },
   methods: {
     getInitials: function (username) {
-        return getNameInitials(username);
+      return getNameInitials(username);
     },
+    search: debounce(async function () {
+      var searchResult = await SearchService.findUsers(this.textForSearch);
+      if (searchResult != null) this.users = searchResult;
+    }, 300),
     loadUsers: async function () {
       this.loading = true;
       var usersList = await UserService.getUsers(this.users.length);
-      if(usersList == null) return;
+      if (usersList == null) return;
       for (let user of usersList) this.users.push(user);
       this.loading = false;
+    },
+  },
+  watch: {
+    // eslint-disable-next-line
+    textForSearch(newValue, oldValue) {
+      if (newValue.length > 2) this.search();
+      if (newValue.length == 0 && oldValue.length > 0) this.users = [];
+      if (newValue.length == 0) this.loadUsers();
     },
   },
   mounted() {

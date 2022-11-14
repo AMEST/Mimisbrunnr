@@ -157,10 +157,12 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
 
     public async Task<IEnumerable<Space>> Search(string text)
     {
+        var textLower = text.ToLower();
         var spaces = await _spaceRepository.GetAll()
-            .Where(x => x.Name.Contains(text)
-            || x.Description.Contains(text))
-            .Take(100).ToArrayAsync();
+            .Where(x => x.Name.ToLower().Contains(textLower)
+                || x.Description.ToLower().Contains(textLower))
+            .Take(100)
+            .ToArrayAsync();
         return spaces;
     }
 

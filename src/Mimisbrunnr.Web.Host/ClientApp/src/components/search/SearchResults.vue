@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import SearchService from "@/services/searchService";
 export default {
   name: "SearchResults",
   data() {
@@ -59,13 +59,12 @@ export default {
     },
     search: async function () {
       this.searchDelayTimeout = null;
-      var searchRequestPromise =
+      var searchRequestResult =
         this.searchType == "space"
-          ? axios.get(`/api/search/space?search=${this.textForSearch}`)
-          : axios.get(`/api/search/page?search=${this.textForSearch}`);
+          ? await SearchService.findSpace(this.textForSearch)
+          : await SearchService.findPage(this.textForSearch);
 
-      var searchRequest = await searchRequestPromise;
-      if (searchRequest.status == 200) this.searchResults = searchRequest.data;
+      if (searchRequestResult != null) this.searchResults = searchRequestResult;
       this.overlayState = false;
     },
     go: function (result) {

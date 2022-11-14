@@ -8,19 +8,17 @@ namespace Mimisbrunnr.Storage.MongoDb;
 
 internal class PageSearcher : IPageSearcher
 {
-    private readonly BaseMongoDbContext _mongoDbContext;
-    private readonly IMongoCollection<Page> _pageCollection;
+    private readonly IMongoCollection<Page> _collection;
 
     public PageSearcher(BaseMongoDbContext mongoDbContext)
     {
-        _mongoDbContext = mongoDbContext;
-        _pageCollection = mongoDbContext.GetCollection<Page>()
+        _collection = mongoDbContext.GetCollection<Page>()
             .WithReadPreference(ReadPreference.SecondaryPreferred);
     }
 
     public async Task<IEnumerable<Page>> Search(string text)
     {
-        var results = await _pageCollection
+        var results = await _collection
             .Find(Builders<Page>.Filter.Text(text))
             .Limit(100)
             .ToListAsync();

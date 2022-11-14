@@ -1,7 +1,7 @@
 <template>
   <b-container class="pt-5 text-left">
-      <b-form-input class="search-field discovery-search" v-model="searchText" size="lg" :placeholder="$t('people.search.placeholder')" disabled></b-form-input>
-      <users/>
+      <b-form-input class="search-field discovery-search" v-model="searchText" size="lg" :placeholder="$t('people.search.placeholder')"></b-form-input>
+      <users :textForSearch="searchText" />
       <!--TODO: Add groups list-->
   </b-container>
 </template>

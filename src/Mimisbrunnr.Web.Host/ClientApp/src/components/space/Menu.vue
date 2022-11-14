@@ -177,7 +177,7 @@ export default {
 
 <style>
 .space-menu {
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: rgb(247 247 247);
   overflow-x: hidden;
   overflow-y: auto;
   box-shadow: inset 0 0rem 0.5em rgba(0, 0, 0, 0.15) !important;

@@ -158,6 +158,7 @@ export default {
 }
 .page-view {
   overflow: auto;
+  background-color: white;
 }
 .page-view img {
   max-width: 100%;

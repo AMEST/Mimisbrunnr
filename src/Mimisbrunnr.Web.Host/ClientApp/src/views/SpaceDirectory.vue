@@ -14,7 +14,7 @@
       </div>
       <b-list-group class="spaces-list">
         <b-list-group-item
-          v-for="space in spaces.filter(this.spaceNameFilter)"
+          v-for="space in spaces"
           :key="space.key"
           :title="space.description"
           button
@@ -36,7 +36,8 @@
 </template>
 <script>
 import axios from "axios";
-import { getNameInitials } from "@/services/Utils";
+import SearchService from "@/services/searchService";
+import { getNameInitials, debounce } from "@/services/Utils";
 export default {
   name: "SpaceDirectory",
   data: () => ({
@@ -50,20 +51,29 @@ export default {
     goToSpace(spaceKey) {
       this.$router.push("/space/" + spaceKey);
     },
-    spaceNameFilter(item) {
-      return (
-        item.name.toLowerCase().indexOf(this.searchText.toLowerCase()) != -1
-      );
+    search: debounce(async function () {
+      var searchResult = await SearchService.findSpaces(this.searchText);
+      if (searchResult != null) this.spaces = searchResult;
+    }, 300),
+    loadSpaces: async function () {
+      var spacesRequest = await axios.get("/api/space", {
+        validateStatus: false,
+      });
+      if (spacesRequest.status == 200) this.spaces = spacesRequest.data;
+    },
+  },
+  watch: {
+    // eslint-disable-next-line
+    searchText(newValue, oldValue) {
+      if (newValue.length > 2) this.search();
+      if (newValue.length == 0) this.loadSpaces();
     },
   },
   created: async function () {
     document.title = `${this.$t("spaceDirectory.title")} - ${
       this.$store.state.application.info.title
     }`;
-    var spacesRequest = await axios.get("/api/space", {
-        validateStatus: false,
-    });
-    if (spacesRequest.status == 200) this.spaces = spacesRequest.data;
+    this.loadSpaces();
   },
 };
 </script>
