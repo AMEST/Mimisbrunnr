@@ -15,4 +15,6 @@ public interface IUserManager
     Task Enable(User user);
 
     Task ChangeRole(User user, UserRole role);
+
+    Task UpdateUserInfo(User user);
 }

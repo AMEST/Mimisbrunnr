@@ -20,6 +20,7 @@ public class User : IHasId<string>
         AvatarUrl = avatarUrl;
         Role = role;
     }
+    
     public string Id { get; set; }
 
     public bool Enable { get; internal set; } = true;
