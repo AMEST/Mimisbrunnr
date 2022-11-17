@@ -1,4 +1,5 @@
 using Mimisbrunnr.Wiki.Contracts;
+using MongoDB.Bson;
 using Skidbladnir.Repository.MongoDB;
 
 namespace Mimisbrunnr.Storage.MongoDb.Mappings
@@ -8,6 +9,7 @@ namespace Mimisbrunnr.Storage.MongoDb.Mappings
         public AttachmentMap()
         {
             ToCollection("Attachments");
+            MapId(x => x.Id, BsonType.String);
         }
     }
 }

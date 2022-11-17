@@ -7,8 +7,8 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="6.0.0" />
-      <PackageReference Include="Skidbladnir.Modules" Version="1.4.1-unstalable.0.2" />
-      <PackageReference Include="Skidbladnir.Repository.Abstractions" Version="1.4.1-unstalable.0.2" />
+      <PackageReference Include="Skidbladnir.Modules" Version="1.5.0" />
+      <PackageReference Include="Skidbladnir.Repository.Abstractions" Version="1.5.0" />
     </ItemGroup>
 
 </Project>
