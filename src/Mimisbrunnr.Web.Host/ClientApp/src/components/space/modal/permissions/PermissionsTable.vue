@@ -2,12 +2,14 @@
   <b-table-simple style="text-align: left">
     <b-thead>
       <b-tr>
-        <b-th>{{$t("space.permissions.table.name")}}</b-th>
-        <b-th>{{$t("space.permissions.table.canView")}}</b-th>
-        <b-th>{{$t("space.permissions.table.canEdit")}}</b-th>
-        <b-th>{{$t("space.permissions.table.canDelete")}}</b-th>
-        <b-th>{{$t("space.permissions.table.admin")}}</b-th>
-        <b-th class="text-right">{{$t("space.permissions.table.action")}}</b-th>
+        <b-th>{{ $t("space.permissions.table.name") }}</b-th>
+        <b-th>{{ $t("space.permissions.table.canView") }}</b-th>
+        <b-th>{{ $t("space.permissions.table.canEdit") }}</b-th>
+        <b-th>{{ $t("space.permissions.table.canDelete") }}</b-th>
+        <b-th>{{ $t("space.permissions.table.admin") }}</b-th>
+        <b-th class="text-right">{{
+          $t("space.permissions.table.action")
+        }}</b-th>
       </b-tr>
     </b-thead>
     <b-tbody>
@@ -43,14 +45,19 @@
           ></b-icon>
         </b-td>
       </b-tr>
-      <b-tr><b-td>{{$t("space.permissions.table.add")}}</b-td></b-tr>
+      <b-tr
+        ><b-td>{{ $t("space.permissions.table.add") }}</b-td></b-tr
+      >
       <b-tr>
-        <b-td
-          ><b-form-input
-            v-model="newPermission.name"
-            :placeholder="type == 'Group' ? 'Group name' : 'User Email'"
-          ></b-form-input
-        ></b-td>
+        <b-td style="min-width: 200px; max-width: 350px;">
+          <v-select
+            v-model="permissionTarget"
+            :options="permissionTargetList"
+            @search="onSearch"
+            :filter="permissionTargetListFilter"
+            :get-option-label="(option) => option.name"
+          ></v-select>
+        </b-td>
         <b-td
           ><b-form-checkbox v-model="newPermission.canView"></b-form-checkbox
         ></b-td>
@@ -75,7 +82,8 @@
 import axios from "axios";
 import UserService from "@/services/userService";
 import GroupService from "@/services/groupService";
-import {showToast} from "@/services/Utils";
+import SearchService from "@/services/searchService";
+import { showToast } from "@/services/Utils";
 export default {
   name: "PermissionsTable",
   props: {
@@ -92,19 +100,56 @@ export default {
         canRemove: false,
         isAdmin: false,
       },
+      permissionTarget: null,
+      permissionTargetList: [],
     };
   },
   methods: {
+    onSearch: async function (query) {
+      console.log(query);
+      if (this.type == "Group") return;
+      if (query.length < 1) {
+        this.permissionTargetList = [];
+        this.load();
+        return;
+      }
+      var searchResult = await SearchService.findUsers(query);
+      this.permissionTargetList = searchResult;
+    },
+    permissionTargetListFilter: function (options, search) {
+      if (this.type != "Group") return options;
+      return options.filter(
+        (item) => item.name.toLowerCase().indexOf(search.toLowerCase()) != -1
+      );
+    },
+    load: async function () {
+      var targets = null;
+      if (this.type == "Group") {
+        targets = await GroupService.getGroups();
+      } else {
+        targets = await UserService.getUsers(this.permissionTargetList.length);
+      }
+      if (targets == null) return;
+      for (let target of targets) this.permissionTargetList.push(target);
+    },
     save: async function (permission) {
       var spaceKey = this.$route.params.key;
       if (spaceKey == null) return;
       if (permission == null) return;
-      var savePermissionRequest = await axios.put(`/api/space/${spaceKey}/permissions`, permission, { validateStatus: false });
-      if (savePermissionRequest.status == 200 ) await this.actionCallBack();
-      else showToast(savePermissionRequest.data.message != undefined
+      var savePermissionRequest = await axios.put(
+        `/api/space/${spaceKey}/permissions`,
+        permission,
+        { validateStatus: false }
+      );
+      if (savePermissionRequest.status == 200) await this.actionCallBack();
+      else
+        showToast(
+          savePermissionRequest.data.message != undefined
             ? savePermissionRequest.data.message
-            : JSON.stringify(savePermissionRequest.data), 
-            "Error when saving permission.", "danger")
+            : JSON.stringify(savePermissionRequest.data),
+          "Error when saving permission.",
+          "danger"
+        );
     },
     deletePermission: async function (permission) {
       var spaceKey = this.$route.params.key;
@@ -126,17 +171,23 @@ export default {
       };
       if (this.type == "Group") {
         var group = await GroupService.getGroup(this.newPermission.name);
-        if(group == null){
-            showToast(`Group with name ${this.newPermission.name} not found`,
-                "Error when search group.", "warning");
+        if (group == null) {
+          showToast(
+            `Group with name ${this.newPermission.name} not found`,
+            "Error when search group.",
+            "warning"
+          );
           return;
         }
         permission.group = group;
       } else {
         var profileRequest = await UserService.getUser(this.newPermission.name);
         if (profileRequest == null) {
-            showToast(`Profile with email ${this.newPermission.name} not found.`,
-            "Error when search user.", "warning");
+          showToast(
+            `Profile with email ${this.newPermission.name} not found.`,
+            "Error when search user.",
+            "warning"
+          );
           return;
         }
         permission.user = profileRequest;
@@ -148,10 +199,24 @@ export default {
       );
       if (addPermissionRequest.status == 200) await this.actionCallBack();
       else
-        showToast(addPermissionRequest.data.message != undefined
+        showToast(
+          addPermissionRequest.data.message != undefined
             ? addPermissionRequest.data.message
             : JSON.stringify(addPermissionRequest.data),
-            "Error when adding permission.", "danger");
+          "Error when adding permission.",
+          "danger"
+        );
+    },
+  },
+  mounted() {
+    this.load();
+  },
+  watch: {
+    // eslint-disable-next-line
+    permissionTarget(newValue, oldValue) {
+      if (newValue == null) return;
+      this.newPermission.name =
+        this.type == "Group" ? newValue.name : newValue.email;
     },
   },
 };

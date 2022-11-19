@@ -15,7 +15,12 @@ import VueTreeList from 'vue-tree-list'
 import Vue2TouchEvents from 'vue2-touch-events'
 // i18n
 import VueI18n from 'vue-i18n'
+// Select plugin
+import vSelect from 'vue-select'
+import 'vue-select/dist/vue-select.css';
 
+// Vue select
+Vue.component('v-select', vSelect)
 // Vue i18n plugin
 Vue.use(VueI18n)
 // Vue touchscreen events plugin

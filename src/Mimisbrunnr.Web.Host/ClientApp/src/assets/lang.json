@@ -262,7 +262,7 @@
                 "destination": {
                     "label": "Destination",
                     "description": "Parent page id or space key",
-                    "placeholder": "Enter pageid or space key"
+                    "placeholder": "Enter page id or space key"
                 }
             },
             "move": {
@@ -276,12 +276,12 @@
                 "destination": {
                     "label": "Destination",
                     "description": "Parent page id or space key",
-                    "placeholder": "Enter pageid or space key"
+                    "placeholder": "Enter page id or space key"
                 }
             },
             "delete": {
                 "button": "Delete",
-                "title": "Are you shure delete page?",
+                "title": "Are you sure delete page?",
                 "content": "Delete page and all children",
                 "delete": "Delete",
                 "cancel": "Cancel"
@@ -608,7 +608,7 @@
                 "destination": {
                     "label": "Куда копировать",
                     "description": "Родительская страница или пространство",
-                    "placeholder": "Введите id страницы or ключ пространства"
+                    "placeholder": "Введите id страницы или ключ пространства"
                 }
             },
             "move": {
@@ -622,7 +622,7 @@
                 "destination": {
                     "label": "Куда перемещать",
                     "description": "Родительская страница или пространство",
-                    "placeholder": "Введите id страницы or ключ пространства"
+                    "placeholder": "Введите id страницы или ключ пространства"
                 }
             },
             "delete": {
