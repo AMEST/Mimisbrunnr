@@ -16,7 +16,7 @@ var UserService = {
     },
     getUsers: async function (offset) {
         var request = await axios.get(
-            `/api/user?offset=${offset}`,
+            `/api/user?offset=${offset == null? "" : offset}`,
             { validateStatus: false }
         );
         if (request.status == 200)

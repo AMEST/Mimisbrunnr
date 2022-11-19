@@ -13,7 +13,7 @@ var GroupService = {
         return null;
     },
     getGroups: async function (offset) {
-        var request = await axios.get(`/api/group?offset=${offset}`,
+        var request = await axios.get(`/api/group?offset=${offset == null? "" : offset}`,
             { validateStatus: false }
         );
         if (request.status == 200)
