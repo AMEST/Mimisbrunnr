@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.Wiki;
+using Mimisbrunnr.Integration.Wiki;
 using Mimisbrunnr.Wiki.Contracts;
 
 namespace Mimisbrunnr.Web.Administration

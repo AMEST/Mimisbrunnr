@@ -2,7 +2,7 @@ using System.IO.Compression;
 using System.Xml.Linq;
 using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.Services;
-using Mimisbrunnr.Web.Wiki;
+using Mimisbrunnr.Integration.Wiki;
 using Mimisbrunnr.Web.Wiki.Import;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;

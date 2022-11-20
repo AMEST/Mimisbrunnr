@@ -1,7 +1,7 @@
 ﻿using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Services;
-using Mimisbrunnr.Web.Wiki;
+using Mimisbrunnr.Integration.Wiki;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;
 using MongoDB.Driver;

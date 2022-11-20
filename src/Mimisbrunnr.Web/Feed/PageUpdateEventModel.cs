@@ -1,5 +1,4 @@
-using Mimisbrunnr.Web.User;
-using Mimisbrunnr.Wiki.Contracts;
+using Mimisbrunnr.Integration.User;
 
 namespace Mimisbrunnr.Web.Feed;
 

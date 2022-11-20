@@ -1,4 +1,4 @@
-﻿using Mimisbrunnr.Web.User;
+﻿using Mimisbrunnr.Integration.User;
 
 namespace Mimisbrunnr.Web.Wiki;
 

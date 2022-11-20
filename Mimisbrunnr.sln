@@ -19,6 +19,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimisbrunnr.Web.Infrastruct
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimisbrunnr.Persistent", "src\Mimisbrunnr.Persistent\Mimisbrunnr.Persistent.csproj", "{4FAC90B1-53E3-4CA2-9640-7E5177AA526C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integrations", "{D0911FC6-4386-4B67-8E1D-D708AE0F34AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimisbrunnr.Integration", "src\Integration\Mimisbrunnr.Integration\Mimisbrunnr.Integration.csproj", "{BF40E4BA-5F8B-4C4F-967C-4CB7A728BC29}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +39,8 @@ Global
 		{C69EC431-9F8E-4368-AC2C-D1DC8B930573} = {7B5B41ED-0FD9-4F24-9BA1-5D1C0D476611}
 		{425CCCC9-EDF8-49A5-86CD-B5E268B47C36} = {7B5B41ED-0FD9-4F24-9BA1-5D1C0D476611}
 		{4FAC90B1-53E3-4CA2-9640-7E5177AA526C} = {7B5B41ED-0FD9-4F24-9BA1-5D1C0D476611}
+		{D0911FC6-4386-4B67-8E1D-D708AE0F34AB} = {7B5B41ED-0FD9-4F24-9BA1-5D1C0D476611}
+		{BF40E4BA-5F8B-4C4F-967C-4CB7A728BC29} = {D0911FC6-4386-4B67-8E1D-D708AE0F34AB}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{84B0F1E6-567E-4136-8D51-E469D460C261}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -65,5 +71,9 @@ Global
 		{4FAC90B1-53E3-4CA2-9640-7E5177AA526C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FAC90B1-53E3-4CA2-9640-7E5177AA526C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4FAC90B1-53E3-4CA2-9640-7E5177AA526C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF40E4BA-5F8B-4C4F-967C-4CB7A728BC29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF40E4BA-5F8B-4C4F-967C-4CB7A728BC29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF40E4BA-5F8B-4C4F-967C-4CB7A728BC29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF40E4BA-5F8B-4C4F-967C-4CB7A728BC29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

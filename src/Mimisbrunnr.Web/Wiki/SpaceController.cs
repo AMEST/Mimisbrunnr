@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Mimisbrunnr.Web.Filters;
 using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.Wiki.Import;
+using Mimisbrunnr.Integration.Wiki;
 
 namespace Mimisbrunnr.Web.Wiki;
 

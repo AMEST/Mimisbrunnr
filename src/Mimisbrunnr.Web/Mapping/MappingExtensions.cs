@@ -1,13 +1,14 @@
 ﻿using System.Security.Claims;
-using Mimisbrunnr.Web.User;
 using Mimisbrunnr.Web.Infrastructure.Contracts;
 using Mimisbrunnr.Web.Quickstart;
 using Mimisbrunnr.Web.Wiki;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Web.Feed;
-using Mimisbrunnr.Web.Group;
 using Mimisbrunnr.Web.Administration;
 using Mimisbrunnr.Web.Authentication.Account;
+using Mimisbrunnr.Integration.Wiki;
+using Mimisbrunnr.Integration.Group;
+using Mimisbrunnr.Integration.User;
 
 namespace Mimisbrunnr.Web.Mapping;
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Mimisbrunnr.Web.Infrastructure;
-using Mimisbrunnr.Web.Wiki;
+using Mimisbrunnr.Integration.Wiki;
 
 namespace Mimisbrunnr.Web.Filters;
 
