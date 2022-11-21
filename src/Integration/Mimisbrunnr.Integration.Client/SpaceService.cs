@@ -19,8 +19,6 @@ public sealed class SpaceService
         var request = await _httpClient.GetAsync($"{ApiPath}", cancellationToken);
         if (request.StatusCode == HttpStatusCode.OK)
             return await request.Content.ReadFromJsonAsync<SpaceModel[]>(cancellationToken: cancellationToken);
-        if (request.StatusCode == HttpStatusCode.NotFound)
-            throw new NotFoundException();
 
         request.EnsureSuccessStatusCode();
         return null;

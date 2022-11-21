@@ -42,7 +42,7 @@ public class AttachmentService
     public async Task Upload(string pageId, Stream content, string name, CancellationToken cancellationToken = default)
     {
         using var multipartFormContent = new MultipartFormDataContent();
-        multipartFormContent.Add(new StreamContent(content), name: "file", fileName: name);
+        multipartFormContent.Add(new StreamContent(content), name: "attachment", fileName: name);
 
         var request = await _httpClient.PostAsync($"{ApiPath}/{pageId}", multipartFormContent, cancellationToken);
         if (request.StatusCode == HttpStatusCode.OK)

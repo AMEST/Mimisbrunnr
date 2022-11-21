@@ -1,4 +1,6 @@
-﻿namespace Mimisbrunnr.Integration.Wiki;
+﻿using System.Text.Json.Serialization;
+
+namespace Mimisbrunnr.Integration.Wiki;
 
 public class SpaceModel
 {
@@ -10,7 +12,9 @@ public class SpaceModel
 
     public string HomePageId { get; set; }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public SpaceTypeModel Type { get; set; }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public SpaceStatusModel Status { get; set; }
 }
