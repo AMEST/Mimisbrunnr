@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
+using Mimisbrunnr.DataImport;
+using Mimisbrunnr.DataImport.Confluence;
 using Mimisbrunnr.Persistent;
 using Mimisbrunnr.Storage.MongoDb;
 using Mimisbrunnr.Web.Host.Configuration;
@@ -8,7 +10,6 @@ using Mimisbrunnr.Web.Host.Services.Features;
 using Mimisbrunnr.Web.Host.Services.Metrics;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Services;
-using Mimisbrunnr.Web.Wiki.Import;
 using Mimisbrunnr.Wiki;
 using Skidbladnir.Caching.Distributed.MongoDB;
 using Skidbladnir.DataProtection.MongoDb;
@@ -21,7 +22,7 @@ public class StartupModule : Module
     public override Type[] DependsModules => new[]
     {
         typeof(AspNetModule), typeof(MongoDbStoreModule), typeof(WebModule), typeof(WikiModule), typeof(PersistentModule),
-        typeof(MetricsModule)
+        typeof(MetricsModule), typeof(ConfluenceDataImportModule)
     };
 
     public override void Configure(IServiceCollection services)
@@ -33,8 +34,8 @@ public class StartupModule : Module
         services.AddSingleton<IAuthorizationHandler, EnsureUserAuthorizationHandler>();
         services.AddSingleton<IPermissionService, PermissionService>();
         services.AddSingleton<IFeatureService, FeatureService>();
-        services.AddScoped<ISpaceImportService, ConfluenceSpaceImportService>();
         services.AddSingleton<ISecurityTokenService, SecurityTokenService>();
+        services.AddSingleton<IWikiService, DataImportWikiService>();
         ConfigureDistributedCache(services);
     }
 

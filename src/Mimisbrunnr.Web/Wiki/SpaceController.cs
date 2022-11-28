@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mimisbrunnr.Web.Filters;
 using Mimisbrunnr.Web.Mapping;
-using Mimisbrunnr.Web.Wiki.Import;
 using Mimisbrunnr.Integration.Wiki;
+using Mimisbrunnr.DataImport;
 
 namespace Mimisbrunnr.Web.Wiki;
 
@@ -23,9 +23,9 @@ public class SpaceController : ControllerBase
     };
 
     private readonly ISpaceService _spaceService;
-    private readonly ISpaceImportService _spaceImportService;
+    private readonly IDataImportService _spaceImportService;
 
-    public SpaceController(ISpaceService spaceService, ISpaceImportService spaceImportService)
+    public SpaceController(ISpaceService spaceService, IDataImportService spaceImportService)
     {
         _spaceImportService = spaceImportService;
         _spaceService = spaceService;
@@ -131,7 +131,7 @@ public class SpaceController : ControllerBase
         var userInfo = User?.ToEntity();
 
         var createdSpace = await _spaceService.Create(createModel, userInfo);
-        await _spaceImportService.Import(createdSpace, importZipStream, userInfo);
+        await _spaceImportService.ImportSpace(createdSpace, importZipStream);
 
         return Ok(createdSpace);
     }

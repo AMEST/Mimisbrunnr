@@ -1,36 +1,25 @@
 using System.IO.Compression;
 using System.Xml.Linq;
-using Mimisbrunnr.Web.Mapping;
-using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Integration.Wiki;
-using Mimisbrunnr.Web.Wiki.Import;
-using Mimisbrunnr.Wiki.Contracts;
-using Mimisbrunnr.Wiki.Services;
-using MongoDB.Driver;
 using ReverseMarkdown;
+using Mimisbrunnr.DataImport;
 using Skidbladnir.Utility.Common;
+using Mimisbrunnr.DataImport.Contracts;
+using Microsoft.Extensions.Logging;
 
 namespace Mimisbrunnr.Web.Host.Services;
 
-internal class ConfluenceSpaceImportService : ISpaceImportService
+internal class ConfluenceDataImportService : IDataImportService
 {
     private readonly Converter _markdownConverter;
-    private readonly IAttachmentManager _attachmentManager;
-    private readonly IPageManager _pageManager;
-    private readonly ISpaceManager _spaceManager;
-    private readonly IPermissionService _permissionService;
+    private readonly IWikiService _wikiService;
+    private readonly ILogger<ConfluenceDataImportService> _logger;
 
-    public ConfluenceSpaceImportService(
-        IPageManager pageManager,
-        ISpaceManager spaceManager,
-        IPermissionService permissionService,
-        IAttachmentManager attachmentManager
+    public ConfluenceDataImportService(
+        IWikiService wikiService,
+        ILogger<ConfluenceDataImportService> logger
     )
     {
-        _attachmentManager = attachmentManager;
-        _pageManager = pageManager;
-        _spaceManager = spaceManager;
-        _permissionService = permissionService;
         var markdownConfig = new Config
         {
             UnknownTags = Config.UnknownTagsOption.Bypass,
@@ -42,128 +31,148 @@ internal class ConfluenceSpaceImportService : ISpaceImportService
             SmartHrefHandling = true
         };
         _markdownConverter = new Converter(markdownConfig);
+        _wikiService = wikiService;
+        _logger = logger;
     }
 
-    public async Task Import(SpaceModel spaceModel, Stream importStream, UserInfo createdBy)
+    public async Task ImportSpace(SpaceModel space, Stream importStream)
     {
-        var space = await _spaceManager.GetByKey(spaceModel.Key);
         if (space is null)
             throw new SpaceNotFoundException();
 
-        await _permissionService.EnsureAdminPermission(space.Key, createdBy);
+        _logger.LogInformation("Starting import space to {SpaceKey}", space.Key);
+
         using (var archive = new ZipArchive(importStream))
         {
+            _logger.LogDebug("Open zip archive with exported space");
             var entities = await ReadEntitiesFromZip(archive);
             var entitiesDocument = XDocument.Parse(entities);
             entities = null;
             GC.Collect(); // HACK: used manual gc.collect for clean memory (confluence xml haven't structure and hav so trash data )
+            _logger.LogDebug("Parse Entities.xmls");
             var attachments = ParseAttachments(entitiesDocument);
             var contents = ParseContents(entitiesDocument);
             var pages = ParsePages(entitiesDocument);
             entitiesDocument = null;
             GC.Collect();
-            
+
+            _logger.LogDebug("Filter pages");
             pages = FilterMostRecent(pages);
 
-            var spaceHomePage = ToPage(pages.FirstOrDefault(x => !x.ContainsKey("parent") && x.ContainsKey("children")), space.Id, contents);
+            var spaceHomePage = ToPage(pages.FirstOrDefault(x => !x.ContainsKey("parent") && x.ContainsKey("children")), space.Key, contents);
             GC.Collect();
 
-            var flatPagesContracts = pages.Where(x => x.ContainsKey("parent")).Select(x => ToPage(x, space.Id, contents));
-            var pageTree = flatPagesContracts.ToModel(spaceHomePage, space);
+            var flatPagesContracts = pages.Where(x => x.ContainsKey("parent")).Select(x => ToPage(x, space.Key, contents));
+            var pageTree = ToPageTreeModel(flatPagesContracts, spaceHomePage);
             flatPagesContracts = null;
             contents.Clear();
             GC.Collect();
 
             var homePageAttachmentIds = pages.Where(x => x.ContainsKey("parent")).FirstOrDefault(x => x.ContainsKey("id") && ((string)x["id"]) == spaceHomePage.Id && x.ContainsKey("attachments"))
                 ?.Where(x => x.Key == "attachments")?.Select(x => x.Value)?.FirstOrDefault() as string[] ?? Array.Empty<string>();
-            await UpdateHomePage(space.HomePageId, spaceHomePage, attachments.Where(x => homePageAttachmentIds.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value), archive, createdBy);
-            
+            _logger.LogDebug("Update Homepage {PageId}", space.HomePageId);
+            await UpdateHomePage(space.HomePageId, spaceHomePage, attachments.Where(x => homePageAttachmentIds.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value), archive);
+
             foreach (var child in pageTree.Childs)
-                await CreatePageFromTree(child, space.Id, space.HomePageId, pages, attachments, archive, createdBy);
+                await CreatePageFromTree(child, space.Key, space.HomePageId, pages, attachments, archive);
             pages.Clear();
             pageTree = null;
             attachments.Clear();
         }
+        _logger.LogInformation("Import finished");
         GC.Collect();
     }
 
-    private async Task UpdateHomePage(string homePageId, Page newHomePage, IDictionary<string, string> attachments, ZipArchive archive, UserInfo updatedBy)
+    private async Task UpdateHomePage(string homePageId, PageModel newHomePage, IDictionary<string, string> attachments, ZipArchive archive)
     {
-        var actualHomePage = await _pageManager.GetById(homePageId);
-        actualHomePage.Content = newHomePage.Content;
-        actualHomePage.Name = newHomePage.Name;
-        actualHomePage.SpaceId = actualHomePage.SpaceId;
-        await _pageManager.Update(actualHomePage, updatedBy);
+        var pageUpdateModel = new PageUpdateModel()
+        {
+            Content = newHomePage.Content,
+            Name = newHomePage.Name
+        };
+        if (attachments.Keys.Count == 0)
+        {
+            await _wikiService.UpdatePage(homePageId, pageUpdateModel);
+            return;
+        }
 
-        if (attachments.Keys.Count == 0) return;
-        actualHomePage.Content = ConfluenceContentPreprocessing.PostProcess(actualHomePage.Content, actualHomePage.Id);
-        await _pageManager.Update(actualHomePage, updatedBy);
+        pageUpdateModel.Content = ConfluenceContentProcessing.PostProcess(newHomePage.Content, homePageId);
+        await _wikiService.UpdatePage(homePageId, pageUpdateModel);
 
         foreach (var (id, name) in attachments)
-            await UploadAttachment(actualHomePage, newHomePage.Id, id, name, archive, updatedBy);
+            await UploadAttachment(homePageId, newHomePage.Id, id, name, archive);
     }
 
-    private async Task CreatePageFromTree(PageTreeModel pageTreeModel, string spaceId, string parentPageId, IList<IDictionary<string, object>> rawPages, IDictionary<string, string> attachments, ZipArchive archive, UserInfo createdBy)
+    private async Task CreatePageFromTree(PageTreeModel pageTreeModel, string spaceKey, string parentPageId, IList<IDictionary<string, object>> rawPages, IDictionary<string, string> attachments, ZipArchive archive)
     {
-
-        var page = await _pageManager.Create(
-             spaceId,
-             pageTreeModel.Page.Name,
-             pageTreeModel.Page.Content,
-             createdBy,
-             parentPageId
-        );
+        var page = await _wikiService.CreatePage(new PageCreateModel(){
+            ParentPageId = parentPageId,
+            Content = pageTreeModel.Page.Content,
+            Name = pageTreeModel.Page.Name,
+            SpaceKey = spaceKey
+        });
 
         var pageAttachmentsIds = rawPages.Where(x => x.ContainsKey("parent")).FirstOrDefault(x => x.ContainsKey("id") && ((string)x["id"]) == pageTreeModel.Page.Id && x.ContainsKey("attachments"))
             ?.Where(x => x.Key == "attachments")?.Select(x => x.Value)?.FirstOrDefault() as string[] ?? Array.Empty<string>();
-        var pageAttachmens = attachments.Where(x => pageAttachmentsIds.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value);
-        if (pageAttachmens.Keys.Count != 0)
+        var pageAttachments = attachments.Where(x => pageAttachmentsIds.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value);
+        if (pageAttachments.Keys.Count != 0)
         {
-            page.Content = ConfluenceContentPreprocessing.PostProcess(page.Content, page.Id);
-            await _pageManager.Update(page, createdBy);
-            foreach (var (id, name) in pageAttachmens)
-                await UploadAttachment(page, pageTreeModel.Page.Id, id, name, archive, createdBy);
+            await _wikiService.UpdatePage(page.Id, new PageUpdateModel(){
+                Content = ConfluenceContentProcessing.PostProcess(page.Content, page.Id),
+                Name = page.Name
+            });
+            foreach (var (id, name) in pageAttachments)
+                await UploadAttachment(page.Id, pageTreeModel.Page.Id, id, name, archive);
         }
         foreach (var child in pageTreeModel.Childs)
-            await CreatePageFromTree(child, spaceId, page.Id, rawPages, attachments, archive, createdBy);
+            await CreatePageFromTree(child, spaceKey, page.Id, rawPages, attachments, archive);
 
     }
 
-    private async Task UploadAttachment(Page actualHomePage, string importPageId, string id, string name, ZipArchive archive, UserInfo updatedBy)
+    private async Task UploadAttachment(string pageId, string importPageId, string id, string name, ZipArchive archive)
     {
         var attachment = archive.Entries.Where(x => x.FullName.StartsWith($"attachments/{importPageId}/{id}"))?.OrderByDescending(x => x.FullName)?.FirstOrDefault();
         if (attachment == null) return;
 
-        using var ms = new MemoryStream();
+        // HACK: Catch (Temporary Any) Exception because confluence export maybe include two different attachments for one page with same name
         using (var attachmentStream = attachment.Open())
-            await attachmentStream.CopyToAsync(ms);
-        ms.Position = 0;
-
-        // HACK: Catch MongoWriteException because confluence export maybe include two different attachments for one page with same name
-        await Try.DoAsync(() => _attachmentManager.Upload(actualHomePage, ms, name, updatedBy), e => e is MongoWriteException);
+            await Try.DoAsync(() => _wikiService.UploadAttachment(pageId, attachmentStream, name), e => true);
         GC.Collect();
     }
 
-    private Page ToPage(IDictionary<string, object> page, string spaceId, IDictionary<string, string> contents)
+#region Mappings
+    private ExtendedPageModel ToPage(IDictionary<string, object> page, string spaceKey, IDictionary<string, string> contents)
     {
         var body = "Empty page";
         if (page.ContainsKey("bodyContents"))
         {
             var contentId = ((string[])page["bodyContents"]).First();
             var content = contents[contentId];
-            body = _markdownConverter.Convert(ConfluenceContentPreprocessing.Process(content));
+            body = _markdownConverter.Convert(ConfluenceContentProcessing.Process(content));
         }
 
-        return new Page
+        return new ExtendedPageModel()
         {
             Id = page.ContainsKey("id") ? page["id"]?.ToString() : string.Empty,
             Name = page.ContainsKey("title") ? page["title"]?.ToString() : string.Empty,
-            SpaceId = spaceId,
+            SpaceKey = spaceKey,
             Content = body,
             ParentId = page.ContainsKey("parent") ? page["parent"]?.ToString() : null
         };
     }
 
+    private static PageTreeModel ToPageTreeModel(IEnumerable<ExtendedPageModel> childs, PageModel rootPage)
+    {
+        var pageTree = new PageTreeModel
+        {
+            Page = rootPage
+        };
+        var childsPages = childs.Where(x => x.ParentId == rootPage?.Id).Select(x => ToPageTreeModel(childs, x)).ToList();
+        pageTree.Childs = childsPages;
+        return pageTree;
+    }
+#endregion
+#region  RawConfluenceXmlParse
     private static IList<IDictionary<string, object>> ParsePages(XDocument doc)
     {
         var allowedProperty = new string[] { "creatorName", "creationDate", "lastModificationDate", "title", "position", "version", "contentStatus" };
@@ -270,4 +279,5 @@ internal class ConfluenceSpaceImportService : ISpaceImportService
 
         return null;
     }
+#endregion
 }
