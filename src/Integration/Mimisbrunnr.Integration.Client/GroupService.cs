@@ -17,9 +17,11 @@ public sealed class GroupService
 
     public async Task<IEnumerable<GroupModel>> GetAll(GroupFilterModel filter = null, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.GetAsync($"{ApiPath}?{filter?.GetQueryString()}", cancellationToken);
+        var request = await _httpClient.GetAsync($"{ApiPath}?{filter?.GetQueryString()}", cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
-            return await request.Content.ReadFromJsonAsync<IEnumerable<GroupModel>>(cancellationToken: cancellationToken);
+            return await request.Content.ReadFromJsonAsync<IEnumerable<GroupModel>>(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
 
         request.EnsureSuccessStatusCode();
         return Array.Empty<GroupModel>();
@@ -27,11 +29,13 @@ public sealed class GroupService
 
     public async Task<GroupModel> Get(string name, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.GetAsync($"{ApiPath}/{name}", cancellationToken);
+        var request = await _httpClient.GetAsync($"{ApiPath}/{name}", cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
-            return await request.Content.ReadFromJsonAsync<GroupModel>(cancellationToken: cancellationToken);
+            return await request.Content.ReadFromJsonAsync<GroupModel>(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.NotFound)
-            throw new NotFoundException();
+            throw new NotFoundException($"Group with name: {name} not found");
 
         request.EnsureSuccessStatusCode();
         return null;
@@ -39,9 +43,11 @@ public sealed class GroupService
 
     public async Task<GroupModel> Create(GroupCreateModel createModel, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.PostAsJsonAsync($"{ApiPath}", createModel, cancellationToken);
+        var request = await _httpClient.PostAsJsonAsync($"{ApiPath}", createModel, cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
-            return await request.Content.ReadFromJsonAsync<GroupModel>(cancellationToken: cancellationToken);
+            return await request.Content.ReadFromJsonAsync<GroupModel>(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
 
         request.EnsureSuccessStatusCode();
         return null;
@@ -49,7 +55,8 @@ public sealed class GroupService
 
     public async Task Remove(string name, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.DeleteAsync($"{ApiPath}/{name}", cancellationToken);
+        var request = await _httpClient.DeleteAsync($"{ApiPath}/{name}", cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
             return;
 
@@ -58,7 +65,8 @@ public sealed class GroupService
 
     public async Task Update(string name, GroupUpdateModel model, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.PutAsJsonAsync($"{ApiPath}/{name}", model, cancellationToken);
+        var request = await _httpClient.PutAsJsonAsync($"{ApiPath}/{name}", model, cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
             return;
 
@@ -67,11 +75,13 @@ public sealed class GroupService
 
     public async Task<IEnumerable<UserModel>> GetUsers(string name, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.GetAsync($"{ApiPath}/{name}/users", cancellationToken);
+        var request = await _httpClient.GetAsync($"{ApiPath}/{name}/users", cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
-            return await request.Content.ReadFromJsonAsync<IEnumerable<UserModel>>(cancellationToken: cancellationToken);
+            return await request.Content.ReadFromJsonAsync<IEnumerable<UserModel>>(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.NotFound)
-            throw new NotFoundException();
+            throw new NotFoundException($"Group with name: {name} not found");
 
         request.EnsureSuccessStatusCode();
         return Array.Empty<UserModel>();
@@ -79,7 +89,8 @@ public sealed class GroupService
 
     public async Task AddUserToGroup(string name, UserModel user, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.PostAsync($"{ApiPath}/{name}/{user.Email}", null, cancellationToken);
+        var request = await _httpClient.PostAsync($"{ApiPath}/{name}/{user.Email}", null, cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
             return;
 
@@ -88,7 +99,8 @@ public sealed class GroupService
 
     public async Task RemoveUserFromGroup(string name, UserModel user, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.DeleteAsync($"{ApiPath}/{name}/{user.Email}", cancellationToken);
+        var request = await _httpClient.DeleteAsync($"{ApiPath}/{name}/{user.Email}", cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
             return;
 

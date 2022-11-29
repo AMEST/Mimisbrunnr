@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimisbrunnr.DataImport", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimisbrunnr.DataImport.Confluence", "src\DataImport\Mimisbrunnr.DataImport.Confluence\Mimisbrunnr.DataImport.Confluence.csproj", "{F5D75103-4E53-4514-B228-CA98923B78DC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimisbrunnr.DataImport.Cli", "src\DataImport\Mimisbrunnr.DataImport.Cli\Mimisbrunnr.DataImport.Cli.csproj", "{9584A06E-3865-446C-9534-FB917583A75B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,7 @@ Global
 		{FB23071D-A3D3-4519-8A7F-BF76826A8BE7} = {7B5B41ED-0FD9-4F24-9BA1-5D1C0D476611}
 		{F5A0057B-E96E-422D-9CC2-E4568A4775B2} = {FB23071D-A3D3-4519-8A7F-BF76826A8BE7}
 		{F5D75103-4E53-4514-B228-CA98923B78DC} = {FB23071D-A3D3-4519-8A7F-BF76826A8BE7}
+		{9584A06E-3865-446C-9534-FB917583A75B} = {FB23071D-A3D3-4519-8A7F-BF76826A8BE7}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{84B0F1E6-567E-4136-8D51-E469D460C261}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -102,5 +105,9 @@ Global
 		{F5D75103-4E53-4514-B228-CA98923B78DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5D75103-4E53-4514-B228-CA98923B78DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5D75103-4E53-4514-B228-CA98923B78DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9584A06E-3865-446C-9534-FB917583A75B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9584A06E-3865-446C-9534-FB917583A75B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9584A06E-3865-446C-9534-FB917583A75B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9584A06E-3865-446C-9534-FB917583A75B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

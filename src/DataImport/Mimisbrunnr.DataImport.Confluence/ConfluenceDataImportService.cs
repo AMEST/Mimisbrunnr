@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Mimisbrunnr.Web.Host.Services;
 
-internal class ConfluenceDataImportService : IDataImportService
+public class ConfluenceDataImportService : IDataImportService
 {
     private readonly Converter _markdownConverter;
     private readonly IWikiService _wikiService;
@@ -45,42 +45,42 @@ internal class ConfluenceDataImportService : IDataImportService
         using (var archive = new ZipArchive(importStream))
         {
             _logger.LogDebug("Open zip archive with exported space");
-            var entities = await ReadEntitiesFromZip(archive);
+            var entities = await ReadEntitiesFromZip(archive).ConfigureAwait(false);
             var entitiesDocument = XDocument.Parse(entities);
             entities = null;
-            GC.Collect(); // HACK: used manual gc.collect for clean memory (confluence xml haven't structure and hav so trash data )
+
             _logger.LogDebug("Parse Entities.xmls");
             var attachments = ParseAttachments(entitiesDocument);
             var contents = ParseContents(entitiesDocument);
             var pages = ParsePages(entitiesDocument);
             entitiesDocument = null;
-            GC.Collect();
+
 
             _logger.LogDebug("Filter pages");
             pages = FilterMostRecent(pages);
 
             var spaceHomePage = ToPage(pages.FirstOrDefault(x => !x.ContainsKey("parent") && x.ContainsKey("children")), space.Key, contents);
-            GC.Collect();
 
             var flatPagesContracts = pages.Where(x => x.ContainsKey("parent")).Select(x => ToPage(x, space.Key, contents));
             var pageTree = ToPageTreeModel(flatPagesContracts, spaceHomePage);
             flatPagesContracts = null;
             contents.Clear();
-            GC.Collect();
 
             var homePageAttachmentIds = pages.Where(x => x.ContainsKey("parent")).FirstOrDefault(x => x.ContainsKey("id") && ((string)x["id"]) == spaceHomePage.Id && x.ContainsKey("attachments"))
                 ?.Where(x => x.Key == "attachments")?.Select(x => x.Value)?.FirstOrDefault() as string[] ?? Array.Empty<string>();
             _logger.LogDebug("Update Homepage {PageId}", space.HomePageId);
-            await UpdateHomePage(space.HomePageId, spaceHomePage, attachments.Where(x => homePageAttachmentIds.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value), archive);
+            await UpdateHomePage(space.HomePageId, spaceHomePage, 
+                attachments.Where(x => homePageAttachmentIds.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value), archive)
+                    .ConfigureAwait(false);
 
             foreach (var child in pageTree.Childs)
-                await CreatePageFromTree(child, space.Key, space.HomePageId, pages, attachments, archive);
+                await CreatePageFromTree(child, space.Key, space.HomePageId, pages, attachments, archive)  
+                    .ConfigureAwait(false);
             pages.Clear();
             pageTree = null;
             attachments.Clear();
         }
         _logger.LogInformation("Import finished");
-        GC.Collect();
     }
 
     private async Task UpdateHomePage(string homePageId, PageModel newHomePage, IDictionary<string, string> attachments, ZipArchive archive)
@@ -92,7 +92,8 @@ internal class ConfluenceDataImportService : IDataImportService
         };
         if (attachments.Keys.Count == 0)
         {
-            await _wikiService.UpdatePage(homePageId, pageUpdateModel);
+            await _wikiService.UpdatePage(homePageId, pageUpdateModel)
+                .ConfigureAwait(false);
             return;
         }
 
@@ -100,17 +101,19 @@ internal class ConfluenceDataImportService : IDataImportService
         await _wikiService.UpdatePage(homePageId, pageUpdateModel);
 
         foreach (var (id, name) in attachments)
-            await UploadAttachment(homePageId, newHomePage.Id, id, name, archive);
+            await UploadAttachment(homePageId, newHomePage.Id, id, name, archive)
+                .ConfigureAwait(false);
     }
 
     private async Task CreatePageFromTree(PageTreeModel pageTreeModel, string spaceKey, string parentPageId, IList<IDictionary<string, object>> rawPages, IDictionary<string, string> attachments, ZipArchive archive)
     {
+        _logger.LogDebug("Creating page {PageName}", pageTreeModel.Page.Name);
         var page = await _wikiService.CreatePage(new PageCreateModel(){
             ParentPageId = parentPageId,
             Content = pageTreeModel.Page.Content,
             Name = pageTreeModel.Page.Name,
             SpaceKey = spaceKey
-        });
+        }).ConfigureAwait(false);
 
         var pageAttachmentsIds = rawPages.Where(x => x.ContainsKey("parent")).FirstOrDefault(x => x.ContainsKey("id") && ((string)x["id"]) == pageTreeModel.Page.Id && x.ContainsKey("attachments"))
             ?.Where(x => x.Key == "attachments")?.Select(x => x.Value)?.FirstOrDefault() as string[] ?? Array.Empty<string>();
@@ -120,12 +123,14 @@ internal class ConfluenceDataImportService : IDataImportService
             await _wikiService.UpdatePage(page.Id, new PageUpdateModel(){
                 Content = ConfluenceContentProcessing.PostProcess(page.Content, page.Id),
                 Name = page.Name
-            });
+            }).ConfigureAwait(false);
             foreach (var (id, name) in pageAttachments)
-                await UploadAttachment(page.Id, pageTreeModel.Page.Id, id, name, archive);
+                await UploadAttachment(page.Id, pageTreeModel.Page.Id, id, name, archive)
+                    .ConfigureAwait(false);
         }
         foreach (var child in pageTreeModel.Childs)
-            await CreatePageFromTree(child, spaceKey, page.Id, rawPages, attachments, archive);
+            await CreatePageFromTree(child, spaceKey, page.Id, rawPages, attachments, archive)
+                .ConfigureAwait(false);
 
     }
 
@@ -134,10 +139,11 @@ internal class ConfluenceDataImportService : IDataImportService
         var attachment = archive.Entries.Where(x => x.FullName.StartsWith($"attachments/{importPageId}/{id}"))?.OrderByDescending(x => x.FullName)?.FirstOrDefault();
         if (attachment == null) return;
 
+        _logger.LogDebug("Upload attachment {AttachmentName} to page {PageId}", name, pageId);
         // HACK: Catch (Temporary Any) Exception because confluence export maybe include two different attachments for one page with same name
         using (var attachmentStream = attachment.Open())
-            await Try.DoAsync(() => _wikiService.UploadAttachment(pageId, attachmentStream, name), e => true);
-        GC.Collect();
+            await Try.DoAsync(() => _wikiService.UploadAttachment(pageId, attachmentStream, name), e => true)
+                .ConfigureAwait(false);
     }
 
 #region Mappings
@@ -228,7 +234,6 @@ internal class ConfluenceDataImportService : IDataImportService
                 latestPages[id] = page;
         }
         currentPages = null;
-        GC.Collect();
         return latestPages.Values.ToList();
     }
 
@@ -266,14 +271,14 @@ internal class ConfluenceDataImportService : IDataImportService
         return attachesDict;
     }
 
-    private static Task<string> ReadEntitiesFromZip(ZipArchive archive)
+    private static async Task<string> ReadEntitiesFromZip(ZipArchive archive)
     {
         foreach (ZipArchiveEntry entry in archive.Entries)
         {
             if (entry.FullName.Equals("entities.xml", StringComparison.OrdinalIgnoreCase))
             {
                 using var reader = new StreamReader(entry.Open());
-                return reader.ReadToEndAsync();
+                return await reader.ReadToEndAsync().ConfigureAwait(false);
             }
         }
 

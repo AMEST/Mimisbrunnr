@@ -17,11 +17,13 @@ public sealed class PageService
 
     public async Task<PageModel> GetById(string pageId, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.GetAsync($"{ApiPath}/{pageId}", cancellationToken);
+        var request = await _httpClient.GetAsync($"{ApiPath}/{pageId}", cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
-            return await request.Content.ReadFromJsonAsync<PageModel>(cancellationToken: cancellationToken);
+            return await request.Content.ReadFromJsonAsync<PageModel>(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.NotFound)
-            throw new NotFoundException();
+            throw new NotFoundException($"Page with id: {pageId} not found");
 
         request.EnsureSuccessStatusCode();
         return null;
@@ -29,11 +31,13 @@ public sealed class PageService
 
     public async Task<PageTreeModel> GetPageTreeModel(string pageId, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.GetAsync($"{ApiPath}/{pageId}/tree", cancellationToken);
+        var request = await _httpClient.GetAsync($"{ApiPath}/{pageId}/tree", cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
-            return await request.Content.ReadFromJsonAsync<PageTreeModel>(cancellationToken: cancellationToken);
+            return await request.Content.ReadFromJsonAsync<PageTreeModel>(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.NotFound)
-            throw new NotFoundException();
+            throw new NotFoundException($"Page with id: {pageId} not found");
 
         request.EnsureSuccessStatusCode();
         return null;
@@ -41,9 +45,11 @@ public sealed class PageService
 
     public async Task<PageModel> Create(PageCreateModel createModel, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.PostAsJsonAsync($"{ApiPath}", createModel, cancellationToken: cancellationToken);
+        var request = await _httpClient.PostAsJsonAsync($"{ApiPath}", createModel, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
-            return await request.Content.ReadFromJsonAsync<PageModel>(cancellationToken: cancellationToken);
+            return await request.Content.ReadFromJsonAsync<PageModel>(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
 
         request.EnsureSuccessStatusCode();
         return null;
@@ -51,31 +57,35 @@ public sealed class PageService
 
     public async Task Update(string pageId, PageUpdateModel updateModel, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.PutAsJsonAsync($"{ApiPath}/{pageId}", updateModel, cancellationToken: cancellationToken);
+        var request = await _httpClient.PutAsJsonAsync($"{ApiPath}/{pageId}", updateModel, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
             return;
         if (request.StatusCode == HttpStatusCode.NotFound)
-            throw new NotFoundException();
+            throw new NotFoundException($"Page with id: {pageId} not found");
 
         request.EnsureSuccessStatusCode();
     }
 
     public async Task Delete(string pageId, bool recursively = false, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.DeleteAsync($"{ApiPath}/{pageId}?recursively={recursively}", cancellationToken);
+        var request = await _httpClient.DeleteAsync($"{ApiPath}/{pageId}?recursively={recursively}", cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
             return;
         if (request.StatusCode == HttpStatusCode.NotFound)
-            throw new NotFoundException();
+            return;
 
         request.EnsureSuccessStatusCode();
     }
 
     public async Task<PageModel> Copy(string sourcePageId, string destinationParentPageId, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.PostAsync($"{ApiPath}/copy/{sourcePageId}/{destinationParentPageId}", null, cancellationToken);
+        var request = await _httpClient.PostAsync($"{ApiPath}/copy/{sourcePageId}/{destinationParentPageId}", null, cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
-            return await request.Content.ReadFromJsonAsync<PageModel>(cancellationToken: cancellationToken);
+            return await request.Content.ReadFromJsonAsync<PageModel>(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
 
         request.EnsureSuccessStatusCode();
         return null;
@@ -83,9 +93,11 @@ public sealed class PageService
 
     public async Task<PageModel> Move(string sourcePageId, string destinationParentPageId, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.PostAsync($"{ApiPath}/move/{sourcePageId}/{destinationParentPageId}", null, cancellationToken);
+        var request = await _httpClient.PostAsync($"{ApiPath}/move/{sourcePageId}/{destinationParentPageId}", null, cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
-            return await request.Content.ReadFromJsonAsync<PageModel>(cancellationToken: cancellationToken);
+            return await request.Content.ReadFromJsonAsync<PageModel>(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
 
         request.EnsureSuccessStatusCode();
         return null;

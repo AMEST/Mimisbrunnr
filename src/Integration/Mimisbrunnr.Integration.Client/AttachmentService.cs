@@ -17,11 +17,13 @@ public class AttachmentService
 
     public async Task<AttachmentModel[]> GetAttachments(string pageId, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.GetAsync($"{ApiPath}/{pageId}", cancellationToken);
+        var request = await _httpClient.GetAsync($"{ApiPath}/{pageId}", cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
-            return await request.Content.ReadFromJsonAsync<AttachmentModel[]>(cancellationToken: cancellationToken);
+            return await request.Content.ReadFromJsonAsync<AttachmentModel[]>(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.NotFound)
-            throw new NotFoundException();
+            throw new NotFoundException($"Page {pageId} not found");
 
         request.EnsureSuccessStatusCode();
         return null;
@@ -29,11 +31,13 @@ public class AttachmentService
 
     public async Task<Stream> GetAttachmentContent(string pageId, string name, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.GetAsync($"{ApiPath}/{pageId}/{name}", cancellationToken);
+        var request = await _httpClient.GetAsync($"{ApiPath}/{pageId}/{name}", cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
-            return await request.Content.ReadAsStreamAsync(cancellationToken: cancellationToken);
+            return await request.Content.ReadAsStreamAsync(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.NotFound)
-            throw new NotFoundException();
+            throw new NotFoundException($"Attachemnt {name} not found or page {pageId} deleted");
 
         request.EnsureSuccessStatusCode();
         return null;
@@ -44,7 +48,8 @@ public class AttachmentService
         using var multipartFormContent = new MultipartFormDataContent();
         multipartFormContent.Add(new StreamContent(content), name: "attachment", fileName: name);
 
-        var request = await _httpClient.PostAsync($"{ApiPath}/{pageId}", multipartFormContent, cancellationToken);
+        var request = await _httpClient.PostAsync($"{ApiPath}/{pageId}", multipartFormContent, cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
             return;
 
@@ -54,7 +59,8 @@ public class AttachmentService
 
     public async Task Remove(string pageId, string name, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.DeleteAsync($"{ApiPath}/{pageId}/{name}", cancellationToken);
+        var request = await _httpClient.DeleteAsync($"{ApiPath}/{pageId}/{name}", cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
             return;
 

@@ -19,19 +19,23 @@ public sealed class UserService
     public async Task<IEnumerable<UserModel>> GetAll(int? offset = null, CancellationToken cancellationToken = default)
     {
         var offsetParameter = offset.HasValue ? $"?offset={offset}" : "";
-        var request = await _httpClient.GetAsync($"{ApiPath}{offsetParameter}", cancellationToken);
+        var request = await _httpClient.GetAsync($"{ApiPath}{offsetParameter}", cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
-            return await request.Content.ReadFromJsonAsync<IEnumerable<UserModel>>(cancellationToken: cancellationToken);
+            return await request.Content.ReadFromJsonAsync<IEnumerable<UserModel>>(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
 
         request.EnsureSuccessStatusCode();
-        return null;
+        return Array.Empty<UserModel>();
     }
 
     public async Task<UserViewModel> GetCurrent(CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.GetAsync($"{ApiPath}/current", cancellationToken);
+        var request = await _httpClient.GetAsync($"{ApiPath}/current", cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
-            return await request.Content.ReadFromJsonAsync<UserViewModel>(cancellationToken: cancellationToken);
+            return await request.Content.ReadFromJsonAsync<UserViewModel>(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.NotFound)
             return null;
 
@@ -41,9 +45,11 @@ public sealed class UserService
 
     public async Task<IEnumerable<GroupModel>> GetUserGroups(string email, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.GetAsync($"{ApiPath}/{email}/groups", cancellationToken);
+        var request = await _httpClient.GetAsync($"{ApiPath}/{email}/groups", cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
-            return await request.Content.ReadFromJsonAsync<IEnumerable<GroupModel>>(cancellationToken: cancellationToken);
+            return await request.Content.ReadFromJsonAsync<IEnumerable<GroupModel>>(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
 
         request.EnsureSuccessStatusCode();
         return null;
@@ -51,9 +57,11 @@ public sealed class UserService
 
     public async Task<UserProfileModel> GetByEmail(string email, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.GetAsync($"{ApiPath}/{email}", cancellationToken);
+        var request = await _httpClient.GetAsync($"{ApiPath}/{email}", cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
-            return await request.Content.ReadFromJsonAsync<UserProfileModel>(cancellationToken: cancellationToken);
+            return await request.Content.ReadFromJsonAsync<UserProfileModel>(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.NotFound)
             return null;
 
@@ -63,7 +71,8 @@ public sealed class UserService
 
     public async Task Disable(string email, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.PostAsync($"{ApiPath}/{email}/disable", null, cancellationToken);
+        var request = await _httpClient.PostAsync($"{ApiPath}/{email}/disable", null, cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
             return;
 
@@ -72,7 +81,8 @@ public sealed class UserService
 
     public async Task Enable(string email, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.PostAsync($"{ApiPath}/{email}/enable", null, cancellationToken);
+        var request = await _httpClient.PostAsync($"{ApiPath}/{email}/enable", null, cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
             return;
 
@@ -81,7 +91,8 @@ public sealed class UserService
 
     public async Task Promote(string email, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.PostAsync($"{ApiPath}/{email}/promote", null, cancellationToken);
+        var request = await _httpClient.PostAsync($"{ApiPath}/{email}/promote", null, cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
             return;
 
@@ -90,7 +101,8 @@ public sealed class UserService
 
     public async Task Demote(string email, CancellationToken cancellationToken = default)
     {
-        var request = await _httpClient.PostAsync($"{ApiPath}/{email}/demote", null, cancellationToken);
+        var request = await _httpClient.PostAsync($"{ApiPath}/{email}/demote", null, cancellationToken)
+            .ConfigureAwait(false);
         if (request.StatusCode == HttpStatusCode.OK)
             return;
 
