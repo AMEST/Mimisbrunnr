@@ -15,8 +15,8 @@ static int Main(CliConfiguration configuration)
         filePath    = {configuration.OptFile},
         fullFilePath    = {Path.GetFullPath(configuration.OptFile)},
         createSpace = {configuration.OptCreateSpace} 
-    }}");
-    
+}}");
+
     if (string.IsNullOrEmpty(configuration.OptFile) || !File.Exists(Path.GetFullPath(configuration.OptFile)))
         throw new ArgumentException("File path not set or file not found");
 
