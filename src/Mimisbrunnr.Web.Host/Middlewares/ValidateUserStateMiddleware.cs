@@ -41,14 +41,17 @@ internal class ValidateUserStateMiddleware
             context.Response.Redirect("/error/account-disabled");
     }
 
-    private async Task SyncUser(IUserManager userManager, Users.User user, UserInfo userInfo)
+    private static async Task SyncUser(IUserManager userManager, Users.User user, UserInfo userInfo)
     {
         if (user.AvatarUrl == userInfo.AvatarUrl
             && user.Name != userInfo.Name)
             return;
 
-        user.AvatarUrl = userInfo.AvatarUrl;
-        user.Name = userInfo.Name;
+        if(!string.IsNullOrEmpty(userInfo.AvatarUrl))
+            user.AvatarUrl = userInfo.AvatarUrl;
+        if(!string.IsNullOrEmpty(userInfo.Name))
+            user.Name = userInfo.Name;
+            
         await userManager.UpdateUserInfo(user);
     }
 }
