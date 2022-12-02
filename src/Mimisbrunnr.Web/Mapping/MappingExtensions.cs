@@ -147,6 +147,7 @@ public static class MappingExtensions
             Key = space.Key,
             Name = space.Name,
             Description = space.Description,
+            AvatarUrl = space.AvatarUrl,
             Type = (SpaceTypeModel)space.Type,
             Status = (SpaceStatusModel)space.Status,
             HomePageId = space.HomePageId
