@@ -11,6 +11,24 @@
 
 </div>
 
+- [Mimisbrunnr - wiki system (like confluence)](#mimisbrunnr---wiki-system-like-confluence)
+  - [Links](#links)
+  - [Description](#description)
+    - [Features](#features)
+  - [Screenshots](#screenshots)
+  - [Get started](#get-started)
+    - [Configuration](#configuration)
+      - [Authentication](#authentication)
+      - [Database](#database)
+      - [Caching](#caching)
+      - [Persistent](#persistent)
+      - [Metrics](#metrics)
+    - [Deploy](#deploy)
+      - [Docker compose (swarm)](#docker-compose-swarm)
+  - [Import spaces via cli](#import-spaces-via-cli)
+    - [CommandLine arguments](#commandline-arguments)
+    - [Example](#example)
+
 ## Links
 * **[Try Mimisbrunnr](https://wiki.nb-47.ml)**  
 * **[Docker image](https://hub.docker.com/r/eluki/mimisbrunnr-wiki)**
@@ -25,7 +43,7 @@ Support for the following features:
 
 - Spaces
   - Create personal, private or public spaces
-  - Import pages from **Confluence** when creating new space
+  - Import pages from **Confluence** when creating new space or [use cli](#import-spaces-via-cli)
   - Configure permissions: allow view / edit / delete pages for individual users or groups
   - Space directory with list user visible spaces
   - Tree of pages
@@ -210,4 +228,39 @@ services:
         max-size: "3m"
         max-file: "3"
 
+```
+
+## Import spaces via cli
+
+The service supports basic import of spaces (pages and attachments) from Atlassian Confluence. This is possible in two ways:
+1. In the interface, when creating a space, you can attach an archive with an exported space. But it is not very suitable for large spaces. there may be restrictions on the downloaded archive, as well as this process will be processed by the host, which may adversely affect its performance.
+2. Use a special console utility with which you can easily import space of any size, as well as monitor the status of the process by messages in the console.
+
+You can download the latest CLI from the releases page(https://github.com/AMEST/Mimisbrunnr/releases/latest)
+
+### CommandLine arguments
+
+| Argument       | Type   | Description                                  |
+| -------------- | ------ | -------------------------------------------- |
+| --host=        | string | Base url to Mimisbrunnr Wiki instance        |
+| --space=       | string | Space key                                    |
+| --token=       | sting  | Access token for Mimisbrunnr Wiki            |
+| --file=        | string | File path to exported zip                    |
+| --create-space | flag   | **(Optional)** Need create space when import |
+| -h --help      | flag   | **(Optional)** Show this screen.             |
+
+### Example
+
+To use the CLI you need:
+* Export space from Atlassian Confluence
+* Download CLI for your OS
+* Issue a personal token in your instance profile Mimisbrunnr Wiki
+* Run CLI like below
+
+```
+./mimisbrunnr-import-cli --host="https://wiki.local" \
+     --space=myspace \
+     --token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c" \
+     --file="/tmp/Confluence-space-export-160423-660.xml.zip" \
+     --create-space
 ```
