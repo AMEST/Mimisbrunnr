@@ -2,8 +2,8 @@ using Mimisbrunnr.Users;
 using Mimisbrunnr.Users.Services;
 using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.Services;
-using Mimisbrunnr.Web.User;
-using Mimisbrunnr.Web.Wiki;
+using Mimisbrunnr.Integration.User;
+using Mimisbrunnr.Integration.Wiki;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;
 

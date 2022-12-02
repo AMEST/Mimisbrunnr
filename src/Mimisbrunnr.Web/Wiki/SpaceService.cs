@@ -1,15 +1,13 @@
-﻿using System.IO.Compression;
-using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
-using Microsoft.Extensions.Caching.Distributed;
+﻿using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Mimisbrunnr.Users;
-using Mimisbrunnr.Web.Group;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;
+using Mimisbrunnr.Integration.Wiki;
+using Mimisbrunnr.Integration.Group;
 
 namespace Mimisbrunnr.Web.Wiki;
 

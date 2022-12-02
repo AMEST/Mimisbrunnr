@@ -1,4 +1,5 @@
 ﻿using Mimisbrunnr.Wiki.Contracts;
+using Mimisbrunnr.Integration.Wiki;
 
 namespace Mimisbrunnr.Web.Wiki;
 

@@ -18,8 +18,8 @@ public class AspNetModule : Module
         var bearerConfiguration = Configuration.Get<BearerTokenConfiguration>();
         if(string.IsNullOrEmpty(bearerConfiguration.SymmetricKey))
             throw new ApplicationException("Bearer:SymmetricKey can't be null or empty");
-
-        services.AddAuthentication(options =>
+        services.AddHttpContextAccessor()
+            .AddAuthentication(options =>
             {
                 options.DefaultScheme = JwtOrCookeSchemeName;
                 options.DefaultChallengeScheme = JwtOrCookeSchemeName;

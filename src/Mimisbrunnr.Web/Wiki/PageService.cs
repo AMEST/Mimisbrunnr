@@ -3,6 +3,7 @@ using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;
+using Mimisbrunnr.Integration.Wiki;
 
 namespace Mimisbrunnr.Web.Wiki;
 

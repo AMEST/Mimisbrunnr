@@ -29,7 +29,6 @@
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.3" />
         <PackageReference Include="prometheus-net.AspNetCore" Version="6.0.0" />
         <PackageReference Include="prometheus-net.DotNetRuntime" Version="4.2.4" />
-        <PackageReference Include="ReverseMarkdown" Version="3.23.1" />
         <PackageReference Include="Skidbladnir.Caching.Distributed.MongoDB" Version="1.5.0" />
         <PackageReference Include="Skidbladnir.DataProtection.MongoDb" Version="1.5.0" />
         <PackageReference Include="Skidbladnir.Modules" Version="1.5.0" />
@@ -44,6 +43,7 @@
         <ProjectReference Include="..\Mimisbrunnr.Storage.MongoDb\Mimisbrunnr.Storage.MongoDb.csproj" />
         <ProjectReference Include="..\Mimisbrunnr.Web\Mimisbrunnr.Web.csproj" />
         <ProjectReference Include="..\Mimisbrunnr.Persistent\Mimisbrunnr.Persistent.csproj" />
+        <ProjectReference Include="..\DataImport\Mimisbrunnr.DataImport.Confluence\Mimisbrunnr.DataImport.Confluence.csproj" />
     </ItemGroup>
     
     <!-- Vue Integration -->

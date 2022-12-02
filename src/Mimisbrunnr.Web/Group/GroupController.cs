@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Mimisbrunnr.Web.Filters;
 using Mimisbrunnr.Web.Mapping;
-using Mimisbrunnr.Web.User;
+using Mimisbrunnr.Integration.User;
+using Mimisbrunnr.Integration.Group;
 using Mimisbrunnr.Wiki.Contracts;
 
 namespace Mimisbrunnr.Web.Group;

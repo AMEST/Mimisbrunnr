@@ -1,4 +1,5 @@
-using Mimisbrunnr.Web.Group;
+using Mimisbrunnr.Integration.Group;
+using Mimisbrunnr.Integration.User;
 using Mimisbrunnr.Wiki.Contracts;
 
 namespace Mimisbrunnr.Web.User

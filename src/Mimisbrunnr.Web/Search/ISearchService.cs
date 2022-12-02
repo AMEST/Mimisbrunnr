@@ -1,5 +1,5 @@
-using Mimisbrunnr.Web.User;
-using Mimisbrunnr.Web.Wiki;
+using Mimisbrunnr.Integration.User;
+using Mimisbrunnr.Integration.Wiki;
 using Mimisbrunnr.Wiki.Contracts;
 
 namespace Mimisbrunnr.Web.Search;

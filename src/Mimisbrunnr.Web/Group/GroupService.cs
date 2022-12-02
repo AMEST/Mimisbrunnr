@@ -1,8 +1,8 @@
-using System.Runtime.CompilerServices;
 using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Mapping;
-using Mimisbrunnr.Web.User;
+using Mimisbrunnr.Integration.User;
+using Mimisbrunnr.Integration.Group;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;
 
