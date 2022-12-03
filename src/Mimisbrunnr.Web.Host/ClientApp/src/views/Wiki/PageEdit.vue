@@ -56,7 +56,7 @@ import Attachments from "@/components/space/modal/Attachments.vue";
 import VueSimplemde from "vue-simplemde";
 import VueMarkdown from "vue-markdown";
 import axios from "axios";
-import { debounce } from "@/services/Utils.js";
+import { debounce, isImageFile } from "@/services/Utils.js";
 import DraftModal from "@/components/pageEditor/DraftModal.vue";
 import ProfileService from "@/services/profileService";
 export default {
@@ -200,7 +200,7 @@ export default {
       )}`;
       var linkElement = `[${attachment.name}](${linkToAttach})`;
 
-      if (this.isImageFile(attachment.name)) linkElement = `!${linkElement}`;
+      if (isImageFile(attachment.name)) linkElement = `!${linkElement}`;
 
       var cursor = this.simplemde.codemirror.getCursor();
       this.simplemde.codemirror.setSelection(cursor, cursor);
@@ -220,7 +220,6 @@ export default {
       );
     },
     dragAndDrop: async function (codeMirror, dropEvent) {
-      var self = this;
       if (dropEvent.dataTransfer.items.length == 0) return;
       var dropItem = dropEvent.dataTransfer.items[0];
       if (dropItem.kind == "string" && dropItem.type == "text/plain") {
@@ -229,7 +228,7 @@ export default {
             return;
 
           var link = `[${data}](${data})`;
-          if (self.isImageFile(data)) link = `!${link}`;
+          if (isImageFile(data)) link = `!${link}`;
           var cursor = codeMirror.getCursor();
           codeMirror.setSelection(cursor, cursor);
           codeMirror.replaceSelection(link);
@@ -249,15 +248,6 @@ export default {
         this.addAttachmentLink({ name: droppedFile.name });
         return;
       }
-    },
-    isImageFile(data) {
-      return (
-        data.toLowerCase().endsWith(".png") ||
-        data.toLowerCase().endsWith(".jpg") ||
-        data.toLowerCase().endsWith(".jpeg") ||
-        data.toLowerCase().endsWith(".gif") ||
-        data.toLowerCase().endsWith(".svg")
-      );
     },
     toggleSideBySide: function toggleSideBySide() {
       var editor = this.simplemde;
