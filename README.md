@@ -258,7 +258,7 @@ To use the CLI you need:
 * Run CLI like below
 
 ```
-./mimisbrunnr-import-cli --host="https://wiki.local" \
+./Mimisbrunnr.DataImport.Cli --host="https://wiki.local" \
      --space=myspace \
      --token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c" \
      --file="/tmp/Confluence-space-export-160423-660.xml.zip" \
