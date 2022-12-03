@@ -12,6 +12,8 @@ public class SpaceModel
 
     public string HomePageId { get; set; }
 
+    public string AvatarUrl { get; set; }
+
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public SpaceTypeModel Type { get; set; }
 

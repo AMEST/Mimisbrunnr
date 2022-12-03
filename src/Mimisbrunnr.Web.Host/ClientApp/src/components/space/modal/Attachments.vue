@@ -5,7 +5,9 @@
     centered
     :title="$t('page.attachments.title')"
   >
-    <b-alert v-if="this.attachments.length == 0" show variant="light">{{$t('page.attachments.empty')}}</b-alert>
+    <b-alert v-if="this.attachments.length == 0" show variant="light">{{
+      $t("page.attachments.empty")
+    }}</b-alert>
     <b-list-group-item
       button
       v-for="attachment in this.attachments"
@@ -23,20 +25,21 @@
       </span>
     </b-list-group-item>
     <template #modal-footer>
-      <div style="width: 100%">
+      <b-input-group style="width: 100%">
         <b-form-file
           v-model="newAttachment"
           :placeholder="$t('page.attachments.placeholder')"
           drop-placeholder="Drop file here..."
           style="width: 80%"
         ></b-form-file>
-        <b-button
-          @click="uploadAttachment"
-          style="margin-top: 0.5em"
-          variant="primary"
-          >{{$t('page.attachments.upload')}}</b-button
-        >
-      </div>
+        <b-input-group-append>
+          <b-button
+            @click="uploadAttachment"
+            variant="primary"
+            >{{ $t("page.attachments.upload") }}</b-button
+          >
+        </b-input-group-append>
+      </b-input-group>
     </template>
   </b-modal>
 </template>
@@ -85,9 +88,12 @@ export default {
     // eslint-disable-next-line
     deleteAttachment: async function (attachment) {
       console.log("[delete]", attachment);
-      await axios.delete("/api/attachment/" + this.page.id + "/" + attachment.name, {
-        validateStatus: false,
-      });
+      await axios.delete(
+        "/api/attachment/" + this.page.id + "/" + attachment.name,
+        {
+          validateStatus: false,
+        }
+      );
       await this.init();
     },
     uploadAttachment: async function () {

@@ -322,6 +322,13 @@
                 "remove": "Remove",
                 "save": "Save",
                 "cancel": "Cancel",
+                "avatar": {
+                    "label": "Space avatar",
+                    "description": "Upload space avatar",
+                    "upload": "Upload",
+                    "browse": "Browse",
+                    "placeholder": "Choose a file"
+                },
                 "name": {
                     "label": "Space name",
                     "placeholder": "Enter space name",
@@ -668,6 +675,13 @@
                 "remove": "Удалить",
                 "save": "Сохранить",
                 "cancel": "Отмена",
+                "avatar": {
+                    "label": "Аватар пространства",
+                    "description": "Загрузить аватарку пространства",
+                    "upload": "Загрузить",
+                    "browse": "Выбрать",
+                    "placeholder": "Выберите файл"
+                },
                 "name": {
                     "label": "Имя пространства",
                     "placeholder": "Введите имя пространства",

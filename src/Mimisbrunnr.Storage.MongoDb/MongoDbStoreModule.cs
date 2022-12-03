@@ -9,11 +9,13 @@ using MongoDB.Driver;
 using Skidbladnir.Modules;
 using Skidbladnir.Repository.MongoDB;
 using Mimisbrunnr.Wiki.Services;
+using Mimisbrunnr.Storage.MongoDb.Migrations;
 
 namespace Mimisbrunnr.Storage.MongoDb;
 
 public class MongoDbStoreModule : RunnableModule
 {
+    public override Type[] DependsModules => new[] { typeof(PersonalSpaceAvatarMigrationModule) };
     public override void Configure(IServiceCollection services)
     {
         // Register conventions
@@ -237,7 +239,7 @@ public class MongoDbStoreModule : RunnableModule
         }));
     }
 
-    
+
     private static async Task CreateUserTokenIndexes(IMongoDbContext mongoContext)
     {
         var collection = mongoContext.GetCollection<UserToken>();

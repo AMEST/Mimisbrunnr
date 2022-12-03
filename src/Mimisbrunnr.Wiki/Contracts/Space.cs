@@ -11,9 +11,10 @@ public class Space : IHasId<string>
     }
 
     [JsonConstructor]
-    public Space(string id, string key, string name, string description, string homePageId, SpaceType type, SpaceStatus status, IEnumerable<Permission> permissions)
+    public Space(string id, string key, string name, string description, string homePageId, string avatarUrl, SpaceType type, SpaceStatus status, IEnumerable<Permission> permissions)
     {
         HomePageId = homePageId;
+        AvatarUrl = avatarUrl;
         Key = key;
         Id = id;
         Name = name;
@@ -31,6 +32,8 @@ public class Space : IHasId<string>
     public string Description { get; set; }
 
     public string HomePageId { get; internal set; }
+
+    public string AvatarUrl { get; set; }
 
     public SpaceType Type { get; set; }
 

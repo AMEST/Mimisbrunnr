@@ -126,12 +126,10 @@ public class SpaceController : ControllerBase
         if (importZip == null)
             return BadRequest();
 
-        using var importZipStream = new MemoryStream();
-        await importZip.CopyToAsync(importZipStream);
         var userInfo = User?.ToEntity();
 
         var createdSpace = await _spaceService.Create(createModel, userInfo);
-        await _spaceImportService.ImportSpace(createdSpace, importZipStream);
+        await _spaceImportService.ImportSpace(createdSpace, importZip.OpenReadStream());
 
         return Ok(createdSpace);
     }

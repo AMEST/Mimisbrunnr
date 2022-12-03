@@ -23,6 +23,7 @@
             <b-avatar
               class="mr-2"
               :text="getSpaceNameInitials(space.name)"
+              :src="space.avatarUrl"
             ></b-avatar>
             <b>{{ space.name }}</b>
           </div>

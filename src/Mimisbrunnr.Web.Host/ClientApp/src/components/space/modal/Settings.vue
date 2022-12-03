@@ -7,6 +7,27 @@
   >
     <b-overlay :show="processing">
       <div role="group">
+        <label>{{ $t("space.settings.avatar.label") }}:</label>
+        <br />
+        <div align="center">
+          <b-avatar style="" :src="this.space.avatarUrl" size="7rem"></b-avatar>
+        </div>
+        <b-input-group class="pt-2" style="width: 100%">
+          <b-form-file
+            v-model="newAttachment"
+            :placeholder="$t('space.settings.avatar.placeholder')"
+            drop-placeholder="Drop file here..."
+            style="width: 80%"
+          ></b-form-file>
+          <b-input-group-append>
+            <b-button @click="uploadAvatar" variant="primary"
+              >{{ $t("space.settings.avatar.upload") }}
+            </b-button>
+          </b-input-group-append>
+        </b-input-group>
+        <b-form-text>{{ $t("space.settings.avatar.description") }}</b-form-text>
+      </div>
+      <div role="group">
         <label>{{ $t("space.settings.name.label") }}:</label>
         <b-form-input
           v-model="space.name"
@@ -72,6 +93,8 @@
 
 <script>
 import axios from "axios";
+
+import { showToast, isImageFile } from "@/services/Utils.js";
 export default {
   name: "Settings",
   props: {
@@ -80,6 +103,7 @@ export default {
   },
   data() {
     return {
+      newAttachment: null,
       isPublic: false,
       isArchive: false,
       processing: false,
@@ -98,6 +122,7 @@ export default {
       var spaceUpdateModel = {
         name: this.space.name,
         description: this.space.description,
+        avatarUrl: this.space.avatarUrl
       };
       if (this.space.type != "Personal")
         spaceUpdateModel.public = this.isPublic;
@@ -116,6 +141,23 @@ export default {
     },
     close: function () {
       this.$bvModal.hide("space-settings-modal");
+    },
+    uploadAvatar: async function () {
+      if(!isImageFile(this.newAttachment.name)) {
+        showToast("Selected file is not image.", "Upload error", "danger");
+        return;
+      }
+      var avatarPath = `/api/attachment/${this.space.homePageId}/${this.newAttachment.name}`;
+      var formData = new FormData();
+      formData.append("attachment", this.newAttachment);
+      await axios({
+        method: "post",
+        url: `/api/attachment/${this.space.homePageId}`,
+        data: formData,
+        validateStatus: false,
+      });
+      this.space.avatarUrl = avatarPath;
+      await this.save();
     },
   },
   watch: {

@@ -51,7 +51,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
             return spaces.Select(x => x.ToModel()).ToArray();
 
         var visibleSpaces = await FindUserVisibleSpaces(requestedBy);
-        return visibleSpaces.Select( x => x.ToModel()).ToArray();
+        return visibleSpaces.Select(x => x.ToModel()).ToArray();
     }
 
     public async Task<SpaceModel> GetByKey(string key, UserInfo requestedBy)
@@ -167,7 +167,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         EnsureSpaceExists(space);
 
         var appConfig = await _applicationConfigurationManager.Get();
-        if(appConfig.CustomHomepageEnabled 
+        if (appConfig.CustomHomepageEnabled
             && appConfig.CustomHomepageSpaceKey.Equals(key, StringComparison.OrdinalIgnoreCase)
             && model.Public.HasValue
             && !model.Public.Value
@@ -176,6 +176,9 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
 
         space.Name = model.Name;
         space.Description = model.Description;
+        if (space.Type != SpaceType.Personal)
+            space.AvatarUrl = model.AvatarUrl;
+
         if (space.Type != SpaceType.Personal && model.Public is not null)
         {
             space.Type = model.Public.Value ? SpaceType.Public : SpaceType.Private;
@@ -215,7 +218,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         EnsureSpaceExists(space);
 
         var appConfig = await _applicationConfigurationManager.Get();
-        if(appConfig.CustomHomepageEnabled 
+        if (appConfig.CustomHomepageEnabled
             && appConfig.CustomHomepageSpaceKey.Equals(key, StringComparison.OrdinalIgnoreCase)
             && space.Type == SpaceType.Public)
             throw new InvalidOperationException("Cannot remove space, because space homepage used for wiki homepage");
@@ -234,7 +237,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         if (spaces is not null) return spaces;
 
         spaces = await _spaceManager.GetAll();
-        if(userInfo == null)
+        if (userInfo == null)
         {
             spaces = spaces.Where(x => x.Type == SpaceType.Public);
             await AddVisibleSpacesToCache(cacheKey, spaces);
@@ -248,24 +251,25 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
             return spaces;
         }
         var userGroups = await _userGroupManager.GetUserGroups(user);
-        spaces = spaces.Where( x => x.Type == SpaceType.Public || FindPermission(x.Permissions.ToArray(), userInfo, userGroups) != null);
+        spaces = spaces.Where(x => x.Type == SpaceType.Public || FindPermission(x.Permissions.ToArray(), userInfo, userGroups) != null);
         await AddVisibleSpacesToCache(cacheKey, spaces);
         return spaces;
     }
 
     private async Task ClearUserVisibleSpacesAfterChangingPermissions(SpacePermissionModel permissionModel)
     {
-        if(permissionModel?.User is not null){
+        if (permissionModel?.User is not null)
+        {
             await _distributedCache.RemoveAsync(CreateUserVisibleSpacesCacheKey(permissionModel.User.Email));
             return;
         }
 
         var group = await _userGroupManager.FindByName(permissionModel?.Group.Name);
-        if( group is null) throw new GroupNotFoundException();
+        if (group is null) throw new GroupNotFoundException();
 
         var usersInGroup = await _userGroupManager.GetUsersInGroup(group);
         var clearTasks = new List<Task>();
-        foreach(var user in usersInGroup)
+        foreach (var user in usersInGroup)
             clearTasks.Add(_distributedCache.RemoveAsync(CreateUserVisibleSpacesCacheKey(user.Email)));
 
         await Task.WhenAll(clearTasks);
@@ -273,9 +277,10 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
 
     private Task AddVisibleSpacesToCache(string cacheKey, IEnumerable<Space> spaces)
     {
-        return _distributedCache.SetAsync(cacheKey, spaces, 
-                new DistributedCacheEntryOptions() {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2) 
+        return _distributedCache.SetAsync(cacheKey, spaces,
+                new DistributedCacheEntryOptions()
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2)
                 }
         );
     }

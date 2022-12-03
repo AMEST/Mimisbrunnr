@@ -54,11 +54,7 @@ public class AttachmentController : ControllerBase
     {
         var uploadedFile = HttpContext.Request.Form.Files.FirstOrDefault();
 
-        using var file = new MemoryStream();
-        await uploadedFile.CopyToAsync(file);
-        file.Position = 0;
-
-        await _attachmentService.Upload(pageId, file, uploadedFile.FileName, User?.ToEntity());
+        await _attachmentService.Upload(pageId, uploadedFile.OpenReadStream(), uploadedFile.FileName, User?.ToEntity());
 
         return Ok();
     }

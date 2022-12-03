@@ -1,41 +1,52 @@
 <template>
   <b-col sm="4" md="auto" class="space-menu">
     <div class="space-menu-title space-menu-bottom-line">
-      <b-avatar class="space-avatar-bg" :text="getSpaceNameInitials()"></b-avatar>
+      <b-avatar
+        class="space-avatar-bg"
+        :text="getSpaceNameInitials()"
+        :src="this.space.avatarUrl"
+      ></b-avatar>
       <b-link :to="'/space/' + this.space.key">{{ this.space.name }}</b-link>
     </div>
     <div class="mt-3 pb-3 space-menu-bottom-line" v-if="this.space.description">
-      <i class="text-muted">{{$t("space.description")}}: {{ this.space.description }}</i>
+      <i class="text-muted">
+        {{ $t("space.description") }}: {{ this.space.description }}
+      </i>
     </div>
-    <div 
-        class="mt-3 pb-3 space-actions-menu space-menu-bottom-line"
-        v-if="this.space.type == 'Personal' || userPermissions.isAdmin"
+    <div
+      class="mt-3 pb-3 space-actions-menu space-menu-bottom-line"
+      v-if="this.space.type == 'Personal' || userPermissions.isAdmin"
     >
-      <i class="text-muted">{{$t("space.actions.title")}}</i>
+      <i class="text-muted">{{ $t("space.actions.title") }}</i>
       <b-list-group class="mt-1">
         <b-list-group-item
           v-if="this.homePage && this.space.type == 'Personal'"
           :to="'/profile/' + this.homePage.createdBy.email"
         >
-          <b-icon icon="person-fill" />&nbsp; {{$t("space.actions.profile")}}
+          <b-icon icon="person-fill" />&nbsp; {{ $t("space.actions.profile") }}
         </b-list-group-item>
         <b-list-group-item
           v-b-modal.space-permissions-modal
           v-if="userPermissions.isAdmin"
         >
-          <b-icon icon="shield-lock-fill" />&nbsp; {{$t("space.actions.permissions")}}
+          <b-icon icon="shield-lock-fill" />&nbsp;
+          {{ $t("space.actions.permissions") }}
         </b-list-group-item>
         <b-list-group-item
           v-b-modal.space-settings-modal
           v-if="userPermissions.isAdmin"
         >
-          <b-icon icon="gear-fill" />&nbsp; {{$t("space.actions.settings")}}
+          <b-icon icon="gear-fill" />&nbsp; {{ $t("space.actions.settings") }}
         </b-list-group-item>
       </b-list-group>
     </div>
     <div class="mt-3 space-menu-page-tree">
-      <i class="text-muted">{{$t("space.tree")}}</i>
-      <i class="text-center text-muted" v-if="this.pageTree && this.pageTree.childs.length == 0">: {{$t("space.emptyTree")}}</i>
+      <i class="text-muted">{{ $t("space.tree") }}</i>
+      <i
+        class="text-center text-muted"
+        v-if="this.pageTree && this.pageTree.childs.length == 0"
+        >: {{ $t("space.emptyTree") }}</i
+      >
       <div class="text-center" v-if="this.pageTree == undefined">
         <b-spinner variant="secondary"></b-spinner>
       </div>
@@ -47,9 +58,11 @@
       >
         <template v-slot:leafNameDisplay="slotProps">
           <span>
-            <b-link :title="slotProps.model.name" :to="'/space/' + space.key + '/' + slotProps.model.id">{{
-              slotProps.model.name
-            }}</b-link>
+            <b-link
+              :title="slotProps.model.name"
+              :to="'/space/' + space.key + '/' + slotProps.model.id"
+              >{{ slotProps.model.name }}</b-link
+            >
           </span>
         </template>
       </vue-tree-list>
@@ -157,14 +170,14 @@ export default {
       await this.loadHomePage();
     },
     pageTree: function (newValue, oldValue) {
-      if(newValue == undefined && oldValue != undefined){
+      if (newValue == undefined && oldValue != undefined) {
         this.pageTreeList = new Tree([]);
         return;
       }
-      if(newValue == undefined) return;
+      if (newValue == undefined) return;
       this.loadPageTree();
       setTimeout(this.expandTree, 1000);
-    }
+    },
   },
   mounted: async function () {
     await this.loadHomePage();

@@ -24,13 +24,23 @@ export function getNameInitials(name) {
     return splited[0][0];
 }
 
-export function showToast(message, title, variant){
-    if(bootStrapToaster == null)
+export function showToast(message, title, variant) {
+    if (bootStrapToaster == null)
         bootStrapToaster = new BToast();
 
     bootStrapToaster.$bvToast.toast(message, {
         title: title,
         variant: variant,
         solid: true
-      });
+    });
+}
+
+export function isImageFile(name) {
+    return (
+        name.toLowerCase().endsWith(".png") ||
+        name.toLowerCase().endsWith(".jpg") ||
+        name.toLowerCase().endsWith(".jpeg") ||
+        name.toLowerCase().endsWith(".gif") ||
+        name.toLowerCase().endsWith(".svg")
+    );
 }
