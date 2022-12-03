@@ -85,6 +85,7 @@
                 class="avatar-bg"
                 :text="getUserInitials()"
                 :src="$store.state.application.profile.avatarUrl"
+                :style="$store.state.application.profile.avatarUrl ? 'background-color: transparent' : ''"
               ></b-avatar>
             </template>
             <b-dropdown-text style="width: 240px">

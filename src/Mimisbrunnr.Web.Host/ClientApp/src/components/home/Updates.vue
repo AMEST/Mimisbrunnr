@@ -25,6 +25,7 @@
           class="updates-avatar"
           :text="getUserInitials(pageEvent.updatedBy.name)"
           :src="pageEvent.updatedBy.avatarUrl"
+          :style="pageEvent.updatedBy.avatarUrl ? 'background-color: transparent' : ''"
         ></b-avatar>
         <b-link
           class="updates-updatedBy"

@@ -5,6 +5,7 @@
         class="space-avatar-bg"
         :text="getSpaceNameInitials()"
         :src="this.space.avatarUrl"
+        :style="this.space.avatarUrl ? 'background-color: transparent' : ''"
       ></b-avatar>
       <b-link :to="'/space/' + this.space.key">{{ this.space.name }}</b-link>
     </div>

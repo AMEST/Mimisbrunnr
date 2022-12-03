@@ -8,6 +8,7 @@
           class="profile-avatar-bg"
           :text="getInitials()"
           :src="this.profile.avatarUrl"
+          :style="this.profile.avatarUrl ? 'background-color: #f4f5f7' : ''"
         ></b-avatar>
         <div class="profile-title">
           <h4>{{ this.profile.name }}</h4>
@@ -151,16 +152,11 @@ export default {
   width: 8em;
   height: 8em;
   margin-top: -4em;
-  background-color: #373a3c !important;
   box-shadow: 0 0 0 5px #f4f5f7;
 }
 
 .profile-avatar-bg .b-avatar-text {
   font-size: 28px;
-}
-
-.profile-avatar-bg .b-avatar-img img {
-  background-color: white;
 }
 
 .profile-actions {

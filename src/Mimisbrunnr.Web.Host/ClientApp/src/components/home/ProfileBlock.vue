@@ -14,6 +14,7 @@
         <b-avatar
           :text="getUserInitials()"
           :src="$store.state.application.profile.avatarUrl"
+          :style="$store.state.application.profile.avatarUrl ? 'background-color: white' : ''"
         ></b-avatar>
         <br />
         {{ $store.state.application.profile.name }}
@@ -85,7 +86,6 @@ export default {
   width: 3em;
   height: 3em;
   margin-top: -2.2em;
-  background-color: #373a3c !important;
 }
 .profile-card .profile-action-go {
   font-size: smaller;

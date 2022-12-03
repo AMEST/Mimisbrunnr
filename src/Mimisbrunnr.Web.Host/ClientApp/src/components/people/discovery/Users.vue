@@ -12,6 +12,7 @@
           class="avatar-bg"
           :text="getInitials(user.name)"
           :src="user.avatarUrl"
+          :style="user.avatarUrl ? 'background-color: transparent' : ''"
         ></b-avatar>
         <b-card-text class="pt-2">
           <b-link :to="`/profile/${user.email}`">{{ user.name }}</b-link>

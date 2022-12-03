@@ -24,6 +24,7 @@
               class="mr-2"
               :text="getSpaceNameInitials(space.name)"
               :src="space.avatarUrl"
+              :style="space.avatarUrl ? 'background-color: transparent' : ''"
             ></b-avatar>
             <b>{{ space.name }}</b>
           </div>
