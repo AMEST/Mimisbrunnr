@@ -25,7 +25,7 @@
 // eslint-disable-next-line
 import hljs from "highlight.js";
 import "highlight.js/styles/github.css";
-import VueMarkdown from "vue-markdown";
+import VueMarkdown from "@/thirdparty/VueMarkdown";
 import axios from "axios";
 export default {
   name: "CustomHome",

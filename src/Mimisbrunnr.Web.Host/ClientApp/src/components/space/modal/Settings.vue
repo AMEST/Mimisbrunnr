@@ -6,7 +6,7 @@
     hide-header-close
   >
     <b-overlay :show="processing">
-      <div role="group">
+      <div role="group" v-if="space.type != 'Personal'">
         <label>{{ $t("space.settings.avatar.label") }}:</label>
         <br />
         <div align="center">
