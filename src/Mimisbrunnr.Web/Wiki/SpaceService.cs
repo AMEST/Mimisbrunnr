@@ -155,6 +155,13 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
 
         space = await _spaceManager.Create(model.Key.ToUpper(), model.Name, model.Description, (SpaceType)model.Type,
             createdBy);
+
+        if (model.Type == SpaceTypeModel.Personal)
+        {
+            space.AvatarUrl = createdBy.AvatarUrl;
+            await _spaceManager.Update(space);
+        }
+
         return space.ToModel();
     }
 
@@ -176,7 +183,9 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
 
         space.Name = model.Name;
         space.Description = model.Description;
-        if (space.Type != SpaceType.Personal)
+        if (space.Type != SpaceType.Personal
+            && !string.IsNullOrEmpty(model.AvatarUrl)
+                && model.AvatarUrl.StartsWith("/api/attachment"))
             space.AvatarUrl = model.AvatarUrl;
 
         if (space.Type != SpaceType.Personal && model.Public is not null)

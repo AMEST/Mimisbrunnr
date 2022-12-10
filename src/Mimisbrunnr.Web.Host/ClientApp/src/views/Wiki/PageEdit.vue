@@ -39,6 +39,7 @@
         :html="this.$store.state.application.info.allowHtml"
         :source="this.page.content"
         :postrender="renderMarkdown"
+        :toc="true"
         style="display: none"
       ></vue-markdown>
     </b-container>
@@ -48,16 +49,18 @@
       :continueCallBack="continueDraft"
       :resetCallBack="resetDraft"
     />
+    <GuideModal/>
   </div>
 </template>
 
 <script>
 import Attachments from "@/components/space/modal/Attachments.vue";
 import VueSimplemde from "vue-simplemde";
-import VueMarkdown from "vue-markdown";
+import VueMarkdown from "@/thirdparty/VueMarkdown";
 import axios from "axios";
 import { debounce, isImageFile } from "@/services/Utils.js";
 import DraftModal from "@/components/pageEditor/DraftModal.vue";
+import GuideModal from "@/components/pageEditor/GuideModal.vue";
 import ProfileService from "@/services/profileService";
 export default {
   name: "PageEdit",
@@ -66,6 +69,7 @@ export default {
     VueMarkdown,
     Attachments,
     DraftModal,
+    GuideModal,
   },
   data() {
     return {
@@ -96,7 +100,12 @@ export default {
             title: "Add attachment",
           },
           "|",
-          "guide",
+          {
+            name: "guide",
+            action: this.openGuide,
+            className: "fa fa-question-circle",
+            title: "Show guide",
+          },
         ],
         spellChecker: false,
         renderedMarkdown: "",
@@ -193,6 +202,10 @@ export default {
     // eslint-disable-next-line
     openAttachments: function (editor) {
       this.$bvModal.show("page-attachments-modal");
+    },
+    // eslint-disable-next-line
+    openGuide: function (editor) {
+      this.$bvModal.show("guide-modal");
     },
     addAttachmentLink: function (attachment) {
       var linkToAttach = `/api/attachment/${this.page.id}/${encodeURIComponent(

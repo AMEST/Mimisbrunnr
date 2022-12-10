@@ -2,27 +2,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Mimisbrunnr.Web.Host",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/src/Mimisbrunnr.Web.Host/bin/Debug/net6.0/Mimisbrunnr.Web.Host.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/src/Mimisbrunnr.Web.Host",
-            "stopAtEntry": false,
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            },
-            "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
-            }
-        },
-        {
-            "name": ".NET Core Attach",
-            "type": "coreclr",
-            "request": "attach"
-        },
-        {
             "name": "Mimisbrunnr.DataImport.Cli",
             "type": "coreclr",
             "request": "launch",
@@ -32,6 +11,26 @@
             "cwd": "${workspaceFolder}/src/DataImport/Mimisbrunnr.DataImport.Cli",
             "stopAtEntry": false,
             "console": "internalConsole"
+        },
+        {
+            "name": "Mimisbrunnr.Web.Host",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-Mimisbrunnr.Web.Host",
+            "program": "${workspaceFolder}/src/Mimisbrunnr.Web.Host/bin/Debug/net6.0/Mimisbrunnr.Web.Host.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/Mimisbrunnr.Web.Host",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/src/Mimisbrunnr.Web.Host/Views"
+            }
         }
     ]
 }

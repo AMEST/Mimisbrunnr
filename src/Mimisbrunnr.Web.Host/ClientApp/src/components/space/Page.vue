@@ -63,6 +63,7 @@
     </div>
     <div>
       <vue-markdown
+        :toc="true"
         :html="this.$store.state.application.info.allowHtml"
         :source="this.page.content"
       ></vue-markdown>
@@ -74,7 +75,7 @@
 // eslint-disable-next-line
 import hljs from "highlight.js";
 import "highlight.js/styles/github.css";
-import VueMarkdown from "vue-markdown";
+import VueMarkdown from "@/thirdparty/VueMarkdown";
 export default {
   name: "Page",
   data() {
