@@ -22,7 +22,7 @@
             $t("profile.favorites")
           }}</b-button>
         </div>
-        <additional-info :itsMe="this.itsMe" />
+        <additional-info v-if="profile != null" :profile="profile" :itsMe="this.itsMe" />
       </b-col>
       <worked-on />
     </b-row>

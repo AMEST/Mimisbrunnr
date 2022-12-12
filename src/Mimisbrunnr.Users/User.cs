@@ -31,5 +31,15 @@ public class User : IHasId<string>
 
     public string AvatarUrl { get; set; }
 
+    public string Website { get; set; }
+
+    public string Post { get; set; }
+
+    public string Department { get; set; }
+
+    public string Organization { get; set; }
+
+    public string Location { get; set; }
+
     public UserRole Role { get; internal set; }
 }

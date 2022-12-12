@@ -47,6 +47,23 @@ var ProfileService = {
             "Error when getting users.", "warning");
         throw new Exception();
     },
+    updateProfileInfo: async function (profile) {
+        if (profile == null || profile.email == undefined || profile.email.length < 1) {
+            showToast("User profile or email is null", "Error when updating user info", "warning");
+            return;
+        }
+
+        var request = await axios.put(`/api/user/${profile.email}`,profile,
+            {
+                validateStatus: false,
+            }
+        );
+        if (request.status == 200)
+            return;
+
+        showToast(`status:${request.status}`, "Error when updating user info.", "warning");
+        throw new Exception();
+    },
     isAdmin: function () {
         return store.state.application.profile && store.state.application.profile.isAdmin;
     },

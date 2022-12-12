@@ -69,6 +69,16 @@ public sealed class UserService
         return null;
     }
 
+    public async Task UpdateProfileInfo(string email, UserProfileUpdateModel model, CancellationToken cancellationToken = default)
+    {
+        var request = await _httpClient.PutAsJsonAsync($"{ApiPath}/{email}", model, cancellationToken)
+            .ConfigureAwait(false);
+        if (request.StatusCode == HttpStatusCode.OK)
+            return;
+
+        request.EnsureSuccessStatusCode();
+    }
+
     public async Task Disable(string email, CancellationToken cancellationToken = default)
     {
         var request = await _httpClient.PostAsync($"{ApiPath}/{email}/disable", null, cancellationToken)

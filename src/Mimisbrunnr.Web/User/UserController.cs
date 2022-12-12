@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Mimisbrunnr.Web.Filters;
 using Mimisbrunnr.Integration.Group;
 using Mimisbrunnr.Web.Mapping;
+using Mimisbrunnr.Integration.User;
 
 namespace Mimisbrunnr.Web.User;
 
@@ -48,6 +49,13 @@ public class UserController : ControllerBase
     {
         var groups = await _userService.GetUserGroups(email, User.ToEntity());
         return groups;
+    }
+
+    [HttpPut("{email}")]
+    public async Task<IActionResult> Update([FromRoute] string email, [FromBody] UserProfileUpdateModel model)
+    {
+        await _userService.UpdateProfileInfo(email, model, User.ToEntity());
+        return Ok();
     }
 
     [HttpPost("{email}/disable")]
