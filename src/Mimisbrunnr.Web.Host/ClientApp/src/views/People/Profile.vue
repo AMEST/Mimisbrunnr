@@ -3,7 +3,7 @@
     <b-card overlay img-src="" text-variant="white" class="profile-img-header">
     </b-card>
     <b-row class="h-100vh profile-content">
-      <b-col sm="3" class="text-left">
+      <b-col sm="5" md="auto"  class="text-left">
         <b-avatar
           class="profile-avatar-bg"
           :text="getInitials()"

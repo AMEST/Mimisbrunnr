@@ -44,3 +44,7 @@
     background-color: #e2e3e5;
     border-color: #d6d8db;
 }
+
+.toc-anchor {
+    color: rgba(0,0,0,0.07) !important;
+}
