@@ -1,5 +1,5 @@
 <template>
-  <b-col sm="9" class="text-left">
+  <b-col class="text-left">
     <div class="profile-worked-on">
       <h5>{{$t('profile.workedOn.title')}}</h5>
       <b-card>

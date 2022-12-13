@@ -194,6 +194,7 @@
             "favorites": "Favorites",
             "additional": {
                 "title": "Additional information",
+                "website": "Website",
                 "post": "Post",
                 "department": "Department",
                 "organization": "Organization",
@@ -547,6 +548,7 @@
             "favorites": "Избранное",
             "additional": {
                 "title": "Дополнительная информация",
+                "website": "Веб-сайт",
                 "post": "Должность",
                 "department": "Отдел",
                 "organization": "Организация",

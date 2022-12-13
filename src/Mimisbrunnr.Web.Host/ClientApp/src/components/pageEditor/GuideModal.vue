@@ -14,19 +14,23 @@ export default {
     data() {
         return {
             guide: `
-#### Table of contents
+## Table of contents
+
+@[toc]
 
 \`\`\`
 @[toc]
 \`\`\`
 
-#### Text emphasis
+**Working only from "## medium header" to "#### tiny header"**
+
+## Text emphasis
 **Bold**, *italic*, ~~strikethrough~~, ++Inserted text++, ==Marked text==
 \`\`\`
 **Bold**, *italic*, ~~strikethrough~~, ++Inserted text++, ==Marked text==
 \`\`\`
 
-#### Headers
+## Headers
 \`\`\`
 # Big header
 ## Medium header
@@ -34,7 +38,7 @@ export default {
 #### Tiny header
 \`\`\`
 
-#### Lists
+## Lists
 \`\`\`
 * Generic list item
 * Generic list item
@@ -47,23 +51,23 @@ export default {
 1. Numbered list item
 \`\`\`
 
-#### Links
+## Links
 \`\`\`
 [Text to display](http://www.example.com)
 \`\`\`
 
-#### Quotes
+## Quotes
 \`\`\`
 > This is a quote.
 > It can span multiple lines!
 \`\`\`
 
-#### Images
+## Images
 \`\`\`
 ![](http://www.example.com/image.jpg)
 \`\`\`
 
-#### Tables
+## Tables
 \`\`\`
 | Column 1 | Column 2 | Column 3 |
 | -------- | -------- | -------- |
@@ -71,7 +75,7 @@ export default {
 | Mary     | Smith    | Female   |
 \`\`\`
 
-#### Display code
+## Display code
 
 \`\`\`
 \`var example = "hello!";\`
@@ -84,14 +88,14 @@ alert(example);
 \\\`\\\`\\\`
 \`\`\`
 
-#### Typographic replacements
+## Typographic replacements
 (c) (C) (r) (R) (tm) (TM) (p) (P) +-
 
 \`\`\`
 (c) (C) (r) (R) (tm) (TM) (p) (P) +-
 \`\`\`
 
-#### Horizontal Rules
+## Horizontal Rules
 ***
 \`\`\`
 ___
@@ -101,7 +105,7 @@ ___
 ***
 \`\`\`
 
-#### Emojies
+## Emojies
 
 :wink: :cry: :laughing: :yum:
 :-) :-( 8-) ;)
@@ -110,7 +114,7 @@ ___
 :-) :-( 8-) ;)
 \`\`\`
 
-#### Subscript/Superscript
+## Subscript/Superscript
 - 19^th^
 - H~2~O
 
@@ -119,7 +123,7 @@ ___
 - H~2~O
 \`\`\`
 
-#### Custom containers
+## Custom containers
 
 ::: warning
 *It's warning*

@@ -107,7 +107,12 @@ public static class MappingExtensions
         {
             Email = user.Email.ToLower(),
             Name = user.Name,
-            AvatarUrl = user.AvatarUrl
+            AvatarUrl = user.AvatarUrl,
+            Website = user.Website,
+            Post = user.Post,
+            Department = user.Department,
+            Organization = user.Organization,
+            Location = user.Location
         };
     }
 

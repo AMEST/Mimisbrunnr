@@ -4,6 +4,7 @@ using Mimisbrunnr.Integration.Group;
 using Mimisbrunnr.Integration.User;
 using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Wiki.Contracts;
+using Mimisbrunnr.Web.Infrastructure;
 
 namespace Mimisbrunnr.Web.User
 {
@@ -45,7 +46,6 @@ namespace Mimisbrunnr.Web.User
             return user?.ToProfileModel();
         }
 
-
         public async Task<IEnumerable<GroupModel>> GetUserGroups(string email, UserInfo requestedBy)
         {
             if (string.IsNullOrEmpty(email)) 
@@ -62,6 +62,26 @@ namespace Mimisbrunnr.Web.User
 
             var groups = await _userGroupManager.GetUserGroups(user);
             return groups.Select(x => x.ToModel());
+        }
+
+        public async Task UpdateProfileInfo(string email, UserProfileUpdateModel model, UserInfo updatedBy)
+        {
+            var user = await _userManager.GetByEmail(email);
+            var updatedByUser = updatedBy.Email.Equals(email, StringComparison.OrdinalIgnoreCase)
+                ? user
+                : await _userManager.GetByEmail(updatedBy.Email);
+
+            if(!updatedBy.Email.Equals(email, StringComparison.OrdinalIgnoreCase)
+                && updatedByUser.Role != UserRole.Admin)
+                throw new UserHasNotPermissionException();
+            
+            user.Website = model.Website;
+            user.Post = model.Post;
+            user.Department = model.Department;
+            user.Organization = model.Organization;
+            user.Location = model.Location;
+
+            await _userManager.UpdateUserInfo(user);
         }
 
         public async Task Disable(string email, UserInfo disabledBy)
