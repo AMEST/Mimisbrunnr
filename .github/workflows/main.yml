@@ -78,4 +78,4 @@ jobs:
     - name: Pack package
       run: dotnet pack ./src/Integration/Mimisbrunnr.Integration.Client/Mimisbrunnr.Integration.Client.csproj -c Release -p:PackageVersion=${{ steps.version.outputs.version }}
     - name: Publish
-      run: Get-ChildItem -Path ./src/**/*.nupkg -Recurse -Force | % { dotnet nuget push $_.ToString() --skip-duplicate -k ${{secrets.NUGET_PUBLISH_KEY}} }
+      run: Get-ChildItem -Path ./src/**/*.nupkg -Recurse -Force | % { dotnet nuget push $_.ToString() --skip-duplicate -s https://nuget.org/ -k ${{secrets.NUGET_PUBLISH_KEY}} }
