@@ -76,6 +76,6 @@ jobs:
       with:
         dotnet-version: '6.0'
     - name: Pack package
-      run: dotnet pack ./src/Integration/Mimisbrunnr.Integration.Client/Mimisbrunnr.Integration.Client.csproj -c Release -p:PackageVersion=${{ steps.version.outputs.version }} }
+      run: dotnet pack ./src/Integration/Mimisbrunnr.Integration.Client/Mimisbrunnr.Integration.Client.csproj -c Release -p:PackageVersion=${{ steps.version.outputs.version }}
     - name: Publish
       run: find . -name '*.nupkg' | xargs -i dotnet nuget push -k $NUGET_PUBLISH_KEY --skip-duplicate -s http://nuget.org/ {} 
