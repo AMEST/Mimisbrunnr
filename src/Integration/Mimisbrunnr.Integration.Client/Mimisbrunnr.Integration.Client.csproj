@@ -4,10 +4,23 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
+    <Authors>Klabukov Erik</Authors>
+    <Description>Client library for Mimisbrunnr wiki</Description>
+    <PackageTags>client; mimisbrunnr; wiki;</PackageTags>
+    <RepositoryUrl>https://github.com/AMEST/Mimisbrunnr</RepositoryUrl>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Mimisbrunnr.Integration\Mimisbrunnr.Integration.csproj" />
+    <ProjectReference Include="..\Mimisbrunnr.Integration\Mimisbrunnr.Integration.csproj">
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
   </ItemGroup>
+
+  <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
+    <ItemGroup>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
+    </ItemGroup>
+  </Target>
 
 </Project>

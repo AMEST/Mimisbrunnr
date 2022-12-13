@@ -55,3 +55,27 @@ jobs:
         target: app
         tag_with_ref: true
         push: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
+
+  publish-client-library-nuget:
+    if: contains(github.ref, 'tags/v') || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: action-minver
+      uses: thefringeninja/action-minver@2.0.0-preview1
+      id: version
+      with:
+        # Optional. Specifies the default pre-release phase.
+        default-pre-release-phase: unstalable
+        # Optional. Specifies the prefix of the tags
+        tag-prefix: v
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0'
+    - name: Pack package
+      run: dotnet pack ./src/Integration/Mimisbrunnr.Integration.Client/Mimisbrunnr.Integration.Client.csproj -c Release -p:PackageVersion=${{ steps.version.outputs.version }} }
+    - name: Publish
+      run: find . -name '*.nupkg' | xargs -i dotnet nuget push -k $NUGET_PUBLISH_KEY --skip-duplicate -s http://nuget.org/ {} 
