@@ -18,16 +18,17 @@ internal class ValidateUserStateMiddleware
     public async Task InvokeAsync(HttpContext context, IUserManager userManager, IApplicationConfigurationManager applicationConfigurationService)
     {
         var userInfo = context.User?.ToEntity();
-        if (userInfo == null)
+        if (userInfo is null)
         {
             await _next(context);
             return;
         }
 
         var user = await userManager.GetByEmail(userInfo?.Email);
-        if (user == null || user.Enable)
+        if (user is null || user.Enable)
         {
-            await SyncUser(userManager, user, userInfo);
+            if (user is not null)
+                await SyncUser(userManager, user, userInfo);
             await _next(context);
             return;
         }
