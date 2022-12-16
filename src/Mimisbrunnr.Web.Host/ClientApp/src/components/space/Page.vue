@@ -122,17 +122,30 @@ export default {
         active: true,
       });
     },
+    scrollToAnchor() {
+        if(!window.location.hash)
+            return;
+        var hash = decodeURI(window.location.hash);
+        if(hash.length == 1)
+            return;
+        var anchor = document.getElementById(hash.substring(1, hash.length));
+        if(!anchor)
+            return;
+        anchor.scrollIntoView();
+    },
   },
   watch: {
     // eslint-disable-next-line
     page: function (newValue, oldValue) {
       this.initBreadcrumbs();
       setTimeout(() => hljs.highlightAll(), 100);
+      setTimeout(this.scrollToAnchor, 100);
     },
   },
   mounted: function () {
     this.initBreadcrumbs();
     setTimeout(() => hljs.highlightAll(), 100);
+    setTimeout(this.scrollToAnchor, 100);
   },
 };
 </script>
