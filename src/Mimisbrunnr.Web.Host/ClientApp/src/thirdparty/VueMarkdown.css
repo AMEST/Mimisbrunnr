@@ -48,3 +48,15 @@
 .toc-anchor {
     color: rgba(0,0,0,0.07) !important;
 }
+
+.align-center {
+    text-align: center;
+}
+
+.align-right {
+    text-align: right;
+}
+
+.align-left {
+    text-align: left;
+}

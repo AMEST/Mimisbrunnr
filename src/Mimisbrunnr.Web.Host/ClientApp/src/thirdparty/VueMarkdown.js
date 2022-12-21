@@ -154,9 +154,11 @@ export default {
       .use(mark)
       .use(katex, { "throwOnError": false, "errorColor": " #cc0000" })
       .use(tasklists, { enabled: this.taskLists })
-      .use(emoji);
+      .use(emoji)
+      .use(require('markdown-it-imsize'));
     
     var containerPlugin = require('markdown-it-container');
+    // Blocks
     this.md.use(containerPlugin, "warning");
     this.md.use(containerPlugin, "danger");
     this.md.use(containerPlugin, "success");
@@ -165,6 +167,7 @@ export default {
     this.md.use(containerPlugin, "card-body");
     this.md.use(containerPlugin, "card-text");
     this.md.use(containerPlugin, "card-title");
+    // Layout
     this.md.use(containerPlugin, "row");
     this.md.use(containerPlugin, "col");
     this.md.use(containerPlugin, "col-auto");
@@ -175,6 +178,10 @@ export default {
       this.md.use(containerPlugin, "col-md-"+i);
       this.md.use(containerPlugin, "col-lg-"+i);
     }
+    // Alignment
+    this.md.use(containerPlugin, "align-center");
+    this.md.use(containerPlugin, "align-right");
+    this.md.use(containerPlugin, "align-left");
 
     this.md.set({
       html: this.html,

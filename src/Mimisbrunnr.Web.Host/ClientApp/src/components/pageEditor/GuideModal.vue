@@ -62,9 +62,15 @@ export default {
 > It can span multiple lines!
 \`\`\`
 
-## Images
+## Images and image size
 \`\`\`
 ![](http://www.example.com/image.jpg)
+
+![](http://www.example.com/image.jpg =100x100) // image with size 100x100 px
+
+![](http://www.example.com/image.jpg =50%x) // image with width 50% and height auto
+
+![](http://www.example.com/image.jpg =x40%) // image with height 40% and width auto
 \`\`\`
 
 ## Tables
@@ -124,7 +130,7 @@ ___
 \`\`\`
 
 ## Custom containers
-
+### Blocks
 ::: warning
 *It's warning*
 :::
@@ -165,6 +171,33 @@ ___
 ::::
 \`\`\`
 
+
+::::: card
+:::: card-body
+::: card-title
+# This is title
+:::
+::: card-text
+text of this cards
+:::
+::::
+:::::
+   
+\`\`\`
+::::: card
+:::: card-body
+::: card-title
+# This is title
+:::
+::: card-text
+text of this cards
+:::
+::::
+:::::
+\`\`\`
+
+### Layout
+
 ::::: row
 :::: col-8
 *Col 1*
@@ -199,30 +232,28 @@ Green block
 :::::
 \`\`\`
 
-::::: card
-:::: card-body
-::: card-title
-# This is title
+### Alignment
+
+:::: align-center
+I am at center
+::: align-right
+I am at right
 :::
-::: card-text
-text of this cards
+::: align-left
+I am at left
 :::
 ::::
-:::::
-   
-   
-   
+
 \`\`\`
-::::: card
-:::: card-body
-::: card-title
-# This is title
+:::: align-center
+I am at center
+::: align-right
+I am at right
 :::
-::: card-text
-text of this cards
+::: align-left
+I am at left
 :::
 ::::
-:::::
 \`\`\`
             `
         }
