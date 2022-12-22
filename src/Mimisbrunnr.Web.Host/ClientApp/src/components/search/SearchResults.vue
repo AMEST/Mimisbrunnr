@@ -61,8 +61,8 @@ export default {
       this.searchDelayTimeout = null;
       var searchRequestResult =
         this.searchType == "space"
-          ? await SearchService.findSpace(this.textForSearch)
-          : await SearchService.findPage(this.textForSearch);
+          ? await SearchService.findSpaces(this.textForSearch)
+          : await SearchService.findPages(this.textForSearch);
 
       if (searchRequestResult != null) this.searchResults = searchRequestResult;
       this.overlayState = false;
