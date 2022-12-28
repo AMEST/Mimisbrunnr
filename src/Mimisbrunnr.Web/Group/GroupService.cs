@@ -38,7 +38,7 @@ internal class GroupService : IGroupService
     public async Task<GroupModel> Create(GroupCreateModel createModel, UserInfo createdBy)
     {
         var group = await _userGroupManager.Add(createModel.Name, createModel.Description, createdBy.Email);
-        return group.ToModel(true);
+        return GroupMapper.Instance.ToModel(group);
     }
 
     public async Task<IEnumerable<GroupModel>> GetAll(GroupFilterModel filter, UserInfo requestedBy)
@@ -53,15 +53,14 @@ internal class GroupService : IGroupService
         if(!string.IsNullOrEmpty(filter?.OwnerEmail))
             groups = groups.Where(x => x.OwnerEmails.Contains(filter.OwnerEmail));
 
-        return groups.Select(x => x.ToModel(user.Role == UserRole.Admin || x.OwnerEmails.Contains(requestedBy.Email)));
+        return groups.Select(GroupMapper.Instance.ToModel);
     }
 
     public async Task<GroupModel> Get(string name, UserInfo requestedBy)
     {
-        var user = await _userManager.GetByEmail(requestedBy.Email);
         var group = await _userGroupManager.FindByName(name);
         if (group is null) throw new GroupNotFoundException();
-        return group.ToModel(user.Role == UserRole.Admin || group.OwnerEmails.Contains(requestedBy.Email) );
+        return GroupMapper.Instance.ToModel(group);
     }
     
     public async Task<IEnumerable<UserModel>> GetUsers(string name, UserInfo requestedBy)
@@ -72,7 +71,7 @@ internal class GroupService : IGroupService
         if (!group.OwnerEmails.Contains(requestedBy.Email) && requestedByUser.Role != UserRole.Admin) throw new UserHasNotPermissionException();
 
         var users = await _userGroupManager.GetUsersInGroup(group);
-        return users.Select(x => x.ToModel());
+        return users.Select(UserMapper.Instance.ToModel);
     }
 
     public async Task Remove(string name, UserInfo removedBy)

@@ -41,7 +41,7 @@ public class QuickstartController : ControllerBase
     {
         try
         {
-            await _quickstartService.Initialize(model, User.ToEntity());
+            await _quickstartService.Initialize(model, UserMapper.Instance.ToInfo(User));
             return Ok();
         }
         catch (InitializeException e)

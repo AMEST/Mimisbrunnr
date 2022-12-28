@@ -44,14 +44,14 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         await _permissionService.EnsureAnonymousAllowed(requestedBy);
         var spaces = await _spaceManager.GetAll();
         if (requestedBy is null)
-            return spaces.Where(x => x.Type == SpaceType.Public).Select(x => x.ToModel()).ToArray();
+            return spaces.Where(x => x.Type == SpaceType.Public).Select(WikiMapper.Instance.ToModel).ToArray();
 
         var user = await _userManager.GetByEmail(requestedBy.Email);
         if (user.Role == UserRole.Admin)
-            return spaces.Select(x => x.ToModel()).ToArray();
+            return spaces.Select(WikiMapper.Instance.ToModel).ToArray();
 
         var visibleSpaces = await FindUserVisibleSpaces(requestedBy);
-        return visibleSpaces.Select(x => x.ToModel()).ToArray();
+        return visibleSpaces.Select(WikiMapper.Instance.ToModel).ToArray();
     }
 
     public async Task<SpaceModel> GetByKey(string key, UserInfo requestedBy)
@@ -62,7 +62,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         var space = await _spaceManager.GetByKey(key);
         EnsureSpaceExists(space);
 
-        return space.ToModel();
+        return WikiMapper.Instance.ToModel(space);
     }
 
     public async Task<UserPermissionModel> GetPermission(string key, UserInfo requestedBy)
@@ -84,7 +84,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         if (userPermission == null)
             return new UserPermissionModel() { CanView = space.Type == SpaceType.Public };
 
-        return userPermission.ToModel();
+        return PermissionMapper.Instance.ToUserPermissions(userPermission);
     }
 
     public async Task<SpacePermissionModel[]> GetSpacePermissions(string key, UserInfo requestedBy)
@@ -95,7 +95,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         var space = await _spaceManager.GetByKey(key);
         EnsureSpaceExists(space);
 
-        return space.Permissions.Select(x => x.ToSpacePermissionModel()).ToArray();
+        return space.Permissions.Select(PermissionMapper.Instance.ToSpacePermissions).ToArray();
     }
 
     public async Task<SpacePermissionModel> AddPermission(string key, SpacePermissionModel model, UserInfo addedBy)
@@ -105,7 +105,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         var space = await _spaceManager.GetByKey(key);
         EnsureSpaceExists(space);
 
-        await _spaceManager.AddPermission(space, model.ToEntity());
+        await _spaceManager.AddPermission(space, PermissionMapper.Instance.ToEntity(model));
         await ClearUserVisibleSpacesAfterChangingPermissions(model);
 
         return model;
@@ -119,7 +119,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         if (space == null)
             throw new SpaceNotFoundException();
 
-        await _spaceManager.UpdatePermission(space, model.ToEntity());
+        await _spaceManager.UpdatePermission(space, PermissionMapper.Instance.ToEntity(model));
         await ClearUserVisibleSpacesAfterChangingPermissions(model);
     }
 
@@ -130,7 +130,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         var space = await _spaceManager.GetByKey(key);
         EnsureSpaceExists(space);
 
-        await _spaceManager.RemovePermission(space, model.ToEntity());
+        await _spaceManager.RemovePermission(space, PermissionMapper.Instance.ToEntity(model));
         await ClearUserVisibleSpacesAfterChangingPermissions(model);
     }
 
@@ -162,7 +162,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
             await _spaceManager.Update(space);
         }
 
-        return space.ToModel();
+        return WikiMapper.Instance.ToModel(space);
     }
 
     public async Task Update(string key, SpaceUpdateModel model, UserInfo updatedBy)

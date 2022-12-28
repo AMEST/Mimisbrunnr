@@ -25,7 +25,7 @@ public class DraftController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Get([FromRoute] string pageId)
     {
-        var draft = await _draftService.GetByPageId(pageId, User?.ToEntity());
+        var draft = await _draftService.GetByPageId(pageId, UserMapper.Instance.ToInfo(User));
         if(draft is null)
             return NotFound();
 
@@ -39,7 +39,7 @@ public class DraftController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> UpdateOrCreate([FromRoute] string pageId, [FromBody] DraftUpdateModel updateModel)
     {
-        await _draftService.Update(pageId, updateModel, User?.ToEntity());
+        await _draftService.Update(pageId, updateModel, UserMapper.Instance.ToInfo(User));
         return Ok();
     }
 
@@ -50,7 +50,7 @@ public class DraftController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Delete([FromRoute] string pageId)
     {
-        await _draftService.Delete(pageId, User?.ToEntity());
+        await _draftService.Delete(pageId, UserMapper.Instance.ToInfo(User));
         return Ok();
     }
 }

@@ -17,7 +17,7 @@ internal class ValidateUserStateMiddleware
 
     public async Task InvokeAsync(HttpContext context, IUserManager userManager, IApplicationConfigurationManager applicationConfigurationService)
     {
-        var userInfo = context.User?.ToEntity();
+        var userInfo = UserMapper.Instance.ToInfo(context.User);
         if (userInfo is null)
         {
             await _next(context);

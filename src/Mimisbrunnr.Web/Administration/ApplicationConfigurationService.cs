@@ -27,7 +27,7 @@ namespace Mimisbrunnr.Web.Administration
         public async Task<ApplicationConfigurationModel> Get()
         {
             var configuration = await _configurationManager.Get();
-            return configuration.ToModel();
+            return ApplicationMapper.Instance.ToModel(configuration);
         }
 
         public async Task Update(ApplicationConfigurationModel model, UserInfo updatedBy)

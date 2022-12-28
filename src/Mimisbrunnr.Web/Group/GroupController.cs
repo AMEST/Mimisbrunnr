@@ -26,7 +26,7 @@ public class GroupController : ControllerBase
     [ProducesResponseType(401)]
     public async Task<IActionResult> GetAll([FromQuery] GroupFilterModel filter = null )
     {
-        return Ok(await _groupService.GetAll(filter, User.ToEntity()));
+        return Ok(await _groupService.GetAll(filter, UserMapper.Instance.ToInfo(User)));
     }
 
     [HttpGet("{name}")]
@@ -34,7 +34,7 @@ public class GroupController : ControllerBase
     [ProducesResponseType(401)]
     public async Task<IActionResult> Get([FromRoute] string name)
     {
-        return Ok(await _groupService.Get(name, User.ToEntity()));
+        return Ok(await _groupService.Get(name, UserMapper.Instance.ToInfo(User)));
     }
 
     [HttpGet("{name}/users")]
@@ -43,7 +43,7 @@ public class GroupController : ControllerBase
     [ProducesResponseType(403)]
     public async Task<IActionResult> GetUsers([FromRoute] string name)
     {
-        return Ok(await _groupService.GetUsers(name, User.ToEntity()));
+        return Ok(await _groupService.GetUsers(name, UserMapper.Instance.ToInfo(User)));
     }
 
 
@@ -53,7 +53,7 @@ public class GroupController : ControllerBase
     [ProducesResponseType(401)]
     public async Task<IActionResult> Create([FromBody] GroupCreateModel model)
     {
-        await _groupService.Create(model, User.ToEntity());
+        await _groupService.Create(model, UserMapper.Instance.ToInfo(User));
         return Ok();
     }
 
@@ -65,7 +65,7 @@ public class GroupController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Update([FromRoute] string name, [FromBody] GroupUpdateModel model)
     {
-        await _groupService.Update(name, model, User?.ToEntity());
+        await _groupService.Update(name, model, UserMapper.Instance.ToInfo(User));
         return Ok();
     }
 
@@ -77,7 +77,7 @@ public class GroupController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Remove([FromRoute] string name)
     {
-        await _groupService.Remove(name, User.ToEntity());
+        await _groupService.Remove(name, UserMapper.Instance.ToInfo(User));
         return Ok();
     }
 
@@ -89,7 +89,7 @@ public class GroupController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> AddToGroup([FromRoute] string name, [FromRoute] string email)
     {
-        await _groupService.AddUserToGroup(name, new UserInfo(){Email = email}, User.ToEntity());
+        await _groupService.AddUserToGroup(name, new UserInfo(){Email = email}, UserMapper.Instance.ToInfo(User));
         return Ok();
     }
 
@@ -101,7 +101,7 @@ public class GroupController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> RemoveFromGroup([FromRoute] string name, [FromRoute] string email)
     {
-        await _groupService.RemoveUserFromGroup(name, new UserInfo(){Email = email}, User.ToEntity());
+        await _groupService.RemoveUserFromGroup(name, new UserInfo(){Email = email}, UserMapper.Instance.ToInfo(User));
         return Ok();
     }
 }

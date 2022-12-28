@@ -37,7 +37,7 @@ internal class DraftService : IDraftService
     {
         await EnsureDraftPermission(pageId, requestedBy);
         var draft = await _draftManager.GetByPageId(pageId);
-        return draft?.ToModel();
+        return WikiMapper.Instance.ToModel(draft);
     }
 
     public async Task Update(string pageId, DraftUpdateModel updateModel, UserInfo updatedBy)

@@ -11,7 +11,7 @@ public class RequiredAdminRoleAttribute : Attribute, IAsyncAuthorizationFilter
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
         var userManager = context.HttpContext.RequestServices.GetService<IUserManager>();
-        var userInfo = context.HttpContext.User?.ToEntity();
+        var userInfo = UserMapper.Instance.ToInfo(context.HttpContext.User);
         var user = await userManager.GetByEmail(userInfo?.Email);
         if(user is null || user.Role != UserRole.Admin)
             context.Result = new ForbidResult();

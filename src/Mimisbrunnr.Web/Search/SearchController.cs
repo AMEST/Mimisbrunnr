@@ -27,7 +27,7 @@ public class SearchController : ControllerBase
         if (string.IsNullOrEmpty(search))
             return Array.Empty<SpaceModel>();
 
-        return await _searchService.SearchSpaces(search, User?.ToEntity());
+        return await _searchService.SearchSpaces(search, UserMapper.Instance.ToInfo(User));
     }
 
     [HttpGet("page")]
@@ -38,7 +38,7 @@ public class SearchController : ControllerBase
         if (string.IsNullOrEmpty(search))
             return Array.Empty<PageModel>();
             
-        return await _searchService.SearchPages(search, User?.ToEntity());
+        return await _searchService.SearchPages(search, UserMapper.Instance.ToInfo(User));
     }
 
     [HttpGet("user")]
@@ -50,6 +50,6 @@ public class SearchController : ControllerBase
         if (string.IsNullOrEmpty(search))
             return Array.Empty<UserModel>();
             
-        return await _searchService.SearchUsers(search, User?.ToEntity());
+        return await _searchService.SearchUsers(search, UserMapper.Instance.ToInfo(User));
     }
 }
