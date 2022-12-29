@@ -8,8 +8,6 @@ namespace Mimisbrunnr.Web.Mapping;
 [Mapper]
 public partial class WikiMapper
 {
-    public static WikiMapper Instance { get; } = new WikiMapper();
-
     public partial SpaceModel ToModel(Space space);
 
     public partial DraftModel ToModel(Draft draft);
@@ -25,9 +23,9 @@ public partial class WikiMapper
             Name = page.Name,
             Content = page.Content,
             Created = page.Created,
-            CreatedBy = UserMapper.Instance.ToModel(page.CreatedBy),
+            CreatedBy = page.CreatedBy.ToModel(),
             Updated = page.Updated,
-            UpdatedBy = UserMapper.Instance.ToModel(page.UpdatedBy)
+            UpdatedBy = page.CreatedBy.ToModel()
         };
     }
 

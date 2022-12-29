@@ -22,7 +22,7 @@ internal class QuickstartService : IQuickstartService
     public async Task<QuickstartModel> Get()
     {
         var configuration = await _applicationConfigurationService.Get();
-        return ApplicationMapper.Instance.ToQuickStartModel(configuration);
+        return configuration.ToQuickStartModel();
     }
 
     public Task<bool> IsInitialized()
@@ -40,6 +40,6 @@ internal class QuickstartService : IQuickstartService
             throw new InitializeException("Application already initialized");
         
         var applicationUser = await _userManager.GetByEmail(user.Email);
-        await _applicationConfigurationService.Initialize(ApplicationMapper.Instance.ToEntity(model), applicationUser);
+        await _applicationConfigurationService.Initialize(model.ToEntity(), applicationUser);
     }
 }

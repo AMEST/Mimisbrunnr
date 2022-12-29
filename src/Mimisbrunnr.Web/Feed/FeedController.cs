@@ -25,7 +25,7 @@ public class FeedController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Get()
     {
-        return Ok(await _feedService.GetPageUpdates(UserMapper.Instance.ToInfo(User)));
+        return Ok(await _feedService.GetPageUpdates(User?.ToInfo()));
     }
 
     [HttpGet("{emailFilter}")]
@@ -34,6 +34,6 @@ public class FeedController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Get([FromRoute] string emailFilter)
     {
-        return Ok(await _feedService.GetPageUpdates(UserMapper.Instance.ToInfo(User), emailFilter));
+        return Ok(await _feedService.GetPageUpdates(User?.ToInfo(), emailFilter));
     }
 }

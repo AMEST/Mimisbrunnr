@@ -25,7 +25,7 @@ public class AttachmentController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetAll([FromRoute] string pageId)
     {
-        var attachments = await _attachmentService.GetAttachments(pageId, UserMapper.Instance.ToInfo(User));
+        var attachments = await _attachmentService.GetAttachments(pageId, User?.ToInfo());
         if (attachments is null)
             return Ok(Array.Empty<AttachmentModel>());
 
@@ -39,7 +39,7 @@ public class AttachmentController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetContent([FromRoute] string pageId, [FromRoute] string name)
     {
-        var attachmentContent = await _attachmentService.GetAttachmentContent(pageId, name, UserMapper.Instance.ToInfo(User));
+        var attachmentContent = await _attachmentService.GetAttachmentContent(pageId, name, User?.ToInfo());
         if (attachmentContent is null)
             return NotFound();
         return File(attachmentContent, MimeTypes.GetMimeType(name));
@@ -54,7 +54,7 @@ public class AttachmentController : ControllerBase
     {
         var uploadedFile = HttpContext.Request.Form.Files.FirstOrDefault();
 
-        await _attachmentService.Upload(pageId, uploadedFile.OpenReadStream(), uploadedFile.FileName, UserMapper.Instance.ToInfo(User));
+        await _attachmentService.Upload(pageId, uploadedFile.OpenReadStream(), uploadedFile.FileName, User?.ToInfo());
 
         return Ok();
     }
@@ -65,7 +65,7 @@ public class AttachmentController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Remove([FromRoute] string pageId, [FromRoute] string name)
     {
-        await _attachmentService.Remove(pageId, name, UserMapper.Instance.ToInfo(User));
+        await _attachmentService.Remove(pageId, name, User?.ToInfo());
         return Ok();
     }
 }

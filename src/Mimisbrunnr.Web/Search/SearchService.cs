@@ -41,7 +41,7 @@ internal class SearchService : ISearchService
         var pages = await _pageSearcher.Search(text);
         var userSpaces = await _spaceDisplayService.FindUserVisibleSpaces(searchBy);
         var userSpacesId = userSpaces.Select(x => x.Id);
-        return pages.Where(x => userSpacesId.Contains(x.SpaceId)).Select(x => WikiMapper.Instance.ToModel(x, userSpaces.First(s => s.Id == x.SpaceId).Key));
+        return pages.Where(x => userSpacesId.Contains(x.SpaceId)).Select(x => x.ToModel(userSpaces.First(s => s.Id == x.SpaceId).Key));
     }
 
     public async Task<IEnumerable<SpaceModel>> SearchSpaces(string text, UserInfo searchBy)
@@ -51,10 +51,10 @@ internal class SearchService : ISearchService
         var user = await _userManager.GetByEmail(searchBy?.Email);
         var spaces = await _spaceSearcher.Search(text);
         if (user?.Role == UserRole.Admin)
-            return spaces.Select(WikiMapper.Instance.ToModel);
+            return spaces.Select(x => x.ToModel());
 
         var userSpaces = (await _spaceDisplayService.FindUserVisibleSpaces(searchBy)).Select(x => x.Id);
-        return spaces.Where(x => userSpaces.Contains(x.Id)).Select(WikiMapper.Instance.ToModel);
+        return spaces.Where(x => userSpaces.Contains(x.Id)).Select(x => x.ToModel());
     }
 
     public async Task<IEnumerable<UserModel>> SearchUsers(string text, UserInfo searchBy)
@@ -62,6 +62,6 @@ internal class SearchService : ISearchService
         await _permissionService.EnsureAnonymousAllowed(searchBy);
 
         var users = await _userSearcher.Search(text);
-        return users.Select(UserMapper.Instance.ToModel);
+        return users.Select(x => x.ToModel());
     }
 }

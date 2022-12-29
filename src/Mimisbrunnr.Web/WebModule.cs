@@ -6,11 +6,13 @@ using Mimisbrunnr.Web.Customization;
 using Mimisbrunnr.Web.Feed;
 using Mimisbrunnr.Web.Group;
 using Mimisbrunnr.Web.Infrastructure;
+using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.Quickstart;
 using Mimisbrunnr.Web.Search;
 using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Web.User;
 using Mimisbrunnr.Web.Wiki;
+using Mimisbrunnr.Wiki.Contracts;
 using Skidbladnir.Modules;
 
 namespace Mimisbrunnr.Web;

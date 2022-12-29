@@ -40,7 +40,7 @@ internal class PageService : IPageService
         var space = await _spaceManager.GetById(page.SpaceId);
 
         await _permissionService.EnsureViewPermission(space.Key, requestedBy);
-        return WikiMapper.Instance.ToModel(page, space.Key);
+        return page.ToModel(space.Key);
     }
 
     public async Task<PageTreeModel> GetPageTreeByPageId(string pageId, UserInfo requestedBy)
@@ -59,7 +59,7 @@ internal class PageService : IPageService
         await _permissionService.EnsureViewPermission(space.Key, requestedBy);
         var pageTree = await _pageManager.GetAllChilds(page);
 
-        var pageTreeModel = WikiMapper.Instance.ToModel(pageTree, page, space);
+        var pageTreeModel = pageTree.ToModel(page, space);
         if (pageTreeModel is not null)
             await _distributedCache.SetAsync(GetPageTreeCacheKey(pageId), pageTreeModel, new DistributedCacheEntryOptions()
             {
@@ -87,7 +87,7 @@ internal class PageService : IPageService
 
         await _distributedCache.RemoveAsync(GetPageTreeCacheKey(space.HomePageId));
 
-        return WikiMapper.Instance.ToModel(page, space.Key);
+        return page.ToModel(space.Key);
     }
 
     public async Task Update(string pageId, PageUpdateModel updateModel, UserInfo updatedBy)
@@ -165,7 +165,7 @@ internal class PageService : IPageService
         if (!sourcePage.Id.Equals(destinationSpace.Id))
             await _distributedCache.RemoveAsync(GetPageTreeCacheKey(destinationSpace.HomePageId));
 
-        return WikiMapper.Instance.ToModel(copiedPage, destinationSpace.Key);
+        return copiedPage.ToModel(destinationSpace.Key);
     }
 
     public async Task<PageModel> Move(string sourcePageId, string destinationParentPageId, UserInfo movedBy)
@@ -207,7 +207,7 @@ internal class PageService : IPageService
         if (!sourcePage.Id.Equals(destinationSpace.Id))
             await _distributedCache.RemoveAsync(GetPageTreeCacheKey(destinationSpace.HomePageId));
 
-        return WikiMapper.Instance.ToModel(movedPage, destinationSpace.Key);
+        return movedPage.ToModel(destinationSpace.Key);
     }
 
     private static string GetPageTreeCacheKey(string pageId) => $"page_tree_{pageId}";

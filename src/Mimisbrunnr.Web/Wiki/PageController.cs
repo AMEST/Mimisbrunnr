@@ -26,7 +26,7 @@ public class PageController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Get([FromRoute] string pageId)
     {
-        return Ok(await _pageService.GetById(pageId, UserMapper.Instance.ToInfo(User)));
+        return Ok(await _pageService.GetById(pageId, User?.ToInfo()));
     }
     
     [HttpGet("{pageId}/tree")]
@@ -36,7 +36,7 @@ public class PageController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetTree([FromRoute] string pageId)
     {
-        return Ok(await _pageService.GetPageTreeByPageId(pageId, UserMapper.Instance.ToInfo(User)));
+        return Ok(await _pageService.GetPageTreeByPageId(pageId, User?.ToInfo()));
     }
     
     [HttpPost]
@@ -45,7 +45,7 @@ public class PageController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Create([FromBody] PageCreateModel createModel)
     {
-        return Ok(await _pageService.Create(createModel, UserMapper.Instance.ToInfo(User)));
+        return Ok(await _pageService.Create(createModel, User?.ToInfo()));
     }    
     
     [HttpPut("{pageId}")]
@@ -54,7 +54,7 @@ public class PageController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Update([FromRoute] string pageId, [FromBody] PageUpdateModel updateModel)
     {
-        await _pageService.Update(pageId, updateModel, UserMapper.Instance.ToInfo(User));
+        await _pageService.Update(pageId, updateModel, User?.ToInfo());
         return Ok();
     }
     
@@ -64,7 +64,7 @@ public class PageController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Delete([FromRoute] string pageId, [FromQuery] bool recursively = false)
     {
-        await _pageService.Delete(pageId, UserMapper.Instance.ToInfo(User), recursively);
+        await _pageService.Delete(pageId, User?.ToInfo(), recursively);
         return Ok();
     }
     
@@ -74,7 +74,7 @@ public class PageController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Copy([FromRoute] string sourcePageId, [FromRoute] string destinationParentPageId)
     {
-        return Ok(await _pageService.Copy(sourcePageId, destinationParentPageId, UserMapper.Instance.ToInfo(User)));
+        return Ok(await _pageService.Copy(sourcePageId, destinationParentPageId, User?.ToInfo()));
     }
     
     [HttpPost("move/{sourcePageId}/{destinationParentPageId}")]
@@ -83,6 +83,6 @@ public class PageController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Move([FromRoute] string sourcePageId, [FromRoute] string destinationParentPageId)
     {
-        return Ok(await _pageService.Move(sourcePageId, destinationParentPageId, UserMapper.Instance.ToInfo(User)));
+        return Ok(await _pageService.Move(sourcePageId, destinationParentPageId, User?.ToInfo()));
     }
 }

@@ -8,8 +8,6 @@ namespace Mimisbrunnr.Web.Mapping;
 [Mapper]
 public partial class ApplicationMapper
 {
-    public static ApplicationMapper Instance { get; } = new ApplicationMapper();
-
     public partial ApplicationConfiguration ToEntity(QuickstartModel model);
 
     public partial ApplicationConfigurationModel ToModel(ApplicationConfiguration applicationConfiguration);

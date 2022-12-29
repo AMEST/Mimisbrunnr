@@ -40,7 +40,7 @@ internal class TokenService : ITokenService
             return Enumerable.Empty<TokenModel>();
 
         var tokens = await _securityTokenService.GetUserTokens(user);
-        return TokenMapper.Instance.ToModel(tokens);
+        return tokens.ToModel();
     }
 
     public async Task Revoke(string tokenId, UserInfo revokedBy)

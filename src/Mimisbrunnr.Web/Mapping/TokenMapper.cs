@@ -7,7 +7,6 @@ namespace Mimisbrunnr.Web.Mapping;
 [Mapper]
 public partial class TokenMapper
 {
-    public static TokenMapper Instance { get; } = new TokenMapper();
 
     public partial TokenModel ToModel(UserToken token);
 

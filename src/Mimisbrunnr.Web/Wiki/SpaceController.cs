@@ -37,7 +37,7 @@ public class SpaceController : ControllerBase
     [ProducesResponseType(401)]
     public async Task<IActionResult> GetAll()
     {
-        return Ok(await _spaceService.GetAll(UserMapper.Instance.ToInfo(User)));
+        return Ok(await _spaceService.GetAll(User?.ToInfo()));
     }
 
     [HttpGet("{key}")]
@@ -47,7 +47,7 @@ public class SpaceController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Get([FromRoute] string key)
     {
-        return Ok(await _spaceService.GetByKey(key, UserMapper.Instance.ToInfo(User)));
+        return Ok(await _spaceService.GetByKey(key, User?.ToInfo()));
     }
 
     [HttpGet("{key}/permission")]
@@ -57,7 +57,7 @@ public class SpaceController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetPermission([FromRoute] string key)
     {
-        return Ok(await _spaceService.GetPermission(key, UserMapper.Instance.ToInfo(User)));
+        return Ok(await _spaceService.GetPermission(key, User?.ToInfo()));
     }
 
     [HttpGet("{key}/permissions")]
@@ -67,7 +67,7 @@ public class SpaceController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetPermissions([FromRoute] string key)
     {
-        return Ok(await _spaceService.GetSpacePermissions(key, UserMapper.Instance.ToInfo(User)));
+        return Ok(await _spaceService.GetSpacePermissions(key, User?.ToInfo()));
     }
 
     [HttpPost("{key}/permissions")]
@@ -77,7 +77,7 @@ public class SpaceController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> AddPermissions([FromRoute] string key, [FromBody] SpacePermissionModel model)
     {
-        return Ok(await _spaceService.AddPermission(key, model, UserMapper.Instance.ToInfo(User)));
+        return Ok(await _spaceService.AddPermission(key, model, User?.ToInfo()));
     }
 
     [HttpPut("{key}/permissions")]
@@ -87,7 +87,7 @@ public class SpaceController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> UpdatePermissions([FromRoute] string key, [FromBody] SpacePermissionModel model)
     {
-        await _spaceService.UpdatePermission(key, model, UserMapper.Instance.ToInfo(User));
+        await _spaceService.UpdatePermission(key, model, User?.ToInfo());
         return Ok();
     }
     [HttpDelete("{key}/permissions")]
@@ -97,7 +97,7 @@ public class SpaceController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> DeletePermissions([FromRoute] string key, [FromBody] SpacePermissionModel model)
     {
-        await _spaceService.RemovePermission(key, model, UserMapper.Instance.ToInfo(User));
+        await _spaceService.RemovePermission(key, model, User?.ToInfo());
         return Ok();
     }
 
@@ -106,7 +106,7 @@ public class SpaceController : ControllerBase
     [ProducesResponseType(401)]
     public async Task<IActionResult> Create([FromBody] SpaceCreateModel createModel)
     {
-        return Ok(await _spaceService.Create(createModel, UserMapper.Instance.ToInfo(User)));
+        return Ok(await _spaceService.Create(createModel, User?.ToInfo()));
     }
 
     [HttpPost("import")]
@@ -126,7 +126,7 @@ public class SpaceController : ControllerBase
         if (importZip == null)
             return BadRequest();
 
-        var userInfo = UserMapper.Instance.ToInfo(User);
+        var userInfo = User?.ToInfo();
 
         var createdSpace = await _spaceService.Create(createModel, userInfo);
         await _spaceImportService.ImportSpace(createdSpace, importZip.OpenReadStream());
@@ -140,7 +140,7 @@ public class SpaceController : ControllerBase
     [ProducesResponseType(403)]
     public async Task<IActionResult> Update([FromRoute] string key, [FromBody] SpaceUpdateModel updateModel)
     {
-        await _spaceService.Update(key, updateModel, UserMapper.Instance.ToInfo(User));
+        await _spaceService.Update(key, updateModel, User?.ToInfo());
         return Ok();
     }
 
@@ -150,7 +150,7 @@ public class SpaceController : ControllerBase
     [ProducesResponseType(403)]
     public async Task<IActionResult> Archive([FromRoute] string key)
     {
-        await _spaceService.Archive(key, UserMapper.Instance.ToInfo(User));
+        await _spaceService.Archive(key, User?.ToInfo());
         return Ok();
     }
 
@@ -160,7 +160,7 @@ public class SpaceController : ControllerBase
     [ProducesResponseType(403)]
     public async Task<IActionResult> UnArchive([FromRoute] string key)
     {
-        await _spaceService.UnArchive(key, UserMapper.Instance.ToInfo(User));
+        await _spaceService.UnArchive(key, User?.ToInfo());
         return Ok();
     }
 
@@ -170,7 +170,7 @@ public class SpaceController : ControllerBase
     [ProducesResponseType(403)]
     public async Task<IActionResult> Delete([FromRoute] string key)
     {
-        await _spaceService.Remove(key, UserMapper.Instance.ToInfo(User));
+        await _spaceService.Remove(key, User?.ToInfo());
         return Ok();
     }
 }

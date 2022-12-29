@@ -32,25 +32,25 @@ internal class FeedService : IFeedService
         {
             await _permissionService.EnsureAnonymousAllowed(requestedBy);
             var publicUpdates = await _feedManager.GetPageUpdates(requestedBy);
-            return publicUpdates.Select(FeedMapper.Instance.ToModel).ToArray();
+            return publicUpdates.Select(x => x.ToModel()).ToArray();
         }
 
         if (!string.IsNullOrEmpty(updatedByEmail))
         {
             var visibleSpaces = await _spaceDisplayService.FindUserVisibleSpaces(requestedBy);
             var userUpdates = await _feedManager.GetPageUpdates(requestedBy, visibleSpaces, new UserInfo { Email = updatedByEmail.ToLower() });
-            return userUpdates.Select(FeedMapper.Instance.ToModel).ToArray();
+            return userUpdates.Select(x => x.ToModel()).ToArray();
         }
 
         var user = await _userManager.GetByEmail(requestedBy.Email);
         if (user.Role == UserRole.Admin)
         {
             var allUpdates = await _feedManager.GetAllPageUpdates();
-            return allUpdates.Select(FeedMapper.Instance.ToModel).ToArray();
+            return allUpdates.Select(x => x.ToModel()).ToArray();
         }
 
         var userSpaces = await _spaceDisplayService.FindUserVisibleSpaces(requestedBy);
         var updates = await _feedManager.GetPageUpdates(requestedBy, userSpaces);
-        return updates.Select(FeedMapper.Instance.ToModel).ToArray();
+        return updates.Select(x => x.ToModel()).ToArray();
     }
 }

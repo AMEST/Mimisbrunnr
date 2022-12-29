@@ -30,20 +30,20 @@ namespace Mimisbrunnr.Web.User
             var users = await _userManager.GetUsers(offset);
 
             return requestedByUser.Role == UserRole.Admin
-                ? users.Select(UserMapper.Instance.ToViewModel)
-                : users.Select(UserMapper.Instance.ToModel);
+                ? users.Select(x => x.ToViewModel())
+                : users.Select(x => x.ToModel());
         }
 
         public async Task<UserViewModel> GetCurrent(UserInfo requestedBy)
         {
             var user = await _userManager.GetByEmail(requestedBy?.Email);
-            return UserMapper.Instance.ToViewModel(user);
+            return user.ToViewModel();
         }
 
         public async Task<UserProfileModel> GetByEmail(string email, UserInfo requestedBy)
         {
             var user = await _userManager.GetByEmail(email);
-            return UserMapper.Instance.ToProfileModel(user);
+            return user.ToProfileModel();
         }
 
         public async Task<IEnumerable<GroupModel>> GetUserGroups(string email, UserInfo requestedBy)
@@ -61,7 +61,7 @@ namespace Mimisbrunnr.Web.User
                 return Array.Empty<GroupModel>();
 
             var groups = await _userGroupManager.GetUserGroups(user);
-            return groups.Select(GroupMapper.Instance.ToModel);
+            return groups.Select(x => x.ToModel());
         }
 
         public async Task UpdateProfileInfo(string email, UserProfileUpdateModel model, UserInfo updatedBy)

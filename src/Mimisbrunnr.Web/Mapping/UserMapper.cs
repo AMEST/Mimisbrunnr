@@ -8,7 +8,6 @@ namespace Mimisbrunnr.Web.Mapping;
 [Mapper]
 public partial class UserMapper
 {
-    public static UserMapper Instance { get; } = new UserMapper();
 
     public partial UserInfo ToInfo(UserModel user);
 
@@ -30,11 +29,12 @@ public partial class UserMapper
         };
     }
 
-        public UserInfo ToInfo(ClaimsPrincipal principal)
+    public UserInfo ToInfo(ClaimsPrincipal principal)
     {
         var user = new UserInfo
         {
-            Email = principal.FindFirst(ClaimTypes.Email)?.Value?.ToLower() ?? principal.FindFirst("email")?.Value?.ToLower(),
+            Email = principal.FindFirst(ClaimTypes.Email)?.Value?.ToLower() ??
+                    principal.FindFirst("email")?.Value?.ToLower(),
             Name = principal.Identity?.Name,
             AvatarUrl = principal.FindFirst("picture")?.Value
         };
@@ -42,5 +42,4 @@ public partial class UserMapper
             return null;
         return user;
     }
-
 }

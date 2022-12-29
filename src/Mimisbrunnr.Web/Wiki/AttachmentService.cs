@@ -35,7 +35,7 @@ internal class AttachmentService : IAttachmentService
 
         var attachments = await _attachmentManager.GetAttachments(page);
 
-        return attachments?.Select(WikiMapper.Instance.ToModel).ToArray();
+        return attachments?.Select(x => x.ToModel()).ToArray();
     }
 
     public async Task<Stream> GetAttachmentContent(string pageId, string name, UserInfo requestedBy)

@@ -6,8 +6,7 @@ namespace Mimisbrunnr.Web.Mapping;
 
 [Mapper]
 public partial class PermissionMapper
-{  
-    public static PermissionMapper Instance { get; } = new PermissionMapper();
+{
 
     public partial SpacePermissionModel ToSpacePermissions(Permission permission);
 

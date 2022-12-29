@@ -22,5 +22,5 @@ public class ApplicationConfigurationController : ControllerBase
     public Task<ApplicationConfigurationModel> Get() => _configurationService.Get();
 
     [HttpPut]
-    public Task Update([FromBody] ApplicationConfigurationModel model) => _configurationService.Update(model, UserMapper.Instance.ToInfo(User));
+    public Task Update([FromBody] ApplicationConfigurationModel model) => _configurationService.Update(model, User?.ToInfo());
 }
