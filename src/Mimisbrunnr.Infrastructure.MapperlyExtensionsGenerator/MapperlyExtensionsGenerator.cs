@@ -24,47 +24,41 @@ public class MapperlyExtensionsGenerator : ISourceGenerator
                 .Where(r => r.AttributeLists
                     .SelectMany(al => al.Attributes)
                     .Any(a => a.Name.GetText().ToString() == "Mapper")));
-        if (classesWithAttribute == null || !classesWithAttribute.Any())
-            return;
         foreach (var declaration in classesWithAttribute)
         {
+            var methodDeclarations = declaration.Members
+                .Where(m => m.IsKind(SyntaxKind.MethodDeclaration))
+                .OfType<MethodDeclarationSyntax>().ToArray();
+            var usings = new List<string>();
+            foreach (var methodDeclaration in methodDeclarations)
+                usings.AddRange(GenerateUsings(methodDeclaration, context));
+            
             context.AddSource($"{declaration.Identifier}Extensions.g.cs",
-                SourceText.From(GenerateClass(context, declaration), Encoding.UTF8));
-            Debug.WriteLine($"{declaration.Identifier}Extensions.g.cs");
+                SourceText.From(GenerateClass(declaration, methodDeclarations, usings), Encoding.UTF8));
         }
     }
 
-    private string GenerateClass(GeneratorExecutionContext context,
-        ClassDeclarationSyntax declaration)
+    private string GenerateClass(ClassDeclarationSyntax declaration, MethodDeclarationSyntax[] methodDeclarations,
+        IList<string> usings)
     {
+        var namespaceName = GetNamespace(declaration);
         var sb = new StringBuilder();
         sb.AppendLine("// Auto-generated code");
-        
-        var methodDeclarations = declaration.Members
-            .Where(m => m.IsKind(SyntaxKind.MethodDeclaration)).OfType<MethodDeclarationSyntax>().ToArray();
-        var usingList = new List<string>();
-        foreach (var methodDeclaration in methodDeclarations)
-            usingList.AddRange(GenerateUsings(methodDeclaration, context));
-
-        foreach (var classUsing in usingList.Distinct())
+        foreach (var classUsing in usings.Distinct())
             sb.AppendLine($"using {classUsing};");
-
-        var namespaceName = GetNamespace(declaration);
-        namespaceName = string.IsNullOrEmpty(namespaceName) ? "MapperlyExtensions" : namespaceName;
         sb.Append($@"
-namespace {namespaceName}
+namespace {(string.IsNullOrEmpty(namespaceName) ? "MapperlyExtensions" : namespaceName)}
 {{
     public static class {declaration.Identifier}Extensions 
     {{
         private static readonly {declaration.Identifier} _mapper = new {declaration.Identifier}();
 ");
+        
         foreach (MethodDeclarationSyntax classMethod in methodDeclarations)
             sb.AppendLine(GenerateMethod(classMethod));
-
         sb.Append(@"
     }
-}
-");
+}");
         return sb.ToString();
     }
 
@@ -87,8 +81,7 @@ namespace {namespaceName}
         usingList.Add(GetNamespace(classMethod));
         usingList.Add(GetTypeNamespace(model, classMethod.ReturnType));
         var parameters = classMethod.ParameterList.Parameters;
-        foreach (var parameter in parameters)
-            usingList.Add(GetTypeNamespace(model, parameter.Type));
+        usingList.AddRange(parameters.Select(parameter => GetTypeNamespace(model, parameter.Type)));
         return usingList;
     }
     
