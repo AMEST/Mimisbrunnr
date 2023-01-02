@@ -17,7 +17,8 @@
       <ProjectReference Include="..\Mimisbrunnr.Infrastructure.MapperlyExtensionsGenerator\Mimisbrunnr.Infrastructure.MapperlyExtensionsGenerator.csproj"
                         PrivateAssets="all"
                         OutputItemType="Analyzer"
-                        ReferenceOutputAssembly="false" />
+                        ReferenceOutputAssembly="false"
+                        IncludeRuntimeDependency="false" />
       <ProjectReference Include="..\Mimisbrunnr.Web.Infrastructure\Mimisbrunnr.Web.Infrastructure.csproj" PrivateAssets="all"/>
       <ProjectReference Include="..\Mimisbrunnr.Wiki\Mimisbrunnr.Wiki.csproj" PrivateAssets="all" />
       <ProjectReference Include="..\Integration\Mimisbrunnr.Integration\Mimisbrunnr.Integration.csproj" PrivateAssets="all" />
