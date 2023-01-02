@@ -5,7 +5,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Mimisbrunnr.Infrastructure.MapperlyExtensionsGenerator;
+namespace Mimisbrunnr.Infrastructure.MapperlyExtensionsGenerator
+{
 
 [Generator]
 public class MapperlyExtensionsGenerator : ISourceGenerator
@@ -106,3 +107,4 @@ namespace {(string.IsNullOrEmpty(namespaceName) ? "MapperlyExtensions" : namespa
         );
     }
 }
+} 
