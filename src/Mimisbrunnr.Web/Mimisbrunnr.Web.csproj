@@ -19,10 +19,10 @@
                         OutputItemType="Analyzer"
                         ReferenceOutputAssembly="false"
                         IncludeRuntimeDependency="false" />
-      <ProjectReference Include="..\Mimisbrunnr.Web.Infrastructure\Mimisbrunnr.Web.Infrastructure.csproj" PrivateAssets="all"/>
-      <ProjectReference Include="..\Mimisbrunnr.Wiki\Mimisbrunnr.Wiki.csproj" PrivateAssets="all" />
-      <ProjectReference Include="..\Integration\Mimisbrunnr.Integration\Mimisbrunnr.Integration.csproj" PrivateAssets="all" />
-      <ProjectReference Include="..\DataImport\Mimisbrunnr.DataImport\Mimisbrunnr.DataImport.csproj" PrivateAssets="all" />
+      <ProjectReference Include="..\Mimisbrunnr.Web.Infrastructure\Mimisbrunnr.Web.Infrastructure.csproj" />
+      <ProjectReference Include="..\Mimisbrunnr.Wiki\Mimisbrunnr.Wiki.csproj" />
+      <ProjectReference Include="..\Integration\Mimisbrunnr.Integration\Mimisbrunnr.Integration.csproj"/>
+      <ProjectReference Include="..\DataImport\Mimisbrunnr.DataImport\Mimisbrunnr.DataImport.csproj" />
     </ItemGroup>
 
     <ItemGroup>
