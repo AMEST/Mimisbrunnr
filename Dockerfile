@@ -4,7 +4,7 @@ COPY . /src
 RUN echo $(git describe --tags --always 2>/dev/null |  sed 's/-g[a-z0-9]\{7\}//') > /version ;\
     echo "Version: "$(cat /version)
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0.10-jammy AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
 WORKDIR /build
 COPY . ./
 COPY --from=version /version /build/version
