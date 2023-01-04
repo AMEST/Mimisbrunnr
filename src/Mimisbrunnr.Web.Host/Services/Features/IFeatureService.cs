@@ -1,6 +1,6 @@
 namespace Mimisbrunnr.Web.Host.Services.Features;
 
-public interface IFeatureService
+internal interface IFeatureService
 {
     Task<bool> IsFeatureEnabled(string name);
 

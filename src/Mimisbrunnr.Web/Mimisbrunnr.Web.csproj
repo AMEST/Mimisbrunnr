@@ -15,7 +15,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Mimisbrunnr.Infrastructure.MapperlyExtensionsGenerator\Mimisbrunnr.Infrastructure.MapperlyExtensionsGenerator.csproj"
-                        PrivateAssets="all"
                         OutputItemType="Analyzer"
                         ReferenceOutputAssembly="false"
                         IncludeRuntimeDependency="false" />

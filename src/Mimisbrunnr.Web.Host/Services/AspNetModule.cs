@@ -10,7 +10,7 @@ using Skidbladnir.Modules;
 
 namespace Mimisbrunnr.Web.Host.Services;
 
-public class AspNetModule : Module
+internal class AspNetModule : Module
 {
     private const string JwtOrCookeSchemeName = "JWT_OR_COOKIE";
     public override void Configure(IServiceCollection services)
