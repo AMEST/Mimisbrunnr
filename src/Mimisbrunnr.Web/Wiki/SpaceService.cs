@@ -84,7 +84,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         if (userPermission == null)
             return new UserPermissionModel() { CanView = space.Type == SpaceType.Public };
 
-        return userPermission.ToModel();
+        return userPermission.ToUserPermissions();
     }
 
     public async Task<SpacePermissionModel[]> GetSpacePermissions(string key, UserInfo requestedBy)
@@ -95,7 +95,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         var space = await _spaceManager.GetByKey(key);
         EnsureSpaceExists(space);
 
-        return space.Permissions.Select(x => x.ToSpacePermissionModel()).ToArray();
+        return space.Permissions.Select(x => x.ToSpacePermissions()).ToArray();
     }
 
     public async Task<SpacePermissionModel> AddPermission(string key, SpacePermissionModel model, UserInfo addedBy)
@@ -179,13 +179,14 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
             && model.Public.HasValue
             && !model.Public.Value
             && space.Type == SpaceType.Public)
-            throw new InvalidOperationException("Cannot change space visible type to private, because space homepage used for wiki homepage");
+            throw new InvalidOperationException(
+                "Cannot change space visible type to private, because space homepage used for wiki homepage");
 
         space.Name = model.Name;
         space.Description = model.Description;
         if (space.Type != SpaceType.Personal
             && !string.IsNullOrEmpty(model.AvatarUrl)
-                && model.AvatarUrl.StartsWith("/api/attachment"))
+            && model.AvatarUrl.StartsWith("/api/attachment"))
             space.AvatarUrl = model.AvatarUrl;
 
         if (space.Type != SpaceType.Personal && model.Public is not null)
@@ -259,8 +260,10 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
             await AddVisibleSpacesToCache(cacheKey, spaces);
             return spaces;
         }
+
         var userGroups = await _userGroupManager.GetUserGroups(user);
-        spaces = spaces.Where(x => x.Type == SpaceType.Public || FindPermission(x.Permissions.ToArray(), userInfo, userGroups) != null);
+        spaces = spaces.Where(x =>
+            x.Type == SpaceType.Public || FindPermission(x.Permissions.ToArray(), userInfo, userGroups) != null);
         await AddVisibleSpacesToCache(cacheKey, spaces);
         return spaces;
     }
@@ -287,10 +290,10 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
     private Task AddVisibleSpacesToCache(string cacheKey, IEnumerable<Space> spaces)
     {
         return _distributedCache.SetAsync(cacheKey, spaces,
-                new DistributedCacheEntryOptions()
-                {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2)
-                }
+            new DistributedCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2)
+            }
         );
     }
 
@@ -322,5 +325,6 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         return userPermission ?? groupPermission;
     }
 
-    private static string CreateUserVisibleSpacesCacheKey(string email) => $"user_visible_spaces_cache_email_{email.ToLower()}";
+    private static string CreateUserVisibleSpacesCacheKey(string email) =>
+        $"user_visible_spaces_cache_email_{email.ToLower()}";
 }

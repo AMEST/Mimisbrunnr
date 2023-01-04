@@ -1,13 +1,13 @@
 namespace Mimisbrunnr.Web.Host.Configuration;
 
-public class CachingConfiguration
+internal class CachingConfiguration
 {
     public string RedisConnectionString { get; set; }
 
     public CachingType Type { get; set; }
 }
 
-public enum CachingType
+internal enum CachingType
 {
     Memory,
     MongoDb,

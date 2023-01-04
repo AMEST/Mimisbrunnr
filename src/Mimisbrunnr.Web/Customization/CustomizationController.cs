@@ -27,7 +27,7 @@ namespace Mimisbrunnr.Web.Customization
         [HttpGet("homepage")]
         public async Task<IActionResult> GetCustomHomepage()
         {
-            var homepage = await _customizationService.GetCustomHomepage(User?.ToEntity());
+            var homepage = await _customizationService.GetCustomHomepage(User?.ToInfo());
             return Ok(homepage);
         }
     }

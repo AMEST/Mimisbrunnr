@@ -1,6 +1,6 @@
 namespace Mimisbrunnr.Web.Host.Configuration;
 
-public class BearerTokenConfiguration
+internal class BearerTokenConfiguration
 {
     public string SymmetricKey { get; set; }
 

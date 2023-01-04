@@ -17,7 +17,7 @@ using Skidbladnir.Modules;
 
 namespace Mimisbrunnr.Web.Host;
 
-public class StartupModule : Module
+internal class StartupModule : Module
 {
     public override Type[] DependsModules => new[]
     {

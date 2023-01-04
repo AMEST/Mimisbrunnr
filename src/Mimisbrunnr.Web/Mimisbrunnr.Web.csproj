@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
+        <ImplicitUsings>enable</ImplicitUsings> 
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,9 +14,13 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Mimisbrunnr.Infrastructure.MapperlyExtensionsGenerator\Mimisbrunnr.Infrastructure.MapperlyExtensionsGenerator.csproj"
+                        OutputItemType="Analyzer"
+                        ReferenceOutputAssembly="false"
+                        IncludeRuntimeDependency="false" />
       <ProjectReference Include="..\Mimisbrunnr.Web.Infrastructure\Mimisbrunnr.Web.Infrastructure.csproj" />
       <ProjectReference Include="..\Mimisbrunnr.Wiki\Mimisbrunnr.Wiki.csproj" />
-      <ProjectReference Include="..\Integration\Mimisbrunnr.Integration\Mimisbrunnr.Integration.csproj" />
+      <ProjectReference Include="..\Integration\Mimisbrunnr.Integration\Mimisbrunnr.Integration.csproj"/>
       <ProjectReference Include="..\DataImport\Mimisbrunnr.DataImport\Mimisbrunnr.DataImport.csproj" />
     </ItemGroup>
 
@@ -25,6 +29,7 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
+      <PackageReference Include="Riok.Mapperly" Version="2.5.0" />
       <PackageReference Include="Skidbladnir.Modules" Version="1.6.0" />
     </ItemGroup>
 

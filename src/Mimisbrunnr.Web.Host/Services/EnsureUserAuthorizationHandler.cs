@@ -17,10 +17,10 @@ internal class EnsureUserAuthorizationHandler : IAuthorizationHandler
 
     public async Task HandleAsync(AuthorizationHandlerContext context)
     {
-        if (context.User == null || context.User.ToEntity() == null)
+        if (context.User == null || context.User.ToInfo() == null)
             return;
 
-        var userInfo = context.User.ToEntity();
+        var userInfo = context.User.ToInfo();
         var applicationUser = await _userManager.GetByEmail(userInfo.Email);
         if (applicationUser == null)
         {

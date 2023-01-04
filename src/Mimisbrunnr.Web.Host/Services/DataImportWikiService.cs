@@ -26,31 +26,31 @@ namespace Mimisbrunnr.Web.Host.Services
 
         public Task<PageModel> CreatePage(PageCreateModel createModel)
         {
-            var user = _contextAccessor.HttpContext.User.ToEntity();
+            var user = _contextAccessor.HttpContext?.User.ToInfo();
             return _pageService.Create(createModel, user);
         }
 
         public Task<PageModel> GetPageById(string id)
         {
-            var user = _contextAccessor.HttpContext.User.ToEntity();
+            var user = _contextAccessor.HttpContext?.User.ToInfo();
             return _pageService.GetById(id, user);
         }
 
         public Task<SpaceModel> GetSpaceByKey(string key)
         {
-            var user = _contextAccessor.HttpContext.User.ToEntity();
+            var user = _contextAccessor.HttpContext?.User.ToInfo();
             return _spaceService.GetByKey(key, user);
         }
 
         public Task UpdatePage(string pageId, PageUpdateModel updateModel)
         {
-            var user = _contextAccessor.HttpContext.User.ToEntity();
+            var user = _contextAccessor.HttpContext?.User.ToInfo();
             return _pageService.Update(pageId, updateModel, user);
         }
 
         public Task UploadAttachment(string pageId, Stream content, string name)
         {
-            var user = _contextAccessor.HttpContext.User.ToEntity();
+            var user = _contextAccessor.HttpContext?.User.ToInfo();
             return _attachmentService.Upload(pageId, content, name, user);
         }
     }

@@ -25,7 +25,7 @@ public class AccountController : ControllerBase
         if(!string.IsNullOrEmpty(redirectUri) && redirectUri.StartsWith("/"))
             redirect = redirectUri;
 
-        var user = User.ToEntity();
+        var user = User?.ToInfo();
         if (user != null)
             return Redirect(redirect);
 
@@ -48,7 +48,7 @@ public class AccountController : ControllerBase
     [ProducesResponseType(401)]
     public async Task<IActionResult> GetTokens()
     {
-        var tokens = await _tokenService.GetUserTokens(User.ToEntity());
+        var tokens = await _tokenService.GetUserTokens(User?.ToInfo());
         return Ok(tokens);
     }
 
@@ -58,7 +58,7 @@ public class AccountController : ControllerBase
     [ProducesResponseType(401)]
     public async Task<IActionResult> CreateToken([FromBody] TokenCreateRequest request)
     {
-        var token = await _tokenService.CreateUserToken(request, User.ToEntity());
+        var token = await _tokenService.CreateUserToken(request, User?.ToInfo());
         if(token is null)
             return BadRequest();
 
@@ -70,7 +70,7 @@ public class AccountController : ControllerBase
     [ProducesResponseType(401)]
     public async Task<IActionResult> CreateToken([FromRoute] string id)
     {
-        await _tokenService.Revoke(id, User.ToEntity());
+        await _tokenService.Revoke(id, User?.ToInfo());
         return Ok();
     }
 }

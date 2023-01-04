@@ -59,7 +59,7 @@ internal class PageService : IPageService
         await _permissionService.EnsureViewPermission(space.Key, requestedBy);
         var pageTree = await _pageManager.GetAllChilds(page);
 
-        var pageTreeModel = pageTree?.ToModel(page, space);
+        var pageTreeModel = pageTree.ToModel(page, space);
         if (pageTreeModel is not null)
             await _distributedCache.SetAsync(GetPageTreeCacheKey(pageId), pageTreeModel, new DistributedCacheEntryOptions()
             {

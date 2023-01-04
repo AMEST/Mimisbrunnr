@@ -21,7 +21,8 @@ internal class QuickstartService : IQuickstartService
 
     public async Task<QuickstartModel> Get()
     {
-        return (await _applicationConfigurationService.Get()).ToQuickStartModel();
+        var configuration = await _applicationConfigurationService.Get();
+        return configuration.ToQuickStartModel();
     }
 
     public Task<bool> IsInitialized()

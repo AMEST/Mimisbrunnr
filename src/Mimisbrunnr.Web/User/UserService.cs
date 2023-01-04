@@ -37,13 +37,13 @@ namespace Mimisbrunnr.Web.User
         public async Task<UserViewModel> GetCurrent(UserInfo requestedBy)
         {
             var user = await _userManager.GetByEmail(requestedBy?.Email);
-            return user?.ToViewModel();
+            return user.ToViewModel();
         }
 
         public async Task<UserProfileModel> GetByEmail(string email, UserInfo requestedBy)
         {
             var user = await _userManager.GetByEmail(email);
-            return user?.ToProfileModel();
+            return user.ToProfileModel();
         }
 
         public async Task<IEnumerable<GroupModel>> GetUserGroups(string email, UserInfo requestedBy)

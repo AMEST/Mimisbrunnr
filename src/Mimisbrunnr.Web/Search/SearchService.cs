@@ -20,8 +20,8 @@ internal class SearchService : ISearchService
 
     public SearchService(
         IPermissionService permissionService,
-        IPageSearcher pageSearcher, 
-        ISpaceSearcher spaceSearcher, 
+        IPageSearcher pageSearcher,
+        ISpaceSearcher spaceSearcher,
         IUserSearcher userSearcher,
         IUserManager userManager,
         ISpaceDisplayService spaceDisplayService)
