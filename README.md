@@ -30,6 +30,7 @@
     - [Example](#example)
 
 ## Links
+* **[Documentation](https://wiki.nb-47.ml/space/MM-DOCS)**
 * **[Try Mimisbrunnr](https://wiki.nb-47.ml)**  
 * **[Docker image](https://hub.docker.com/r/eluki/mimisbrunnr-wiki)**
 
