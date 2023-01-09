@@ -5,12 +5,12 @@ using Riok.Mapperly.Abstractions;
 namespace Mimisbrunnr.Web.Mapping;
 
 [Mapper]
-public partial class PermissionMapper
+public static partial class PermissionMapper
 {
 
-    public partial SpacePermissionModel ToSpacePermissions(Permission permission);
+    public static partial SpacePermissionModel ToSpacePermissions(this Permission permission);
 
-    public partial UserPermissionModel ToUserPermissions(Permission permission);
+    public static partial UserPermissionModel ToUserPermissions(this Permission permission);
 
-    public partial Permission ToEntity(SpacePermissionModel model);
+    public static partial Permission ToEntity(this SpacePermissionModel model);
 }

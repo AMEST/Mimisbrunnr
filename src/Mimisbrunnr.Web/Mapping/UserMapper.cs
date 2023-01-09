@@ -6,18 +6,18 @@ using Riok.Mapperly.Abstractions;
 namespace Mimisbrunnr.Web.Mapping;
 
 [Mapper]
-public partial class UserMapper
+public static partial class UserMapper
 {
 
-    public partial UserInfo ToInfo(UserModel user);
+    public static partial UserInfo ToInfo(this UserModel user);
 
-    public partial UserModel ToModel(UserInfo user);
+    public static partial UserModel ToModel(this UserInfo user);
 
-    public partial UserModel ToModel(Users.User user);
+    public static partial UserModel ToModel(this Users.User user);
 
-    public partial UserProfileModel ToProfileModel(Users.User user);
+    public static partial UserProfileModel ToProfileModel(this Users.User user);
 
-    public UserViewModel ToViewModel(Users.User user)
+    public static UserViewModel ToViewModel(this Users.User user)
     {
         return new UserViewModel()
         {
@@ -29,7 +29,7 @@ public partial class UserMapper
         };
     }
 
-    public UserInfo ToInfo(ClaimsPrincipal principal)
+    public static UserInfo ToInfo(this ClaimsPrincipal principal)
     {
         var user = new UserInfo
         {

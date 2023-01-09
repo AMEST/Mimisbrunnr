@@ -5,12 +5,12 @@ using Riok.Mapperly.Abstractions;
 namespace Mimisbrunnr.Web.Mapping;
 
 [Mapper]
-public partial class TokenMapper
+public static partial class TokenMapper
 {
 
-    public partial TokenModel ToModel(UserToken token);
+    public static partial TokenModel ToModel(this UserToken token);
 
-    public IEnumerable<TokenModel> ToModel(IEnumerable<UserToken> tokens)
+    public static IEnumerable<TokenModel> ToModel(this IEnumerable<UserToken> tokens)
     {
         return tokens?.Select(ToModel);
     }

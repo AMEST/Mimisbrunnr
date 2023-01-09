@@ -5,11 +5,11 @@ using Riok.Mapperly.Abstractions;
 namespace Mimisbrunnr.Web.Mapping;
 
 [Mapper]
-public partial class GroupMapper
+public static partial class GroupMapper
 {
-    public partial GroupModel ToModel(GroupInfo group);
+    public static partial GroupModel ToModel(this GroupInfo group);
 
-    public partial GroupModel ToModel(Users.Group group);
+    public static partial GroupModel ToModel(this Users.Group group);
 
-    public partial GroupInfo ToInfo(GroupModel model);
+    public static partial GroupInfo ToInfo(this GroupModel model);
 }

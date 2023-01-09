@@ -14,10 +14,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Mimisbrunnr.Infrastructure.MapperlyExtensionsGenerator\Mimisbrunnr.Infrastructure.MapperlyExtensionsGenerator.csproj"
-                        OutputItemType="Analyzer"
-                        ReferenceOutputAssembly="false"
-                        IncludeRuntimeDependency="false" />
       <ProjectReference Include="..\Mimisbrunnr.Web.Infrastructure\Mimisbrunnr.Web.Infrastructure.csproj" />
       <ProjectReference Include="..\Mimisbrunnr.Wiki\Mimisbrunnr.Wiki.csproj" />
       <ProjectReference Include="..\Integration\Mimisbrunnr.Integration\Mimisbrunnr.Integration.csproj"/>
