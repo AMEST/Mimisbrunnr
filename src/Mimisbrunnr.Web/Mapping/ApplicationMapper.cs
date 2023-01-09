@@ -6,13 +6,13 @@ using Riok.Mapperly.Abstractions;
 namespace Mimisbrunnr.Web.Mapping;
 
 [Mapper]
-public partial class ApplicationMapper
+public static partial class ApplicationMapper
 {
-    public partial ApplicationConfiguration ToEntity(QuickstartModel model);
+    public static partial ApplicationConfiguration ToEntity(this QuickstartModel model);
 
-    public partial ApplicationConfigurationModel ToModel(ApplicationConfiguration applicationConfiguration);
+    public static partial ApplicationConfigurationModel ToModel(this ApplicationConfiguration applicationConfiguration);
 
-    public QuickstartModel ToQuickStartModel(ApplicationConfiguration model)
+    public static QuickstartModel ToQuickStartModel(this ApplicationConfiguration model)
     {
         return new QuickstartModel()
         {

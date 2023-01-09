@@ -6,15 +6,15 @@ using Riok.Mapperly.Abstractions;
 namespace Mimisbrunnr.Web.Mapping;
 
 [Mapper]
-public partial class WikiMapper
+public static partial class WikiMapper
 {
-    public partial SpaceModel ToModel(Space space);
+    public static partial SpaceModel ToModel(this Space space);
 
-    public partial DraftModel ToModel(Draft draft);
+    public static partial DraftModel ToModel(this Draft draft);
 
-    public partial AttachmentModel ToModel(Attachment attachment);
+    public static partial AttachmentModel ToModel(this Attachment attachment);
 
-    public PageModel ToModel(Page page, string spaceKey = null)
+    public static PageModel ToModel(this Page page, string spaceKey = null)
     {
         return new PageModel()
         {
@@ -29,7 +29,7 @@ public partial class WikiMapper
         };
     }
 
-    public PageTreeModel ToModel(IEnumerable<Page> childs, Page rootPage, Space space = null)
+    public static PageTreeModel ToModel(this IEnumerable<Page> childs, Page rootPage, Space space = null)
     {
         var pageTree = new PageTreeModel
         {

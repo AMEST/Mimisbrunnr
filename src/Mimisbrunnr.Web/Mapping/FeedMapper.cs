@@ -5,7 +5,7 @@ using Riok.Mapperly.Abstractions;
 namespace Mimisbrunnr.Web.Mapping;
 
 [Mapper]
-public partial class FeedMapper
+public static partial class FeedMapper
 {
-    public partial PageUpdateEventModel ToModel(PageUpdateEvent pageUpdateEvent);
+    public static partial PageUpdateEventModel ToModel(this PageUpdateEvent pageUpdateEvent);
 }
