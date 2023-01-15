@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Mimisbrunnr.Favorites;
 using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Administration;
 using Mimisbrunnr.Web.Authentication.Account;
@@ -13,13 +14,15 @@ using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Web.User;
 using Mimisbrunnr.Web.Wiki;
 using Mimisbrunnr.Wiki.Contracts;
+using Mimisbrunnr.Wiki;
 using Skidbladnir.Modules;
 
 namespace Mimisbrunnr.Web;
 
 public class WebModule : Module
 {
-    public override Type[] DependsModules => new[] { typeof(WebInfrastructureModule), typeof(UsersModule) };
+    public override Type[] DependsModules => new[] { typeof(WebInfrastructureModule), typeof(UsersModule), 
+        typeof(WikiModule), typeof(FavoritesModule) };
 
     public override void Configure(IServiceCollection services)
     {

@@ -10,7 +10,6 @@ using Mimisbrunnr.Web.Host.Services.Features;
 using Mimisbrunnr.Web.Host.Services.Metrics;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Services;
-using Mimisbrunnr.Wiki;
 using Skidbladnir.Caching.Distributed.MongoDB;
 using Skidbladnir.DataProtection.MongoDb;
 using Skidbladnir.Modules;
@@ -21,7 +20,7 @@ internal class StartupModule : Module
 {
     public override Type[] DependsModules => new[]
     {
-        typeof(AspNetModule), typeof(MongoDbStoreModule), typeof(WebModule), typeof(WikiModule), typeof(PersistentModule),
+        typeof(AspNetModule), typeof(MongoDbStoreModule), typeof(WebModule), typeof(PersistentModule),
         typeof(MetricsModule), typeof(ConfluenceDataImportModule)
     };
 
