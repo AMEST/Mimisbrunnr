@@ -10,6 +10,7 @@ using Skidbladnir.Modules;
 using Skidbladnir.Repository.MongoDB;
 using Mimisbrunnr.Wiki.Services;
 using Mimisbrunnr.Storage.MongoDb.Migrations;
+using Mimisbrunnr.Favorites.Contracts;
 
 namespace Mimisbrunnr.Storage.MongoDb;
 
@@ -40,6 +41,7 @@ public class MongoDbStoreModule : RunnableModule
                 .AddEntity<PageUpdateEvent, PageUpdateEventMap>()
                 .AddEntity<Attachment, AttachmentMap>()
                 .AddEntity<UserToken, UserTokenMap>()
+                .AddEntity<Favorite, FavoriteMap>()
         );
         services.AddSingleton<IPageSearcher, PageSearcher>();
     }
@@ -59,6 +61,7 @@ public class MongoDbStoreModule : RunnableModule
             await CreatePageUpdatesIndexes(baseMongoContext);
             await CreateAttachmentIndexes(baseMongoContext);
             await CreateUserTokenIndexes(baseMongoContext);
+            await CreateFavoriteIndexes(baseMongoContext);
         }
         catch (Exception e)
         {
@@ -256,6 +259,28 @@ public class MongoDbStoreModule : RunnableModule
         var ensureRevokedTokenDefinition = Builders<UserToken>.IndexKeys.Ascending(x => x.Id).Ascending(x => x.Revoked);
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<UserToken>(ensureRevokedTokenDefinition, new CreateIndexOptions()
         {
+            Background = true
+        }));
+    }
+
+    private static async Task CreateFavoriteIndexes(BaseMongoDbContext mongoContext)
+    {
+        var collection = mongoContext.GetCollection<Favorite>();
+        var userIdKeyDefinition = Builders<Favorite>.IndexKeys.Ascending(x => x.UserId);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Favorite>(userIdKeyDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+        var userIdAndTypeKeyDefinition = Builders<Favorite>.IndexKeys.Ascending(x => x.UserId).Ascending(x => x.Type);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Favorite>(userIdAndTypeKeyDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+        var userIdAndFavoriteItemIdAndFavoriteTypeKeyDefinition = Builders<Favorite>.IndexKeys
+            .Ascending(x => x.UserId).Ascending(x => x.FavoriteItemId).Ascending(x => x.Type);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Favorite>(userIdAndFavoriteItemIdAndFavoriteTypeKeyDefinition, new CreateIndexOptions()
+        {
+            Unique = true,
             Background = true
         }));
     }
