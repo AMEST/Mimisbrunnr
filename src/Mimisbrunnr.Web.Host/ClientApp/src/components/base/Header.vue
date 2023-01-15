@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-navbar toggleable="sm" type="dark" variant="primary">
+    <b-navbar toggleable="sm" type="dark" variant="primary" id="header-nav">
       <b-container fluid>
         <b-navbar-brand to="/">{{
           this.$store.state.application.info.title
@@ -8,6 +8,11 @@
 
         <b-navbar-nav class="mr-auto">
           <b-nav-item-dropdown :text="$t('header.spacesDropdown.title')" right>
+            <!-- Using 'button-content' slot-->
+            <template #button-content>
+              <b-icon class="spaces-icon" icon="globe"></b-icon>
+              <span class="spaces-title">{{ $t("header.spacesDropdown.title") }}</span>
+            </template>
             <b-dropdown-item to="/spaces">{{
               $t("header.spacesDropdown.list")
             }}</b-dropdown-item>
@@ -18,7 +23,11 @@
               >{{ $t("header.spacesDropdown.create") }}</b-dropdown-item
             >
           </b-nav-item-dropdown>
-          <b-nav-item v-if="this.$store.state.application.profile" to="/people" class="people">
+          <b-nav-item
+            v-if="this.$store.state.application.profile"
+            to="/people"
+            class="people"
+          >
             <b-icon class="people-icon" icon="people-fill"></b-icon>
             <span>{{ $t("header.people") }}</span>
           </b-nav-item>
@@ -85,7 +94,11 @@
                 class="avatar-bg"
                 :text="getUserInitials()"
                 :src="$store.state.application.profile.avatarUrl"
-                :style="$store.state.application.profile.avatarUrl ? 'background-color: transparent' : ''"
+                :style="
+                  $store.state.application.profile.avatarUrl
+                    ? 'background-color: transparent'
+                    : ''
+                "
               ></b-avatar>
             </template>
             <b-dropdown-text style="width: 240px">
@@ -231,7 +244,7 @@ export default {
   }
 }
 .people .people-icon {
-    display: none;
+  display: none;
 }
 @media (max-width: 764px) {
   .people .people-icon {
@@ -240,6 +253,14 @@ export default {
   .people span {
     display: none;
   }
+  .spaces-title {
+    display: none;
+  }
+}
+@media (min-width: 765px) {
+    .spaces-icon {
+    display: none !important;
+}
 }
 </style>
 
@@ -252,6 +273,11 @@ export default {
 }
 .flex-search form {
   display: flex;
+}
+@media (max-width: 577px) {
+  .flex-search {
+    display: none !important;
+  }
 }
 @media (max-width: 993px) {
   .invisibleComponentBorder {
