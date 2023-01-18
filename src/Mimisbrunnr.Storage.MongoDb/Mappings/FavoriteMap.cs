@@ -12,8 +12,30 @@ public class FavoriteMap : EntityMapClass<Favorite>
     {
         ToCollection("Favorites");
         MapId(x => x.Id);
-        MapMember(x => x.Type)
-            .SetSerializer(new EnumSerializer<FavoriteType>(BsonType.String))
-            .SetIgnoreIfDefault(false);
+        SetIsRootClass(true);
+    }
+}
+
+public class FavoriteUserMap : EntityMapClass<FavoriteUser>
+{
+    public FavoriteUserMap()
+    {
+        AutoMap();
+    }
+}
+
+public class FavoriteSpaceMap : EntityMapClass<FavoriteSpace>
+{
+    public FavoriteSpaceMap()
+    {
+        AutoMap();
+    }
+}
+
+public class FavoritePageMap : EntityMapClass<FavoritePage>
+{
+    public FavoritePageMap()
+    {
+        AutoMap();
     }
 }

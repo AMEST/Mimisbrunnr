@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Mimisbrunnr.Favorites.Contracts;
 using Skidbladnir.Repository.Abstractions;
 
@@ -12,31 +13,33 @@ internal class FavoritesManager : IFavoritesManager
         _repository = repository;
     }
 
-    public async Task<Favorite> Add(string userId, string favoriteItemId, FavoriteType type, CancellationToken token = default)
+    public async Task<Favorite> Add(Favorite favorite, CancellationToken token = default)
     {
-        var favorite = new Favorite()
-        {
-            UserId = userId,
-            FavoriteItemId = favoriteItemId,
-            Type = type
-        };
         await _repository.Create(favorite, token);
         return favorite;
     }
 
-    public Task<bool> EnsureItemInFavorite(string userId, string favoriteItemId, FavoriteType type, CancellationToken token = default)
+    public Task<bool> EnsureItemInFavorite<T>(string email, Expression<Func<T, bool>> expression, CancellationToken token = default)
+        where T : Favorite
     {
-        return _repository.GetAll().AnyAsync(x => x.UserId == userId && x.FavoriteItemId == favoriteItemId && x.Type == type, cancellationToken: token);
+        return _repository.GetAll().Where(x => x.OwnerEmail == email).OfType<T>().AnyAsync(expression, cancellationToken: token);
     }
 
-    public async Task<IEnumerable<Favorite>> FindAllByUserId(string userId, CancellationToken token = default)
+    public async Task<IEnumerable<Favorite>> FindAllByUserEmail(string email, CancellationToken token = default)
     {
-        return await _repository.GetAll().Where( x=> x.UserId == userId).ToArrayAsync(token);
+        return await _repository.GetAll().Where(x => x.OwnerEmail == email).ToArrayAsync(token);
     }
 
-    public async Task<IEnumerable<Favorite>> FindByUserIdAndType(string userId, FavoriteType type, CancellationToken token = default)
+
+    public async Task<Favorite> FindById(string id, CancellationToken token = default)
     {
-        return await _repository.GetAll().Where( x=> x.UserId == userId && x.Type == type).ToArrayAsync(token);
+        return await _repository.GetAll().FirstOrDefaultAsync(x => x.Id == id, token);
+    }
+
+    public async Task<IEnumerable<Favorite>> FindByUserEmail<T>(string email, CancellationToken token = default)
+        where T : Favorite
+    {
+        return await _repository.GetAll().Where(x => x.OwnerEmail == email).OfType<T>().ToArrayAsync(token);
     }
 
     public Task Remove(Favorite favorite, CancellationToken token = default)

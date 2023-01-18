@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
+using Mimisbrunnr.Integration.Favorites;
 using Mimisbrunnr.Web.Host.Configuration;
 using Skidbladnir.Modules;
 
@@ -60,6 +61,8 @@ internal class AspNetModule : Module
             .AddJsonOptions(x =>
             {
                 x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                x.JsonSerializerOptions.Converters.Add(new AbstractClassConverter<FavoriteModel>());
+                x.JsonSerializerOptions.Converters.Add(new AbstractClassConverter<FavoriteCreateModel>());
             });
         services.AddDataProtection()
             .SetApplicationName("Mimisbrunnr");
@@ -70,6 +73,13 @@ internal class AspNetModule : Module
         });
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options => {
+            options.UseOneOfForPolymorphism();
+            options.SelectSubTypesUsing(baseType => {
+                return typeof(FavoriteModel).Assembly.GetTypes().Where(type => type.IsSubclassOf(baseType));
+            });
+            options.SelectDiscriminatorNameUsing(_ => "$type");
+            options.SelectDiscriminatorValueUsing(t => t.Name);
+            
             options.MapType<TimeSpan>(() => new OpenApiSchema(){
                 Type = "string",
                 Example = new OpenApiString("02:00:00")

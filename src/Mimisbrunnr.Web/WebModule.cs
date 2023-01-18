@@ -4,16 +4,15 @@ using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Administration;
 using Mimisbrunnr.Web.Authentication.Account;
 using Mimisbrunnr.Web.Customization;
+using Mimisbrunnr.Web.Favorites;
 using Mimisbrunnr.Web.Feed;
 using Mimisbrunnr.Web.Group;
 using Mimisbrunnr.Web.Infrastructure;
-using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.Quickstart;
 using Mimisbrunnr.Web.Search;
 using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Web.User;
 using Mimisbrunnr.Web.Wiki;
-using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki;
 using Skidbladnir.Modules;
 
@@ -39,5 +38,6 @@ public class WebModule : Module
         services.AddSingleton<ICustomizationService, CustomizationService>();
         services.AddSingleton<IDraftService, DraftService>();
         services.AddSingleton<ITokenService, TokenService>();
+        services.AddSingleton<IFavoriteService, FavoriteService>();
     }
 }
