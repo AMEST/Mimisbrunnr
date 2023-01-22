@@ -48,6 +48,7 @@ export default {
     this.$store.commit("changeProfile", currentAccount);
 
     this.loaded = true;
+    this.updateHeaderHeightVar();
     this.initialized = initializedRequest.data.isInitialized;
   },
   destroyed() {
