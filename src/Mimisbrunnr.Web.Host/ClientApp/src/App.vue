@@ -48,8 +48,8 @@ export default {
     this.$store.commit("changeProfile", currentAccount);
 
     this.loaded = true;
-    this.updateHeaderHeightVar();
     this.initialized = initializedRequest.data.isInitialized;
+    setTimeout( this.updateHeaderHeightVar, 300);
   },
   destroyed() {
     window.removeEventListener("resize", this.updateHeaderHeightVar);
