@@ -228,7 +228,11 @@
             "all": "All spaces",
             "name": "Name",
             "description": "Description",
-            "action": "Action"
+            "action": "Action",
+            "favorites": {
+                "title": "Favorite spaces",
+                "empty": "You don't have any spaces in favorite"
+            }
         },
         "pageEditor": {
             "placeholder": "Page Name",
@@ -582,7 +586,11 @@
             "all": "Все пространства",
             "name": "Имя",
             "description": "Описание",
-            "action": "Действия"
+            "action": "Действия",
+            "favorites": {
+                "title": "Избранные пространства",
+                "empty": "У вас нет пространств в избранном"
+            }
         },
         "pageEditor": {
             "placeholder": "Имя страницы",

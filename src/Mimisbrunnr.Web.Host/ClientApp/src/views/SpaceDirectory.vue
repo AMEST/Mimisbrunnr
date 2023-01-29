@@ -2,6 +2,15 @@
   <b-container fluid class="spaces-container h-100vh">
     <b-container class="text-left">
       <br />
+      <div class="mb-3">
+        <h3>
+          <b>{{ $t("spaceDirectory.favorites.title") }}</b>
+        </h3>
+      </div>
+      <div v-if="favoriteSpaces.length == 0" align="center">
+        <span class="text-muted">{{ $t("spaceDirectory.favorites.empty") }}</span>
+      </div>
+      <br />
       <div>
         <h3>
           <b>{{ $t("spaceDirectory.all") }}</b>
@@ -44,6 +53,7 @@ export default {
   name: "SpaceDirectory",
   data: () => ({
     spaces: [],
+    favoriteSpaces: [],
     searchText: "",
   }),
   methods: {

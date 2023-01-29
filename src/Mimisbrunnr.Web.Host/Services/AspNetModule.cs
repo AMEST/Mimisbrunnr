@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+﻿using Mimisbrunnr.Json;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
@@ -58,12 +58,7 @@ internal class AspNetModule : Module
             });
         services.AddMemoryCache();
         services.AddControllers()
-            .AddJsonOptions(x =>
-            {
-                x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                x.JsonSerializerOptions.Converters.Add(new AbstractClassConverter<FavoriteModel>());
-                x.JsonSerializerOptions.Converters.Add(new AbstractClassConverter<FavoriteCreateModel>());
-            });
+            .AddJsonOptions(x => x.JsonSerializerOptions.ApplyDefaults());
         services.AddDataProtection()
             .SetApplicationName("Mimisbrunnr");
         // In production, the Vue files will be served from this directory

@@ -38,7 +38,10 @@ public class FavoritesController : ControllerBase
     }
 
     [HttpPost("exists")]
-    public async Task<IActionResult> Exists([FromBody] FavoriteModel favorite)
+    [ProducesResponseType(200)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> Exists([FromBody] FavoriteCreateModel favorite)
     {
         var user = User.ToInfo();
         if (await _favorites.EnsureInFavorites(favorite, user))
@@ -48,6 +51,8 @@ public class FavoritesController : ControllerBase
 
 
     [HttpDelete("{id}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(401)]
     public async Task<IActionResult> Remove([FromRoute] string id)
     {
         var user = User.ToInfo();
