@@ -25,6 +25,7 @@ public static partial class FavoriteMapper
     public static partial FavoriteUser ToEntity(this FavoriteUserCreateModel createModel);
     public static partial FavoriteSpace ToEntity(this FavoriteSpaceCreateModel createModel);
     public static partial FavoritePage ToEntity(this FavoritePageCreateModel createModel);
+    public static partial FavoriteFilter ToEntity(this FavoriteFilterModel filter);
 
     public static Favorite ToEntity(this FavoriteCreateModel createModel)
     {

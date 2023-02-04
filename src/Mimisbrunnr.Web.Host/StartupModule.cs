@@ -22,8 +22,8 @@ internal class StartupModule : Module
     public override Type[] DependsModules => new[]
     {
         typeof(AspNetModule), typeof(MongoDbStoreModule), typeof(WebModule),
-        typeof(WebCacheModule), typeof(PersistentModule),
-        typeof(MetricsModule), typeof(ConfluenceDataImportModule)
+        typeof(PersistentModule), typeof(MetricsModule),
+        typeof(ConfluenceDataImportModule), typeof(WebCacheModule),
     };
 
     public override void Configure(IServiceCollection services)

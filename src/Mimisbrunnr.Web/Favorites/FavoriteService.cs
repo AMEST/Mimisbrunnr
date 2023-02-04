@@ -15,7 +15,7 @@ public interface IFavoriteService
 {
     Task<FavoriteModel> Add(FavoriteCreateModel model, UserInfo user);
 
-    Task<FavoriteModel[]> GetFavorites(UserInfo user);
+    Task<FavoriteModel[]> GetFavorites(FavoriteFilterModel filter, UserInfo user);
 
     Task<bool> EnsureInFavorites(FavoriteCreateModel model, UserInfo user);
 
@@ -60,9 +60,9 @@ internal class FavoriteService : IFavoriteService
 
     }
 
-    public async Task<FavoriteModel[]> GetFavorites(UserInfo user)
+    public async Task<FavoriteModel[]> GetFavorites(FavoriteFilterModel filter, UserInfo user)
     {
-        var favorites = await _favorites.FindAllByUserEmail(user.Email);
+        var favorites = await _favorites.FindAllByUserEmail(user.Email, filter?.ToEntity());
         var result = new List<FavoriteModel>();
         foreach (var favorite in favorites)
         {

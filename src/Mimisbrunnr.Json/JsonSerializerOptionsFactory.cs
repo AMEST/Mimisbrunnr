@@ -16,6 +16,8 @@ public static class JsonSerializerOptionsFactory
 
     public static void ApplyDefaults(this JsonSerializerOptions opt)
     {
+        opt.PropertyNameCaseInsensitive = true;
+        opt.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         opt.Converters.Add(new JsonStringEnumConverter());
         opt.Converters.Add(new AbstractClassConverter<FavoriteModel>());
         opt.Converters.Add(new AbstractClassConverter<FavoriteCreateModel>());

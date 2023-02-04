@@ -12,6 +12,7 @@ using Mimisbrunnr.Wiki.Services;
 using Mimisbrunnr.Storage.MongoDb.Migrations;
 using Mimisbrunnr.Favorites.Contracts;
 using MongoDB.Bson.Serialization;
+using Mimisbrunnr.Favorites.Services;
 
 namespace Mimisbrunnr.Storage.MongoDb;
 
@@ -48,7 +49,9 @@ public class MongoDbStoreModule : RunnableModule
         BsonClassMap.RegisterClassMap(new FavoriteSpaceMap());
         BsonClassMap.RegisterClassMap(new FavoritePageMap());
 
-        services.AddSingleton<IPageSearcher, PageSearcher>();
+        services
+            .AddSingleton<IPageSearcher, PageSearcher>()
+            .AddSingleton<IFavoriteStore, FavoriteStore>();
     }
 
     public override async Task StartAsync(IServiceProvider provider, CancellationToken cancellationToken)

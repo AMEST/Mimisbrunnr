@@ -1,0 +1,110 @@
+using Microsoft.Extensions.Caching.Distributed;
+using Mimisbrunnr.Web.Services;
+using Mimisbrunnr.Wiki.Contracts;
+using Mimisbrunnr.Wiki.Services;
+
+namespace Mimisbrunnr.Web.Host.Services.CacheDecorators;
+
+internal class PageManagerCacheDecorator : IPageManager
+{
+    private readonly TimeSpan _maxCacheTime = TimeSpan.FromDays(1);
+    private readonly TimeSpan _slidingCacheTime = TimeSpan.FromMinutes(30);
+    private readonly IPageManager _inner;
+    private readonly IDistributedCache _cache;
+
+    public PageManagerCacheDecorator(IPageManager inner, IDistributedCache cache)
+    {
+        _inner = inner;
+        _cache = cache;
+    }
+
+    public async Task<Page> Copy(Page source, Page destinationParentPage)
+    {
+        var page = await _inner.Copy(source, destinationParentPage);
+        await ClearCache(page);
+        return page;
+    }
+
+    public async Task<Page> Create(string spaceId, string name, string content, UserInfo createdBy, string parentPageId = null)
+    {
+        var page = await _inner.Create(spaceId, name, content, createdBy, parentPageId);
+        await ClearCache(page);
+        return page;
+    }
+
+    public Task<Page[]> FindByName(string name)
+    {
+        return _inner.FindByName(name);
+    }
+
+    public Task<Page[]> GetAllChilds(Page page)
+    {
+        return _inner.GetAllChilds(page);
+    }
+
+    public async Task<Page[]> GetAllOnSpace(Space space)
+    {
+        var cached = await _cache.GetAsync<Page[]>(GetSpacePagesCacheName(space.Id));
+        if(cached is not null)
+            return cached;
+        
+        cached = await _inner.GetAllOnSpace(space);
+        await StoreInCache(cached, space);
+        return cached;
+    }
+
+    public async Task<Page> GetById(string id)
+    {
+        var cached = await _cache.GetAsync<Page>(GetPageCacheName(id));
+        if(cached is not null)
+            return cached;
+        cached = await _inner.GetById(id);
+        await StoreInCache(cached);
+        return cached;
+    }
+
+    public async Task<Page> Move(Page source, Page destinationParentPage)
+    {
+        var copiedPage = await _inner.Move(source, destinationParentPage);
+        await ClearCache(source);
+        await ClearCache(copiedPage);
+        return copiedPage;
+    }
+
+    public async Task Remove(Page page, bool deleteChild = false)
+    {
+        await _inner.Remove(page, deleteChild);
+        await ClearCache(page);
+    }
+
+    public async Task Update(Page page, UserInfo updatedBy)
+    {
+        await _inner.Update(page, updatedBy);
+        await ClearCache(page);
+    }
+
+    private Task StoreInCache(Page page)
+    {
+        return _cache.SetAsync(key: GetPageCacheName(page.Id),entry: page, options: new DistributedCacheEntryOptions() {
+            AbsoluteExpirationRelativeToNow = _maxCacheTime,
+            SlidingExpiration = _slidingCacheTime
+        });
+    }
+
+    private Task StoreInCache(Page[] pages, Space space)
+    {
+        return _cache.SetAsync(key: GetSpacePagesCacheName(space.Id), entry: pages, options: new DistributedCacheEntryOptions() {
+            AbsoluteExpirationRelativeToNow = _maxCacheTime,
+            SlidingExpiration = _slidingCacheTime
+        });
+    }
+
+    private async Task ClearCache(Page page)
+    {
+        await _cache.RemoveAsync(GetPageCacheName(page.Id));
+        await _cache.RemoveAsync(GetSpacePagesCacheName(page.SpaceId));
+    }
+
+    private static string GetPageCacheName(string id) => $"page_manager_cache_id_{id}";
+    private static string GetSpacePagesCacheName(string spaceId) => $"page_manager_cache_all_{spaceId}";
+}

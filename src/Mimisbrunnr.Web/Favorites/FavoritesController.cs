@@ -22,10 +22,10 @@ public class FavoritesController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(FavoriteModel[]), 200)]
     [ProducesResponseType(401)]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] FavoriteFilterModel filter)
     {
         var user = User.ToInfo();
-        return Ok(await _favorites.GetFavorites(user));
+        return Ok(await _favorites.GetFavorites(filter, user));
     }
 
     [HttpPost]

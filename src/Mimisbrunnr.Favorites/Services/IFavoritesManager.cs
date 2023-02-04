@@ -5,9 +5,7 @@ namespace Mimisbrunnr.Favorites.Services;
 
 public interface IFavoritesManager
 {
-    Task<IEnumerable<Favorite>> FindAllByUserEmail(string email, CancellationToken token = default);
-    Task<IEnumerable<Favorite>> FindByUserEmail<T>(string email, CancellationToken token = default)
-       where T : Favorite;
+    Task<IEnumerable<Favorite>> FindAllByUserEmail(string email, FavoriteFilter filter = null, CancellationToken token = default);
     Task<Favorite> FindById(string id, CancellationToken token = default);
      Task<bool> EnsureItemInFavorite<T>(string email, Expression<Func<T, bool>> expression, CancellationToken token = default)
         where T : Favorite;
