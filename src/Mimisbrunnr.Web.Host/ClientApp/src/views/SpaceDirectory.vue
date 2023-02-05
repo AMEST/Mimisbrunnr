@@ -8,8 +8,17 @@
         </h3>
       </div>
       <div v-if="favoriteSpaces.length == 0" align="center">
-        <span class="text-muted">{{ $t("spaceDirectory.favorites.empty") }}</span>
+        <span class="text-muted">{{
+          $t("spaceDirectory.favorites.empty")
+        }}</span>
       </div>
+      <b-card-group class="favorite-spaces-deck" deck v-else>
+        <FavoriteSpaceCard
+          v-for="favorite in favoriteSpaces"
+          :key="favorite.id"
+          :favorite="favorite"
+        />
+      </b-card-group>
       <br />
       <div>
         <h3>
@@ -22,25 +31,12 @@
         ></b-form-input>
       </div>
       <b-list-group class="spaces-list">
-        <b-list-group-item
+        <SpaceListItem
           v-for="space in spaces"
           :key="space.key"
-          :title="space.description"
+          :space="space"
           button
-        >
-          <div class="space-title" v-on:click="goToSpace(space.key)">
-            <b-avatar
-              class="mr-2"
-              :text="getSpaceNameInitials(space.name)"
-              :src="space.avatarUrl"
-              :style="space.avatarUrl ? 'background-color: transparent' : ''"
-            ></b-avatar>
-            <b>{{ space.name }}</b>
-          </div>
-          <div class="space-actions">
-            <b-button variant="light"> <b-icon icon="star"></b-icon></b-button>
-          </div>
-        </b-list-group-item>
+        />
       </b-list-group>
     </b-container>
   </b-container>
@@ -48,7 +44,10 @@
 <script>
 import axios from "axios";
 import SearchService from "@/services/searchService";
+import FavoriteService from "@/services/favoriteService";
 import { getNameInitials, debounce } from "@/services/Utils";
+import FavoriteSpaceCard from "@/components/base/FavoriteSpaceCard.vue";
+import SpaceListItem from "@/components/spaceDirectory/SpaceListItem.vue";
 export default {
   name: "SpaceDirectory",
   data: () => ({
@@ -56,6 +55,10 @@ export default {
     favoriteSpaces: [],
     searchText: "",
   }),
+  components: {
+    FavoriteSpaceCard,
+    SpaceListItem,
+  },
   methods: {
     getSpaceNameInitials(name) {
       return getNameInitials(name);
@@ -73,6 +76,9 @@ export default {
       });
       if (spacesRequest.status == 200) this.spaces = spacesRequest.data;
     },
+    loadFavorites: async function () {
+      this.favoriteSpaces = await FavoriteService.getAll(15, 0, "space");
+    },
   },
   watch: {
     // eslint-disable-next-line
@@ -86,6 +92,7 @@ export default {
       this.$store.state.application.info.title
     }`;
     this.loadSpaces();
+    this.loadFavorites();
   },
 };
 </script>
@@ -99,20 +106,11 @@ export default {
   border: unset;
   border-radius: unset;
 }
-.spaces-list .list-group-item {
-  border: unset;
-}
-.spaces-list .space-title {
-  width: 85%;
-  display: inline-block;
-}
-.spaces-list .space-actions {
-  margin-left: auto;
-  display: inline-block;
-  float: right;
-}
 .space-search {
   width: 150px;
   margin-left: auto;
+}
+.favorite-spaces-deck{
+    justify-content: center;
 }
 </style>

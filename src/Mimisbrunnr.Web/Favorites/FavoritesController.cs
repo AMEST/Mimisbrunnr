@@ -37,14 +37,27 @@ public class FavoritesController : ControllerBase
         return Ok(await _favorites.Add(favorite, user));
     }
 
+    [HttpPost("findOne")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> FindOne([FromBody] FavoriteFindModel findModel)
+    {
+        var user = User.ToInfo();
+        var favorite = await _favorites.GetFavorite(findModel, user);
+        if (favorite is not null)
+            return Ok(favorite);
+        return NotFound();
+    }
+
     [HttpPost("exists")]
     [ProducesResponseType(200)]
     [ProducesResponseType(401)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> Exists([FromBody] FavoriteCreateModel favorite)
+    public async Task<IActionResult> Exists([FromBody] FavoriteFindModel findModel)
     {
         var user = User.ToInfo();
-        if (await _favorites.EnsureInFavorites(favorite, user))
+        if (await _favorites.EnsureInFavorites(findModel, user))
             return Ok();
         return NotFound();
     }

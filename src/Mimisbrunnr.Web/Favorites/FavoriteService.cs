@@ -17,7 +17,9 @@ public interface IFavoriteService
 
     Task<FavoriteModel[]> GetFavorites(FavoriteFilterModel filter, UserInfo user);
 
-    Task<bool> EnsureInFavorites(FavoriteCreateModel model, UserInfo user);
+    Task<FavoriteModel> GetFavorite(FavoriteFindModel filter, UserInfo user);
+
+    Task<bool> EnsureInFavorites(FavoriteFindModel model, UserInfo user);
 
     Task Remove(string id, UserInfo user);
 }
@@ -48,16 +50,29 @@ internal class FavoriteService : IFavoriteService
         return await MapToFavoriteModel(user, favorite);
     }
 
-    public Task<bool> EnsureInFavorites(FavoriteCreateModel model, UserInfo user)
+    public Task<bool> EnsureInFavorites(FavoriteFindModel model, UserInfo user)
     {
         return model switch
         {
-            FavoriteUserCreateModel favoriteUserModel => _favorites.EnsureItemInFavorite<FavoriteUser>(user.Email, x => x.UserEmail == favoriteUserModel.UserEmail),
-            FavoriteSpaceCreateModel favoriteSpaceModel => _favorites.EnsureItemInFavorite<FavoriteSpace>(user.Email, x => x.SpaceKey == favoriteSpaceModel.SpaceKey),
-            FavoritePageCreateModel favoritePageModel => _favorites.EnsureItemInFavorite<FavoritePage>(user.Email, x => x.PageId == favoritePageModel.PageId),
+            FavoriteUserFindModel favoriteUserModel => _favorites.EnsureItemInFavorite<FavoriteUser>(user.Email, x => x.UserEmail.ToLower() == favoriteUserModel.UserEmail.ToLower()),
+            FavoriteSpaceFindModel favoriteSpaceModel => _favorites.EnsureItemInFavorite<FavoriteSpace>(user.Email, x => x.SpaceKey.ToLower() == favoriteSpaceModel.SpaceKey.ToLower()),
+            FavoritePageFindModel favoritePageModel => _favorites.EnsureItemInFavorite<FavoritePage>(user.Email, x => x.PageId.ToLower() == favoritePageModel.PageId.ToLower()),
             _ => throw new ArgumentOutOfRangeException(nameof(model), model.GetType().Name, "Unknown favorite type"),
         };
+    }
 
+    public async Task<FavoriteModel> GetFavorite(FavoriteFindModel filter, UserInfo user)
+    {
+        var favorite = filter switch
+        {
+            FavoriteUserFindModel favoriteUserModel => await _favorites.GetByExpression<FavoriteUser>(user.Email, x => x.UserEmail.ToLower() == favoriteUserModel.UserEmail.ToLower()),
+            FavoriteSpaceFindModel favoriteSpaceModel => await _favorites.GetByExpression<FavoriteSpace>(user.Email, x => x.SpaceKey.ToLower() == favoriteSpaceModel.SpaceKey.ToLower()),
+            FavoritePageFindModel favoritePageModel => await _favorites.GetByExpression<FavoritePage>(user.Email, x => x.PageId.ToLower() == favoritePageModel.PageId.ToLower()),
+            _ => throw new ArgumentOutOfRangeException(nameof(filter), filter.GetType().Name, "Unknown favorite type"),
+        };
+        if(favorite is null)
+            return null;
+        return await MapToFavoriteModel(user, favorite);
     }
 
     public async Task<FavoriteModel[]> GetFavorites(FavoriteFilterModel filter, UserInfo user)

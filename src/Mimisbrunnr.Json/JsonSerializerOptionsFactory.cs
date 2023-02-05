@@ -21,5 +21,6 @@ public static class JsonSerializerOptionsFactory
         opt.Converters.Add(new JsonStringEnumConverter());
         opt.Converters.Add(new AbstractClassConverter<FavoriteModel>());
         opt.Converters.Add(new AbstractClassConverter<FavoriteCreateModel>());
+        opt.Converters.Add(new AbstractClassConverter<FavoriteFindModel>());
     }
 }

@@ -12,53 +12,78 @@
         class="m-2"
         :disabled="!userPermissions.canEdit || isArchived"
       >
-        <b-icon icon="pencil-fill" font-scale="0.9"/>
-        {{$t("page.edit")}}
+        <b-icon class="edit-icon" icon="pencil-fill" font-scale="0.9" />
+        {{ $t("page.edit") }}
       </b-button>
-      <b-dropdown
-        variant="secondary"
+      <b-button
+        v-if="!this.isSpaceHomePage"
+        variant="outline-secondary"
+        @click="star"
         size="sm"
-        class="m-2 no-arrow-dropdown"
+        class="m-2"
       >
+        <b-icon v-if="inFavorite" icon="star-fill" variant="warning" />
+        <b-icon v-else icon="star"
+      /></b-button>
+      <b-dropdown variant="secondary" size="sm" class="m-2 no-arrow-dropdown">
         <template #button-content>
           <b-icon icon="three-dots" />
         </template>
         <b-dropdown-item
-         href="#"
-         v-b-modal.page-attachments-modal
-         :disabled="!this.$store.state.application.profile"
-        >{{$t("page.attachments.title")}}</b-dropdown-item>
+          href="#"
+          v-b-modal.page-attachments-modal
+          :disabled="!this.$store.state.application.profile"
+          >{{ $t("page.attachments.title") }}</b-dropdown-item
+        >
         <b-dropdown-divider></b-dropdown-divider>
         <b-dropdown-item
           v-b-modal.page-copy-modal
           :disabled="!userPermissions.canEdit"
-          >{{$t("page.copy.title")}}</b-dropdown-item
+          >{{ $t("page.copy.title") }}</b-dropdown-item
         >
         <b-dropdown-item
           v-b-modal.page-move-modal
-          :disabled="isSpaceHomePage || (!userPermissions.canEdit && !userPermissions.canRemove) || isArchived"
-          >{{$t("page.move.title")}}</b-dropdown-item
+          :disabled="
+            isSpaceHomePage ||
+            (!userPermissions.canEdit && !userPermissions.canRemove) ||
+            isArchived
+          "
+          >{{ $t("page.move.title") }}</b-dropdown-item
         >
         <b-dropdown-item
           variant="danger"
           v-b-modal.page-delete-modal
-          :disabled="isSpaceHomePage || !userPermissions.canRemove || isArchived"
-          >{{$t("page.delete.button")}}</b-dropdown-item
+          :disabled="
+            isSpaceHomePage || !userPermissions.canRemove || isArchived
+          "
+          >{{ $t("page.delete.button") }}</b-dropdown-item
         >
       </b-dropdown>
+      <b-button
+        v-if="isSpaceHomePage"
+        variant="secondary"
+        size="sm"
+        class="m-2"
+        @click="star"
+      >
+        {{ inFavorite ? $t("page.unstar") : $t("page.star") }}
+      </b-button>
     </div>
     <div class="pb-2 page-title">
       <h2>{{ this.page.name }}</h2>
       <p class="text-muted page-title-dates">
-        {{$t("page.date.created")}}
+        {{ $t("page.date.created") }}
         <b-link :to="'/profile/' + this.page.createdBy.email">{{
           this.page.createdBy.name
         }}</b-link>
-        {{$t("page.date.at")}} {{ new Date(this.page.created).toLocaleString() }}. {{$t("page.date.updated")}}
+        {{ $t("page.date.at") }}
+        {{ new Date(this.page.created).toLocaleString() }}.
+        {{ $t("page.date.updated") }}
         <b-link :to="'/profile/' + this.page.updatedBy.email">{{
           this.page.updatedBy.name
         }}</b-link>
-        {{$t("page.date.at")}} {{ new Date(this.page.updated).toLocaleString() }}.
+        {{ $t("page.date.at") }}
+        {{ new Date(this.page.updated).toLocaleString() }}.
       </p>
     </div>
     <div>
@@ -76,11 +101,13 @@
 import hljs from "highlight.js";
 import "highlight.js/styles/github.css";
 import VueMarkdown from "@/thirdparty/VueMarkdown";
+import FavoriteService from "@/services/favoriteService";
 export default {
   name: "Page",
   data() {
     return {
       breadcrumbs: [],
+      inFavorite: false,
     };
   },
   components: {
@@ -95,9 +122,9 @@ export default {
     isArchived() {
       return this.space.status == "Archived";
     },
-    isSpaceHomePage(){
-        return this.space.homePageId == this.page.id;
-    }
+    isSpaceHomePage() {
+      return this.space.homePageId == this.page.id;
+    },
   },
   methods: {
     initBreadcrumbs() {
@@ -122,28 +149,49 @@ export default {
         active: true,
       });
     },
+    checkInFavorites: async function () {
+      if (this.isSpaceHomePage)
+        this.inFavorite = await FavoriteService.existsSpace(this.space.key);
+      else this.inFavorite = await FavoriteService.existsPage(this.page.id);
+    },
+    star: async function () {
+      if (this.inFavorite) {
+        await this.unStar();
+      } else {
+        if (this.isSpaceHomePage)
+          await FavoriteService.addSpace(this.space.key);
+        else await FavoriteService.addPage(this.page.id);
+      }
+      this.inFavorite = !this.inFavorite;
+    },
+    unStar: async function () {
+      var favorite = null;
+      if (this.isSpaceHomePage)
+        favorite = await FavoriteService.getSpace(this.space.key);
+      else favorite = await FavoriteService.getPage(this.page.id);
+      await FavoriteService.delete(favorite.id);
+    },
     scrollToAnchor() {
-        if(!window.location.hash)
-            return;
-        var hash = decodeURI(window.location.hash);
-        if(hash.length == 1)
-            return;
-        var anchor = document.getElementById(hash.substring(1, hash.length));
-        if(!anchor)
-            return;
-        anchor.scrollIntoView();
+      if (!window.location.hash) return;
+      var hash = decodeURI(window.location.hash);
+      if (hash.length == 1) return;
+      var anchor = document.getElementById(hash.substring(1, hash.length));
+      if (!anchor) return;
+      anchor.scrollIntoView();
     },
   },
   watch: {
     // eslint-disable-next-line
     page: function (newValue, oldValue) {
       this.initBreadcrumbs();
+      this.checkInFavorites();
       setTimeout(() => hljs.highlightAll(), 100);
       setTimeout(this.scrollToAnchor, 100);
     },
   },
   mounted: function () {
     this.initBreadcrumbs();
+    this.checkInFavorites();
     setTimeout(() => hljs.highlightAll(), 100);
     setTimeout(this.scrollToAnchor, 100);
   },
@@ -156,6 +204,9 @@ export default {
 }
 .page-head .sr-only {
   display: none;
+}
+.page-head .edit-icon {
+    margin-bottom: 0.25em;
 }
 .page-title {
   padding-top: 5px;

@@ -2,8 +2,8 @@ import axios from "axios";
 import { showToast } from "@/services/Utils";
 /*eslint-disable */
 var FavoriteService = {
-    getAll: async function (name) {
-        var request = await axios.get(`/api/favorites`,
+    getAll: async function (count = 15, skip = 0, type = undefined) {
+        var request = await axios.get(`/api/favorites?count=${count}&skip=${skip}`+(type == undefined ? "" : `&type=${type}`),
             { validateStatus: false }
         );
         if (request.status == 200)
@@ -11,6 +11,48 @@ var FavoriteService = {
         showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
             "Error when get favorites.", "warning");
         return [];
+    },
+    getUser: async function (userEmail) {
+        var request = await axios.post(`/api/favorites/findOne`,
+            {
+                "$type": "FavoriteUserFindModel",
+                "userEmail": userEmail,
+            },
+            { validateStatus: false }
+        );
+        if (request.status == 200)
+            return request.data;
+        showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
+            "Error when get favorite.", "warning");
+        return null;
+    },
+    getSpace: async function (spaceKey) {
+        var request = await axios.post(`/api/favorites/findOne`,
+            {
+                "$type": "FavoriteSpaceFindModel",
+                "spaceKey": spaceKey,
+            },
+            { validateStatus: false }
+        );
+        if (request.status == 200)
+            return request.data;
+        showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
+            "Error when get favorite.", "warning");
+        return null;
+    },
+    getPage: async function (pageId) {
+        var request = await axios.post(`/api/favorites/findOne`,
+            {
+                "$type": "FavoritePageFindModel",
+                "pageId": pageId,
+            },
+            { validateStatus: false }
+        );
+        if (request.status == 200)
+            return request.data;
+        showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
+            "Error when get favorite.", "warning");
+        return null;
     },
     addUser: async function (userEmail) {
         var request = await axios.post(`/api/favorites`,
@@ -60,7 +102,7 @@ var FavoriteService = {
     existsUser: async function (userEmail) {
         var request = await axios.post(`/api/favorites/exists`,
             {
-                "$type": "FavoriteUserCreateModel",
+                "$type": "FavoriteUserFindModel",
                 "userEmail": userEmail,
             },
             { validateStatus: false }
@@ -70,7 +112,7 @@ var FavoriteService = {
     existsSpace: async function (spaceKey) {
         var request = await axios.post(`/api/favorites/exists`,
             {
-                "$type": "FavoriteSpaceCreateModel",
+                "$type": "FavoriteSpaceFindModel",
                 "spaceKey": spaceKey,
             },
             { validateStatus: false }
@@ -80,7 +122,7 @@ var FavoriteService = {
     existsPage: async function (pageId) {
         var request = await axios.post(`/api/favorites/exists`,
             {
-                "$type": "FavoritePageCreateModel",
+                "$type": "FavoritePageFindModel",
                 "pageId": pageId,
             },
             { validateStatus: false }
@@ -101,5 +143,5 @@ var FavoriteService = {
         return false;
     }
 }
-export default GroupService
+export default FavoriteService
 /* eslint-enable */

@@ -249,6 +249,8 @@
         },
         "page": {
             "edit": "Edit",
+            "unstar": "Unstar this space",
+            "star": "Star this space",
             "attachments": {
                 "title": "Attachments",
                 "upload": "Upload",
@@ -607,6 +609,8 @@
         },
         "page": {
             "edit": "Редактировать",
+            "unstar": "Убрать пространство из избранного",
+            "star": "Добавить пространство в избранное",
             "attachments": {
                 "title": "Вложения",
                 "upload": "Загрузить",

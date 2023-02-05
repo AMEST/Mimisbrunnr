@@ -48,6 +48,12 @@ internal class FavoritesManager : IFavoritesManager
         return await _repository.GetAll().FirstOrDefaultAsync(x => x.Id == id, token);
     }
 
+    public async Task<Favorite> GetByExpression<T>(string email, Expression<Func<T, bool>> expression, CancellationToken token = default)
+         where T : Favorite
+    {
+        return await _repository.GetAllByType<T>().Where( x=> x.OwnerEmail == email).FirstOrDefaultAsync(expression, token);
+    }
+
     public Task Remove(Favorite favorite, CancellationToken token = default)
     {
         return _repository.Delete(favorite, token);
