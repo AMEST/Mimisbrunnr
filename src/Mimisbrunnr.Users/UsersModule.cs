@@ -10,6 +10,6 @@ public class UsersModule : Module
     {
         services.AddSingleton<IUserManager, UserManager>()
             .AddSingleton<IUserGroupManager, UserGroupManager>()
-            .AddSingleton<IUserSearcher>(r => (IUserSearcher)r.GetService<IUserManager>());
+            .AddSingleton<IUserSearcher, UserManager>();
     }
 }

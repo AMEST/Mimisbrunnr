@@ -5,13 +5,14 @@
     header="|"
     header-text-variant="light"
     v-on:click="goToSpace()"
+    align="left"
   >
     <b-avatar
       size="48"
       :text="getSpaceNameInitials()"
       :src="favorite.space.avatarUrl"
       :style="
-        favorite.space.avatarUrl
+        this.favorite.space.avatarUrl
           ? 'background-color: white; margin-top: -4em'
           : 'margin-top: -4em'
       "

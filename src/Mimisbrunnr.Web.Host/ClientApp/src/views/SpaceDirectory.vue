@@ -12,7 +12,7 @@
           $t("spaceDirectory.favorites.empty")
         }}</span>
       </div>
-      <b-card-group class="favorite-spaces-deck" deck v-else>
+      <b-card-group align="center" class="favorite-spaces-deck" deck v-else>
         <FavoriteSpaceCard
           v-for="favorite in favoriteSpaces"
           :key="favorite.id"
@@ -105,6 +105,9 @@ export default {
   height: 52px;
   border: unset;
   border-radius: unset;
+}
+.spaces-list .list-group-item {
+  border: unset !important;
 }
 .space-search {
   width: 150px;

@@ -1,5 +1,5 @@
 <template>
-  <b-list-group-item :title="space.description" button>
+  <b-list-group-item class="space-list-item" :title="space.description" button>
     <div class="space-title" v-on:click="goToSpace()">
       <b-avatar
         class="mr-2"
@@ -59,15 +59,15 @@ export default {
 </script>
 
 <style>
-.space-actions {
+.space-list-item .space-actions {
   margin-left: auto;
   display: inline-block;
   float: right;
 }
-.list-group-item {
-  border: unset;
+.space-list-item .list-group-item {
+  border: unset !important;
 }
-.space-title {
+.space-list-item .space-title {
   width: 85%;
   display: inline-block;
 }
