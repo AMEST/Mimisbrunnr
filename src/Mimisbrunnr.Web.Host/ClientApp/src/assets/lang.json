@@ -61,6 +61,19 @@
             },
             "recentlyVisited": {
                 "title": "Recently visited"
+            },
+            "favorites": {
+                "title": "Favorites",
+                "tabs": {
+                    "space": {
+                        "title": "Spaces",
+                        "empty": "You don't have any spaces in favorite"
+                    },
+                    "page": {
+                        "title": "Pages",
+                        "empty": "You don't have any pages in favorite"
+                    }
+                }
             }
         },
         "quickStart": {
@@ -228,7 +241,11 @@
             "all": "All spaces",
             "name": "Name",
             "description": "Description",
-            "action": "Action"
+            "action": "Action",
+            "favorites": {
+                "title": "Favorite spaces",
+                "empty": "You don't have any spaces in favorite"
+            }
         },
         "pageEditor": {
             "placeholder": "Page Name",
@@ -245,6 +262,8 @@
         },
         "page": {
             "edit": "Edit",
+            "unstar": "Unstar this space",
+            "star": "Star this space",
             "attachments": {
                 "title": "Attachments",
                 "upload": "Upload",
@@ -415,6 +434,19 @@
             },
             "recentlyVisited": {
                 "title": "Ранее посещенные"
+            },
+            "favorites": {
+                "title": "Избранное",
+                "tabs": {
+                    "space": {
+                        "title": "Пространства",
+                        "empty":"У вас нет пространств в избранном"
+                    },
+                    "page": {
+                        "title": "Страницы",
+                        "empty":"У вас нет страниц в избранном"
+                    }
+                }
             }
         },
         "quickStart": {
@@ -582,7 +614,11 @@
             "all": "Все пространства",
             "name": "Имя",
             "description": "Описание",
-            "action": "Действия"
+            "action": "Действия",
+            "favorites": {
+                "title": "Избранные пространства",
+                "empty": "У вас нет пространств в избранном"
+            }
         },
         "pageEditor": {
             "placeholder": "Имя страницы",
@@ -599,6 +635,8 @@
         },
         "page": {
             "edit": "Редактировать",
+            "unstar": "Убрать пространство из избранного",
+            "star": "Добавить пространство в избранное",
             "attachments": {
                 "title": "Вложения",
                 "upload": "Загрузить",

@@ -20,6 +20,16 @@ export default new Router({
             component: Dashboard
         },
         {
+            path: '/dashboard/:section',
+            name: 'dashboard-sections',
+            component: Dashboard
+        },
+        {
+            path: '/dashboard/:section/:subsection',
+            name: 'dashboard-subsections',
+            component: Dashboard
+        },
+        {
             path: '/spaces',
             name: 'spaces',
             component: () => import(/* webpackChunkName: "spaces" */ './views/SpaceDirectory.vue')

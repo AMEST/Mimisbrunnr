@@ -1,5 +1,5 @@
 <template>
-  <b-tab active class="max-tab-pane" style="text-align: left">
+  <b-tab class="max-tab-pane" style="text-align: left">
     <template #title>
       <b-icon icon="compass" class="text-secondary"></b-icon>
       <strong class="text-secondary"> {{$t("home.updates.title")}}</strong>

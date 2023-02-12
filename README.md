@@ -64,7 +64,7 @@ Support for the following features:
 - Profile
   - Profile page with avatar and last worked on
   - Settings (Manage personal api tokens, Profile settings _(Not implemented)_, Other settings _(Not implemented)_)
-  - Favorites _(Not implemented)_
+  - Favorites
 - Administration
   - Change wiki instance title
   - Enabling anonymous access (permission to read public spaces and access to wiki without authentication)

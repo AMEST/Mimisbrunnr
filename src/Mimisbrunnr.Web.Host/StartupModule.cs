@@ -6,11 +6,11 @@ using Mimisbrunnr.Persistent;
 using Mimisbrunnr.Storage.MongoDb;
 using Mimisbrunnr.Web.Host.Configuration;
 using Mimisbrunnr.Web.Host.Services;
+using Mimisbrunnr.Web.Host.Services.CacheDecorators;
 using Mimisbrunnr.Web.Host.Services.Features;
 using Mimisbrunnr.Web.Host.Services.Metrics;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Services;
-using Mimisbrunnr.Wiki;
 using Skidbladnir.Caching.Distributed.MongoDB;
 using Skidbladnir.DataProtection.MongoDb;
 using Skidbladnir.Modules;
@@ -21,8 +21,9 @@ internal class StartupModule : Module
 {
     public override Type[] DependsModules => new[]
     {
-        typeof(AspNetModule), typeof(MongoDbStoreModule), typeof(WebModule), typeof(WikiModule), typeof(PersistentModule),
-        typeof(MetricsModule), typeof(ConfluenceDataImportModule)
+        typeof(AspNetModule), typeof(MongoDbStoreModule), typeof(WebModule),
+        typeof(PersistentModule), typeof(MetricsModule),
+        typeof(ConfluenceDataImportModule), typeof(WebCacheModule),
     };
 
     public override void Configure(IServiceCollection services)
@@ -36,6 +37,7 @@ internal class StartupModule : Module
         services.AddSingleton<IFeatureService, FeatureService>();
         services.AddSingleton<ISecurityTokenService, SecurityTokenService>();
         services.AddSingleton<IWikiService, DataImportWikiService>();
+        
         ConfigureDistributedCache(services);
     }
 

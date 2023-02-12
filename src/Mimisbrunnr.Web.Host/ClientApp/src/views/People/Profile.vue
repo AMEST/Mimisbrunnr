@@ -18,7 +18,7 @@
           <b-button class="profile-actions-button" block variant="light" v-b-modal.profile-settings-modal>{{
             $t("profile.settings.title")
           }}</b-button>
-          <b-button class="profile-actions-button" block variant="light">{{
+          <b-button class="profile-actions-button" to="/dashboard/favorites" block variant="light">{{
             $t("profile.favorites")
           }}</b-button>
         </div>

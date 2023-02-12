@@ -10,6 +10,9 @@ using Skidbladnir.Modules;
 using Skidbladnir.Repository.MongoDB;
 using Mimisbrunnr.Wiki.Services;
 using Mimisbrunnr.Storage.MongoDb.Migrations;
+using Mimisbrunnr.Favorites.Contracts;
+using MongoDB.Bson.Serialization;
+using Mimisbrunnr.Favorites.Services;
 
 namespace Mimisbrunnr.Storage.MongoDb;
 
@@ -40,8 +43,15 @@ public class MongoDbStoreModule : RunnableModule
                 .AddEntity<PageUpdateEvent, PageUpdateEventMap>()
                 .AddEntity<Attachment, AttachmentMap>()
                 .AddEntity<UserToken, UserTokenMap>()
+                .AddEntity<Favorite, FavoriteMap>()
         );
-        services.AddSingleton<IPageSearcher, PageSearcher>();
+        BsonClassMap.RegisterClassMap(new FavoriteUserMap());
+        BsonClassMap.RegisterClassMap(new FavoriteSpaceMap());
+        BsonClassMap.RegisterClassMap(new FavoritePageMap());
+
+        services
+            .AddSingleton<IPageSearcher, PageSearcher>()
+            .AddSingleton<IFavoriteStore, FavoriteStore>();
     }
 
     public override async Task StartAsync(IServiceProvider provider, CancellationToken cancellationToken)
@@ -59,6 +69,7 @@ public class MongoDbStoreModule : RunnableModule
             await CreatePageUpdatesIndexes(baseMongoContext);
             await CreateAttachmentIndexes(baseMongoContext);
             await CreateUserTokenIndexes(baseMongoContext);
+            await CreateFavoriteIndexes(baseMongoContext);
         }
         catch (Exception e)
         {
@@ -255,6 +266,34 @@ public class MongoDbStoreModule : RunnableModule
         }));
         var ensureRevokedTokenDefinition = Builders<UserToken>.IndexKeys.Ascending(x => x.Id).Ascending(x => x.Revoked);
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<UserToken>(ensureRevokedTokenDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+    }
+
+    private static async Task CreateFavoriteIndexes(BaseMongoDbContext mongoContext)
+    {
+        var collection = mongoContext.GetCollection<Favorite>();
+        var userIdKeyDefinition = Builders<Favorite>.IndexKeys.Ascending(x => x.OwnerEmail);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Favorite>(userIdKeyDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+        var favoriteUserIndex = Builders<FavoriteUser>.IndexKeys
+            .Ascending(x => x.OwnerEmail).Ascending(x => x.UserEmail);
+        await collection.OfType<FavoriteUser>().Indexes.CreateOneAsync(new CreateIndexModel<FavoriteUser>(favoriteUserIndex, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+        var favoriteSpaceIndex = Builders<FavoriteSpace>.IndexKeys
+            .Ascending(x => x.OwnerEmail).Ascending(x => x.SpaceKey);
+        await collection.OfType<FavoriteSpace>().Indexes.CreateOneAsync(new CreateIndexModel<FavoriteSpace>(favoriteSpaceIndex, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+        var favoritePageIndex = Builders<FavoritePage>.IndexKeys
+            .Ascending(x => x.OwnerEmail).Ascending(x => x.PageId);
+        await collection.OfType<FavoritePage>().Indexes.CreateOneAsync(new CreateIndexModel<FavoritePage>(favoritePageIndex, new CreateIndexOptions()
         {
             Background = true
         }));

@@ -17,8 +17,10 @@
           pills
           card
           vertical
-          :nav-class="['home-nav', menuClosed ? 'home-nav-closed':'']"
+          :nav-class="['home-nav', menuClosed ? 'home-nav-closed' : '']"
           active-nav-item-class="home-nav-active-item"
+          @activate-tab="tabChanged"
+          v-model="tabIndex"
         >
           <template #tabs-start>
             <br />
@@ -26,25 +28,17 @@
               @click="switchMenu"
               href="#"
               class="circle-little-link tabs-badge"
-              ><b-icon width="1.7em" height="1.7em"  icon="arrow-left-short" />
+              ><b-icon width="1.7em" height="1.7em" icon="arrow-left-short" />
             </a>
             <ProfileBlock />
           </template>
 
           <Updates />
           <RecentlyVisited />
+          <Favorites />
 
           <template #tabs-end>
             <div class="nav-end"></div>
-            <!-- Temporary disable skeleton while my spaces not implemented
-            <br />
-            <h5 style="text-align: left">
-              {{$t("home.menu.mySpaces")}}
-              <b-link class="favorites-all-link" to="/favorites">{{$t("home.menu.allFavoritesSpaces")}}</b-link>
-            </h5>
-            <br />
-            <MySpaces /> 
-            -->
             <version />
           </template>
         </b-tabs>
@@ -56,6 +50,7 @@
 <script>
 import Updates from "@/components/home/Updates.vue";
 import RecentlyVisited from "@/components/home/RecentlyVisited.vue";
+import Favorites from "@/components/home/Favorites.vue";
 import Version from "@/components/home/Version.vue";
 import ProfileBlock from "@/components/home/ProfileBlock.vue";
 export default {
@@ -63,12 +58,15 @@ export default {
   components: {
     Updates,
     RecentlyVisited,
+    Favorites,
     Version,
     ProfileBlock,
   },
   data() {
     return {
       menuClosed: false,
+      tabIndex: 0,
+      availableTabs: ["updates", "recently", "favorites"],
     };
   },
   computed: {
@@ -89,10 +87,32 @@ export default {
       this.menuClosed = !this.menuClosed;
       this.$store.commit("changeHomeMenuClose", this.menuClosed);
     },
+    // eslint-disable-next-line
+    tabChanged: function (newTabIndex, oldTabIndex, event) {
+      this.$router.push(`/dashboard/${this.availableTabs[newTabIndex]}`);
+    },
+    tabRouter: function () {
+      if (this.$route.params.section != null) {
+        var requestedIndex = this.availableTabs.indexOf(
+          this.$route.params.section
+        );
+        this.tabIndex = requestedIndex >= 0 ? requestedIndex : 0;
+      }
+    },
+  },
+  watch: {
+    // eslint-disable-next-line
+    "$route.params.section": function (to, from) {
+      // eslint-disable-next-line
+      this.tabRouter();
+    },
   },
   mounted: function () {
     document.title = `Dashboard - ${this.$store.state.application.info.title}`;
     this.menuClosed = this.$store.state.application.homeMenuClosed;
+  },
+  created() {
+    this.tabRouter();
   },
 };
 </script>
@@ -107,9 +127,9 @@ export default {
   background-color: rgb(247 247 247) !important;
 }
 .home-nav-closed {
-    max-width: 0.5em !important;
-    content-visibility: hidden !important;
-    position: initial !important;
+  max-width: 0.5em !important;
+  content-visibility: hidden !important;
+  position: initial !important;
 }
 .home-nav .nav-item {
   background-color: #fff;
@@ -119,7 +139,7 @@ export default {
   border-bottom: unset;
 }
 .home-nav .nav-item .nav-link {
-    border-radius: unset;
+  border-radius: unset;
 }
 @media (max-width: 860px) {
   .home-nav {
@@ -132,21 +152,20 @@ export default {
   color: #42526e !important;
 }
 .nav-end {
-    border-bottom: 1px solid rgba(0,0,0,.125);
-    width:100%;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  width: 100%;
 }
 .favorites-all-link {
   text-decoration: none;
   float: right;
 }
-.circle-little-link 
-{
-    display: block;
-    width: 25px;
-    height: 25px;
-    border-radius: 25px;
-    background-color: #2780e3;
-    line-height: 25px;
+.circle-little-link {
+  display: block;
+  width: 25px;
+  height: 25px;
+  border-radius: 25px;
+  background-color: #2780e3;
+  line-height: 25px;
 }
 .tabs-badge {
   z-index: 5;

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
-using Mimisbrunnr.Users.Services;
+﻿using Mimisbrunnr.Users.Services;
 using Skidbladnir.Repository.Abstractions;
 
 namespace Mimisbrunnr.Users;
@@ -7,14 +6,11 @@ namespace Mimisbrunnr.Users;
 internal class UserManager : IUserManager, IUserSearcher
 {
     private const int DefaultMaxUserGet = 15;
-    private readonly TimeSpan _defaultCacheTime = TimeSpan.FromMinutes(10);
     private readonly IRepository<User> _userRepository;
-    private readonly IDistributedCache _distributedCache;
 
-    public UserManager(IRepository<User> userRepository, IDistributedCache distributedCache)
+    public UserManager(IRepository<User> userRepository)
     {
         _userRepository = userRepository;
-        _distributedCache = distributedCache;
     }
 
     public Task<User[]> GetUsers(int? offset = null)
@@ -33,31 +29,13 @@ internal class UserManager : IUserManager, IUserSearcher
         if (string.IsNullOrEmpty(email))
             return null;
 
-        var user = await _distributedCache.GetAsync<User>(GetUserCacheKeyEmail(email));
-        if (user is not null)
-            return user;
-
-        user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Email == email.ToLower());
-        if (user is null)
-            return user;
-
-        await CacheUser(user, GetUserCacheKeyEmail(user.Email));
-        await CacheUser(user, GetUserCacheKeyId(user.Id));
+        var user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Email == email.ToLower());
         return user;
     }
 
     public async Task<User> GetById(string id)
     {
-        var user = await _distributedCache.GetAsync<User>(GetUserCacheKeyId(id));
-        if (user is not null)
-            return user;
-
-        user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id.ToLower());
-        if (user is null)
-            return user;
-
-        await CacheUser(user, GetUserCacheKeyEmail(user.Email));
-        await CacheUser(user, GetUserCacheKeyId(user.Id));
+        var user =  await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id.ToLower());
         return user;
     }
 
@@ -71,47 +49,29 @@ internal class UserManager : IUserManager, IUserSearcher
             Role = role
         };
         await _userRepository.Create(user);
-        await CacheUser(user, GetUserCacheKeyEmail(user.Email));
-        await CacheUser(user, GetUserCacheKeyId(user.Id));
-    }
-
-    private async Task CacheUser(User user, string cacheKey)
-    {
-        await _distributedCache.SetAsync(cacheKey, user, new DistributedCacheEntryOptions()
-        {
-            AbsoluteExpirationRelativeToNow = _defaultCacheTime
-        });
     }
 
     public async Task Disable(User user)
     {
         user.Enable = false;
         await _userRepository.Update(user);
-        await _distributedCache.RemoveAsync(GetUserCacheKeyEmail(user.Email));
-        await _distributedCache.RemoveAsync(GetUserCacheKeyId(user.Id));
     }
 
     public async Task Enable(User user)
     {
         user.Enable = true;
         await _userRepository.Update(user);
-        await _distributedCache.RemoveAsync(GetUserCacheKeyEmail(user.Email));
-        await _distributedCache.RemoveAsync(GetUserCacheKeyId(user.Id));
     }
 
     public async Task ChangeRole(User user, UserRole role)
     {
         user.Role = role;
         await _userRepository.Update(user);
-        await _distributedCache.RemoveAsync(GetUserCacheKeyEmail(user.Email));
-        await _distributedCache.RemoveAsync(GetUserCacheKeyId(user.Id));
     }
 
     public async Task UpdateUserInfo(User user)
     {
         await _userRepository.Update(user);
-        await CacheUser(user, GetUserCacheKeyEmail(user.Email));
-        await CacheUser(user, GetUserCacheKeyId(user.Id));
     }
 
     public async Task<IEnumerable<User>> Search(string text)
@@ -124,8 +84,4 @@ internal class UserManager : IUserManager, IUserSearcher
             .ToArrayAsync();
         return users;
     }
-
-    private static string GetUserCacheKeyEmail(string email) => $"user_cache_email_{email.ToLower()}";
-
-    private static string GetUserCacheKeyId(string id) => $"user_cache_id_{id.ToLower()}";
 }

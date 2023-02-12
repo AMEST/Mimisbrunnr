@@ -1,10 +1,11 @@
-﻿using System.Text.Json.Serialization;
+﻿using Mimisbrunnr.Json;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
+using Mimisbrunnr.Integration.Favorites;
 using Mimisbrunnr.Web.Host.Configuration;
 using Skidbladnir.Modules;
 
@@ -57,10 +58,7 @@ internal class AspNetModule : Module
             });
         services.AddMemoryCache();
         services.AddControllers()
-            .AddJsonOptions(x =>
-            {
-                x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            });
+            .AddJsonOptions(x => x.JsonSerializerOptions.ApplyDefaults());
         services.AddDataProtection()
             .SetApplicationName("Mimisbrunnr");
         // In production, the Vue files will be served from this directory
@@ -70,6 +68,13 @@ internal class AspNetModule : Module
         });
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options => {
+            options.UseOneOfForPolymorphism();
+            options.SelectSubTypesUsing(baseType => {
+                return typeof(FavoriteModel).Assembly.GetTypes().Where(type => type.IsSubclassOf(baseType));
+            });
+            options.SelectDiscriminatorNameUsing(_ => "$type");
+            options.SelectDiscriminatorValueUsing(t => t.Name);
+            
             options.MapType<TimeSpan>(() => new OpenApiSchema(){
                 Type = "string",
                 Example = new OpenApiString("02:00:00")

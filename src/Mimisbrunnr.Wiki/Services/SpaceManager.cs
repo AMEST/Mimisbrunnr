@@ -1,54 +1,34 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
-using Mimisbrunnr.Wiki.Contracts;
+﻿using Mimisbrunnr.Wiki.Contracts;
 using Skidbladnir.Repository.Abstractions;
 
 namespace Mimisbrunnr.Wiki.Services;
 
 internal class SpaceManager : ISpaceManager, ISpaceSearcher
 {
-    private const string SpacesCacheKey = "space_cache";
-    private readonly TimeSpan _defaultCacheTime = TimeSpan.FromHours(12);
     private readonly IRepository<Space> _spaceRepository;
     private readonly IPageManager _pageManager;
-    private readonly IDistributedCache _distributedCache;
 
-    public SpaceManager(IRepository<Space> spaceRepository, IPageManager pageManager, IDistributedCache distributedCache)
+    public SpaceManager(IRepository<Space> spaceRepository, IPageManager pageManager)
     {
         _spaceRepository = spaceRepository;
         _pageManager = pageManager;
-        _distributedCache = distributedCache;
     }
 
     public async Task<Space[]> GetAll()
     {
-        var spaces = await _distributedCache.GetAsync<Space[]>(SpacesCacheKey);
-        if (spaces is not null) return spaces;
-
-        spaces = await _spaceRepository.GetAll().ToArrayAsync();
-
-        await _distributedCache.SetAsync(SpacesCacheKey,
-         spaces, new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = _defaultCacheTime });
+        var spaces = await _spaceRepository.GetAll().ToArrayAsync();
         return spaces;
     }
 
     public async Task<Space> GetById(string id)
     {
-        var space = await _distributedCache.GetAsync<Space>(GetSpaceCacheKeyById(id));
-        if (space is not null)
-            return space;
-        space = await _spaceRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
-        await AddSpaceToCache(space);
+        var space = await _spaceRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
         return space;
     }
 
     public async Task<Space> GetByKey(string key)
     {
-        var space = await _distributedCache.GetAsync<Space>(GetSpaceCacheKey(key));
-        if (space is not null)
-            return space;
-
-        space = await _spaceRepository.GetAll().FirstOrDefaultAsync(x => x.Key == key.ToUpper());
-        await AddSpaceToCache(space);
+        var space = await _spaceRepository.GetAll().FirstOrDefaultAsync(x => x.Key == key.ToUpper());
         return space;
     }
 
@@ -81,14 +61,12 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
         var homePage = await _pageManager.Create(space.Id, name, $"# {description}   ", owner);
         space.HomePageId = homePage.Id;
         await Update(space);
-        await AddSpaceToCache(space);
         return space;
     }
 
     public async Task Update(Space space)
     {
         await _spaceRepository.Update(space);
-        await DeleteSpaceFromCache(space);
     }
 
     public async Task AddPermission(Space space, Permission permission)
@@ -102,7 +80,6 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
         var newPermissions = new List<Permission>(space.Permissions) { permission };
         space.Permissions = newPermissions;
         await Update(space);
-        await DeleteSpaceFromCache(space);
     }
 
     public async Task UpdatePermission(Space space, Permission permission)
@@ -128,21 +105,18 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
             : x.Group is null || !x.Group.Equals(permission.Group));
         space.Permissions = newPermissions;
         await Update(space);
-        await DeleteSpaceFromCache(space);
     }
 
     public async Task Archive(Space space)
     {
         space.Status = SpaceStatus.Archived;
         await Update(space);
-        await DeleteSpaceFromCache(space);
     }
 
     public async Task UnArchive(Space space)
     {
         space.Status = SpaceStatus.Actual;
         await Update(space);
-        await DeleteSpaceFromCache(space);
     }
 
     public async Task Remove(Space space)
@@ -151,9 +125,7 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
         await _pageManager.Remove(spaceHomePage, true);
 
         await _spaceRepository.Delete(space);
-        await DeleteSpaceFromCache(space);
     }
-
 
     public async Task<IEnumerable<Space>> Search(string text)
     {
@@ -165,30 +137,4 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
             .ToArrayAsync();
         return spaces;
     }
-
-    private async Task AddSpaceToCache(Space space)
-    {
-        if (space is null) return;
-        await _distributedCache.SetAsync(GetSpaceCacheKey(space.Key), space, new DistributedCacheEntryOptions()
-        {
-            AbsoluteExpirationRelativeToNow = _defaultCacheTime
-        });
-        await _distributedCache.SetAsync(GetSpaceCacheKeyById(space.Id), space, new DistributedCacheEntryOptions()
-        {
-            AbsoluteExpirationRelativeToNow = _defaultCacheTime
-        });
-        await _distributedCache.RemoveAsync(SpacesCacheKey);
-    }
-
-    private async Task DeleteSpaceFromCache(Space space)
-    {
-        if (space is null) return;
-        await _distributedCache.RemoveAsync(GetSpaceCacheKey(space.Key));
-        await _distributedCache.RemoveAsync(GetSpaceCacheKeyById(space.Id));
-        await _distributedCache.RemoveAsync(SpacesCacheKey);
-    }
-
-    private static string GetSpaceCacheKey(string spaceKey) => $"space_cache_key_{spaceKey}";
-
-    private static string GetSpaceCacheKeyById(string id) => $"space_cache_id_{id}";
 }
