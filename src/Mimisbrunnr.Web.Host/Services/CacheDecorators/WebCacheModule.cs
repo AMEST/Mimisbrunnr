@@ -4,7 +4,7 @@ using Skidbladnir.Modules;
 
 namespace Mimisbrunnr.Web.Host.Services.CacheDecorators;
 
-public class WebCacheModule : Module
+internal class WebCacheModule : Module
 {
     public override void Configure(IServiceCollection services)
     {

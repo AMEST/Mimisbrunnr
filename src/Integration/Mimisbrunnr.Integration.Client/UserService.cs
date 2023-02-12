@@ -69,6 +69,17 @@ public sealed class UserService
         return null;
     }
 
+    public async Task<UserModel> Create(UserCreateModel model, CancellationToken cancellationToken = default)
+    {
+        var request = await _httpClient.PostAsJsonAsync($"{ApiPath}", model, cancellationToken)
+            .ConfigureAwait(false);
+        if (request.StatusCode == HttpStatusCode.OK)
+            return await request.Content.ReadFromJsonAsync<UserModel>(cancellationToken: cancellationToken);
+
+        request.EnsureSuccessStatusCode();
+        return null;
+    }
+
     public async Task UpdateProfileInfo(string email, UserProfileUpdateModel model, CancellationToken cancellationToken = default)
     {
         var request = await _httpClient.PutAsJsonAsync($"{ApiPath}/{email}", model, cancellationToken)

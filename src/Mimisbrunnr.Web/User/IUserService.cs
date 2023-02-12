@@ -14,6 +14,8 @@ namespace Mimisbrunnr.Web.User
 
         Task<UserProfileModel> GetByEmail(string email, UserInfo requestedBy);
 
+        Task<UserModel> CreateUser(UserCreateModel model, UserInfo createdBy);
+
         Task UpdateProfileInfo(string email, UserProfileUpdateModel model, UserInfo updatedBy);
 
         Task Disable(string email, UserInfo disabledBy);

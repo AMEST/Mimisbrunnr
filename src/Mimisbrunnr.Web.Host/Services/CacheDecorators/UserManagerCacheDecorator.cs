@@ -17,12 +17,13 @@ internal class UserManagerCacheDecorator : IUserManager
         _cache = cache;
     }
 
-    public async Task Add(string email, string name, string avatarUrl, UserRole role)
+    public async Task<Users.User> Add(string email, string name, string avatarUrl, UserRole role)
     {
         await _inner.Add(email, name, avatarUrl, role);
         var user = await _inner.GetByEmail(email);
         await CacheUser(user, GetUserCacheKeyEmail(user.Email));
         await CacheUser(user, GetUserCacheKeyId(user.Id));
+        return user;
     }
 
     public async Task ChangeRole(Users.User user, UserRole role)
