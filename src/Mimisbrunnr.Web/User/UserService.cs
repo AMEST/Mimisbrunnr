@@ -64,6 +64,21 @@ namespace Mimisbrunnr.Web.User
             return groups.Select(x => x.ToModel());
         }
 
+        public async Task<UserModel> CreateUser(UserCreateModel model, UserInfo createdBy)
+        {
+            var createdByUser = await _userManager.GetByEmail(createdBy.Email);
+            if(createdByUser.Role != UserRole.Admin)
+                throw new UserHasNotPermissionException();
+
+            var user = await _userManager.GetByEmail(model.Email);
+            if(user is not null)
+                throw new InvalidOperationException("User already exists.");
+
+            user = await _userManager.Add(model.Email, model.Name, model.AvatarUrl, UserRole.Employee);
+            return user.ToModel();
+
+        }
+
         public async Task UpdateProfileInfo(string email, UserProfileUpdateModel model, UserInfo updatedBy)
         {
             var user = await _userManager.GetByEmail(email);

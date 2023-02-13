@@ -39,7 +39,7 @@ internal class UserManager : IUserManager, IUserSearcher
         return user;
     }
 
-    public async Task Add(string email, string name, string avatarUrl, UserRole role)
+    public async Task<User> Add(string email, string name, string avatarUrl, UserRole role)
     {
         var user = new User()
         {
@@ -49,6 +49,7 @@ internal class UserManager : IUserManager, IUserSearcher
             Role = role
         };
         await _userRepository.Create(user);
+        return user;
     }
 
     public async Task Disable(User user)

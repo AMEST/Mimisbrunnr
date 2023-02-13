@@ -8,7 +8,7 @@ public interface IUserManager
 
     Task<User> GetById(string id);
 
-    Task Add(string email, string name, string avatarUrl, UserRole role);
+    Task<User> Add(string email, string name, string avatarUrl, UserRole role);
 
     Task Disable(User user);
 

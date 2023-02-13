@@ -22,7 +22,14 @@ public class UserController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll(int? offset = null)
     {
-        return Ok( await _userService.GetUsers(User?.ToInfo(), offset));
+        return Ok(await _userService.GetUsers(User?.ToInfo(), offset));
+    }
+
+    [HttpPost]
+    [RequiredAdminRole]
+    public async Task<IActionResult> Create([FromBody] UserCreateModel model)
+    {
+        return Ok(await _userService.CreateUser(model, User?.ToInfo()));
     }
 
     [HttpGet("current")]
