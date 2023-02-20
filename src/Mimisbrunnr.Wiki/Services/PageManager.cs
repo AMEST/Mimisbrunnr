@@ -9,15 +9,18 @@ internal class PageManager : IPageManager
     private readonly IRepository<Page> _pageRepository;
     private readonly IAttachmentManager _attachmentManager;
     private readonly IDraftManager _draftManager;
+    private readonly ICommentManager _commentManager;
 
     public PageManager(IRepository<Page> pageRepository,
         IAttachmentManager attachmentManager,
-        IDraftManager draftManager
+        IDraftManager draftManager,
+        ICommentManager commentManager
     )
     {
         _pageRepository = pageRepository;
         _attachmentManager = attachmentManager;
         _draftManager = draftManager;
+        _commentManager = commentManager;
     }
 
     public Task<Page[]> GetAllOnSpace(Space space)
@@ -129,6 +132,7 @@ internal class PageManager : IPageManager
         
         await RemoveAttachments(page);
         await _draftManager.Remove(page.Id);
+        await _commentManager.RemoveAll(page);
         await _pageRepository.Delete(page);
     }
 
@@ -139,11 +143,13 @@ internal class PageManager : IPageManager
         {
             await RemoveAttachments(child);
             await _draftManager.Remove(child.Id);
+            await _commentManager.RemoveAll(page);
             await _pageRepository.Delete(child);
         }
 
         await RemoveAttachments(page);
         await _draftManager.Remove(page.Id);
+        await _commentManager.RemoveAll(page);
         await _pageRepository.Delete(page);
     }
 

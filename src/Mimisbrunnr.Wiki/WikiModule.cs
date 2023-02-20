@@ -13,6 +13,7 @@ public class WikiModule : Module
             .AddSingleton<IFeedManager, FeedManager>()
             .AddSingleton<IAttachmentManager, AttachmentManager>()
             .AddSingleton<ISpaceSearcher, SpaceManager>()
-            .AddSingleton<IDraftManager, DraftManager>();
+            .AddSingleton<IDraftManager, DraftManager>()
+            .AddSingleton<ICommentManager, CommentManager>();
     }
 }
