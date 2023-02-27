@@ -2,23 +2,25 @@
   <b-container fluid class="spaces-container h-100vh">
     <b-container class="text-left">
       <br />
-      <div class="mb-3">
-        <h3>
-          <b>{{ $t("spaceDirectory.favorites.title") }}</b>
-        </h3>
+      <div v-if="!this.isAnonymous">
+        <div class="mb-3">
+          <h3>
+            <b>{{ $t("spaceDirectory.favorites.title") }}</b>
+          </h3>
+        </div>
+        <div v-if="favoriteSpaces.length == 0" align="center">
+          <span class="text-muted">{{
+            $t("spaceDirectory.favorites.empty")
+          }}</span>
+        </div>
+        <b-card-group align="center" class="favorite-spaces-deck" deck v-else>
+          <FavoriteSpaceCard
+            v-for="favorite in favoriteSpaces"
+            :key="favorite.id"
+            :favorite="favorite"
+          />
+        </b-card-group>
       </div>
-      <div v-if="favoriteSpaces.length == 0" align="center">
-        <span class="text-muted">{{
-          $t("spaceDirectory.favorites.empty")
-        }}</span>
-      </div>
-      <b-card-group align="center" class="favorite-spaces-deck" deck v-else>
-        <FavoriteSpaceCard
-          v-for="favorite in favoriteSpaces"
-          :key="favorite.id"
-          :favorite="favorite"
-        />
-      </b-card-group>
       <br />
       <div>
         <h3>
@@ -59,6 +61,11 @@ export default {
     FavoriteSpaceCard,
     SpaceListItem,
   },
+  computed: {
+    isAnonymous() {
+      return this.$store.state.application.profile == undefined;
+    },
+  },
   methods: {
     getSpaceNameInitials(name) {
       return getNameInitials(name);
@@ -92,7 +99,8 @@ export default {
       this.$store.state.application.info.title
     }`;
     this.loadSpaces();
-    this.loadFavorites();
+    if(!this.isAnonymous)
+        this.loadFavorites();
   },
 };
 </script>
@@ -113,7 +121,7 @@ export default {
   width: 150px;
   margin-left: auto;
 }
-.favorite-spaces-deck{
-    justify-content: center;
+.favorite-spaces-deck {
+  justify-content: center;
 }
 </style>

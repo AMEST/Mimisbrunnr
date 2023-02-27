@@ -35,7 +35,7 @@
 
           <Updates />
           <RecentlyVisited />
-          <Favorites />
+          <Favorites v-if="!this.isAnonymous"/>
 
           <template #tabs-end>
             <div class="nav-end"></div>
@@ -72,6 +72,9 @@ export default {
   computed: {
     isSmallScreen() {
       return window.innerWidth < 860;
+    },
+    isAnonymous() {
+        return this.$store.state.application.profile == undefined;
     },
   },
   methods: {
