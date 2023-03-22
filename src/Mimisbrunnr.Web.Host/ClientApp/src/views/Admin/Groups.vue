@@ -126,9 +126,12 @@ export default {
   text-align: left;
 }
 
-.admin-group-card .card-body {
-  margin: 2.25rem 2.25rem 2.25rem 2.25rem;
+@media (min-width: 440px) {
+    .admin-group-card .card-body {
+    margin: 2.25rem 2.25rem 2.25rem 2.25rem;
+    }
 }
+
 .group-add-button {
   float: right;
   margin-top: -3em;

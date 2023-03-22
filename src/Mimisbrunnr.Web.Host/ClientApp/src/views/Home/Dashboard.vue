@@ -20,6 +20,7 @@
           :nav-class="['home-nav', menuClosed ? 'home-nav-closed' : '']"
           active-nav-item-class="home-nav-active-item"
           @activate-tab="tabChanged"
+          content-class="tab-content-overflow"
           v-model="tabIndex"
         >
           <template #tabs-start>
@@ -39,7 +40,7 @@
 
           <template #tabs-end>
             <div class="nav-end"></div>
-            <version />
+            <version :hidden="menuClosed"/>
           </template>
         </b-tabs>
       </b-card>
@@ -133,6 +134,7 @@ export default {
   max-width: 0.5em !important;
   content-visibility: hidden !important;
   position: initial !important;
+  overflow-x: hidden !important; 
 }
 .home-nav .nav-item {
   background-color: #fff;
@@ -184,5 +186,10 @@ export default {
   color: white !important;
   margin-top: 2.5em;
   margin-left: 0.4em;
+}
+@media (max-width: 300px) {
+    .tab-content-overflow {
+        overflow-x: auto;
+    }
 }
 </style>
