@@ -160,9 +160,12 @@ export default {
   text-align: left;
 }
 
-.admin-user-card .card-body {
-  margin: 2.25rem 2.25rem 2.25rem 2.25rem;
+@media (min-width: 440px) {
+    .admin-user-card .card-body {
+    margin: 2.25rem 2.25rem 2.25rem 2.25rem;
+    }
 }
+
 .load-more-button {
   width: 100%;
 }
