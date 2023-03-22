@@ -40,7 +40,7 @@
 
           <template #tabs-end>
             <div class="nav-end"></div>
-            <version />
+            <version :hidden="menuClosed"/>
           </template>
         </b-tabs>
       </b-card>
