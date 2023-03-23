@@ -187,7 +187,7 @@ export default {
   margin-top: 2.5em;
   margin-left: 0.4em;
 }
-@media (max-width: 300px) {
+@media (max-width: 450px) {
     .tab-content-overflow {
         overflow-x: auto;
     }
