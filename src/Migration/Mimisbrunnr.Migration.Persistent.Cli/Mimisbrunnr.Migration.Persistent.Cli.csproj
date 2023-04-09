@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>disable</Nullable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Mimisbrunnr.DataImport.Confluence\Mimisbrunnr.DataImport.Confluence.csproj" />
-    <ProjectReference Include="..\..\Integration\Mimisbrunnr.Integration.Client\Mimisbrunnr.Integration.Client.csproj" />
+    <ProjectReference Include="..\..\Mimisbrunnr.Storage.MongoDb\Mimisbrunnr.Storage.MongoDb.csproj" />
+    <ProjectReference Include="..\..\Mimisbrunnr.Persistent\Mimisbrunnr.Persistent.csproj" />
   </ItemGroup>
 
 </Project>

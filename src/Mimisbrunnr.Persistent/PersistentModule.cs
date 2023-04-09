@@ -3,6 +3,7 @@ using Skidbladnir.Modules;
 using Skidbladnir.Storage.Abstractions;
 using Skidbladnir.Storage.GridFS;
 using Skidbladnir.Storage.LocalFileStorage;
+using Skidbladnir.Storage.S3;
 using Skidbladnir.Storage.WebDav;
 
 namespace Mimisbrunnr.Persistent
@@ -16,7 +17,7 @@ namespace Mimisbrunnr.Persistent
             {
                 case StorageType.Local:
                     var attachPath = Path.Combine(configuration.Local.Path, "attachments");
-                    if(!Directory.Exists(attachPath))
+                    if (!Directory.Exists(attachPath))
                         Directory.CreateDirectory(attachPath);
                     services
                         .AddLocalFsStorage(configuration.Local)
@@ -31,6 +32,11 @@ namespace Mimisbrunnr.Persistent
                     services
                         .AddWebDavStorage(configuration.WebDav)
                         .AddSingleton<IStorage>(r => r.GetService<IStorage<WebDavStorageInfo>>());
+                    break;
+                case StorageType.S3:
+                    services
+                        .AddS3Storage(configuration.S3)
+                        .AddSingleton<IStorage>(r => r.GetService<IStorage<S3StorageInfo>>());
                     break;
             }
         }

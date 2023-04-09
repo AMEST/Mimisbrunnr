@@ -40,6 +40,38 @@ jobs:
         overwrite: true
         body: "Builded Mimisbrunnr import Cli"
 
+  publish-persistent-migration-cli-binary:
+    if: contains(github.ref, 'tags/v') # works only version tagged
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rid: [ win-x86, linux-x64, linux-arm, linux-arm64, osx-x64 ]
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      NUGET_XMLDOC_MODE: skip
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0'
+    - name: Build
+      run: |
+        dotnet publish ./src/Migration/Mimisbrunnr.Migration.Persistent.Cli/Mimisbrunnr.Migration.Persistent.Cli.csproj -c Release --self-contained -r ${{ matrix.rid }} -p:PublishSingleFile=true -p:PublishTrimmed=true -o ./bin/mimisbrunnr-persistent-migration-cli-${{ matrix.rid }}
+        zip -r ${{ matrix.rid }} ./bin/mimisbrunnr-persistent-migration-cli-${{ matrix.rid }}
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ./${{ matrix.rid }}.zip
+        asset_name: mimisbrunnr-persistent-migration-cli-${{ matrix.rid }}.zip
+        tag: ${{ github.ref }}
+        overwrite: true
+        body: "Builded Mimisbrunnr persistent migration Cli"
+
   publish-webapp-binary:
     if: contains(github.ref, 'tags/v') # works only version tagged
     runs-on: ubuntu-latest
