@@ -31,7 +31,7 @@ static int Main(CliConfiguration configuration)
 
     services.AddFileStorage(migrateFromConfiguration);
     services.AddFileStorage(migrateToConfiguration);
-    services.AddDataBase(configuration.OptConnectionString);
+    services.AddDataBase(configuration.OptConnectionString.Replace("\"",""));
 
     var provider = services.BuildServiceProvider();
 

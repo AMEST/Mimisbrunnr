@@ -8,8 +8,8 @@ public partial class CliConfiguration
     const string Help = @"Mimisbrunnr Wiki persistent storage migration cli.
 
     Usage:
-      mimisbrunnr-migration-persistent-cli.exe --connection-string=<MongoDb url> --from-storage-type=<Type> --to-storage-type=<Type> [--local-path=<path to files>] [--gridfs-connection-string=<MongoDB url>] [--webdav-address=<url to webdav>] [--webdav-username=<username>] [--webdav-password=<password>] [--s3-service-url=<url to s3>] [--s3-bucket=<bucket name>] [--s3-access-key=<access key>] [--s3-secret-key=<secret key>] [--only-absent]
-      mimisbrunnr-migration-persistent-cli.exe (-h | --help)
+      Mimisbrunnr.Migration.Persistent.Cli.exe --connection-string=<MongoDb url> --from-storage-type=<Type> --to-storage-type=<Type> [--local-path=<path to files>] [--gridfs-connection-string=<MongoDB url>] [--webdav-address=<url to webdav>] [--webdav-username=<username>] [--webdav-password=<password>] [--s3-service-url=<url to s3>] [--s3-bucket=<bucket name>] [--s3-access-key=<access key>] [--s3-secret-key=<secret key>] [--only-absent]
+      Mimisbrunnr.Migration.Persistent.Cli.exe (-h | --help)
 
     Options:
       --connection-string=<MongoDb url>             MongoDb Connection String
