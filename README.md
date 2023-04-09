@@ -81,7 +81,7 @@ Support for the following features:
 - Hosting
   - Simple scalable
   - Three types of caching (one for single node and two for multiple nodes)
-  - Three types of persistent storage (file storage)
+  - Four types of persistent storage (file storage)
   - Prometheus like metrics with PushGateway support
 
 ## Screenshots
@@ -135,7 +135,7 @@ There are several storage options for storing page attachments and other files:
 2. GridFS - storing files in MongoDB
 3. WebDav - storing files in repositories with webdav interface
 
-* `Persistent:Type` - storage type (`Local`, `GridFs`, `WebDav`)
+* `Persistent:Type` - storage type (`Local`, `GridFs`, `WebDav`, `S3`)
 * Local:
   * `Persistent:Local:Path` - Path in file system where stored files
 * GridFs:
@@ -144,6 +144,11 @@ There are several storage options for storing page attachments and other files:
   * `Persistent:WebDav:Address` - url to WebDav server (example: `http://nextcloud.local/remote.php/dav/files/sample-username/`)
   * `Persistent:WebDav:Username` - WebDav username
   * `Persistent:WebDav:Password` - WebDav password
+* S3
+  * `Persistent:S3:ServiceUrl` - url to s3 compatible service (example: `https://minio.local/`)
+  * `Persistent:S3:Bucket` - Bucket name
+  * `Persistent:S3:AccessKey` - S3 access key
+  * `Persistent:S3:SecretKey` - S3 secret key
   
 #### Metrics
 

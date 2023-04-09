@@ -28,7 +28,7 @@
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
       <PackageReference Include="Riok.Mapperly" Version="2.5.0" />
-      <PackageReference Include="Skidbladnir.Modules" Version="1.6.0" />
+      <PackageReference Include="Skidbladnir.Modules" Version="1.7.0" />
     </ItemGroup>
 
 </Project>

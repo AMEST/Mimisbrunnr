@@ -4,5 +4,6 @@ public enum StorageType
 {
     Local,
     GridFs,
-    WebDav
+    WebDav,
+    S3
 }
