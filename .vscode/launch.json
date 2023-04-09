@@ -31,6 +31,17 @@
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/src/Mimisbrunnr.Web.Host/Views"
             }
+        },
+        {
+            "name": "Mimisbrunnr.Migration.Persistent.Cli",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-Mimisbrunnr.Migration.Persistent.Cli",
+            "program": "${workspaceFolder}/src/Migration/Mimisbrunnr.Migration.Persistent.Cli/bin/Debug/net6.0/Mimisbrunnr.Migration.Persistent.Cli.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/Migration/Mimisbrunnr.Migration.Persistent.Cli",
+            "stopAtEntry": false,
+            "console": "internalConsole"
         }
     ]
 }

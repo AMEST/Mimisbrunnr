@@ -37,6 +37,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimisbrunnr.Favorites", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimisbrunnr.Json", "src\Mimisbrunnr.Json\Mimisbrunnr.Json.csproj", "{C18BCA77-92BC-4653-A4E9-860E5A80B099}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Migration", "Migration", "{04570E9A-30E7-4D6C-B395-2831D86AA665}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimisbrunnr.Migration.Persistent.Cli", "src\Migration\Mimisbrunnr.Migration.Persistent.Cli\Mimisbrunnr.Migration.Persistent.Cli.csproj", "{441CD216-C6A9-467A-957D-94CD0AE8FC0A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,6 +66,8 @@ Global
 		{BF40E4BA-5F8B-4C4F-967C-4CB7A728BC29} = {A67956CF-DC77-4961-877A-140A2C47E19D}
 		{7B25CC4B-BE5D-4AD8-A80F-88CCE928480D} = {7B5B41ED-0FD9-4F24-9BA1-5D1C0D476611}
 		{C18BCA77-92BC-4653-A4E9-860E5A80B099} = {7B5B41ED-0FD9-4F24-9BA1-5D1C0D476611}
+		{04570E9A-30E7-4D6C-B395-2831D86AA665} = {7B5B41ED-0FD9-4F24-9BA1-5D1C0D476611}
+		{441CD216-C6A9-467A-957D-94CD0AE8FC0A} = {04570E9A-30E7-4D6C-B395-2831D86AA665}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{84B0F1E6-567E-4136-8D51-E469D460C261}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -120,5 +126,9 @@ Global
 		{C18BCA77-92BC-4653-A4E9-860E5A80B099}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C18BCA77-92BC-4653-A4E9-860E5A80B099}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C18BCA77-92BC-4653-A4E9-860E5A80B099}.Release|Any CPU.Build.0 = Release|Any CPU
+		{441CD216-C6A9-467A-957D-94CD0AE8FC0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{441CD216-C6A9-467A-957D-94CD0AE8FC0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{441CD216-C6A9-467A-957D-94CD0AE8FC0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{441CD216-C6A9-467A-957D-94CD0AE8FC0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

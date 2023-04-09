@@ -28,6 +28,9 @@
   - [Import spaces via cli](#import-spaces-via-cli)
     - [CommandLine arguments](#commandline-arguments)
     - [Example](#example)
+  - [Migrating Persistent Storage Data](#migrating-persistent-storage-data)
+    - [CommandLine arguments](#commandline-arguments-1)
+    - [Example](#example-1)
 
 ## Links
 * **[Documentation](https://wiki.nb-47.su/space/MM-DOCS)**
@@ -250,10 +253,10 @@ You can download the latest CLI from the releases page(https://github.com/AMEST/
 | -------------- | ------ | -------------------------------------------- |
 | --host=        | string | Base url to Mimisbrunnr Wiki instance        |
 | --space=       | string | Space key                                    |
-| --token=       | sting  | Access token for Mimisbrunnr Wiki            |
+| --token=       | string | Access token for Mimisbrunnr Wiki            |
 | --file=        | string | File path to exported zip                    |
 | --create-space | flag   | **(Optional)** Need create space when import |
-| -h --help      | flag   | **(Optional)** Show this screen.             |
+| -h --help      | flag   | **(Optional)** Show help message.            |
 
 ### Example
 
@@ -269,4 +272,46 @@ To use the CLI you need:
      --token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c" \
      --file="/tmp/Confluence-space-export-160423-660.xml.zip" \
      --create-space
+```
+
+## Migrating Persistent Storage Data
+Sometimes the size of the instance grows so that the original storage is no longer suitable for storing attachments (for example, when storing attachments locally in 1 node mode or offloading the database server from GridFS, transferring data to a more suitable object storage).   
+
+For this, a tool has been prepared for transferring attachments from one type of storage to another storage
+
+### CommandLine arguments
+
+| Argument                    | Type   | Description                                           |
+| --------------------------- | ------ | ----------------------------------------------------- |
+| --connection-string=        | string | MongoDb Connection String                             |
+| --from-storage-type=        | string | Persistent type: Local, GridFs, WebDav, S3            |
+| --to-storage-type=          | string | Persistent type: Local, GridFs, WebDav, S3            |
+| --local-path=               | string | Local storage: Path in file system where stored files |
+| --gridfs-connection-string= | string | GridFs storage: MongoDb Connection String             |
+| --webdav-address=           | string | WebDav storage: Url to WebDav server                  |
+| --webdav-username=          | string | WebDav storage: WebDav username                       |
+| --webdav-password=          | string | WebDav storage: WebDav password                       |
+| --s3-service-url=           | string | S3 Storage: Url to s3 compatible service              |
+| --s3-bucket=                | string | S3 Storage: Bucket name                               |
+| --s3-access-key=            | string | S3 Storage: S3 access key                             |
+| --s3-secret-key=            | string | S3 Storage: S3 secret key                             |
+| --only-absent               | flag   | **(Optional)** Only absent files in target storage    |
+| -h --help                   | flag   | **(Optional)** Show help message.                     |
+
+### Example
+
+To use the CLI you need:
+* Download CLI for your OS (if migrating not local fs type)
+* Download CLI for OS where launched instance of service (if migrating Local FS)
+* Run CLI like below
+
+```
+./Mimisbrunnr.Migration.Persistent.Cli --connection-string="mongodb+srv://app:password@mongo-local/mimisbrunnr?retryWrites=true" \
+    --from-storage-type=GridFs \
+    --to-storage-type=S3 \
+    --gridfs-connection-string="mongodb+srv://app:password@mongo-local/mimisbrunnr?retryWrites=true" \
+    --s3-service-url=https://minio.local \
+    --s3-bucket=wiki \
+    --s3-access-key=minioAccessKey \
+    --s3-secret-key=minioSecretKey
 ```
