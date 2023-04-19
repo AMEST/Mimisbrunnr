@@ -39,5 +39,6 @@ public class WebModule : Module
         services.AddSingleton<IDraftService, DraftService>();
         services.AddSingleton<ITokenService, TokenService>();
         services.AddSingleton<IFavoriteService, FavoriteService>();
+        services.AddSingleton<ICommentService, CommentService>();
     }
 }
