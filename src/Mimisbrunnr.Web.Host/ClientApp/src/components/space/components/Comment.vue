@@ -27,8 +27,8 @@ export default {
     deleteAction: Function
   },
   methods: {
-    getUserInitials: function () {
-      return getInitials(this.$store.state.application.profile);
+    getUserInitials: function (name) {
+      return getInitials(name);
     },
     remove: async function() {
         await this.deleteAction(this.comment);
