@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Mimisbrunnr.Wiki.Contracts;
 using Skidbladnir.Repository.Abstractions;
 
@@ -5,6 +6,7 @@ namespace Mimisbrunnr.Wiki.Services;
 
 internal class CommentManager : ICommentManager
 {
+    private static Regex _htmlSanitizeRegex = new Regex("<.*?>", RegexOptions.Compiled);
     private readonly IRepository<Comment> _repository;
 
     public CommentManager(IRepository<Comment> repository)
@@ -18,7 +20,7 @@ internal class CommentManager : ICommentManager
         {
             PageId = page.Id,
             Author = author,
-            Message = message,
+            Message = _htmlSanitizeRegex.Replace(message, string.Empty),
             Created = DateTime.UtcNow
         };
         await _repository.Create(comment);

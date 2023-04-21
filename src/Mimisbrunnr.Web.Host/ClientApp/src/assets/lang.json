@@ -264,6 +264,11 @@
             "edit": "Edit",
             "unstar": "Unstar this space",
             "star": "Star this space",
+            "comments": {
+                "title": "Comments",
+                "add": "Post comment",
+                "delete": "Delete"
+            },
             "attachments": {
                 "title": "Attachments",
                 "upload": "Upload",
@@ -637,6 +642,11 @@
             "edit": "Редактировать",
             "unstar": "Убрать пространство из избранного",
             "star": "Добавить пространство в избранное",
+            "comments": {
+                "title": "Комментарии",
+                "add": "Отправить",
+                "delete": "Удалить"
+            },
             "attachments": {
                 "title": "Вложения",
                 "upload": "Загрузить",
