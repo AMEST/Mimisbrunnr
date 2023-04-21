@@ -1,5 +1,5 @@
 <template>
-  <b-container class="bg-light comment-create-block pb-2" fluid>
+  <b-container class="comment-create-block pb-2" fluid>
     <div class="d-flex flex-row pt-2">
       <b-avatar
         class="avatar-bg"
