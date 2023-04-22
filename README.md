@@ -138,6 +138,7 @@ There are several storage options for storing page attachments and other files:
 1. Local file system - only suitable for deployment in a single instance and not in a docker container
 2. GridFS - storing files in MongoDB
 3. WebDav - storing files in repositories with webdav interface
+4. S3 - storing files in S3 compatible service
 
 * `Persistent:Type` - storage type (`Local`, `GridFs`, `WebDav`, `S3`)
 * Local:
