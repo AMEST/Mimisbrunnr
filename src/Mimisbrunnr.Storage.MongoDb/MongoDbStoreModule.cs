@@ -44,6 +44,7 @@ public class MongoDbStoreModule : RunnableModule
                 .AddEntity<Attachment, AttachmentMap>()
                 .AddEntity<UserToken, UserTokenMap>()
                 .AddEntity<Favorite, FavoriteMap>()
+                .AddEntity<Comment, CommentMap>()
         );
         BsonClassMap.RegisterClassMap(new FavoriteUserMap());
         BsonClassMap.RegisterClassMap(new FavoriteSpaceMap());
@@ -70,6 +71,7 @@ public class MongoDbStoreModule : RunnableModule
             await CreateAttachmentIndexes(baseMongoContext);
             await CreateUserTokenIndexes(baseMongoContext);
             await CreateFavoriteIndexes(baseMongoContext);
+            await CreateCommentIndexes(baseMongoContext);
         }
         catch (Exception e)
         {
@@ -294,6 +296,16 @@ public class MongoDbStoreModule : RunnableModule
         var favoritePageIndex = Builders<FavoritePage>.IndexKeys
             .Ascending(x => x.OwnerEmail).Ascending(x => x.PageId);
         await collection.OfType<FavoritePage>().Indexes.CreateOneAsync(new CreateIndexModel<FavoritePage>(favoritePageIndex, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+    }
+
+    private static async Task CreateCommentIndexes(BaseMongoDbContext mongoContext)
+    {
+        var collection = mongoContext.GetCollection<Comment>();
+        var pageIdKeyDefinition = Builders<Comment>.IndexKeys.Ascending(x => x.PageId);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Comment>(pageIdKeyDefinition, new CreateIndexOptions()
         {
             Background = true
         }));

@@ -33,6 +33,11 @@ public class HandleWikiErrorsAttribute : ExceptionFilterAttribute
                 context.Result = new ObjectResult(new { message = pageNotFoundEx.Message }) { StatusCode = 404 };
                 context.ExceptionHandled = true;
                 break;
+            case CommentNotFoundException commentNotFoundException:
+                context.Result = new ObjectResult(new { message = commentNotFoundException.Message })
+                    { StatusCode = 404 };
+                context.ExceptionHandled = true;
+                break;
             case InvalidOperationException invalidOperationException:
                 context.Result = new ObjectResult(new { message = invalidOperationException.Message })
                     { StatusCode = 400 };

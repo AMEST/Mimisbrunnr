@@ -93,6 +93,11 @@
         :source="this.page.content"
       ></vue-markdown>
     </div>
+    <br>
+    <h3 v-if="comments.length > 0"><b>{{ $t("page.comments.title") }}: {{ this.comments.length }}</b></h3>
+    <hr v-if="comments.length > 0">
+    <comment v-for="comment in comments" :key="comment.id" :comment="comment" :deleteAction="deleteComment"/>
+    <CommentCreate v-if="!isAnonymous" :createAction="addComment"/>
   </b-col>
 </template>
 
@@ -102,16 +107,23 @@ import hljs from "highlight.js";
 import "highlight.js/styles/github.css";
 import VueMarkdown from "@/thirdparty/VueMarkdown";
 import FavoriteService from "@/services/favoriteService";
+import PageService from "@/services/pageService";
+import ProfileService from "@/services/profileService";
+import CommentCreate from "@/components/space/components/CommentCreate.vue";
+import Comment from "@/components/space/components/Comment.vue";
 export default {
   name: "Page",
   data() {
     return {
       breadcrumbs: [],
+      comments: [],
       inFavorite: false,
     };
   },
   components: {
     VueMarkdown,
+    CommentCreate,
+    Comment
   },
   props: {
     space: Object,
@@ -125,6 +137,9 @@ export default {
     isSpaceHomePage() {
       return this.space.homePageId == this.page.id;
     },
+    isAnonymous(){
+        return ProfileService.isAnonymous();
+    }
   },
   methods: {
     initBreadcrumbs() {
@@ -148,6 +163,26 @@ export default {
         text: this.page.name,
         active: true,
       });
+    },
+    loadComments: async function() {
+        this.comments = [];
+        var comments = await PageService.getComments(this.page.id);
+        if(comments != null)
+            this.comments = comments;
+    },
+    addComment: async function(comment){
+        var createdComment = await PageService.createComment(this.page.id, comment);
+        if(createdComment != null)
+            this.comments.push(createdComment);
+    },
+    deleteComment: async function(comment){
+        await PageService.deleteComment(this.page.id, comment.id);
+        var newComments = []
+        this.comments.forEach(c => {
+            if(c.id != comment.id)
+                newComments.push(c);
+        });
+        this.comments = newComments;
     },
     checkInFavorites: async function () {
       if (this.isSpaceHomePage)
@@ -185,6 +220,7 @@ export default {
     page: function (newValue, oldValue) {
       this.initBreadcrumbs();
       this.checkInFavorites();
+      this.loadComments();
       setTimeout(() => hljs.highlightAll(), 100);
       setTimeout(this.scrollToAnchor, 100);
     },
@@ -192,6 +228,7 @@ export default {
   mounted: function () {
     this.initBreadcrumbs();
     this.checkInFavorites();
+    this.loadComments();
     setTimeout(() => hljs.highlightAll(), 100);
     setTimeout(this.scrollToAnchor, 100);
   },

@@ -1,4 +1,5 @@
 using Mimisbrunnr.Integration.Wiki;
+using Mimisbrunnr.Web.Authentication.Account;
 using Mimisbrunnr.Web.Wiki;
 using Mimisbrunnr.Wiki.Contracts;
 using Riok.Mapperly.Abstractions;
@@ -13,6 +14,8 @@ public static partial class WikiMapper
     public static partial DraftModel ToModel(this Draft draft);
 
     public static partial AttachmentModel ToModel(this Attachment attachment);
+
+    public static partial CommentModel ToModel(this Comment comment);
 
     public static PageModel ToModel(this Page page, string spaceKey = null)
     {
