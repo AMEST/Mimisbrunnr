@@ -13,7 +13,7 @@
     <span class="text-muted date-small">
       {{ new Date(comment.created).toLocaleString() }}
     </span>
-    <p class="pl-2 comment">{{ comment.message }}</p>
+    <p class="pl-2 comment" v-html="comment.message"></p>
     <span
         v-if="itsMe"
         class="delete-button pl-2" 
