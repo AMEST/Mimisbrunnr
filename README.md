@@ -36,6 +36,7 @@
 * **[Documentation](https://wiki.nb-47.su/space/MM-DOCS)**
 * **[Try Mimisbrunnr](https://wiki.nb-47.su)**  
 * **[Docker image](https://hub.docker.com/r/eluki/mimisbrunnr-wiki)**
+* **[Latest release and compiled binaries](https://github.com/amest/Mimisbrunnr/releases/latest)**
 
 ## Description
 
@@ -138,6 +139,7 @@ There are several storage options for storing page attachments and other files:
 1. Local file system - only suitable for deployment in a single instance and not in a docker container
 2. GridFS - storing files in MongoDB
 3. WebDav - storing files in repositories with webdav interface
+4. S3 - storing files in S3 compatible service
 
 * `Persistent:Type` - storage type (`Local`, `GridFs`, `WebDav`, `S3`)
 * Local:
