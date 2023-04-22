@@ -36,6 +36,7 @@
 * **[Documentation](https://wiki.nb-47.su/space/MM-DOCS)**
 * **[Try Mimisbrunnr](https://wiki.nb-47.su)**  
 * **[Docker image](https://hub.docker.com/r/eluki/mimisbrunnr-wiki)**
+* **[Latest release and compiled binaries](https://github.com/amest/Mimisbrunnr/releases/latest)**
 
 ## Description
 
