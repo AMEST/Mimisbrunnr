@@ -14,7 +14,7 @@
       <b-form-textarea
         class="ml-2"
         v-model="comment"
-        placeholder="..."
+        :placeholder="$t('page.comments.placeholder')"
         rows="3"
         max-rows="6"
         @keyup.enter="create"

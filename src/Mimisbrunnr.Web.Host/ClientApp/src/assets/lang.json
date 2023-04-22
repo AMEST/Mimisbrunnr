@@ -267,7 +267,8 @@
             "comments": {
                 "title": "Comments",
                 "add": "Post comment",
-                "delete": "Delete"
+                "delete": "Delete",
+                "placeholder": "Write comment..."
             },
             "attachments": {
                 "title": "Attachments",
@@ -645,7 +646,8 @@
             "comments": {
                 "title": "Комментарии",
                 "add": "Отправить",
-                "delete": "Удалить"
+                "delete": "Удалить",
+                "placeholder": "Написать Комментарий..."
             },
             "attachments": {
                 "title": "Вложения",

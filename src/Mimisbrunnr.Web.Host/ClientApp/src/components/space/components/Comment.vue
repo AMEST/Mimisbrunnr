@@ -14,7 +14,13 @@
       {{ new Date(comment.created).toLocaleString() }}
     </span>
     <p class="pl-2 comment">{{ comment.message }}</p>
-    <span class="delete-button pl-2" @click="remove"><b-icon icon="trash"/> {{ $t("page.comments.delete") }}</span>
+    <span
+        v-if="itsMe"
+        class="delete-button pl-2" 
+        @click="remove"
+    >
+        <b-icon icon="trash"/> {{ $t("page.comments.delete") }}
+    </span>
   </b-card>
 </template>
 
@@ -25,6 +31,13 @@ export default {
   props: {
     comment: Object,
     deleteAction: Function
+  },
+  computed: {
+    itsMe() {
+        if(!this.$store.state.application.profile)
+            return false;
+        return this.comment.author.email == this.$store.state.application.profile.email;
+    }
   },
   methods: {
     getUserInitials: function (name) {

@@ -94,10 +94,10 @@
       ></vue-markdown>
     </div>
     <br>
-    <h3><b>{{ $t("page.comments.title") }}: {{ this.comments.length }}</b></h3>
-    <hr>
+    <h3 v-if="comments.length > 0"><b>{{ $t("page.comments.title") }}: {{ this.comments.length }}</b></h3>
+    <hr v-if="comments.length > 0">
     <comment v-for="comment in comments" :key="comment.id" :comment="comment" :deleteAction="deleteComment"/>
-    <CommentCreate :createAction="addComment"/>
+    <CommentCreate v-if="!isAnonymous" :createAction="addComment"/>
   </b-col>
 </template>
 
@@ -108,6 +108,7 @@ import "highlight.js/styles/github.css";
 import VueMarkdown from "@/thirdparty/VueMarkdown";
 import FavoriteService from "@/services/favoriteService";
 import PageService from "@/services/pageService";
+import ProfileService from "@/services/profileService";
 import CommentCreate from "@/components/space/components/CommentCreate.vue";
 import Comment from "@/components/space/components/Comment.vue";
 export default {
@@ -136,6 +137,9 @@ export default {
     isSpaceHomePage() {
       return this.space.homePageId == this.page.id;
     },
+    isAnonymous(){
+        return ProfileService.isAnonymous();
+    }
   },
   methods: {
     initBreadcrumbs() {
