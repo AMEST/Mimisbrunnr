@@ -282,6 +282,8 @@ Sometimes the size of the instance grows so that the original storage is no long
 
 For this, a tool has been prepared for transferring attachments from one type of storage to another storage
 
+You can download the latest CLI from the releases page(https://github.com/AMEST/Mimisbrunnr/releases/latest)
+
 ### CommandLine arguments
 
 | Argument                    | Type   | Description                                           |
