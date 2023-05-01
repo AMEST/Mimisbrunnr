@@ -21,7 +21,6 @@
     "markdown-it-footnote": "^3.0.3",
     "markdown-it-imsize": "^2.0.1",
     "markdown-it-ins": "^3.0.1",
-    "markdown-it-katex": "^2.0.3",
     "markdown-it-mark": "^3.0.1",
     "markdown-it-sub": "^1.0.0",
     "markdown-it-sup": "^1.0.0",
@@ -43,8 +42,8 @@
     "@vue/cli-plugin-eslint": "^3.0.5",
     "@vue/cli-plugin-pwa": "^3.0.5",
     "@vue/cli-service": "^3.0.5",
-    "bootstrap-vue": "2.21.2",
     "babel-eslint": "^10.0.1",
+    "bootstrap-vue": "2.21.2",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "vue-template-compiler": "^2.6.10"

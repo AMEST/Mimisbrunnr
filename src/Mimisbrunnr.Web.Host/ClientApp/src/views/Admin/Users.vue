@@ -57,11 +57,10 @@
         </template>
       </b-table>
       <b-button variant="light" class="load-more-button" @click="loadUsers">
-        <b-icon
-          icon="arrow-clockwise"
+        <b-icon-arrow-clockwise
           :animation="loading ? 'spin' : 'none'"
           font-scale="1"
-        ></b-icon>
+        />
         {{ $t("admin.users.loadMore") }}
       </b-button>
     </b-card>
@@ -69,6 +68,7 @@
 </template>
 
 <script>
+import { BIconArrowClockwise } from "bootstrap-vue";
 import Menu from "@/components/admin/Menu.vue";
 import ProfileService from "@/services/profileService";
 import UserService from "@/services/userService";
@@ -76,6 +76,7 @@ export default {
   name: "UsersAdministration",
   components: {
     Menu,
+    BIconArrowClockwise,
   },
   data() {
     return {

@@ -11,14 +11,15 @@
     </div>
     <div class="space-actions">
       <b-button variant="light" @click="star">
-        <b-icon v-if="inFavorite" icon="star-fill" variant="warning" />
-        <b-icon v-else icon="star"
-      /></b-button>
+        <b-icon-star-fill v-if="inFavorite" variant="warning" />
+        <b-icon-star v-else />
+    </b-button>
     </div>
   </b-list-group-item>
 </template>
 
 <script>
+import { BIconStarFill, BIconStar } from "bootstrap-vue";
 import FavoriteService from "@/services/favoriteService";
 import { getNameInitials } from "@/services/Utils";
 export default {
@@ -31,6 +32,10 @@ export default {
       inFavorite: false,
     };
   },
+  components: {
+    BIconStarFill,
+    BIconStar,
+  },
   methods: {
     getSpaceNameInitials(name) {
       return getNameInitials(name);
@@ -38,19 +43,19 @@ export default {
     goToSpace() {
       this.$router.push("/space/" + this.space.key);
     },
-    star: async function(){
-        if(this.inFavorite){
-            await this.unStar();
-        }else{
-            await FavoriteService.addSpace(this.space.key);
-        }
-        this.inFavorite = !this.inFavorite;
+    star: async function () {
+      if (this.inFavorite) {
+        await this.unStar();
+      } else {
+        await FavoriteService.addSpace(this.space.key);
+      }
+      this.inFavorite = !this.inFavorite;
     },
-    unStar: async function(){
-        var favorite = await FavoriteService.getSpace(this.space.key);
-        if(favorite == null) return;
-        await FavoriteService.delete(favorite.id);
-    }
+    unStar: async function () {
+      var favorite = await FavoriteService.getSpace(this.space.key);
+      if (favorite == null) return;
+      await FavoriteService.delete(favorite.id);
+    },
   },
   created: async function () {
     this.inFavorite = await FavoriteService.existsSpace(this.space.key);

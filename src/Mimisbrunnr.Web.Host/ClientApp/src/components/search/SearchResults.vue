@@ -1,27 +1,38 @@
 <template>
   <b-overlay :show="overlayState" rounded="sm">
     <div class="text-left search-results">
-        <h2 v-if="searchResults.length == 0"> {{$t("search.results.noResults")}}</h2>
-        <h2 v-else>{{$t("search.results.hasResults")}} {{searchResults.length}}</h2>
+      <h2 v-if="searchResults.length == 0">
+        {{ $t("search.results.noResults") }}
+      </h2>
+      <h2 v-else>
+        {{ $t("search.results.hasResults") }} {{ searchResults.length }}
+      </h2>
       <b-card
         class="updates-card"
         v-for="result in searchResults"
         :key="searchType == 'space' ? result.key : result.id"
       >
-        <b-icon
+        <b-icon-folder
           class="search-result-icon"
-          icon="folder"
           v-if="searchType == 'space'"
         />
-        <b-icon class="search-result-icon" icon="file-earmark-text" v-else />
-        <b-link class="search-result-page-name" 
-            :to="searchType == 'space' ? '/space/' + result.key : '/space/' + result.spaceKey + '/' + result.id"
-        >{{
-          result.name
-        }}</b-link
+        <b-icon-file-earmark-text class="search-result-icon" v-else />
+        <b-link
+          class="search-result-page-name"
+          :to="
+            searchType == 'space'
+              ? '/space/' + result.key
+              : '/space/' + result.spaceKey + '/' + result.id
+          "
+          >{{ result.name }}</b-link
         ><br />
-        <b-link class="search-result-content" 
-            :to="searchType == 'space' ? '/space/' + result.key : '/space/' + result.spaceKey + '/' + result.id"
+        <b-link
+          class="search-result-content"
+          :to="
+            searchType == 'space'
+              ? '/space/' + result.key
+              : '/space/' + result.spaceKey + '/' + result.id
+          "
         >
           {{
             searchType == "space"
@@ -35,6 +46,7 @@
 </template>
 
 <script>
+import { BIconFolder, BIconFileEarmarkText } from "bootstrap-vue";
 import SearchService from "@/services/searchService";
 export default {
   name: "SearchResults",
@@ -44,6 +56,10 @@ export default {
       searchDelayTimeout: null,
       overlayState: false,
     };
+  },
+  components: {
+    BIconFolder,
+    BIconFileEarmarkText,
   },
   props: {
     textForSearch: String,
@@ -77,7 +93,9 @@ export default {
       this.$router.push(route);
     },
     getFoundedContent: function (result) {
-      var searchTextPosition = result.content.toLowerCase().indexOf(this.textForSearch.toLowerCase());
+      var searchTextPosition = result.content
+        .toLowerCase()
+        .indexOf(this.textForSearch.toLowerCase());
       if (searchTextPosition <= 25) return result.content.substring(0, 128);
       return result.content.substring(
         searchTextPosition - 20,

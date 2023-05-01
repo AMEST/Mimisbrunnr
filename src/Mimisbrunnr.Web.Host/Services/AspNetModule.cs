@@ -8,6 +8,8 @@ using Microsoft.OpenApi.Models;
 using Mimisbrunnr.Integration.Favorites;
 using Mimisbrunnr.Web.Host.Configuration;
 using Skidbladnir.Modules;
+using Microsoft.AspNetCore.ResponseCompression;
+using System.IO.Compression;
 
 namespace Mimisbrunnr.Web.Host.Services;
 
@@ -17,7 +19,7 @@ internal class AspNetModule : Module
     public override void Configure(IServiceCollection services)
     {
         var bearerConfiguration = Configuration.Get<BearerTokenConfiguration>();
-        if(string.IsNullOrEmpty(bearerConfiguration.SymmetricKey))
+        if (string.IsNullOrEmpty(bearerConfiguration.SymmetricKey))
             throw new ApplicationException("Bearer:SymmetricKey can't be null or empty");
         services.AddHttpContextAccessor()
             .AddAuthentication(options =>
@@ -67,18 +69,37 @@ internal class AspNetModule : Module
             configuration.RootPath = "ClientApp/dist";
         });
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(options => {
+        services.AddSwaggerGen(options =>
+        {
             options.UseOneOfForPolymorphism();
-            options.SelectSubTypesUsing(baseType => {
+            options.SelectSubTypesUsing(baseType =>
+            {
                 return typeof(FavoriteModel).Assembly.GetTypes().Where(type => type.IsSubclassOf(baseType));
             });
             options.SelectDiscriminatorNameUsing(_ => "$type");
             options.SelectDiscriminatorValueUsing(t => t.Name);
-            
-            options.MapType<TimeSpan>(() => new OpenApiSchema(){
+
+            options.MapType<TimeSpan>(() => new OpenApiSchema()
+            {
                 Type = "string",
                 Example = new OpenApiString("02:00:00")
             });
+        });
+
+        services.AddResponseCompression(options =>
+        {
+            options.EnableForHttps = true;
+            options.Providers.Add<BrotliCompressionProvider>();
+            options.Providers.Add<GzipCompressionProvider>();
+        });
+        services.Configure<BrotliCompressionProviderOptions>(options =>
+        {
+            options.Level = CompressionLevel.Fastest;
+        });
+
+        services.Configure<GzipCompressionProviderOptions>(options =>
+        {
+            options.Level = CompressionLevel.SmallestSize;
         });
     }
 }

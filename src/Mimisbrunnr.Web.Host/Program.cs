@@ -26,8 +26,9 @@ builder.Services.AddSkidbladnirModules<StartupModule>(configuration =>
     configuration.Add(bearerConfiguration);
 }, builder.Configuration);
 
-
 var app = builder.Build();
+
+app.UseResponseCompression();
 
 // Configure the HTTP request pipeline.
 var forwardedHeadersOptions = new ForwardedHeadersOptions

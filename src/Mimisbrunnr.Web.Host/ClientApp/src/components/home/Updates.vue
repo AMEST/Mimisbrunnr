@@ -1,10 +1,10 @@
 <template>
   <b-tab class="max-tab-pane" style="text-align: left">
     <template #title>
-      <b-icon icon="compass" class="text-secondary"></b-icon>
-      <strong class="text-secondary"> {{$t("home.updates.title")}}</strong>
+      <b-icon-compass class="text-secondary"/>
+      <strong class="text-secondary"> {{ $t("home.updates.title") }}</strong>
     </template>
-    <h2>{{$t("home.updates.title")}}</h2>
+    <h2>{{ $t("home.updates.title") }}</h2>
     <div v-if="!loaded">
       <b-card v-for="n in 10" :key="n" class="updates-card">
         <b-skeleton type="avatar" class="updates-avatar"></b-skeleton>
@@ -15,7 +15,9 @@
       </b-card>
     </div>
     <div v-else>
-      <b-alert v-if="this.updates.length == 0" show variant="light">{{$t("home.updates.emptyUpdates")}}</b-alert>
+      <b-alert v-if="this.updates.length == 0" show variant="light">{{
+        $t("home.updates.emptyUpdates")
+      }}</b-alert>
       <b-card
         class="updates-card"
         v-for="pageEvent in this.updates"
@@ -25,25 +27,33 @@
           class="updates-avatar"
           :text="getUserInitials(pageEvent.updatedBy.name)"
           :src="pageEvent.updatedBy.avatarUrl"
-          :style="pageEvent.updatedBy.avatarUrl ? 'background-color: transparent' : ''"
+          :style="
+            pageEvent.updatedBy.avatarUrl ? 'background-color: transparent' : ''
+          "
         ></b-avatar>
         <b-link
           class="updates-updatedBy"
           :to="'/profile/' + pageEvent.updatedBy.email"
           >{{ pageEvent.updatedBy.name }}</b-link
         ><br />
-        <b-link class="updates-pagelink" :to="'/space/'+pageEvent.spaceKey+'/'+pageEvent.pageId">
-          <b-icon icon="file-earmark-text" class="updates-pageIcon" />
+        <b-link
+          class="updates-pagelink"
+          :to="'/space/' + pageEvent.spaceKey + '/' + pageEvent.pageId"
+        >
+          <b-icon-file-earmark-text class="updates-pageIcon" />
           {{ pageEvent.pageTitle }}
         </b-link>
-        <br/><br/>
-        <span class="text-muted">{{new Date(pageEvent.updated).toLocaleString()}}</span>
+        <br /><br />
+        <span class="text-muted">{{
+          new Date(pageEvent.updated).toLocaleString()
+        }}</span>
       </b-card>
     </div>
   </b-tab>
 </template>
 
 <script>
+import { BIconCompass, BIconFileEarmarkText } from "bootstrap-vue";
 import { getNameInitials } from "@/services/Utils";
 import FeedService from "@/services/feedService";
 export default {
@@ -53,6 +63,10 @@ export default {
       updates: [],
       loaded: false,
     };
+  },
+  components: {
+    BIconCompass,
+    BIconFileEarmarkText,
   },
   methods: {
     getUserInitials: function (name) {
@@ -92,6 +106,6 @@ export default {
   border: unset !important;
 }
 .updates-card:hover {
-  background: rgba(0,0,0,0.01) !important;
+  background: rgba(0, 0, 0, 0.01) !important;
 }
 </style>

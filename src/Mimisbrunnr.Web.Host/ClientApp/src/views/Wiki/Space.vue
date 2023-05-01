@@ -17,12 +17,12 @@
 import axios from "axios";
 import Menu from "@/components/space/Menu.vue";
 import Page from "@/components/space/Page.vue";
-import DeletePage from "@/components/space/modal/DeletePage.vue";
-import CopyPage from "@/components/space/modal/CopyPage.vue";
-import MovePage from "@/components/space/modal/MovePage.vue";
-import Permissions from "@/components/space/modal/Permissions.vue";
-import Settings from "@/components/space/modal/Settings.vue";
-import Attachments from "@/components/space/modal/Attachments.vue";
+const DeletePage = () => import(/* webpackChunkName: "page-modals-component" */"@/components/space/modal/DeletePage.vue");
+const CopyPage = () => import(/* webpackChunkName: "page-modals-component" */"@/components/space/modal/CopyPage.vue");
+const MovePage = () => import(/* webpackChunkName: "page-modals-component" */"@/components/space/modal/MovePage.vue");
+const Settings = () => import(/* webpackChunkName: "space-modals-component" */"@/components/space/modal/Settings.vue");
+const Attachments = () => import(/* webpackChunkName: "page-modals-component" */"@/components/space/modal/Attachments.vue");
+const Permissions = () => import(/* webpackChunkName: "space-modals-component" */"@/components/space/modal/Permissions.vue");
 import { showToast } from "@/services/Utils";
 export default {
   name: "Space",

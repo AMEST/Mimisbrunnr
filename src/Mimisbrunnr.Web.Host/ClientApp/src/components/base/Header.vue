@@ -10,8 +10,10 @@
           <b-nav-item-dropdown :text="$t('header.spacesDropdown.title')" right>
             <!-- Using 'button-content' slot-->
             <template #button-content>
-              <b-icon class="spaces-icon" icon="globe"></b-icon>
-              <span class="spaces-title">{{ $t("header.spacesDropdown.title") }}</span>
+              <b-icon-globe class="spaces-icon"/>
+              <span class="spaces-title">{{
+                $t("header.spacesDropdown.title")
+              }}</span>
             </template>
             <b-dropdown-item to="/spaces">{{
               $t("header.spacesDropdown.list")
@@ -28,7 +30,7 @@
             to="/people"
             class="people"
           >
-            <b-icon class="people-icon" icon="people-fill"></b-icon>
+            <b-icon-people-fill class="people-icon" />
             <span>{{ $t("header.people") }}</span>
           </b-nav-item>
           <b-button
@@ -38,7 +40,7 @@
             @click="create"
             size="sm"
           >
-            <b-icon class="create-icon" icon="plus"></b-icon>
+            <b-icon-plus class="create-icon" />
             <span>{{ $t("header.pageCreateButton") }}</span>
           </b-button>
         </b-navbar-nav>
@@ -58,8 +60,8 @@
                   text="Button"
                   variant="success"
                   disabled
-                  ><b-icon icon="search"
-                /></b-button>
+                  ><b-icon-search/>
+                </b-button>
               </b-input-group-append>
             </b-input-group>
           </b-nav-form>
@@ -121,7 +123,7 @@
               v-if="this.$store.state.application.profile.isAdmin"
               to="/admin"
             >
-              <b-icon icon="gear" /> {{ $t("header.profileDropdown.admin") }}
+              <b-icon-gear /> {{ $t("header.profileDropdown.admin") }}
             </b-dropdown-item>
             <b-dropdown-divider
               v-if="this.$store.state.application.profile.isAdmin"
@@ -142,6 +144,13 @@
 </template>
 
 <script>
+import {
+  BIconGlobe,
+  BIconPeopleFill,
+  BIconPlus,
+  BIconSearch,
+  BIconGear,
+} from "bootstrap-vue";
 import axios from "axios";
 import ProfileService from "@/services/profileService";
 import { getInitials } from "@/services/Utils";
@@ -154,6 +163,13 @@ export default {
         { value: "en", text: "English" },
       ],
     };
+  },
+  components: {
+    BIconGlobe,
+    BIconPeopleFill,
+    BIconPlus,
+    BIconSearch,
+    BIconGear,
   },
   watch: {
     // eslint-disable-next-line
@@ -258,9 +274,9 @@ export default {
   }
 }
 @media (min-width: 765px) {
-    .spaces-icon {
+  .spaces-icon {
     display: none !important;
-}
+  }
 }
 </style>
 

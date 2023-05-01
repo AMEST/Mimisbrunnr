@@ -3,21 +3,21 @@
     <div v-if="this.loaded && this.initialized">
       <Header />
       <router-view />
+      <SpaceCreateModal />
+      <search-bar />
     </div>
     <div v-if="this.loaded && !this.initialized">
       <Quickstart />
     </div>
-    <SpaceCreateModal />
-    <search-bar />
   </div>
 </template>
 
 <script>
 import Header from "@/components/base/Header.vue";
-import SpaceCreateModal from "@/components/base/SpaceCreateModal.vue";
-import Quickstart from "@/components/quickstart/Quickstart.vue";
+const Quickstart = () => import(/* webpackChunkName: "quicstart-component" */"@/components/quickstart/Quickstart.vue");
+const SpaceCreateModal = () => import(/* webpackChunkName: "space-create-modal" */"@/components/base/SpaceCreateModal.vue");
+const SearchBar = () => import(/* webpackChunkName: "search-bar-component" */"@/components/search/SearchBar.vue");
 import axios from "axios";
-import SearchBar from "@/components/search/SearchBar.vue";
 import ProfileService from "@/services/profileService";
 export default {
   components: {
@@ -49,7 +49,7 @@ export default {
 
     this.loaded = true;
     this.initialized = initializedRequest.data.isInitialized;
-    setTimeout( this.updateHeaderHeightVar, 300);
+    setTimeout(this.updateHeaderHeightVar, 300);
   },
   destroyed() {
     window.removeEventListener("resize", this.updateHeaderHeightVar);

@@ -12,7 +12,7 @@
         class="m-2"
         :disabled="!userPermissions.canEdit || isArchived"
       >
-        <b-icon class="edit-icon" icon="pencil-fill" font-scale="0.9" />
+        <b-icon-pencil-fill class="edit-icon" font-scale="0.9" />
         {{ $t("page.edit") }}
       </b-button>
       <b-button
@@ -22,12 +22,12 @@
         size="sm"
         class="m-2"
       >
-        <b-icon v-if="inFavorite" icon="star-fill" variant="warning" />
-        <b-icon v-else icon="star"
-      /></b-button>
+        <b-icon-star-fill v-if="inFavorite" variant="warning" />
+        <b-icon-star v-else />
+      </b-button>
       <b-dropdown variant="secondary" size="sm" class="m-2 no-arrow-dropdown">
         <template #button-content>
-          <b-icon icon="three-dots" />
+          <b-icon-three-dots />
         </template>
         <b-dropdown-item
           href="#"
@@ -93,19 +93,32 @@
         :source="this.page.content"
       ></vue-markdown>
     </div>
-    <br>
-    <h3 v-if="comments.length > 0"><b>{{ $t("page.comments.title") }}: {{ this.comments.length }}</b></h3>
-    <hr v-if="comments.length > 0">
-    <comment v-for="comment in comments" :key="comment.id" :comment="comment" :deleteAction="deleteComment"/>
-    <CommentCreate v-if="!isAnonymous" :createAction="addComment"/>
+    <br />
+    <h3 v-if="comments.length > 0">
+      <b>{{ $t("page.comments.title") }}: {{ this.comments.length }}</b>
+    </h3>
+    <hr v-if="comments.length > 0" />
+    <comment
+      v-for="comment in comments"
+      :key="comment.id"
+      :comment="comment"
+      :deleteAction="deleteComment"
+    />
+    <CommentCreate v-if="!isAnonymous" :createAction="addComment" />
   </b-col>
 </template>
 
 <script>
 // eslint-disable-next-line
-import hljs from "highlight.js";
+import hljs from "highlight.js/lib/common";
 import "highlight.js/styles/github.css";
-import VueMarkdown from "@/thirdparty/VueMarkdown";
+import {
+  BIconPencilFill,
+  BIconStarFill,
+  BIconStar,
+  BIconThreeDots,
+} from "bootstrap-vue";
+const VueMarkdown = () => import(/* webpackChunkName: "vue-markdown-component" */"@/thirdparty/VueMarkdown");
 import FavoriteService from "@/services/favoriteService";
 import PageService from "@/services/pageService";
 import ProfileService from "@/services/profileService";
@@ -123,7 +136,11 @@ export default {
   components: {
     VueMarkdown,
     CommentCreate,
-    Comment
+    Comment,
+    BIconPencilFill,
+    BIconStarFill,
+    BIconStar,
+    BIconThreeDots,
   },
   props: {
     space: Object,
@@ -137,9 +154,9 @@ export default {
     isSpaceHomePage() {
       return this.space.homePageId == this.page.id;
     },
-    isAnonymous(){
-        return ProfileService.isAnonymous();
-    }
+    isAnonymous() {
+      return ProfileService.isAnonymous();
+    },
   },
   methods: {
     initBreadcrumbs() {
@@ -164,25 +181,25 @@ export default {
         active: true,
       });
     },
-    loadComments: async function() {
-        this.comments = [];
-        var comments = await PageService.getComments(this.page.id);
-        if(comments != null)
-            this.comments = comments;
+    loadComments: async function () {
+      this.comments = [];
+      var comments = await PageService.getComments(this.page.id);
+      if (comments != null) this.comments = comments;
     },
-    addComment: async function(comment){
-        var createdComment = await PageService.createComment(this.page.id, comment);
-        if(createdComment != null)
-            this.comments.push(createdComment);
+    addComment: async function (comment) {
+      var createdComment = await PageService.createComment(
+        this.page.id,
+        comment
+      );
+      if (createdComment != null) this.comments.push(createdComment);
     },
-    deleteComment: async function(comment){
-        await PageService.deleteComment(this.page.id, comment.id);
-        var newComments = []
-        this.comments.forEach(c => {
-            if(c.id != comment.id)
-                newComments.push(c);
-        });
-        this.comments = newComments;
+    deleteComment: async function (comment) {
+      await PageService.deleteComment(this.page.id, comment.id);
+      var newComments = [];
+      this.comments.forEach((c) => {
+        if (c.id != comment.id) newComments.push(c);
+      });
+      this.comments = newComments;
     },
     checkInFavorites: async function () {
       if (this.isSpaceHomePage)
@@ -243,7 +260,7 @@ export default {
   display: none;
 }
 .page-head .edit-icon {
-    margin-bottom: 0.25em;
+  margin-bottom: 0.25em;
 }
 .page-title {
   padding-top: 5px;

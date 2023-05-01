@@ -11,7 +11,7 @@
           @click="switchMenu"
           href="#"
           class="circle-little-link fixed-tabs-badge"
-          ><b-icon width="1.7em" height="1.7em" icon="arrow-right-short" />
+          ><b-icon-arrow-right-short width="1.7em" height="1.7em" />
         </a>
         <b-tabs
           pills
@@ -29,18 +29,18 @@
               @click="switchMenu"
               href="#"
               class="circle-little-link tabs-badge"
-              ><b-icon width="1.7em" height="1.7em" icon="arrow-left-short" />
+              ><b-icon-arrow-left-short width="1.7em" height="1.7em" />
             </a>
             <ProfileBlock />
           </template>
 
           <Updates />
           <RecentlyVisited />
-          <Favorites v-if="!this.isAnonymous"/>
+          <Favorites v-if="!this.isAnonymous" />
 
           <template #tabs-end>
             <div class="nav-end"></div>
-            <version :hidden="menuClosed"/>
+            <version :hidden="menuClosed" />
           </template>
         </b-tabs>
       </b-card>
@@ -49,6 +49,7 @@
 </template>
 
 <script>
+import { BIconArrowRightShort, BIconArrowLeftShort } from "bootstrap-vue";
 import Updates from "@/components/home/Updates.vue";
 import RecentlyVisited from "@/components/home/RecentlyVisited.vue";
 import Favorites from "@/components/home/Favorites.vue";
@@ -62,6 +63,8 @@ export default {
     Favorites,
     Version,
     ProfileBlock,
+    BIconArrowRightShort,
+    BIconArrowLeftShort,
   },
   data() {
     return {
@@ -75,7 +78,7 @@ export default {
       return window.innerWidth < 860;
     },
     isAnonymous() {
-        return this.$store.state.application.profile == undefined;
+      return this.$store.state.application.profile == undefined;
     },
   },
   methods: {
@@ -134,7 +137,7 @@ export default {
   max-width: 0.5em !important;
   content-visibility: hidden !important;
   position: initial !important;
-  overflow-x: hidden !important; 
+  overflow-x: hidden !important;
 }
 .home-nav .nav-item {
   background-color: #fff;
@@ -188,8 +191,8 @@ export default {
   margin-left: 0.4em;
 }
 @media (max-width: 450px) {
-    .tab-content-overflow {
-        overflow-x: auto;
-    }
+  .tab-content-overflow {
+    overflow-x: auto;
+  }
 }
 </style>

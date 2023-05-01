@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import VueMarkdown from "@/thirdparty/VueMarkdown";
+const VueMarkdown = () => import(/* webpackChunkName: "vue-markdown-component" */"@/thirdparty/VueMarkdown");
 export default {
     name: "GuideModal",
     components: {

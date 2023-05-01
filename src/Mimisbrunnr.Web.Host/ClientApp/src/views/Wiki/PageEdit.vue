@@ -56,7 +56,7 @@
 <script>
 import Attachments from "@/components/space/modal/Attachments.vue";
 import VueSimplemde from "vue-simplemde";
-import VueMarkdown from "@/thirdparty/VueMarkdown";
+const VueMarkdown = () => import(/* webpackChunkName: "vue-markdown-component" */"@/thirdparty/VueMarkdown");
 import axios from "axios";
 import { debounce, isImageFile } from "@/services/Utils.js";
 import DraftModal from "@/components/pageEditor/DraftModal.vue";

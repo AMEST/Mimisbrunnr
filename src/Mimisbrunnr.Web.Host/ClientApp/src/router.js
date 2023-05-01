@@ -42,7 +42,7 @@ export default new Router({
         {
             path: '/space/:key/:pageId',
             name: 'page',
-            component: () => import(/* webpackChunkName: "page" */ './views/Wiki/Space.vue')
+            component: () => import(/* webpackChunkName: "space" */ './views/Wiki/Space.vue')
         },
         {
             path: '/space/:key/:pageId/edit',
@@ -67,17 +67,17 @@ export default new Router({
         {
             path: '/admin',
             name: 'GeneralConfiguration',
-            component: () => import(/* webpackChunkName: "adminGeneral" */ './views/Admin/GeneralConfiguration.vue')
+            component: () => import(/* webpackChunkName: "admin" */ './views/Admin/GeneralConfiguration.vue')
         },
         {
             path: '/admin/groups',
             name: 'GroupsAdministration',
-            component: () => import(/* webpackChunkName: "adminGroups" */ './views/Admin/Groups.vue')
+            component: () => import(/* webpackChunkName: "admin" */ './views/Admin/Groups.vue')
         },
         {
             path: '/admin/users',
             name: 'UsersAdministration',
-            component: () => import(/* webpackChunkName: "adminUsers" */ './views/Admin/Users.vue')
+            component: () => import(/* webpackChunkName: "admin" */ './views/Admin/Users.vue')
         }
     ]
 })
