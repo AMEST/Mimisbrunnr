@@ -79,7 +79,7 @@ import {
 } from "bootstrap-vue";
 import axios from "axios";
 import { VueTreeList, Tree } from "vue-tree-list";
-import { getInitials } from "@/services/Utils";
+import { getNameInitials } from "@/services/Utils";
 export default {
   name: "Menu",
   components: {
@@ -102,7 +102,7 @@ export default {
   methods: {
     getSpaceNameInitials: function () {
       if (!this.space) return "";
-      return getInitials(this.space.name);
+      return getNameInitials(this.space.name);
     },
     loadHomePage: async function () {
       var homePageRequest = await axios.get(

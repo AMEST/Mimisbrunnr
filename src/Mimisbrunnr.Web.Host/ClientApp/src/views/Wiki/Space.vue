@@ -24,6 +24,7 @@ const Settings = () => import(/* webpackChunkName: "space-modals-component" */"@
 const Attachments = () => import(/* webpackChunkName: "page-modals-component" */"@/components/space/modal/Attachments.vue");
 const Permissions = () => import(/* webpackChunkName: "space-modals-component" */"@/components/space/modal/Permissions.vue");
 import { showToast } from "@/services/Utils";
+import SpaceService from "@/services/spaceService";
 export default {
   name: "Space",
   components:{
@@ -48,8 +49,16 @@ export default {
   methods: {
     init: async function () {
       this.loaded = false;
-      if(!await this.loadSpace()) return;
-      if(!await this.loadPage()) return;
+      try{
+        if(!await this.loadSpace()) return;
+        if(!await this.loadPage()) return;
+      }catch(error){
+        if(error == 401 || error == 403)
+            this.$router.push("/error/unauthorized");
+        else
+            this.$router.push("/error/unknown");
+        return;
+      }
       // eslint-disable-next-line
       console.log("Space initialized");
       this.loaded = true;
@@ -63,24 +72,20 @@ export default {
         return false;
       }
 
-      var spacesRequest = await axios.get("/api/space/" + key, {
-        validateStatus: false,
-      });
-      if (spacesRequest.status != 200) {
-        this.$router.push("/error/unauthorized");
+      var space = await SpaceService.getSpace(key);
+      if (space == null) {
+        this.$router.push("/error/notfound");
         return false;
       }
+      this.space = space;
 
-      this.space = spacesRequest.data;
-
-      var permissionsRequest = await axios.get("/api/space/" + key + "/permission", {
-        validateStatus: false,
-      });
-      if (permissionsRequest.status != 200) {
-        this.$router.push("/error/unauthorized");
+      var spacePermissions = await SpaceService.getSpacePermissions(key);
+      if (spacePermissions == null) {
+        this.$router.push("/error/notfound");
         return false;
       }
-      this.userPermissions = permissionsRequest.data;
+      this.userPermissions = spacePermissions;
+
       this.$store.commit('addToHistory', {
         id: this.space.key,
         key: this.space.key,

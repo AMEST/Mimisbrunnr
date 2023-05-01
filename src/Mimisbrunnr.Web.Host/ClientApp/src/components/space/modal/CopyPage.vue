@@ -39,6 +39,7 @@
 
 <script>
 import axios from 'axios';
+import SpaceService from '@/services/spaceService';
 export default {
   name: "CopyPage",
   data() {
@@ -59,11 +60,16 @@ export default {
   methods: {
     pageAction: async function() {
       var pageId = this.$route.params.pageId;
-      if(pageId == null) return;
+      var spaceKey = this.$route.params.key;
+      if(pageId == null && spaceKey == null) return;
+      if(pageId == null) {
+        var space = await SpaceService.getSpace(spaceKey);
+        pageId = space.homePageId;
+      }
       var destinationPageId = "";
       if(this.destinationType == 'Space'){
-        var spaceRequest = await axios.get("/api/space/" + this.destination);
-        destinationPageId = spaceRequest.data.homePageId;
+        var destinationSpace = await SpaceService.getSpace(this.destination);
+        destinationPageId = destinationSpace.homePageId;
       }else{
         destinationPageId = this.destination;
       }

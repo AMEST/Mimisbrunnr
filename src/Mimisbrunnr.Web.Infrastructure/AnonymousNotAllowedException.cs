@@ -2,7 +2,8 @@
 
 public class AnonymousNotAllowedException : Exception
 {
-    public AnonymousNotAllowedException()
+    public AnonymousNotAllowedException(string message = "Anonymous access disabled. Authorize needed.")
+        : base(message)
     {
     }
 }
