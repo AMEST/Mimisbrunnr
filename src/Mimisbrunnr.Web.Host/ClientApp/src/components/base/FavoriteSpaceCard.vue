@@ -17,9 +17,8 @@
           : 'margin-top: -4em'
       "
     ></b-avatar>
-    <b-icon
+    <b-icon-star-fill
       font-scale="1.5"
-      icon="star-fill"
       variant="warning"
       style="border: unset; float: right; margin-top: -0.5em"
     />
@@ -31,11 +30,15 @@
 </template>
 
 <script>
+import { BIconStarFill } from "bootstrap-vue";
 import { getNameInitials } from "@/services/Utils";
 export default {
   name: "FavoriteSpaceCard",
   props: {
     favorite: Object,
+  },
+  components: {
+    BIconStarFill,
   },
   methods: {
     getSpaceNameInitials(name) {

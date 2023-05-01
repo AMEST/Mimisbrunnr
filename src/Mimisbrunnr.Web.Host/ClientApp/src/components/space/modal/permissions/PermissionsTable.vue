@@ -32,24 +32,23 @@
           ><b-form-checkbox v-model="permission.isAdmin"></b-form-checkbox
         ></b-td>
         <b-td class="text-right">
-          <b-icon
+          <b-icon-disc
             v-on:click="save(permission)"
-            icon="disc"
             style="cursor: pointer"
-          ></b-icon>
+          />
           &nbsp;
-          <b-icon
+          <b-icon-trash
             v-on:click="deletePermission(permission)"
-            icon="trash"
+
             style="cursor: pointer"
-          ></b-icon>
+          />
         </b-td>
       </b-tr>
       <b-tr
         ><b-td>{{ $t("space.permissions.table.add") }}</b-td></b-tr
       >
       <b-tr>
-        <b-td style="min-width: 200px; max-width: 350px;">
+        <b-td style="min-width: 200px; max-width: 350px">
           <v-select
             v-model="permissionTarget"
             :options="permissionTargetList"
@@ -71,7 +70,7 @@
           ><b-form-checkbox v-model="newPermission.isAdmin"></b-form-checkbox
         ></b-td>
         <b-td class="text-right">
-          <b-icon @click="add" icon="disc" style="cursor: pointer"></b-icon>
+          <b-icon-disc @click="add" style="cursor: pointer"/>
         </b-td>
       </b-tr>
     </b-tbody>
@@ -79,6 +78,7 @@
 </template>
 
 <script>
+import { BIconDisc, BIconTrash } from "bootstrap-vue";
 import axios from "axios";
 import UserService from "@/services/userService";
 import GroupService from "@/services/groupService";
@@ -103,6 +103,10 @@ export default {
       permissionTarget: null,
       permissionTargetList: [],
     };
+  },
+  components: {
+    BIconDisc,
+    BIconTrash,
   },
   methods: {
     onSearch: async function (query) {

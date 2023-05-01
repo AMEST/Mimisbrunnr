@@ -2,9 +2,8 @@
 
 public class PageNotFoundException : Exception
 {
-    public PageNotFoundException(string message = null)
+    public PageNotFoundException(string message = "Page not found")
         : base(message)
     {
-        
     }
 }

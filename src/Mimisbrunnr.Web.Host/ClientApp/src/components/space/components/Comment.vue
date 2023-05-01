@@ -19,18 +19,22 @@
         class="delete-button pl-2" 
         @click="remove"
     >
-        <b-icon icon="trash"/> {{ $t("page.comments.delete") }}
+        <b-icon-trash/> {{ $t("page.comments.delete") }}
     </span>
   </b-card>
 </template>
 
 <script>
+import { BIconTrash } from "bootstrap-vue";
 import { getInitials } from "@/services/Utils";
 export default {
   name: "Comment",
   props: {
     comment: Object,
     deleteAction: Function
+  },
+  components: {
+    BIconTrash,
   },
   computed: {
     itsMe() {

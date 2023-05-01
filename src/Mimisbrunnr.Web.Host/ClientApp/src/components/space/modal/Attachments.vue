@@ -17,11 +17,10 @@
         attachment.name
       }}</span>
       <span class="text-muted" style="float: right">
-        <b-icon
+        <b-icon-trash
           v-on:click="deleteAttachment(attachment)"
-          icon="trash"
           style="cursor: pointer"
-        ></b-icon>
+        />
       </span>
     </b-list-group-item>
     <template #modal-footer>
@@ -45,6 +44,7 @@
 </template>
 
 <script>
+import { BIconTrash } from "bootstrap-vue";
 import axios from "axios";
 export default {
   name: "Attachments",
@@ -53,6 +53,9 @@ export default {
       newAttachment: null,
       attachments: [],
     };
+  },
+  components: {
+    BIconTrash,
   },
   props: {
     page: Object,

@@ -35,11 +35,10 @@
         </template>
       </b-table>
       <b-button variant="light" class="load-more-button" @click="loadGroups">
-        <b-icon
-          icon="arrow-clockwise"
+        <b-icon-arrow-clockwise
           :animation="loading ? 'spin' : 'none'"
           font-scale="1"
-        ></b-icon>
+        />
         {{ $t("admin.groups.loadMore") }}
       </b-button>
     </b-card>
@@ -48,6 +47,7 @@
 </template>
 
 <script>
+import { BIconArrowClockwise } from "bootstrap-vue";
 import Menu from "@/components/admin/Menu.vue";
 import GroupMembers from "@/components/admin/GroupMembers.vue";
 import GroupModal from "@/components/admin/modals/GroupModal.vue";
@@ -59,6 +59,7 @@ export default {
     Menu,
     GroupMembers,
     GroupModal,
+    BIconArrowClockwise,
   },
   data() {
     return {

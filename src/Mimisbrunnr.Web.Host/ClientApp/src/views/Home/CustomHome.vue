@@ -8,7 +8,7 @@
         class="m-2"
         v-if="this.$store.state.application.profile && this.$store.state.application.profile.isAdmin"
       >
-        <b-icon icon="pencil-fill" font-scale="0.9" />
+        <b-icon-pencil-fill font-scale="0.9" />
         {{ $t("page.edit") }}
       </b-button>
     </div>
@@ -23,14 +23,16 @@
 
 <script>
 // eslint-disable-next-line
-import hljs from "highlight.js";
+import hljs from "highlight.js/lib/common";
 import "highlight.js/styles/github.css";
-import VueMarkdown from "@/thirdparty/VueMarkdown";
+import { BIconPencilFill } from "bootstrap-vue";
+const VueMarkdown = () => import(/* webpackChunkName: "vue-markdown-component" */"@/thirdparty/VueMarkdown");
 import axios from "axios";
 export default {
   name: "CustomHome",
   components: {
     VueMarkdown,
+    BIconPencilFill,
   },
   data() {
     return {

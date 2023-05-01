@@ -2,11 +2,7 @@
 
 public class UserHasNotPermissionException : Exception
 {
-    public UserHasNotPermissionException()
-    {
-    }
-
-    public UserHasNotPermissionException(string message)
+    public UserHasNotPermissionException(string message = "User has no permissions for this action")
         : base(message)
     {
     }

@@ -1,7 +1,7 @@
 <template>
   <b-tab class="max-tab-pane text-left" id="favorites-tab">
     <template #title>
-      <b-icon icon="star" class="text-secondary"></b-icon>
+      <b-icon-star class="text-secondary"/>
       <strong class="text-secondary"> {{ $t("home.favorites.title") }}</strong>
     </template>
     <h2>{{ $t("home.favorites.title") }}</h2>
@@ -46,6 +46,7 @@
 </template>
 
 <script>
+import { BIconStar } from "bootstrap-vue";
 import FavoriteService from "@/services/favoriteService";
 import FavoriteSpaceCard from "@/components/base/FavoriteSpaceCard.vue";
 import FavoritePageCard from "@/components/base/FavoritePageCard.vue";
@@ -54,6 +55,7 @@ export default {
   components: {
     FavoriteSpaceCard,
     FavoritePageCard,
+    BIconStar,
   },
   data() {
     return {

@@ -1,13 +1,12 @@
 <template>
   <b-card class="favorite-page-card" v-on:click="goToPage()">
-    <b-icon
+    <b-icon-star-fill
       font-scale="1.5"
-      icon="star-fill"
       variant="warning"
       style="float: right"
     />
     <b-card-title>
-      <b-icon scale="1" icon="file-earmark-text" />
+      <b-icon-file-earmark-text scale="1" />
       {{ favorite.page.name.substring(0, 24) }}
       {{ favorite.page.name.length > 24 ? "..." : "" }}
     </b-card-title>
@@ -26,10 +25,15 @@
 </template>
 
 <script>
+import { BIconStarFill, BIconFileEarmarkText } from 'bootstrap-vue';
 export default {
   name: "FavoritePageCard",
   props: {
     favorite: Object,
+  },
+  components: {
+    BIconStarFill,
+    BIconFileEarmarkText
   },
   methods: {
     goToPage() {

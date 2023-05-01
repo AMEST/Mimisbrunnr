@@ -2,7 +2,8 @@
 
 public class SpaceNotFoundException : Exception
 {
-    public SpaceNotFoundException()
+    public SpaceNotFoundException(string message = "Space not found")
+        : base(message)
     {
     }
 }

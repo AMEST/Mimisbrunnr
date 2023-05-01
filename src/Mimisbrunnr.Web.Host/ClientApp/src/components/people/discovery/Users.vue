@@ -19,12 +19,11 @@
         </b-card-text>
       </b-card>
       <b-card class="people-card" @click="loadUsers" v-if="!textForSearch">
-        <b-icon
-          icon="arrow-clockwise"
+        <b-icon-arrow-clockwise
           :animation="loading ? 'spin' : 'none'"
           font-scale="6"
           class="mt-3"
-        ></b-icon>
+        />
         <b-card-text>
           {{ $t("people.users.loadMore") }}
         </b-card-text>
@@ -34,6 +33,7 @@
 </template>
 
 <script>
+import { BIconArrowClockwise } from "bootstrap-vue";
 import UserService from "@/services/userService";
 import SearchService from "@/services/searchService";
 import { getNameInitials, debounce } from "@/services/Utils";
@@ -44,6 +44,9 @@ export default {
       users: [],
       loading: false,
     };
+  },
+  components: {
+    BIconArrowClockwise,
   },
   props: {
     textForSearch: String,

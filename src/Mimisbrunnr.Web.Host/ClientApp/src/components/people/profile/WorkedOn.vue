@@ -5,13 +5,13 @@
       <b-card>
         <b-card-text v-if="!this.loaded">
           <b-list-group-item button v-for="h in [1, 2, 3, 4, 5, 6]" :key="h">
-            <b-icon icon="file-earmark-text" style="float: left" />
+            <b-icon-file-earmark-text style="float: left" />
             <b-skeleton animation="wave" width="25%"></b-skeleton>
           </b-list-group-item>
         </b-card-text>
         <b-card-text v-else>
             <b-list-group-item button v-for="work in this.workedOn" :key="new Date(work.updated).getTime()">
-              <b-icon class="work-pageIcon" icon="file-earmark-text" style="float: left" />
+              <b-icon-file-earmark-text class="work-pageIcon" style="float: left" />
               <b-link :to="'/space/'+work.spaceKey+'/'+work.pageId">{{ work.pageTitle }}</b-link>
               <span class="text-muted work-date">{{new Date(work.updated).toLocaleString()}}</span>
           </b-list-group-item>
@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import { BIconFileEarmarkText } from "bootstrap-vue";
 import FeedService from "@/services/feedService";
 export default {
   name: "WorkedOn",
@@ -31,6 +32,9 @@ export default {
       workedOn: [],
       loaded: false,
     };
+  },
+  components: {
+    BIconFileEarmarkText,
   },
   methods: {
     init: async function () {

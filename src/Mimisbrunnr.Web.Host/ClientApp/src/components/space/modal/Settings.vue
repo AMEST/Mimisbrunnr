@@ -10,7 +10,12 @@
         <label>{{ $t("space.settings.avatar.label") }}:</label>
         <br />
         <div align="center">
-          <b-avatar style="" :src="this.space.avatarUrl" size="7rem"></b-avatar>
+            <b-avatar
+                :text="getSpaceNameInitials()"
+                :src="this.space.avatarUrl"
+                :style="this.space.avatarUrl ? 'background-color: transparent' : ''"
+                size="7rem"
+            ></b-avatar>
         </div>
         <b-input-group class="pt-2" style="width: 100%">
           <b-form-file
@@ -94,7 +99,7 @@
 <script>
 import axios from "axios";
 
-import { showToast, isImageFile } from "@/services/Utils.js";
+import { showToast, isImageFile, getNameInitials } from "@/services/Utils.js";
 export default {
   name: "Settings",
   props: {
@@ -118,6 +123,10 @@ export default {
     },
   },
   methods: {
+    getSpaceNameInitials: function () {
+      if (!this.space) return "";
+      return getNameInitials(this.space.name);
+    },
     save: async function () {
       var spaceUpdateModel = {
         name: this.space.name,

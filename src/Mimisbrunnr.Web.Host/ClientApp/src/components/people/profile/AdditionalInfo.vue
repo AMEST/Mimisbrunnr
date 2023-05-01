@@ -3,7 +3,7 @@
     <span class="text-muted"> {{ $t("profile.additional.title") }} </span>
     <b-card-text>
       <b-input-group-prepend is-text v-on:click="goToWebSite">
-        <b-icon icon="globe2" /> &nbsp;
+        <b-icon-globe-2 /> &nbsp;
         <b-form-input
           :disabled="!this.itsMe"
           v-model="profile.website"
@@ -12,7 +12,7 @@
         ></b-form-input>
       </b-input-group-prepend>
       <b-input-group-prepend is-text>
-        <b-icon icon="bag-fill" /> &nbsp;
+        <b-icon-bag-fill /> &nbsp;
         <b-form-input
           :disabled="!this.itsMe"
           v-model="profile.post"
@@ -21,7 +21,7 @@
         ></b-form-input>
       </b-input-group-prepend>
       <b-input-group-prepend is-text>
-        <b-icon icon="diagram2" /> &nbsp;
+        <b-icon-diagram-2 /> &nbsp;
         <b-form-input
           :disabled="!this.itsMe"
           v-model="profile.department"
@@ -30,7 +30,7 @@
         ></b-form-input>
       </b-input-group-prepend>
       <b-input-group-prepend is-text>
-        <b-icon icon="building" /> &nbsp;
+        <b-icon-building /> &nbsp;
         <b-form-input
           :disabled="!this.itsMe"
           v-model="profile.organization"
@@ -39,7 +39,7 @@
         ></b-form-input>
       </b-input-group-prepend>
       <b-input-group-prepend is-text>
-        <b-icon icon="geo-alt" /> &nbsp;
+        <b-icon-geo-alt /> &nbsp;
         <b-form-input
           :disabled="!this.itsMe"
           v-model="profile.location"
@@ -52,6 +52,13 @@
 </template>
 
 <script>
+import {
+  BIconGlobe2,
+  BIconBagFill,
+  BIconDiagram2,
+  BIconBuilding,
+  BIconGeoAlt,
+} from "bootstrap-vue";
 import { debounce } from "@/services/Utils.js";
 import ProfileService from "@/services/profileService";
 export default {
@@ -59,6 +66,13 @@ export default {
   props: {
     itsMe: Boolean,
     profile: Object,
+  },
+  components: {
+    BIconGlobe2,
+    BIconBagFill,
+    BIconDiagram2,
+    BIconBuilding,
+    BIconGeoAlt,
   },
   methods: {
     goToWebSite() {

@@ -24,20 +24,20 @@
           v-if="this.homePage && this.space.type == 'Personal'"
           :to="'/profile/' + this.homePage.createdBy.email"
         >
-          <b-icon icon="person-fill" />&nbsp; {{ $t("space.actions.profile") }}
+          <b-icon-person-fill/>&nbsp; {{ $t("space.actions.profile") }}
         </b-list-group-item>
         <b-list-group-item
           v-b-modal.space-permissions-modal
           v-if="userPermissions.isAdmin"
         >
-          <b-icon icon="shield-lock-fill" />&nbsp;
+          <b-icon-shield-lock-fill />&nbsp;
           {{ $t("space.actions.permissions") }}
         </b-list-group-item>
         <b-list-group-item
           v-b-modal.space-settings-modal
           v-if="userPermissions.isAdmin"
         >
-          <b-icon icon="gear-fill" />&nbsp; {{ $t("space.actions.settings") }}
+          <b-icon-gear-fill/>&nbsp; {{ $t("space.actions.settings") }}
         </b-list-group-item>
       </b-list-group>
     </div>
@@ -72,13 +72,21 @@
 </template>
 
 <script>
+import {
+  BIconPersonFill,
+  BIconShieldLockFill,
+  BIconGearFill,
+} from "bootstrap-vue";
 import axios from "axios";
 import { VueTreeList, Tree } from "vue-tree-list";
-import { getInitials } from "@/services/Utils";
+import { getNameInitials } from "@/services/Utils";
 export default {
   name: "Menu",
   components: {
     VueTreeList,
+    BIconPersonFill,
+    BIconShieldLockFill,
+    BIconGearFill,
   },
   data() {
     return {
@@ -94,7 +102,7 @@ export default {
   methods: {
     getSpaceNameInitials: function () {
       if (!this.space) return "";
-      return getInitials(this.space.name);
+      return getNameInitials(this.space.name);
     },
     loadHomePage: async function () {
       var homePageRequest = await axios.get(
