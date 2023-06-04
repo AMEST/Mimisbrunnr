@@ -64,7 +64,7 @@ export function parseEditorJsToMarkdown(data) {
             case 'paragraph':
                 return parseParagraphToMarkdown(item.data);
             case 'list':
-                return parseListToMarkdown(item.data);
+                return wrapWithNewLine(parseListToMarkdown(item.data));
             case 'delimiter':
                 return parseDelimiterToMarkdown(item);
             case 'image':
@@ -72,17 +72,21 @@ export function parseEditorJsToMarkdown(data) {
             case 'quote':
                 return parseQuoteToMarkdown(item.data);
             case 'checkbox':
-                return parseCheckboxToMarkdown(item.data);
+                return wrapWithNewLine(parseCheckboxToMarkdown(item.data));
             case 'code':
                 return parseCodeToMarkdown(item.data);
             case 'checklist':
-                return parseCheckboxToMarkdown(item.data);
+                return wrapWithNewLine(parseCheckboxToMarkdown(item.data));
             case 'table':
-                return parseTableToMarkdown(item.data);
+                return wrapWithNewLine(parseTableToMarkdown(item.data));
             default:
                 break;
         }
     });
 
     return parsedData.join('\n');
+}
+
+function wrapWithNewLine(result) {
+    return `\n${result}\n`;
 }

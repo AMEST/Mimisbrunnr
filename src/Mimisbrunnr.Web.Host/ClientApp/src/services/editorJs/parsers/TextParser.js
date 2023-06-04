@@ -29,17 +29,18 @@ export function parseTextFromMarkdown(blocks) {
                 var openTag = tagFromType == null ? "" : `<${tagFromType}>`;
                 var closeTag = tagFromType == null ? "" : `</${tagFromType}>`;
                 if (item.children == null) {
-                    paragraph.data.text += prefix + openTag + replaceExtraMarkdownToHtml(item.value) + closeTag;
+                    paragraph.data.text += prefix + openTag + replaceExtraMarkdownToHtml(item.value || item.data.text) + closeTag;
                     if (lastParagraph == null)
                         result.push(paragraph);
                 } else {
                     let parsedChild = parseTextFromMarkdown(item);
                     if (parsedChild.length == 1 && parsedChild[0].type == 'paragraph')
-                        paragraph.data.text += prefix + openTag + replaceExtraMarkdownToHtml(parsedChild[0].value) + closeTag;
+                        paragraph.data.text += prefix + openTag + replaceExtraMarkdownToHtml(parsedChild[0].value || parsedChild[0].data.text ) + closeTag;
                     if (parsedChild.length > 0) {
                         if (lastParagraph == null)
                             result.push(paragraph);
-                        parsedChild.forEach((childItem => result.push(childItem)));
+                        if(parsedChild.length > 1)
+                            parsedChild.forEach((childItem => result.push(childItem)));
                     }
                 }
                 break;
@@ -51,7 +52,7 @@ export function parseTextFromMarkdown(blocks) {
                 } else {
                     let parsedChild = parseTextFromMarkdown(item);
                     if (parsedChild.length == 1 && parsedChild[0].type == 'paragraph')
-                        paragraph.data.text += prefix + `<a href="${item.url}">${replaceExtraMarkdownToHtml(parsedChild[0].value)}</a>`;
+                        paragraph.data.text += prefix + `<a href="${item.url}">${replaceExtraMarkdownToHtml(parsedChild[0].value || parsedChild[0].data.text)}</a>`;
                     if (lastParagraph == null)
                         result.push(paragraph);
                 }
@@ -84,11 +85,13 @@ export function replaceTextModifiersHtmlToMarkdown(htmlText) {
 function typeToTag(type) {
     switch (type) {
         case "strong":
-            return "strong";
+            return "b";
         case "emphasis":
-            return "em";
+            return "i";
         case "delete":
-            return "del"
+            return "strike"
+        case "mark":
+            return "mark";
         default:
             return null;
     }

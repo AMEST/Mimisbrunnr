@@ -5,11 +5,11 @@ export function parseListToMarkdown(blocks) {
       case 'unordered':
         items = blocks.items.map((item) => (`* ${replaceTextModifiersHtmlToMarkdown(item)}`));
   
-        return items;
+        return items.join('\n');
       case 'ordered':
-        items = blocks.items.map((item, index) => (`${index + 1} ${replaceTextModifiersHtmlToMarkdown(item)}`));
+        items = blocks.items.map((item, index) => (`${index + 1}. ${replaceTextModifiersHtmlToMarkdown(item)}`));
   
-        return items;
+        return items.join('\n');
       default:
         break;
     }
@@ -21,7 +21,9 @@ export function parseListToMarkdown(blocks) {
   
     blocks.children.forEach((items) => {
       items.children.forEach((listItem) => {
-        itemData.push(parseTextFromMarkdown(listItem));
+        var results = parseTextFromMarkdown(listItem).filter(x => x.data && x.data.text != null && x.data.text.trim() != "");
+        if(results.length > 0 && results[0].data )
+            itemData.push(results[0].data.text);
       });
     });
   
