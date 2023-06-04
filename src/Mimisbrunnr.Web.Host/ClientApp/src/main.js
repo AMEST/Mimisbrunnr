@@ -18,7 +18,11 @@ import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
 //Vue Markdown
 import './thirdparty/VueMarkdown.css'
+//Editor Js
+import Editor from 'vue-editor-js/src/index'
 
+// Editor Js
+Vue.use(Editor)
 // Vue select
 Vue.component('v-select', vSelect)
 // Vue i18n plugin

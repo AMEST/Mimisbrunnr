@@ -2,6 +2,65 @@ import axios from "axios";
 import { showToast } from "@/services/Utils";
 /*eslint-disable */
 var PageService = {
+    getPage: async function (pageId) {
+        var request = await axios.get(`/api/page/${pageId}`, {
+            validateStatus: false,
+        });
+
+        if (request.status == 404) return null;
+        if (request.status == 200)
+            return request.data;
+
+        showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
+            "Error when get draft.", "warning");
+        throw 401;
+    },
+    savePage: async function (page) {
+        var request = await axios.put(
+            `/api/page/${page.id}`,
+            page,
+            {
+                validateStatus: false,
+            }
+        );
+        if (request.status == 200) return true;
+
+        showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
+            "Error when save page.", "danger");
+        return false;
+    },
+    getDraft: async function (pageId) {
+        var request = await axios.get(`/api/draft/${pageId}`, {
+            validateStatus: false,
+        });
+
+        if (request.status == 404) return null;
+        if (request.status == 200)
+            return request.data;
+
+        showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
+            "Error when get draft.", "warning");
+        throw 401;
+    },
+    saveDraft: async function (pageId, draft) {
+        var request = await axios.put(`/api/draft/${pageId}`, draft, {
+            validateStatus: false,
+        });
+        if (request.status == 200)
+            return request.data;
+        showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
+            "Error when save draft.", "warning");
+        return null;
+    },
+    deleteDraft: async function (pageId) {
+        var request = await axios.delete(`/api/draft/${pageId}`, {
+            validateStatus: false,
+        });
+        if (request.status == 200)
+            return;
+        showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
+            "Error when deleting draft.", "warning");
+    },
     getComments: async function (pageId) {
         var request = await axios.get(`/api/page/${pageId}/comments`,
             { validateStatus: false }
