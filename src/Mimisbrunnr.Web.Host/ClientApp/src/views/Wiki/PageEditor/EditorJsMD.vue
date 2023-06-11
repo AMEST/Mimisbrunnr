@@ -228,7 +228,10 @@ export default {
     addAttachmentLink: function (attachment) {},
     // eslint-disable-next-line
     initEditor: function (editor) {
-      var convertedMarkdown = parseMarkdownToEditorJs(this.page.content);
+      var content = this.page.content;
+      if(!content)
+        content = "Empty page";
+      var convertedMarkdown = parseMarkdownToEditorJs(content);
       console.log(editor);
       console.log(convertedMarkdown);
       setTimeout(

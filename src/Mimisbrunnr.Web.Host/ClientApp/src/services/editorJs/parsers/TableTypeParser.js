@@ -15,8 +15,10 @@ export function parseTableToMarkdown(blocks) {
         items.push(`|${[...Array(firstLineLength)].map(() => "").join('|')}|`);
         items.push(`|${[...Array(firstLineLength)].map(() => `--------`).join('|')}|`);
     }
-    for(var i = startWith; i < firstLineLength; i ++)
+    for(var i = startWith; i < firstLineLength; i ++){
+        if(!blocks.content[i]) continue;
         items.push(`|${replaceTextModifiersHtmlToMarkdown(blocks.content[i].join('|'))}|`);
+    }
     return items.join("\n");
   }
   

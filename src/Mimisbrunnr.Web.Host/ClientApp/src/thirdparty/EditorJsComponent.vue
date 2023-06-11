@@ -37,3 +37,7 @@ export default {
   },
 };
 </script>
+
+<style>
+.codex-editor__redactor { padding-bottom: 38px !important; }
+</style>
