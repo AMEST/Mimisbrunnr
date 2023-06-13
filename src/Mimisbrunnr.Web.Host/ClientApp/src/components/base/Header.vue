@@ -6,7 +6,7 @@
           this.$store.state.application.info.title
         }}</b-navbar-brand>
 
-        <b-navbar-nav class="mr-auto">
+        <b-navbar-nav class="mr-auto main-menu-flex">
           <b-nav-item-dropdown :text="$t('header.spacesDropdown.title')" right>
             <!-- Using 'button-content' slot-->
             <template #button-content>
@@ -277,6 +277,9 @@ export default {
   .spaces-icon {
     display: none !important;
   }
+}
+.main-menu-flex {
+  flex-direction: row !important;
 }
 </style>
 
