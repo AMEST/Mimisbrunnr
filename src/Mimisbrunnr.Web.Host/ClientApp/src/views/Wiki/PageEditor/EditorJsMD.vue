@@ -7,7 +7,11 @@
         class="page-edit-name"
         :state="nameState"
       ></b-form-input>
-      <EditorJsComponent ref="editor" :config="config" :initialized="initEditor" />
+      <EditorJsComponent
+        ref="editor"
+        :config="config"
+        :initialized="initEditor"
+      />
     </b-container>
     <b-container class="buttons-block pb-3">
       <div align="right">
@@ -40,6 +44,7 @@ import { debounce } from "@/services/Utils.js";
 import DraftModal from "@/components/pageEditor/DraftModal.vue";
 import ProfileService from "@/services/profileService";
 import PageService from "@/services/pageService";
+import axios from "axios";
 // EditorJs
 import EditorJsComponent from "@/thirdparty/EditorJsComponent.vue";
 import Header from "@editorjs/header";
@@ -53,6 +58,7 @@ import Marker from "@editorjs/marker";
 import Warning from "@editorjs/warning";
 import Quote from "@editorjs/quote";
 import InlineCode from "@editorjs/inline-code";
+import ImageTool from '@editorjs/image';
 import Delimiter from "@editorjs/delimiter";
 // OwnExtensions
 import {
@@ -70,6 +76,10 @@ export default {
   data() {
     return {
       page: { content: "", name: "" },
+      cursor: {
+        offset: 0,
+        block: 0
+      },
       config: {
         tools: {
           header: {
@@ -137,11 +147,22 @@ export default {
             class: InlineCode,
             shortcut: "CMD+SHIFT+M",
           },
+        image: {
+            class: ImageTool,
+            config: {
+                uploader: {
+                    uploadByFile: this.uploadByFile,
+                    async uploadByUrl(url){
+                        return {success: 1,file: {url: url}};
+                    }
+                }
+            }
+          },
           delimiter: Delimiter,
         },
         onReady: () => {},
         // eslint-disable-next-line
-        onChange: (args) => {},
+        onChange: this.onEditorChange,
       },
       draft: null,
       loaded: false,
@@ -226,6 +247,30 @@ export default {
     },
     // eslint-disable-next-line
     addAttachmentLink: function (attachment) {},
+    uploadByFile: async function(file){
+        var formData = new FormData();
+        formData.append("attachment", file);
+        await axios({
+            method: "post",
+            url: "/api/attachment/" + this.page.id,
+            data: formData,
+            validateStatus: false,
+        });
+        return {
+            success: 1,
+            file: {
+                url: `/api/attachment/${this.page.id}/${file.name}`,
+            }
+        };
+    },
+    onEditorChange: async function(api, event){
+      console.log("[evt]",event);
+      console.log("[api]",api);
+      var selection = document.getSelection();
+      if(selection)
+        this.cursor.offset = selection.anchorOffset()
+      this.cursor.block = api.blocks.getCurrentBlockIndex();
+    },
     // eslint-disable-next-line
     initEditor: function (editor) {
       var content = this.page.content;
@@ -233,6 +278,7 @@ export default {
         content = "Empty page";
       var convertedMarkdown = parseMarkdownToEditorJs(content);
       console.log(editor);
+      window.ejs = editor;
       console.log(convertedMarkdown);
       setTimeout(
         (ed, data) => {
