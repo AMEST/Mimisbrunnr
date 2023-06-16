@@ -178,10 +178,6 @@ export default {
     space: async function (newValue, oldValue) {
       await this.loadHomePage();
     },
-    "$route.params.pageId": async function(newValue, oldValue){
-        if( newValue === oldValue) return;
-        setTimeout(this.expandTree, 500);
-    },
     pageTree: function (newValue, oldValue) {
       if (newValue == undefined && oldValue != undefined) {
         this.pageTreeList = new Tree([]);
