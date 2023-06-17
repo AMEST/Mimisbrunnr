@@ -41,6 +41,7 @@
         :postrender="renderMarkdown"
         :toc="true"
         style="display: none"
+        v-if="sideBySide"
       ></vue-markdown>
     </b-container>
     <draft-modal
@@ -76,6 +77,7 @@ export default {
       page: { content: "" },
       draft: null,
       loaded: false,
+      sideBySide: false,
       mdeConfig: {
         toolbar: [
           "bold",
@@ -277,6 +279,7 @@ export default {
           /\s*CodeMirror-sided\s*/g,
           " "
         );
+        this.sideBySide = false;
       } else {
         // When the preview button is clicked for the first time,
         // give some time for the transition from editor.css to fire and the view to slide from right to left,
@@ -286,6 +289,7 @@ export default {
         }, 1);
         wrapper.className += " CodeMirror-sided";
         useSideBySideListener = true;
+        this.sideBySide = true;
       }
 
       // Hide normal preview if active
@@ -316,10 +320,12 @@ export default {
       }
 
       if (useSideBySideListener) {
-        preview.innerHTML = editor.options.previewRender(
-          editor.value(),
-          preview
-        );
+        setTimeout( () => {
+            preview.innerHTML = editor.options.previewRender(
+                editor.value(),
+                preview
+            );
+        }, 200);
         cm.on("update", cm.sideBySideRenderingFunction);
       } else {
         cm.off("update", cm.sideBySideRenderingFunction);
@@ -330,7 +336,7 @@ export default {
     },
     // eslint-disable-next-line
     previewRender: function (plainText) {
-      return this.renderedMarkdown;
+      return this.renderedMarkdown || "";
     },
     renderMarkdown: function (html) {
       this.renderedMarkdown = html;
