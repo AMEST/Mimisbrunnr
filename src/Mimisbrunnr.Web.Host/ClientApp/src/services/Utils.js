@@ -1,4 +1,5 @@
 import { BToast } from 'bootstrap-vue'
+import router from '@/router'
 var bootStrapToaster = null;
 
 export function debounce(fn, delay) {
@@ -43,4 +44,29 @@ export function isImageFile(name) {
         name.toLowerCase().endsWith(".gif") ||
         name.toLowerCase().endsWith(".svg")
     );
+}
+
+export function replaceRelativeLinksToRoute(elementId){
+    var block = document.getElementById(elementId);
+    if(!block) return;
+
+    var links = block.getElementsByTagName("a");
+    if(!links) return;
+
+    var linksForReplace = Array.from(links).filter(x => x 
+            && x.getAttribute("href")
+            && x.getAttribute("href").startsWith("/") 
+            && !x.getAttribute("href").startsWith("/api/"));
+    if(!linksForReplace) return;
+
+    for(let link of linksForReplace){
+        if(!link) continue;
+        link.addEventListener("click", function (e) {
+            if(!e && !e.target) return;
+            let rawHref = e.target.getAttribute("href");
+            if(!rawHref) return;
+            e.preventDefault();
+            router.push(rawHref);
+        })
+    }
 }
