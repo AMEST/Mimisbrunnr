@@ -91,6 +91,7 @@
         :toc="true"
         :html="this.$store.state.application.info.allowHtml"
         :source="this.page.content"
+        id="page-content"
       ></vue-markdown>
     </div>
     <br />
@@ -118,6 +119,7 @@ import {
   BIconStar,
   BIconThreeDots,
 } from "bootstrap-vue";
+import { replaceRelativeLinksToRoute } from "@/services/Utils";
 const VueMarkdown = () => import(/* webpackChunkName: "vue-markdown-component" */"@/thirdparty/VueMarkdown");
 import FavoriteService from "@/services/favoriteService";
 import PageService from "@/services/pageService";
@@ -163,7 +165,7 @@ export default {
       this.breadcrumbs = [
         {
           text: "Home",
-          to: { name: "home" },
+          to: { name: "dashboard" },
         },
       ];
       if (this.space == undefined || this.page == undefined) return;
@@ -240,6 +242,7 @@ export default {
       this.loadComments();
       setTimeout(() => hljs.highlightAll(), 100);
       setTimeout(this.scrollToAnchor, 100);
+      setTimeout(replaceRelativeLinksToRoute, 250, "page-content");
     },
   },
   mounted: function () {
@@ -248,6 +251,7 @@ export default {
     this.loadComments();
     setTimeout(() => hljs.highlightAll(), 100);
     setTimeout(this.scrollToAnchor, 100);
+    setTimeout(replaceRelativeLinksToRoute, 250, "page-content");
   },
 };
 </script>

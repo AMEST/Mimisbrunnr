@@ -1,12 +1,15 @@
 <template>
   <b-container fluid class="full-size-container text-left">
-    <div style="float: right;" class="pr-5">
+    <div style="float: right" class="pr-5">
       <b-button
         :to="'/space/' + this.page.spaceKey + '/' + this.page.id + '/edit'"
         variant="outline-secondary"
         size="sm"
         class="m-2"
-        v-if="this.$store.state.application.profile && this.$store.state.application.profile.isAdmin"
+        v-if="
+          this.$store.state.application.profile &&
+          this.$store.state.application.profile.isAdmin
+        "
       >
         <b-icon-pencil-fill font-scale="0.9" />
         {{ $t("page.edit") }}
@@ -16,6 +19,7 @@
       <vue-markdown
         :html="this.$store.state.application.info.allowHtml"
         :source="this.page.content"
+        id="custom-home-page-content"
       ></vue-markdown>
     </div>
   </b-container>
@@ -26,7 +30,11 @@
 import hljs from "highlight.js/lib/common";
 import "highlight.js/styles/github.css";
 import { BIconPencilFill } from "bootstrap-vue";
-const VueMarkdown = () => import(/* webpackChunkName: "vue-markdown-component" */"@/thirdparty/VueMarkdown");
+import { replaceRelativeLinksToRoute } from "@/services/Utils";
+const VueMarkdown = () =>
+  import(
+    /* webpackChunkName: "vue-markdown-component" */ "@/thirdparty/VueMarkdown"
+  );
 import axios from "axios";
 export default {
   name: "CustomHome",
@@ -66,6 +74,7 @@ export default {
     }
     this.page = pageRequest.data;
     setTimeout(() => hljs.highlightAll(), 100);
+    setTimeout(replaceRelativeLinksToRoute, 250, "custom-home-page-content");
   },
 };
 </script>
