@@ -37,8 +37,7 @@ jobs:
         file: ./${{ matrix.rid }}.zip
         asset_name: mimisbrunnr-import-cli-${{ matrix.rid }}.zip
         tag: ${{ github.ref }}
-        overwrite: true
-        body: "Builded Mimisbrunnr import Cli"
+        overwrite: false
 
   publish-persistent-migration-cli-binary:
     if: contains(github.ref, 'tags/v') # works only version tagged
@@ -69,8 +68,7 @@ jobs:
         file: ./${{ matrix.rid }}.zip
         asset_name: mimisbrunnr-persistent-migration-cli-${{ matrix.rid }}.zip
         tag: ${{ github.ref }}
-        overwrite: true
-        body: "Builded Mimisbrunnr persistent migration Cli"
+        overwrite: false
 
   publish-webapp-binary:
     if: contains(github.ref, 'tags/v') # works only version tagged
@@ -105,8 +103,7 @@ jobs:
         file: ./${{ matrix.rid }}.zip
         asset_name: mimisbrunnr-wiki-${{ matrix.rid }}.zip
         tag: ${{ github.ref }}
-        overwrite: true
-        body: "Builded Mimisbrunnr Wiki app binary"
+        overwrite: false
 
   publish-webapp-docker:
     runs-on: ubuntu-latest
