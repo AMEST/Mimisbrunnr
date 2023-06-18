@@ -154,7 +154,7 @@ export default {
         var pageTreeItem = document.getElementById(flatPageList[i]);
         if (pageTreeItem == null) continue;
         var expandIcon = pageTreeItem.getElementsByClassName("vtl-icon");
-        if (expandIcon != null && expandIcon.length > 0) expandIcon[0].click();
+        if (expandIcon != null && expandIcon.length > 0 && !expandIcon[0].classList.contains("vtl-icon-caret-down")) expandIcon[0].click();
       }
     },
     findPageTree: function (pages, neededPageId) {
