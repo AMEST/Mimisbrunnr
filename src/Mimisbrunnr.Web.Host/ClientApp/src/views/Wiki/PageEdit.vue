@@ -50,14 +50,17 @@
       :continueCallBack="continueDraft"
       :resetCallBack="resetDraft"
     />
-    <GuideModal/>
+    <GuideModal />
   </div>
 </template>
 
 <script>
 import Attachments from "@/components/space/modal/Attachments.vue";
-import VueSimplemde from "vue-simplemde";
-const VueMarkdown = () => import(/* webpackChunkName: "vue-markdown-component" */"@/thirdparty/VueMarkdown");
+import VueSimplemde from "@/thirdparty/VueSimpleMde.vue";
+const VueMarkdown = () =>
+  import(
+    /* webpackChunkName: "vue-markdown-component" */ "@/thirdparty/VueMarkdown"
+  );
 import axios from "axios";
 import { debounce, isImageFile } from "@/services/Utils.js";
 import DraftModal from "@/components/pageEditor/DraftModal.vue";
@@ -93,7 +96,12 @@ export default {
           "|",
           "link",
           "image",
-          "table",
+          {
+            name: "table1",
+            action: this.insertTable,
+            className: "fa fa-table",
+            title: "Insert table",
+          },
           "|",
           {
             name: "attachment",
@@ -234,6 +242,9 @@ export default {
         this
       );
     },
+    insertTable: function () {
+      this.simplemde.drawTable();
+    },
     dragAndDrop: async function (codeMirror, dropEvent) {
       if (dropEvent.dataTransfer.items.length == 0) return;
       var dropItem = dropEvent.dataTransfer.items[0];
@@ -309,10 +320,12 @@ export default {
       }
 
       var sideBySideRenderingFunction = function () {
-        preview.innerHTML = editor.options.previewRender(
-          editor.value(),
-          preview
-        );
+        setTimeout(() => {
+          preview.innerHTML = editor.options.previewRender(
+            editor.value(),
+            preview
+          );
+        }, 100);
       };
 
       if (!cm.sideBySideRenderingFunction) {
@@ -320,12 +333,7 @@ export default {
       }
 
       if (useSideBySideListener) {
-        setTimeout( () => {
-            preview.innerHTML = editor.options.previewRender(
-                editor.value(),
-                preview
-            );
-        }, 200);
+        sideBySideRenderingFunction();
         cm.on("update", cm.sideBySideRenderingFunction);
       } else {
         cm.off("update", cm.sideBySideRenderingFunction);
@@ -356,7 +364,7 @@ export default {
 </script>
 
 <style>
-@import "~simplemde/dist/simplemde.min.css";
+@import "~easymde/dist/easymde.min.css";
 
 .vue-simplemde .CodeMirror {
   height: calc(100vh - var(--page-edit-height, 240px)) !important;
