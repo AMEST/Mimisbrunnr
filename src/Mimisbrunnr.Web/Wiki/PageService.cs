@@ -34,9 +34,7 @@ internal class PageService : IPageService
     {
         await _permissionService.EnsureAnonymousAllowed(requestedBy);
 
-        var page = await _pageManager.GetById(pageId);
-        if (page == null)
-            throw new PageNotFoundException();
+        var page = await _pageManager.GetById(pageId) ?? throw new PageNotFoundException();
         var space = await _spaceManager.GetById(page.SpaceId);
 
         await _permissionService.EnsureViewPermission(space.Key, requestedBy);
@@ -51,9 +49,7 @@ internal class PageService : IPageService
         if (cachedPageTree is not null)
             return cachedPageTree;
 
-        var page = await _pageManager.GetById(pageId);
-        if (page is null)
-            throw new PageNotFoundException();
+        var page = await _pageManager.GetById(pageId) ?? throw new PageNotFoundException();
         var space = await _spaceManager.GetById(page.SpaceId);
 
         await _permissionService.EnsureViewPermission(space.Key, requestedBy);
@@ -71,10 +67,7 @@ internal class PageService : IPageService
     public async Task<PageModel> Create(PageCreateModel createModel, UserInfo createdBy)
     {
         await _permissionService.EnsureEditPermission(createModel.SpaceKey, createdBy);
-        var space = await _spaceManager.GetByKey(createModel.SpaceKey);
-        if (space == null)
-            throw new SpaceNotFoundException();
-
+        var space = await _spaceManager.GetByKey(createModel.SpaceKey) ?? throw new SpaceNotFoundException();
         if (space.Status == SpaceStatus.Archived)
             throw new InvalidOperationException("Can't create page because space archived");
 
@@ -92,14 +85,8 @@ internal class PageService : IPageService
 
     public async Task Update(string pageId, PageUpdateModel updateModel, UserInfo updatedBy)
     {
-        var page = await _pageManager.GetById(pageId);
-        if (page == null)
-            throw new PageNotFoundException();
-
-        var space = await _spaceManager.GetById(page.SpaceId);
-        if (space == null)
-            throw new SpaceNotFoundException();
-
+        var page = await _pageManager.GetById(pageId) ?? throw new PageNotFoundException();
+        var space = await _spaceManager.GetById(page.SpaceId) ?? throw new SpaceNotFoundException();
         await _permissionService.EnsureEditPermission(space.Key, updatedBy);
 
         if (space.Status == SpaceStatus.Archived)
@@ -115,14 +102,8 @@ internal class PageService : IPageService
 
     public async Task Delete(string pageId, UserInfo deletedBy, bool recursively)
     {
-        var page = await _pageManager.GetById(pageId);
-        if (page == null)
-            throw new PageNotFoundException();
-
-        var space = await _spaceManager.GetById(page.SpaceId);
-        if (space == null)
-            throw new SpaceNotFoundException();
-
+        var page = await _pageManager.GetById(pageId) ?? throw new PageNotFoundException();
+        var space = await _spaceManager.GetById(page.SpaceId) ?? throw new SpaceNotFoundException();
         await _permissionService.EnsureRemovePermission(space.Key, deletedBy);
 
         if (space.Status == SpaceStatus.Archived)
@@ -137,14 +118,10 @@ internal class PageService : IPageService
 
     public async Task<PageModel> Copy(string sourcePageId, string destinationParentPageId, UserInfo copiedBy)
     {
-        var sourcePage = await _pageManager.GetById(sourcePageId);
-        if (sourcePage == null)
-            throw new PageNotFoundException($"Source page with id `{sourcePageId}` not found");
-
-        var destinationParentPage = await _pageManager.GetById(destinationParentPageId);
-        if (destinationParentPage == null)
-            throw new PageNotFoundException($"Destination parent page with id `{destinationParentPageId}` not found");
-
+        var sourcePage = await _pageManager.GetById(sourcePageId) 
+            ?? throw new PageNotFoundException($"Source page with id `{sourcePageId}` not found");
+        var destinationParentPage = await _pageManager.GetById(destinationParentPageId) 
+            ?? throw new PageNotFoundException($"Destination parent page with id `{destinationParentPageId}` not found");
         var sourceSpace = await _spaceManager.GetById(sourcePage.SpaceId);
 
         await _permissionService.EnsureEditPermission(sourceSpace.Key, copiedBy);
@@ -170,14 +147,10 @@ internal class PageService : IPageService
 
     public async Task<PageModel> Move(string sourcePageId, string destinationParentPageId, UserInfo movedBy)
     {
-        var sourcePage = await _pageManager.GetById(sourcePageId);
-        if (sourcePage == null)
-            throw new PageNotFoundException($"Source page with id `{sourcePageId}` not found");
-
-        var destinationParentPage = await _pageManager.GetById(destinationParentPageId);
-        if (destinationParentPage == null)
-            throw new PageNotFoundException($"Destination parent page with id `{destinationParentPageId}` not found");
-
+        var sourcePage = await _pageManager.GetById(sourcePageId) 
+            ?? throw new PageNotFoundException($"Source page with id `{sourcePageId}` not found");
+        var destinationParentPage = await _pageManager.GetById(destinationParentPageId)
+            ?? throw new PageNotFoundException($"Destination parent page with id `{destinationParentPageId}` not found");
         var sourceSpace = await _spaceManager.GetById(sourcePage.SpaceId);
 
         await _permissionService.EnsureEditPermission(sourceSpace.Key, movedBy);
@@ -208,6 +181,50 @@ internal class PageService : IPageService
             await _distributedCache.RemoveAsync(GetPageTreeCacheKey(destinationSpace.HomePageId));
 
         return movedPage.ToModel(destinationSpace.Key);
+    }
+
+
+    public async Task<PageVersionsListModel> GetPageVersions(string pageId, UserInfo requestedBy)
+    {
+        await _permissionService.EnsureAnonymousAllowed(requestedBy);
+
+        var page = await _pageManager.GetById(pageId) ?? throw new PageNotFoundException();
+        var space = await _spaceManager.GetById(page.SpaceId);
+
+        await _permissionService.EnsureViewPermission(space.Key, requestedBy);
+
+        var versions = await _pageManager.GetAllVersions(page);
+        return new PageVersionsListModel()
+        {
+            Versions = versions.Select(x => x.ToModel()).ToArray(),
+            Count = versions.Length,
+            LatestVersion = page.Version,
+            LatestVersionDate = page.Updated
+        };
+    }
+
+    public async Task<PageModel> RestoreVersion(string pageId, long version, UserInfo restoredBy)
+    {
+        await _permissionService.EnsureAnonymousAllowed(restoredBy);
+
+        var page = await _pageManager.GetById(pageId) ?? throw new PageNotFoundException();
+        var space = await _spaceManager.GetById(page.SpaceId);
+
+        await _permissionService.EnsureEditPermission(space.Key, restoredBy);
+        await _pageManager.RestoreVersion(page, version, restoredBy);
+        return page.ToModel(space.Key);
+    }
+
+    public async Task DeleteVersion(string pageId, long version, UserInfo deletedBy)
+    {
+        await _permissionService.EnsureAnonymousAllowed(deletedBy);
+
+        var page = await _pageManager.GetById(pageId) ?? throw new PageNotFoundException();
+        var space = await _spaceManager.GetById(page.SpaceId);
+
+        await _permissionService.EnsureEditPermission(space.Key, deletedBy);
+
+        await _pageManager.RemoveVersion(page, version);
     }
 
     private static string GetPageTreeCacheKey(string pageId) => $"page_tree_{pageId}";

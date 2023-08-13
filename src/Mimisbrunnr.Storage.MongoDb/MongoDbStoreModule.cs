@@ -66,6 +66,7 @@ public class MongoDbStoreModule : RunnableModule
             await CreateUserGroupIndexes(baseMongoContext);
             await CreateSpaceIndexes(baseMongoContext);
             await CreatePageIndexes(baseMongoContext);
+            await CreatePageHistoryIndexes(baseMongoContext);
             await CreatePageDraftIndexes(baseMongoContext);
             await CreatePageUpdatesIndexes(baseMongoContext);
             await CreateAttachmentIndexes(baseMongoContext);
@@ -184,6 +185,23 @@ public class MongoDbStoreModule : RunnableModule
             Background = true
         }));
     }
+
+
+    private async Task CreatePageHistoryIndexes(BaseMongoDbContext mongoContext)
+    {
+        var collection = mongoContext.GetCollection<HistoricalPage>();
+        var pageIdDefinition = Builders<HistoricalPage>.IndexKeys.Ascending(x => x.PageId);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<HistoricalPage>(pageIdDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+        var pageIdAndVersionDefinition = Builders<HistoricalPage>.IndexKeys.Ascending(x => x.PageId).Ascending(x => x.Version);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<HistoricalPage>(pageIdAndVersionDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+    }
+
 
     private static async Task CreatePageDraftIndexes(IMongoDbContext mongoContext)
     {

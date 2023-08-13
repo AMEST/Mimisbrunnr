@@ -17,6 +17,8 @@ public static partial class WikiMapper
 
     public static partial CommentModel ToModel(this Comment comment);
 
+    public static partial HistoricalPageModel ToModel(this HistoricalPage historicalPage);
+
     public static PageModel ToModel(this Page page, string spaceKey = null)
     {
         return new PageModel()

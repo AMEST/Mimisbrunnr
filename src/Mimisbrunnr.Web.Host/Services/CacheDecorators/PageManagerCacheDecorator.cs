@@ -45,9 +45,9 @@ internal class PageManagerCacheDecorator : IPageManager
     public async Task<Page[]> GetAllOnSpace(Space space)
     {
         var cached = await _cache.GetAsync<Page[]>(GetSpacePagesCacheName(space.Id));
-        if(cached is not null)
+        if (cached is not null)
             return cached;
-        
+
         cached = await _inner.GetAllOnSpace(space);
         await StoreInCache(cached, space);
         return cached;
@@ -56,7 +56,7 @@ internal class PageManagerCacheDecorator : IPageManager
     public async Task<Page> GetById(string id)
     {
         var cached = await _cache.GetAsync<Page>(GetPageCacheName(id));
-        if(cached is not null)
+        if (cached is not null)
             return cached;
         cached = await _inner.GetById(id);
         await StoreInCache(cached);
@@ -83,9 +83,30 @@ internal class PageManagerCacheDecorator : IPageManager
         await ClearCache(page);
     }
 
+    public Task<HistoricalPage[]> GetAllVersions(Page page)
+    {
+        return _inner.GetAllVersions(page);
+    }
+
+    public Task<HistoricalPage> GetVersionByPageId(string id, long version)
+    {
+        return _inner.GetVersionByPageId(id, version);
+    }
+
+    public Task<Page> RestoreVersion(Page page, long version, UserInfo restoredBy)
+    {
+        return _inner.RestoreVersion(page, version, restoredBy);
+    }
+
+    public Task RemoveVersion(Page page, long version)
+    {
+        return _inner.RemoveVersion(page, version);
+    }
+
     private Task StoreInCache(Page page)
     {
-        return _cache.SetAsync(key: GetPageCacheName(page.Id),entry: page, options: new DistributedCacheEntryOptions() {
+        return _cache.SetAsync(key: GetPageCacheName(page.Id), entry: page, options: new DistributedCacheEntryOptions()
+        {
             AbsoluteExpirationRelativeToNow = _maxCacheTime,
             SlidingExpiration = _slidingCacheTime
         });
@@ -93,7 +114,8 @@ internal class PageManagerCacheDecorator : IPageManager
 
     private Task StoreInCache(Page[] pages, Space space)
     {
-        return _cache.SetAsync(key: GetSpacePagesCacheName(space.Id), entry: pages, options: new DistributedCacheEntryOptions() {
+        return _cache.SetAsync(key: GetSpacePagesCacheName(space.Id), entry: pages, options: new DistributedCacheEntryOptions()
+        {
             AbsoluteExpirationRelativeToNow = _maxCacheTime,
             SlidingExpiration = _slidingCacheTime
         });
