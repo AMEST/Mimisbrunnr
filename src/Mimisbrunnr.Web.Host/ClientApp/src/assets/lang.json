@@ -264,6 +264,17 @@
             "edit": "Edit",
             "unstar": "Unstar this space",
             "star": "Star this space",
+            "versions":{
+                "titile": "Page history",
+                "delete": "Delete",
+                "restore": "Restore version",
+                "empty": "Versions empty",
+                "informationBlock":{
+                    "message": "You are viewing the historical version of the page.",
+                    "next": "Next version",
+                    "previous": "Previous version"
+                }
+            },
             "comments": {
                 "title": "Comments",
                 "add": "Post comment",
@@ -643,6 +654,17 @@
             "edit": "Редактировать",
             "unstar": "Убрать пространство из избранного",
             "star": "Добавить пространство в избранное",
+            "versions":{
+                "titile": "История страницы",
+                "delete": "Удалить",
+                "restore": "Восстановить версию",
+                "empty": "Список версий пуст",
+                "informationBlock":{
+                    "message": "Вы просматриваете историческую версию страницы.",
+                    "next": "Следующая версия",
+                    "previous": "Предыдущая версия"
+                }
+            },
             "comments": {
                 "title": "Комментарии",
                 "add": "Отправить",

@@ -10,13 +10,13 @@
         variant="outline-secondary"
         size="sm"
         class="m-2"
-        :disabled="!userPermissions.canEdit || isArchived"
+        :disabled="!userPermissions.canEdit || historyMode || isArchived"
       >
         <b-icon-pencil-fill class="edit-icon" font-scale="0.9" />
         {{ $t("page.edit") }}
       </b-button>
       <b-button
-        v-if="!this.isSpaceHomePage"
+        v-if="!this.isSpaceHomePage && !historyMode"
         variant="outline-secondary"
         @click="star"
         size="sm"
@@ -32,13 +32,13 @@
         <b-dropdown-item
           href="#"
           v-b-modal.page-attachments-modal
-          :disabled="!this.$store.state.application.profile"
+          :disabled="!this.$store.state.application.profile || historyMode"
           >{{ $t("page.attachments.title") }}</b-dropdown-item
         >
         <b-dropdown-divider></b-dropdown-divider>
         <b-dropdown-item
           v-b-modal.page-copy-modal
-          :disabled="!userPermissions.canEdit"
+          :disabled="!userPermissions.canEdit || historyMode"
           >{{ $t("page.copy.title") }}</b-dropdown-item
         >
         <b-dropdown-item
@@ -46,7 +46,7 @@
           :disabled="
             isSpaceHomePage ||
             (!userPermissions.canEdit && !userPermissions.canRemove) ||
-            isArchived
+            historyMode || isArchived
           "
           >{{ $t("page.move.title") }}</b-dropdown-item
         >
@@ -54,13 +54,13 @@
           variant="danger"
           v-b-modal.page-delete-modal
           :disabled="
-            isSpaceHomePage || !userPermissions.canRemove || isArchived
+            isSpaceHomePage || !userPermissions.canRemove || historyMode || isArchived
           "
           >{{ $t("page.delete.button") }}</b-dropdown-item
         >
       </b-dropdown>
       <b-button
-        v-if="isSpaceHomePage"
+        v-if="isSpaceHomePage && !historyMode"
         variant="secondary"
         size="sm"
         class="m-2"
@@ -69,6 +69,15 @@
         {{ inFavorite ? $t("page.unstar") : $t("page.star") }}
       </b-button>
     </div>
+    <b-card bg-variant="warning" text-variant="white" v-if="historyMode">
+        <p>{{$t("page.versions.informationBlock.message")}}</p>
+        <p>
+            <b-link v-if="versions.find(x => x.version == (page.version -1))" :to="`/space/${page.spaceKey}/${page.id}/version/${page.version - 1}`">{{$t("page.versions.informationBlock.previous")}}</b-link>
+            &lt;= {{this.page.version}} =&gt;
+            <b-link v-if="versions.find(x => x.version == (page.version +1))" :to="`/space/${page.spaceKey}/${page.id}/version/${page.version + 1}`">{{$t("page.versions.informationBlock.next")}}</b-link>
+        </p>
+    </b-card>
+
     <div class="pb-2 page-title">
       <h2>{{ this.page.name }}</h2>
       <p class="text-muted page-title-dates">
@@ -148,6 +157,8 @@ export default {
     space: Object,
     page: Object,
     userPermissions: Object,
+    versions: Array,
+    historyMode: Boolean
   },
   computed: {
     isArchived() {

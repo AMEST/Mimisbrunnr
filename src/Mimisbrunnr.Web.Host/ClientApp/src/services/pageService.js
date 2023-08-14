@@ -34,6 +34,25 @@ var PageService = {
         showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
             "Error when deleting comment.", "warning");
     },
+    getVersions: async function (pageId) {
+        var request = await axios.get(`/api/page/${pageId}/versions`,
+            { validateStatus: false }
+        );
+        if (request.status == 200)
+            return request.data;
+        showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
+            "Error when get page versions.", "warning");
+        return null;
+    },
+    deleteVersion: async function (pageId, version) {
+        var request = await axios.delete(`/api/page/${pageId}/versions/${version}`,
+            { validateStatus: false }
+        );
+        if (request.status == 200)
+            return;
+        showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
+            "Error when page version.", "warning");
+    },
 }
 export default PageService
 /* eslint-enable */
