@@ -93,7 +93,7 @@ public class PageController : ControllerBase
     [ProducesResponseType(200)]
     [ProducesResponseType(401)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> Delete([FromRoute] string pageId, [FromRoute] long version)
+    public async Task<IActionResult> DeleteVersion([FromRoute] string pageId, [FromRoute] long version)
     {
         await _pageService.DeleteVersion(pageId, version, User?.ToInfo());
         return Ok();

@@ -93,9 +93,11 @@ internal class PageManagerCacheDecorator : IPageManager
         return _inner.GetVersionByPageId(id, version);
     }
 
-    public Task<Page> RestoreVersion(Page page, long version, UserInfo restoredBy)
+    public async Task<Page> RestoreVersion(Page page, long version, UserInfo restoredBy)
     {
-        return _inner.RestoreVersion(page, version, restoredBy);
+        var result = await _inner.RestoreVersion(page, version, restoredBy);
+        await ClearCache(page);
+        return result;
     }
 
     public Task RemoveVersion(Page page, long version)

@@ -44,6 +44,15 @@ var PageService = {
             "Error when get page versions.", "warning");
         return null;
     },
+    restoreVersion: async function (pageId, version) {
+        var request = await axios.put(`/api/page/${pageId}/versions/${version}`,
+            { validateStatus: false }
+        );
+        if (request.status == 200)
+            return;
+        showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
+            "Error when restore page version.", "warning");
+    },
     deleteVersion: async function (pageId, version) {
         var request = await axios.delete(`/api/page/${pageId}/versions/${version}`,
             { validateStatus: false }
@@ -51,7 +60,7 @@ var PageService = {
         if (request.status == 200)
             return;
         showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
-            "Error when page version.", "warning");
+            "Error when delete page version.", "warning");
     },
 }
 export default PageService

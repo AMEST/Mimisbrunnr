@@ -31,7 +31,7 @@
       :space="space"
     />
     <attachments :page="page" />
-    <versions :page="page" />
+    <versions :page="page" :onVersionRestore="loadPage" :userPermissions="userPermissions" />
   </b-container>
 </template>
 
