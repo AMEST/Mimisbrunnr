@@ -25,7 +25,7 @@
         <b-icon-star-fill v-if="inFavorite" variant="warning" />
         <b-icon-star v-else />
       </b-button>
-      <b-dropdown variant="secondary" size="sm" class="m-2 no-arrow-dropdown">
+      <b-dropdown variant="secondary" size="sm" class="m-2 no-arrow-dropdown" menu-class="page-dropdown">
         <template #button-content>
           <b-icon-three-dots />
         </template>
@@ -76,7 +76,7 @@
       </b-button>
     </div>
     <b-card bg-variant="light" v-if="historyMode" style="width: 100%">
-        <p>{{$t("page.versions.informationBlock.message")}}</p>
+        <p><b-icon-info-circle font-scale="1"/> {{$t("page.versions.informationBlock.message")}}</p>
         <p>
             <b-link v-if="versions.find(x => x.version == (page.version -1))" :to="`/space/${page.spaceKey}/${page.id}/version/${page.version - 1}`">{{$t("page.versions.informationBlock.previous")}} &lt;= </b-link>
             {{$t("page.versions.version")}}: {{this.page.version}}
@@ -134,6 +134,7 @@ import {
   BIconStarFill,
   BIconStar,
   BIconThreeDots,
+  BIconInfoCircle,
 } from "bootstrap-vue";
 import { replaceRelativeLinksToRoute } from "@/services/Utils";
 const VueMarkdown = () => import(/* webpackChunkName: "vue-markdown-component" */"@/thirdparty/VueMarkdown");
@@ -159,6 +160,7 @@ export default {
     BIconStarFill,
     BIconStar,
     BIconThreeDots,
+    BIconInfoCircle
   },
   props: {
     space: Object,
@@ -316,5 +318,8 @@ export default {
 }
 .no-arrow-dropdown .dropdown-toggle::after {
   content: unset !important;
+}
+.page-dropdown {
+    min-width: 190px;
 }
 </style>
