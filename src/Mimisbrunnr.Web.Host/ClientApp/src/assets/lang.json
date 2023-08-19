@@ -265,14 +265,17 @@
             "unstar": "Unstar this space",
             "star": "Star this space",
             "versions":{
-                "titile": "Page history",
+                "title": "Page history",
                 "delete": "Delete",
                 "restore": "Restore version",
                 "empty": "Versions empty",
+                "version": "Version",
+                "updated": "Updated",
                 "informationBlock":{
                     "message": "You are viewing the historical version of the page.",
                     "next": "Next version",
-                    "previous": "Previous version"
+                    "previous": "Previous version",
+                    "current": "Current version"
                 }
             },
             "comments": {
@@ -655,13 +658,16 @@
             "unstar": "Убрать пространство из избранного",
             "star": "Добавить пространство в избранное",
             "versions":{
-                "titile": "История страницы",
+                "title": "История страницы",
                 "delete": "Удалить",
                 "restore": "Восстановить версию",
                 "empty": "Список версий пуст",
+                "version": "Версия",
+                "updated": "Изменен",
                 "informationBlock":{
                     "message": "Вы просматриваете историческую версию страницы.",
                     "next": "Следующая версия",
+                    "current": "Текущая версия",
                     "previous": "Предыдущая версия"
                 }
             },

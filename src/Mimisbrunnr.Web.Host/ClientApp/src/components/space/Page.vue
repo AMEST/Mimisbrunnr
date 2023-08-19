@@ -16,7 +16,7 @@
         {{ $t("page.edit") }}
       </b-button>
       <b-button
-        v-if="!this.isSpaceHomePage && !historyMode"
+        v-if="!this.isSpaceHomePage && !historyMode && this.$store.state.application.profile "
         variant="outline-secondary"
         @click="star"
         size="sm"
@@ -29,6 +29,12 @@
         <template #button-content>
           <b-icon-three-dots />
         </template>
+        <b-dropdown-item
+          href="#"
+          v-b-modal.page-versions-modal
+          >{{ $t("page.versions.title") }}</b-dropdown-item
+        >
+        <b-dropdown-divider></b-dropdown-divider>
         <b-dropdown-item
           href="#"
           v-b-modal.page-attachments-modal
@@ -60,7 +66,7 @@
         >
       </b-dropdown>
       <b-button
-        v-if="isSpaceHomePage && !historyMode"
+        v-if="isSpaceHomePage && !historyMode && this.$store.state.application.profile "
         variant="secondary"
         size="sm"
         class="m-2"
@@ -69,12 +75,13 @@
         {{ inFavorite ? $t("page.unstar") : $t("page.star") }}
       </b-button>
     </div>
-    <b-card bg-variant="warning" text-variant="white" v-if="historyMode">
+    <b-card bg-variant="light" v-if="historyMode" style="width: 100%">
         <p>{{$t("page.versions.informationBlock.message")}}</p>
         <p>
-            <b-link v-if="versions.find(x => x.version == (page.version -1))" :to="`/space/${page.spaceKey}/${page.id}/version/${page.version - 1}`">{{$t("page.versions.informationBlock.previous")}}</b-link>
-            &lt;= {{this.page.version}} =&gt;
-            <b-link v-if="versions.find(x => x.version == (page.version +1))" :to="`/space/${page.spaceKey}/${page.id}/version/${page.version + 1}`">{{$t("page.versions.informationBlock.next")}}</b-link>
+            <b-link v-if="versions.find(x => x.version == (page.version -1))" :to="`/space/${page.spaceKey}/${page.id}/version/${page.version - 1}`">{{$t("page.versions.informationBlock.previous")}} &lt;= </b-link>
+            {{$t("page.versions.version")}}: {{this.page.version}}
+            <b-link v-if="versions.find(x => x.version == (page.version +1))" :to="`/space/${page.spaceKey}/${page.id}/version/${page.version + 1}`"> =&gt; {{$t("page.versions.informationBlock.next")}}</b-link>
+            <b-link v-else :to="`/space/${page.spaceKey}/${page.id}`"> =&gt; {{$t("page.versions.informationBlock.current")}}</b-link>
         </p>
     </b-card>
 

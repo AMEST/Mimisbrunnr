@@ -10,5 +10,8 @@ public class HistoricalPageMap : EntityMapClass<HistoricalPage>
     {
         ToCollection("PageHistory");
         MapId(x => x.Id, BsonType.String);
+        MapProperty(x => x.Version)
+            .SetDefaultValue(0L)
+            .SetIgnoreIfDefault(false);
     }
 }

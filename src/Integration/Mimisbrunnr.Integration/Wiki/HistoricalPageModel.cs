@@ -18,4 +18,6 @@ public class HistoricalPageModel
 
     public DateTime Updated { get; set; }
 
+    public UserModel UpdatedBy { get; set; }
+
 }

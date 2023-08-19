@@ -31,6 +31,7 @@
       :space="space"
     />
     <attachments :page="page" />
+    <versions :page="page" />
   </b-container>
 </template>
 
@@ -58,6 +59,10 @@ const Attachments = () =>
   import(
     /* webpackChunkName: "page-modals-component" */ "@/components/space/modal/Attachments.vue"
   );
+const Versions = () =>
+import(
+/* webpackChunkName: "page-modals-component" */ "@/components/space/modal/Versions.vue"
+);
 const Permissions = () =>
   import(
     /* webpackChunkName: "space-modals-component" */ "@/components/space/modal/Permissions.vue"
@@ -76,6 +81,7 @@ export default {
     Permissions,
     Settings,
     Attachments,
+    Versions,
   },
   data() {
     return {
@@ -152,7 +158,12 @@ export default {
         return false;
       }
 
-      this.page = pageRequest.data;
+      if (this.$route.params.versionId) {
+        await this.loadHistoryVersion(pageRequest.data);
+      }else{
+        this.page = pageRequest.data;
+      }
+      
       this.$store.commit("addToHistory", {
         id: this.page.id,
         name: this.page.name,
@@ -161,25 +172,26 @@ export default {
         type: "Page",
       });
 
-      if (this.$route.params.versionId) {
-        await this.loadHistoryVersion();
-      }
-
       this.changePageTitle();
       return true;
     },
-    loadHistoryVersion: async function () {
-      var versions = await PageService.getVersions(this.page.id);
-      if (!versions || !versions.data) return;
-      this.pageVersions = versions.data;
+    loadHistoryVersion: async function (originalPage) {
+      var versionsResult = await PageService.getVersions(originalPage.id);
+      if (!versionsResult || !versionsResult.versions){ 
+        this.page = originalPage;
+        return;
+      }
+      this.pageVersions = versionsResult.versions;
       var selectedVersion = this.pageVersions.find(
         (x) => x.version == parseInt(this.$route.params.versionId)
       );
       if (!selectedVersion) {
         this.pageVersions = [];
-        this.$router.push(`/space/${this.space.key}/${this.page.id}`);
+        this.$router.push(`/space/${this.space.key}/${originalPage.id}`);
+        this.page = originalPage;
         return;
       }
+      this.page = originalPage;
       this.page.version = selectedVersion.version;
       this.page.name = selectedVersion.name;
       this.page.content = selectedVersion.content;

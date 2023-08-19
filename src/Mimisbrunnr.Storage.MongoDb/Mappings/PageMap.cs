@@ -11,7 +11,7 @@ public class PageMap : EntityMapClass<Page>
         ToCollection("Pages");
         MapId(x => x.Id, BsonType.String);
         MapProperty(x => x.Version)
-            .SetDefaultValue(0)
+            .SetDefaultValue(0L)
             .SetIgnoreIfDefault(false);
     }
 }

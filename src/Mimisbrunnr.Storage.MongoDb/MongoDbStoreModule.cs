@@ -39,6 +39,7 @@ public class MongoDbStoreModule : RunnableModule
                 .AddEntity<UserGroup, UserGroupMap>()
                 .AddEntity<Space, SpaceMap>()
                 .AddEntity<Page, PageMap>()
+                .AddEntity<HistoricalPage, HistoricalPageMap>()
                 .AddEntity<Draft, DraftMap>()
                 .AddEntity<PageUpdateEvent, PageUpdateEventMap>()
                 .AddEntity<Attachment, AttachmentMap>()
