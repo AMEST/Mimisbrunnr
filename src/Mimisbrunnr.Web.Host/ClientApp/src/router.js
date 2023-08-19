@@ -45,6 +45,11 @@ export default new Router({
             component: () => import(/* webpackChunkName: "space" */ './views/Wiki/Space.vue')
         },
         {
+            path: '/space/:key/:pageId/version/:versionId',
+            name: 'historicalPage',
+            component: () => import(/* webpackChunkName: "space" */ './views/Wiki/Space.vue')
+        },
+        {
             path: '/space/:key/:pageId/edit',
             name: 'pageEdit',
             component: () => import(/* webpackChunkName: "editor" */ './views/Wiki/PageEdit.vue')

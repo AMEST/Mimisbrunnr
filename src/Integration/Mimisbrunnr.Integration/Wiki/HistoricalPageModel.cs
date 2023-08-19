@@ -2,13 +2,13 @@
 
 namespace Mimisbrunnr.Integration.Wiki;
 
-public class PageModel
+public class HistoricalPageModel
 {
     public string Id { get; set; }
 
-    public long Version {get; set;}
+    public string PageId { get; set; }
 
-    public string SpaceKey { get; set; }
+    public long Version { get; set; }
 
     public string Name { get; set; }
 
@@ -17,8 +17,7 @@ public class PageModel
     public DateTime Created { get; set; }
 
     public DateTime Updated { get; set; }
-    
-    public UserModel CreatedBy { get; set; }
-    
+
     public UserModel UpdatedBy { get; set; }
+
 }

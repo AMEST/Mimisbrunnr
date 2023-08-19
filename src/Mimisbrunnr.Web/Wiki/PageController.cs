@@ -38,6 +38,17 @@ public class PageController : ControllerBase
     {
         return Ok(await _pageService.GetPageTreeByPageId(pageId, User?.ToInfo()));
     }
+
+    [HttpGet("{pageId}/versions")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(PageVersionsListModel), 200)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> GetVersions([FromRoute] string pageId)
+    {
+        return Ok(await _pageService.GetPageVersions(pageId, User?.ToInfo()));
+    }
+    
     
     [HttpPost]
     [ProducesResponseType(typeof(PageModel), 200)]
@@ -57,6 +68,16 @@ public class PageController : ControllerBase
         await _pageService.Update(pageId, updateModel, User?.ToInfo());
         return Ok();
     }
+
+    [HttpPut("{pageId}/versions/{version}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> RestoreVersion([FromRoute] string pageId, [FromRoute] long version)
+    {
+        await _pageService.RestoreVersion(pageId, version, User?.ToInfo());
+        return Ok();
+    }
     
     [HttpDelete("{pageId}")]
     [ProducesResponseType(200)]
@@ -65,6 +86,16 @@ public class PageController : ControllerBase
     public async Task<IActionResult> Delete([FromRoute] string pageId, [FromQuery] bool recursively = false)
     {
         await _pageService.Delete(pageId, User?.ToInfo(), recursively);
+        return Ok();
+    }
+
+    [HttpDelete("{pageId}/versions/{version}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> DeleteVersion([FromRoute] string pageId, [FromRoute] long version)
+    {
+        await _pageService.DeleteVersion(pageId, version, User?.ToInfo());
         return Ok();
     }
     

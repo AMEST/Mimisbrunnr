@@ -60,6 +60,7 @@ Support for the following features:
   - Copy / move pages in space or between spaces
   - Save changes to draft when editing a page (allows you to keep changes without publishing them and save changes in case of failure)
   - Page comments
+  - Page versioning
 - Base
   - Page updates feed on home page
   - Recently visited pages

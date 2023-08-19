@@ -12,6 +12,7 @@ public class Page : IHasId<string>
 
     [JsonConstructor]
     public Page(string id,
+        long version,
         string spaceId,
         string parentId,
         string name,
@@ -22,6 +23,7 @@ public class Page : IHasId<string>
         UserInfo updatedBy)
     {
         Id = id;
+        Version = version;
         SpaceId = spaceId;
         ParentId = parentId;
         Name = name;
@@ -33,6 +35,8 @@ public class Page : IHasId<string>
     }
 
     public string Id { get; set; }
+
+    public long Version { get; set; }
 
     public string SpaceId { get; set; }
 
@@ -54,6 +58,7 @@ public class Page : IHasId<string>
     {
         return new Page()
         {
+            Version = Version,
             SpaceId = SpaceId,
             ParentId = ParentId,
             Name = Name,

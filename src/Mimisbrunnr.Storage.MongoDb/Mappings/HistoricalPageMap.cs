@@ -4,11 +4,11 @@ using Skidbladnir.Repository.MongoDB;
 
 namespace Mimisbrunnr.Storage.MongoDb.Mappings;
 
-public class PageMap : EntityMapClass<Page>
+public class HistoricalPageMap : EntityMapClass<HistoricalPage>
 {
-    public PageMap()
+    public HistoricalPageMap()
     {
-        ToCollection("Pages");
+        ToCollection("PageHistory");
         MapId(x => x.Id, BsonType.String);
         MapProperty(x => x.Version)
             .SetDefaultValue(0L)

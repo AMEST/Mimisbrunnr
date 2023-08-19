@@ -6,13 +6,19 @@ public interface IPageManager
 {
     Task<Page[]> GetAllOnSpace(Space space);
 
+    Task<HistoricalPage[]> GetAllVersions(Page page); 
+
     Task<Page[]> FindByName(string name);
 
     Task<Page[]> GetAllChilds(Page page);
 
     Task<Page> GetById(string id);
 
+    Task<HistoricalPage> GetVersionByPageId(string id, long version);
+
     Task<Page> Create(string spaceId, string name, string content, UserInfo createdBy, string parentPageId = null);
+
+    Task<Page> RestoreVersion(Page page, long version, UserInfo restoredBy);
 
     Task Update(Page page, UserInfo updatedBy);
 
@@ -21,4 +27,6 @@ public interface IPageManager
     Task<Page> Move(Page source, Page destinationParentPage);
 
     Task Remove(Page page, bool deleteChild = false);
+
+    Task RemoveVersion(Page page, long version);
 }
