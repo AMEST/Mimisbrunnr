@@ -103,6 +103,13 @@ internal class PageManager : IPageManager
 
     }
 
+    public Task ChangeEditorType(Page page, PageEditorType editorType, UserInfo updatedBy)
+    {
+        page.EditorType = editorType;
+        page.UpdatedBy = updatedBy;
+        return _pageRepository.Update(page);
+    }
+
     public async Task<Page> Copy(Page source, Page destinationParentPage)
     {
         var destinationPage = source.Clone();

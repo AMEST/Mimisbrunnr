@@ -61,7 +61,7 @@ import {
 } from "@/services/editorJs/Parser";
 //===End===
 export default {
-  name: "PageEditEditorJs",
+  name: "EditorJs",
   components: {
     Attachments,
     DraftModal,

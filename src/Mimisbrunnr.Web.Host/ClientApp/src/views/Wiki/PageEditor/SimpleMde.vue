@@ -68,7 +68,7 @@ import GuideModal from "@/components/pageEditor/GuideModal.vue";
 import ProfileService from "@/services/profileService";
 import PageService from "@/services/pageService";
 export default {
-  name: "PageEditMarkdown",
+  name: "SimpleMde",
   components: {
     VueSimplemde,
     VueMarkdown,

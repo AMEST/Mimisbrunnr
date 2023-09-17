@@ -183,6 +183,69 @@ internal class PageService : IPageService
         return movedPage.ToModel(destinationSpace.Key);
     }
 
+    public async Task UpdateEditorType(string pageId, PageEditorTypeUpdateModel model, UserInfo updatedBy)
+    {
+        var page = await _pageManager.GetById(pageId);
+        if (page == null)
+            throw new PageNotFoundException();
+
+        var space = await _spaceManager.GetById(page.SpaceId);
+        if (space == null)
+            throw new SpaceNotFoundException();
+
+        await _permissionService.EnsureEditPermission(space.Key, updatedBy);
+
+        if (space.Status == SpaceStatus.Archived)
+            throw new InvalidOperationException("Can't update page because space archived");
+
+        await _pageManager.ChangeEditorType(page, model.Type.ToEntity(), updatedBy);
+        await _feedManager.AddPageUpdate(space, page, updatedBy);
+    }
+
+
+    public async Task<PageVersionsListModel> GetPageVersions(string pageId, UserInfo requestedBy)
+    {
+        await _permissionService.EnsureAnonymousAllowed(requestedBy);
+
+        var page = await _pageManager.GetById(pageId) ?? throw new PageNotFoundException();
+        var space = await _spaceManager.GetById(page.SpaceId);
+
+        await _permissionService.EnsureViewPermission(space.Key, requestedBy);
+
+        var versions = await _pageManager.GetAllVersions(page);
+        return new PageVersionsListModel()
+        {
+            Versions = versions.Select(x => x.ToModel()).ToArray(),
+            Count = versions.Length,
+            LatestVersion = page.Version,
+            LatestVersionDate = page.Updated
+        };
+    }
+
+    public async Task<PageModel> RestoreVersion(string pageId, long version, UserInfo restoredBy)
+    {
+        await _permissionService.EnsureAnonymousAllowed(restoredBy);
+
+        var page = await _pageManager.GetById(pageId) ?? throw new PageNotFoundException();
+        var space = await _spaceManager.GetById(page.SpaceId);
+
+        await _permissionService.EnsureEditPermission(space.Key, restoredBy);
+        await _pageManager.RestoreVersion(page, version, restoredBy);
+        return page.ToModel(space.Key);
+    }
+
+    public async Task DeleteVersion(string pageId, long version, UserInfo deletedBy)
+    {
+        await _permissionService.EnsureAnonymousAllowed(deletedBy);
+
+        var page = await _pageManager.GetById(pageId) ?? throw new PageNotFoundException();
+        var space = await _spaceManager.GetById(page.SpaceId);
+
+        await _permissionService.EnsureEditPermission(space.Key, deletedBy);
+
+        await _pageManager.RemoveVersion(page, version);
+    }
+
 
     public async Task<PageVersionsListModel> GetPageVersions(string pageId, UserInfo requestedBy)
     {
@@ -228,4 +291,5 @@ internal class PageService : IPageService
     }
 
     private static string GetPageTreeCacheKey(string pageId) => $"page_tree_{pageId}";
+
 }

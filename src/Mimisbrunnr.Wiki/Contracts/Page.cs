@@ -20,7 +20,8 @@ public class Page : IHasId<string>
         DateTime created,
         DateTime updated,
         UserInfo createdBy,
-        UserInfo updatedBy)
+        UserInfo updatedBy,
+        PageEditorType editorType)
     {
         Id = id;
         Version = version;
@@ -32,6 +33,7 @@ public class Page : IHasId<string>
         Updated = updated;
         CreatedBy = createdBy;
         UpdatedBy = updatedBy;
+        EditorType = editorType;
     }
 
     public string Id { get; set; }
@@ -54,6 +56,8 @@ public class Page : IHasId<string>
 
     public UserInfo UpdatedBy { get; internal set; }
 
+    public PageEditorType EditorType {get; internal set; }
+
     public Page Clone()
     {
         return new Page()
@@ -66,7 +70,8 @@ public class Page : IHasId<string>
             Created = Created,
             Updated = Updated,
             CreatedBy = CreatedBy,
-            UpdatedBy = UpdatedBy
+            UpdatedBy = UpdatedBy,
+            EditorType = EditorType
         };
     }
 }

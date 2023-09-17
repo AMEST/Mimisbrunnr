@@ -26,6 +26,8 @@ public interface IPageManager
 
     Task<Page> Move(Page source, Page destinationParentPage);
 
+    Task ChangeEditorType(Page page, PageEditorType editorType, UserInfo updatedBy);
+
     Task Remove(Page page, bool deleteChild = false);
 
     Task RemoveVersion(Page page, long version);
