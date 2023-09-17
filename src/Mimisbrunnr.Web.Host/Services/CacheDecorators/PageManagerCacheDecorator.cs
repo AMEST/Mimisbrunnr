@@ -83,6 +83,12 @@ internal class PageManagerCacheDecorator : IPageManager
         await ClearCache(page);
     }
 
+    public async Task ChangeEditorType(Page page, PageEditorType editorType, UserInfo updatedBy)
+    {
+        await _inner.ChangeEditorType(page, editorType, updatedBy);
+        await ClearCache(page);
+    }
+
     public Task<HistoricalPage[]> GetAllVersions(Page page)
     {
         return _inner.GetAllVersions(page);
