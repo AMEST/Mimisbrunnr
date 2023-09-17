@@ -310,19 +310,15 @@ export default {
 .editor-block {
   background-color: #fff;
   box-shadow: 0 -3px 29px -5px rgba(34, 39, 47, 0.14);
-  max-width: 850px;
   min-height: calc(100vh - var(--header-height) - 52.5px) !important;
 }
 .buttons-block {
   background-color: #fff;
-  max-width: 850px;
 }
 .page-edit-name {
   background-color: transparent;
   border: unset;
   font-size: 1.5em;
-  margin-left: 2.5em;
-  width: calc(100% - 2.5em);
 }
 
 @media (max-width: 575px) {

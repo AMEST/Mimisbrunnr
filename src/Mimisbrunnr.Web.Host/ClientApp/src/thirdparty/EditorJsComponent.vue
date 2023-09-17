@@ -40,4 +40,7 @@ export default {
 
 <style>
 .codex-editor__redactor { padding-bottom: 38px !important; }
+.ce-block__content,.ce-toolbar__content {
+    max-width: unset;
+}
 </style>
