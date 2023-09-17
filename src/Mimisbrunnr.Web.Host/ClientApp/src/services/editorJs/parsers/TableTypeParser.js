@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import {parseTextFromMarkdown, replaceTextModifiersHtmlToMarkdown} from './TextParser';
 
 export function parseTableToMarkdown(blocks) {
@@ -40,9 +41,8 @@ export function parseTableToMarkdown(blocks) {
   
     listData = {
       data: {
-        items: itemData,
+        content: itemData,
         withHeadings: !emptyHeader,
-        style: blocks.ordered ? 'ordered' : 'unordered',
       },
       type: 'table',
     };

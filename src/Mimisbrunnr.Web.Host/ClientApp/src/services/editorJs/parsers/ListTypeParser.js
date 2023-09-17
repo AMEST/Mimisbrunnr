@@ -1,12 +1,13 @@
+import {parseTextFromMarkdown, replaceTextModifiersHtmlToMarkdown} from './TextParser';
 export function parseListToMarkdown(blocks) {
     let items = {};
     switch (blocks.style) {
       case 'unordered':
-        items = blocks.items.map((item) => (`* ${item}`));
+        items = blocks.items.map((item) => (`* ${replaceTextModifiersHtmlToMarkdown(item)}`));
   
         return items;
       case 'ordered':
-        items = blocks.items.map((item, index) => (`${index + 1} ${item}`));
+        items = blocks.items.map((item, index) => (`${index + 1} ${replaceTextModifiersHtmlToMarkdown(item)}`));
   
         return items;
       default:
@@ -20,9 +21,7 @@ export function parseListToMarkdown(blocks) {
   
     blocks.children.forEach((items) => {
       items.children.forEach((listItem) => {
-        listItem.children.forEach((listEntry) => {
-          itemData.push(listEntry.value);
-        });
+        itemData.push(parseTextFromMarkdown(listItem));
       });
     });
   

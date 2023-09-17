@@ -1,4 +1,5 @@
 import { remark } from "remark";
+import remarkGfm from 'remark-gfm';
 import { parseMarkdownToHeader } from './parsers/HeaderTypeParser';
 import { parseMarkdownToParagraph } from './parsers/ParagraphTypeParser';
 import { parseMarkdownToList } from './parsers/ListTypeParser';
@@ -20,7 +21,9 @@ import { parseTableToMarkdown } from './parsers/TableTypeParser';
 
 export function parseMarkdownToEditorJs(markdown) {
     const editorData = [];
-    const parsedMarkdown = remark().parse(markdown);
+    const parsedMarkdown = remark()
+                            .use(remarkGfm)
+                            .parse(markdown);
     // iterating over the pared remarkjs syntax tree and executing the json parsers
     // eslint-disable-next-line
     parsedMarkdown.children.forEach((item, index) => {

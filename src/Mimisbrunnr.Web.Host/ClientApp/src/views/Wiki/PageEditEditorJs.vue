@@ -41,6 +41,7 @@ import DraftModal from "@/components/pageEditor/DraftModal.vue";
 import ProfileService from "@/services/profileService";
 import PageService from "@/services/pageService";
 // EditorJs
+import Editor from "@/thirdparty/EditorJs.vue";
 import Header from "@editorjs/header";
 import List from "@editorjs/list";
 import CodeTool from "@editorjs/code";
@@ -64,6 +65,7 @@ export default {
   components: {
     Attachments,
     DraftModal,
+    Editor
   },
   data() {
     return {
@@ -150,7 +152,7 @@ export default {
       return this.page.name.length > 0;
     },
     editorJs() {
-      return this.$refs.editor._data.state.editor;
+      return this.$refs.editor.editor;
     },
   },
   methods: {
@@ -206,9 +208,11 @@ export default {
       console.log(data);
       console.log(parseEditorJsToMarkdown(data));
       return;
+      /* eslint-disable */
       var isPageSaved = await PageService.savePage(this.page);
       if (isPageSaved)
         this.$router.push(`/space/${this.page.spaceKey}/${this.page.id}`);
+        /* eslint-disable */
     },
     saveDraft: debounce(async function () {
       await PageService.saveDraft(this.page.id, this.page);

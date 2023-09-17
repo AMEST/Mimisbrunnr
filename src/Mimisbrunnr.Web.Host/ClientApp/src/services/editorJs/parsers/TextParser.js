@@ -23,6 +23,7 @@ export function parseTextFromMarkdown(blocks) {
                 break;
             case "text":
             case "strong":
+            case "delete":    
             case "emphasis":
                 var tagFromType = typeToTag(item.type);
                 var openTag = tagFromType == null ? "" : `<${tagFromType}>`;
@@ -86,6 +87,8 @@ function typeToTag(type) {
             return "strong";
         case "emphasis":
             return "em";
+        case "delete":
+            return "del"
         default:
             return null;
     }
