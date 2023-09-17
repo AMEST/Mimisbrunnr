@@ -7,7 +7,7 @@
         class="page-edit-name"
         :state="nameState"
       ></b-form-input>
-      <editor ref="editor" :config="config" :initialized="initEditor" />
+      <EditorJsComponent ref="editor" :config="config" :initialized="initEditor" />
     </b-container>
     <b-container class="buttons-block pb-3">
       <div align="right">
@@ -41,7 +41,7 @@ import DraftModal from "@/components/pageEditor/DraftModal.vue";
 import ProfileService from "@/services/profileService";
 import PageService from "@/services/pageService";
 // EditorJs
-import Editor from "@/thirdparty/EditorJs.vue";
+import EditorJsComponent from "@/thirdparty/EditorJsComponent.vue";
 import Header from "@editorjs/header";
 import List from "@editorjs/list";
 import CodeTool from "@editorjs/code";
@@ -61,11 +61,11 @@ import {
 } from "@/services/editorJs/Parser";
 //===End===
 export default {
-  name: "EditorJs",
+  name: "EditorJsMD",
   components: {
     Attachments,
     DraftModal,
-    Editor
+    EditorJsComponent
   },
   data() {
     return {

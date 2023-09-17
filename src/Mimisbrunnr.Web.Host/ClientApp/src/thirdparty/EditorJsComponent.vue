@@ -3,10 +3,10 @@
 </template>
   
 <script>
-import EditorJS from "@editorjs/editorjs";
+import EditorJS from '@editorjs/editorjs';
 
 export default {
-  name: "Editor",
+  name: "EditorJsComponent",
   data() {
     return {
         editor: null
