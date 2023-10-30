@@ -63,6 +63,7 @@
                   ><b-icon-search/>
                 </b-button>
               </b-input-group-append>
+              <div style="position: absolute; top:0;left: 0;bottom: 0;right: 0; z-index: 999;"></div>
             </b-input-group>
           </b-nav-form>
 
