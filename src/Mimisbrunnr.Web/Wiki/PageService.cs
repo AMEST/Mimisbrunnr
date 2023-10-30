@@ -75,8 +75,8 @@ internal class PageService : IPageService
         if (parentPage == null || parentPage.SpaceId != space.Id)
             throw new PageNotFoundException();
 
-        var page = await _pageManager.Create(space.Id, createModel.Name, createModel.Content, createdBy,
-            createModel.ParentPageId);
+        var page = await _pageManager.Create(space.Id, createModel.Name, createModel.Content, createModel.PlainTextContent,
+            createdBy, createModel.EditorType.ToEntity(), createModel.ParentPageId);
 
         await _distributedCache.RemoveAsync(GetPageTreeCacheKey(space.HomePageId));
 
@@ -94,6 +94,7 @@ internal class PageService : IPageService
 
         page.Name = updateModel.Name;
         page.Content = updateModel.Content;
+        page.PlainTextContent = updateModel.PlainTextContent;
 
         await _pageManager.Update(page, updatedBy);
         await _feedManager.AddPageUpdate(space, page, updatedBy);

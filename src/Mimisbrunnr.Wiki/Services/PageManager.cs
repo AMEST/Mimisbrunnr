@@ -75,17 +75,25 @@ internal class PageManager : IPageManager
         return _pageRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task<Page> Create(string spaceId, string name, string content, UserInfo createdBy, string parentPageId = null)
+    public async Task<Page> Create(string spaceId,
+                                    string name,
+                                    string content,
+                                    string plainTextContent,
+                                    UserInfo createdBy,
+                                    PageEditorType editorType = PageEditorType.MarkdownEditor,
+                                    string parentPageId = null)
     {
         var page = new Page()
         {
             SpaceId = spaceId,
             Name = name,
             Content = content,
+            PlainTextContent = plainTextContent,
             Created = DateTime.UtcNow,
             Updated = DateTime.UtcNow,
             CreatedBy = createdBy,
             UpdatedBy = createdBy,
+            EditorType = editorType,
             ParentId = parentPageId
         };
         await _pageRepository.Create(page);
@@ -151,6 +159,8 @@ internal class PageManager : IPageManager
         var selectedVersion = await GetVersionByPageId(page.Id, version);
         page.Name = selectedVersion.Name;
         page.Content = selectedVersion.Content;
+        page.PlainTextContent = selectedVersion.PlainTextContent;
+        page.EditorType = selectedVersion.EditorType;
         await Update(page, restoredBy);
         return page;
     }

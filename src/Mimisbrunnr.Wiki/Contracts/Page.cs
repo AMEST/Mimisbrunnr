@@ -17,6 +17,7 @@ public class Page : IHasId<string>
         string parentId,
         string name,
         string content,
+        string plainTextContent,
         DateTime created,
         DateTime updated,
         UserInfo createdBy,
@@ -29,6 +30,7 @@ public class Page : IHasId<string>
         ParentId = parentId;
         Name = name;
         Content = content;
+        PlainTextContent = plainTextContent;
         Created = created;
         Updated = updated;
         CreatedBy = createdBy;
@@ -47,6 +49,8 @@ public class Page : IHasId<string>
     public string Name { get; set; }
 
     public string Content { get; set; }
+
+    public string PlainTextContent { get; set; }
 
     public DateTime Created { get; internal set; }
 
@@ -67,6 +71,7 @@ public class Page : IHasId<string>
             ParentId = ParentId,
             Name = Name,
             Content = Content,
+            PlainTextContent = PlainTextContent,
             Created = Created,
             Updated = Updated,
             CreatedBy = CreatedBy,

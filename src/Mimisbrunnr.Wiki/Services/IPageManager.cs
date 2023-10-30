@@ -16,7 +16,13 @@ public interface IPageManager
 
     Task<HistoricalPage> GetVersionByPageId(string id, long version);
 
-    Task<Page> Create(string spaceId, string name, string content, UserInfo createdBy, string parentPageId = null);
+    Task<Page> Create(string spaceId,
+                                    string name,
+                                    string content,
+                                    string plainTextContent,
+                                    UserInfo createdBy,
+                                    PageEditorType editorType = PageEditorType.MarkdownEditor,
+                                    string parentPageId = null);
 
     Task<Page> RestoreVersion(Page page, long version, UserInfo restoredBy);
 

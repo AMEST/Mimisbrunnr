@@ -9,7 +9,8 @@
       ></b-form-input>
       <EditorJsComponent
         ref="editor"
-        :config="config"
+        :imageUpload="uploadByFile"
+        :onChange="onEditorChange"
         :initialized="initEditor"
       />
     </b-container>
@@ -47,19 +48,6 @@ import PageService from "@/services/pageService";
 import axios from "axios";
 // EditorJs
 import EditorJsComponent from "@/thirdparty/EditorJsComponent.vue";
-import Header from "@editorjs/header";
-import List from "@editorjs/list";
-import CodeTool from "@editorjs/code";
-import Paragraph from "@editorjs/paragraph";
-import Embed from "@editorjs/embed";
-import Table from "@editorjs/table";
-import Checklist from "@editorjs/checklist";
-import Marker from "@editorjs/marker";
-import Warning from "@editorjs/warning";
-import Quote from "@editorjs/quote";
-import InlineCode from "@editorjs/inline-code";
-import ImageTool from '@editorjs/image';
-import Delimiter from "@editorjs/delimiter";
 // OwnExtensions
 import {
   parseEditorJsToMarkdown,
@@ -79,90 +67,6 @@ export default {
       cursor: {
         offset: 0,
         block: 0
-      },
-      config: {
-        tools: {
-          header: {
-            class: Header,
-            config: {
-              placeholder: "Enter a header",
-              levels: [2, 3, 4],
-              defaultLevel: 3,
-            },
-          },
-          list: {
-            class: List,
-            inlineToolbar: true,
-          },
-          code: {
-            class: CodeTool,
-          },
-          paragraph: {
-            class: Paragraph,
-          },
-          embed: {
-            class: Embed,
-            config: {
-              services: {
-                youtube: true,
-                coub: true,
-                imgur: true,
-              },
-            },
-          },
-          table: {
-            class: Table,
-            inlineToolbar: true,
-            config: {
-              rows: 2,
-              cols: 3,
-            },
-          },
-          checklist: {
-            class: Checklist,
-          },
-          Marker: {
-            class: Marker,
-            shortcut: "CMD+SHIFT+M",
-          },
-          warning: {
-            class: Warning,
-            inlineToolbar: true,
-            shortcut: "CMD+SHIFT+W",
-            config: {
-              titlePlaceholder: "Title",
-              messagePlaceholder: "Message",
-            },
-          },
-          quote: {
-            class: Quote,
-            inlineToolbar: true,
-            shortcut: "CMD+SHIFT+O",
-            config: {
-              quotePlaceholder: "Enter a quote",
-              captionPlaceholder: "Quote's author",
-            },
-          },
-          inlineCode: {
-            class: InlineCode,
-            shortcut: "CMD+SHIFT+M",
-          },
-        image: {
-            class: ImageTool,
-            config: {
-                uploader: {
-                    uploadByFile: this.uploadByFile,
-                    async uploadByUrl(url){
-                        return {success: 1,file: {url: url}};
-                    }
-                }
-            }
-          },
-          delimiter: Delimiter,
-        },
-        onReady: () => {},
-        // eslint-disable-next-line
-        onChange: this.onEditorChange,
       },
       draft: null,
       loaded: false,
@@ -267,9 +171,11 @@ export default {
       console.log("[evt]",event);
       console.log("[api]",api);
       var selection = document.getSelection();
-      if(selection)
-        this.cursor.offset = selection.anchorOffset()
-      this.cursor.block = api.blocks.getCurrentBlockIndex();
+      try{
+        if(selection && selection.anchorOffset)
+            this.cursor.offset = selection.anchorOffset();
+        this.cursor.block = api.blocks.getCurrentBlockIndex();
+      }catch{}
     },
     // eslint-disable-next-line
     initEditor: function (editor) {
@@ -280,19 +186,19 @@ export default {
       console.log(editor);
       window.ejs = editor;
       console.log(convertedMarkdown);
-      setTimeout(
-        (ed, data) => {
-          ed.render({
+      setTimeout(this.render,1000,editor,convertedMarkdown);
+    },
+    render(editor, data){
+        if(!editor.render){
+            setTimeout(this.render, 1000, editor, data);
+            return;
+        }
+        editor.render({
             blocks: data.filter(
               (value) => Object.keys(value).length !== 0
             ), // filter through array and remove empty objects
           });
-        },
-        1000,
-        editor,
-        convertedMarkdown
-      );
-    },
+    }
   },
   mounted: function () {
     this.init();

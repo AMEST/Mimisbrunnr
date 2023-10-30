@@ -14,8 +14,9 @@ export function parseTextFromMarkdown(blocks) {
                         caption: item.alt,
                         stretched: false,
                         url: item.url,
+                        file:{url:item.url},
                         withBackground: false,
-                        withBorder: false,
+                        withBorder: false
                     },
                     type: 'image',
                 })

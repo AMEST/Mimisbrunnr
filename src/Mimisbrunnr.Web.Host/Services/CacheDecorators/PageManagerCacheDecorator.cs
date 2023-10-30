@@ -25,9 +25,9 @@ internal class PageManagerCacheDecorator : IPageManager
         return page;
     }
 
-    public async Task<Page> Create(string spaceId, string name, string content, UserInfo createdBy, string parentPageId = null)
+    public async Task<Page> Create(string spaceId, string name, string content, string plainTextContent, UserInfo createdBy, PageEditorType editorType = PageEditorType.MarkdownEditor, string parentPageId = null)
     {
-        var page = await _inner.Create(spaceId, name, content, createdBy, parentPageId);
+        var page = await _inner.Create(spaceId, name, content, plainTextContent, createdBy, editorType, parentPageId);
         await ClearCache(page);
         return page;
     }

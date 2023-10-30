@@ -17,6 +17,7 @@ public class PageMap : EntityMapClass<Page>
 
         MapProperty( x=> x.EditorType)
             .SetIgnoreIfDefault(false)
+            .SetDefaultValue(PageEditorType.MarkdownEditor)
             .SetSerializer(new EnumSerializer<PageEditorType>(BsonType.String));
     }
 }
