@@ -14,6 +14,8 @@ public class PageModel
 
     public string Content { get; set; }
 
+    public string PlainTextContent { get; set; }
+
     public DateTime Created { get; set; }
 
     public DateTime Updated { get; set; }
@@ -21,4 +23,6 @@ public class PageModel
     public UserModel CreatedBy { get; set; }
     
     public UserModel UpdatedBy { get; set; }
+
+    public PageEditorTypeModel EditorType { get; set; }
 }

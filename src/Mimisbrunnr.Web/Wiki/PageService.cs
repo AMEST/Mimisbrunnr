@@ -75,8 +75,8 @@ internal class PageService : IPageService
         if (parentPage == null || parentPage.SpaceId != space.Id)
             throw new PageNotFoundException();
 
-        var page = await _pageManager.Create(space.Id, createModel.Name, createModel.Content, createdBy,
-            createModel.ParentPageId);
+        var page = await _pageManager.Create(space.Id, createModel.Name, createModel.Content, createModel.PlainTextContent,
+            createdBy, createModel.EditorType.ToEntity(), createModel.ParentPageId);
 
         await _distributedCache.RemoveAsync(GetPageTreeCacheKey(space.HomePageId));
 
@@ -94,6 +94,7 @@ internal class PageService : IPageService
 
         page.Name = updateModel.Name;
         page.Content = updateModel.Content;
+        page.PlainTextContent = updateModel.PlainTextContent;
 
         await _pageManager.Update(page, updatedBy);
         await _feedManager.AddPageUpdate(space, page, updatedBy);
@@ -183,6 +184,25 @@ internal class PageService : IPageService
         return movedPage.ToModel(destinationSpace.Key);
     }
 
+    public async Task UpdateEditorType(string pageId, PageEditorTypeUpdateModel model, UserInfo updatedBy)
+    {
+        var page = await _pageManager.GetById(pageId);
+        if (page == null)
+            throw new PageNotFoundException();
+
+        var space = await _spaceManager.GetById(page.SpaceId);
+        if (space == null)
+            throw new SpaceNotFoundException();
+
+        await _permissionService.EnsureEditPermission(space.Key, updatedBy);
+
+        if (space.Status == SpaceStatus.Archived)
+            throw new InvalidOperationException("Can't update page because space archived");
+
+        await _pageManager.ChangeEditorType(page, model.Type.ToEntity(), updatedBy);
+        await _feedManager.AddPageUpdate(space, page, updatedBy);
+    }
+
 
     public async Task<PageVersionsListModel> GetPageVersions(string pageId, UserInfo requestedBy)
     {
@@ -228,4 +248,5 @@ internal class PageService : IPageService
     }
 
     private static string GetPageTreeCacheKey(string pageId) => $"page_tree_{pageId}";
+
 }

@@ -79,6 +79,17 @@ public class PageController : ControllerBase
         return Ok();
     }
     
+
+    [HttpPut("{pageId}/editor-type")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> UpdateEditorType([FromRoute] string pageId, [FromBody] PageEditorTypeUpdateModel updateModel)
+    {
+        await _pageService.UpdateEditorType(pageId, updateModel, User?.ToInfo());
+        return Ok();
+    }
+    
     [HttpDelete("{pageId}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(401)]

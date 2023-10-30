@@ -19,6 +19,8 @@ public static partial class WikiMapper
 
     public static partial HistoricalPageModel ToModel(this HistoricalPage historicalPage);
 
+    public static partial PageEditorType ToEntity(this PageEditorTypeModel pageEditorType);
+
     public static PageModel ToModel(this Page page, string spaceKey = null)
     {
         return new PageModel()

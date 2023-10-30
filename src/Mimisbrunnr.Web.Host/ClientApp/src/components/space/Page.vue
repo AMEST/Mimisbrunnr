@@ -16,7 +16,11 @@
         {{ $t("page.edit") }}
       </b-button>
       <b-button
-        v-if="!this.isSpaceHomePage && !historyMode && this.$store.state.application.profile "
+        v-if="
+          !this.isSpaceHomePage &&
+          !historyMode &&
+          this.$store.state.application.profile
+        "
         variant="outline-secondary"
         @click="star"
         size="sm"
@@ -25,15 +29,18 @@
         <b-icon-star-fill v-if="inFavorite" variant="warning" />
         <b-icon-star v-else />
       </b-button>
-      <b-dropdown variant="secondary" size="sm" class="m-2 no-arrow-dropdown" menu-class="page-dropdown">
+      <b-dropdown
+        variant="secondary"
+        size="sm"
+        class="m-2 no-arrow-dropdown"
+        menu-class="page-dropdown"
+      >
         <template #button-content>
           <b-icon-three-dots />
         </template>
-        <b-dropdown-item
-          href="#"
-          v-b-modal.page-versions-modal
-          >{{ $t("page.versions.title") }}</b-dropdown-item
-        >
+        <b-dropdown-item href="#" v-b-modal.page-versions-modal>{{
+          $t("page.versions.title")
+        }}</b-dropdown-item>
         <b-dropdown-divider></b-dropdown-divider>
         <b-dropdown-item
           href="#"
@@ -52,7 +59,8 @@
           :disabled="
             isSpaceHomePage ||
             (!userPermissions.canEdit && !userPermissions.canRemove) ||
-            historyMode || isArchived
+            historyMode ||
+            isArchived
           "
           >{{ $t("page.move.title") }}</b-dropdown-item
         >
@@ -60,13 +68,20 @@
           variant="danger"
           v-b-modal.page-delete-modal
           :disabled="
-            isSpaceHomePage || !userPermissions.canRemove || historyMode || isArchived
+            isSpaceHomePage ||
+            !userPermissions.canRemove ||
+            historyMode ||
+            isArchived
           "
           >{{ $t("page.delete.button") }}</b-dropdown-item
         >
       </b-dropdown>
       <b-button
-        v-if="isSpaceHomePage && !historyMode && this.$store.state.application.profile "
+        v-if="
+          isSpaceHomePage &&
+          !historyMode &&
+          this.$store.state.application.profile
+        "
         variant="secondary"
         size="sm"
         class="m-2"
@@ -76,13 +91,27 @@
       </b-button>
     </div>
     <b-card bg-variant="light" v-if="historyMode" style="width: 100%">
-        <p><b-icon-info-circle font-scale="1"/> {{$t("page.versions.informationBlock.message")}}</p>
-        <p>
-            <b-link v-if="versions.find(x => x.version == (page.version -1))" :to="`/space/${page.spaceKey}/${page.id}/version/${page.version - 1}`">{{$t("page.versions.informationBlock.previous")}} &lt;= </b-link>
-            {{$t("page.versions.version")}}: {{this.page.version}}
-            <b-link v-if="versions.find(x => x.version == (page.version +1))" :to="`/space/${page.spaceKey}/${page.id}/version/${page.version + 1}`"> =&gt; {{$t("page.versions.informationBlock.next")}}</b-link>
-            <b-link v-else :to="`/space/${page.spaceKey}/${page.id}`"> =&gt; {{$t("page.versions.informationBlock.current")}}</b-link>
-        </p>
+      <p>
+        <b-icon-info-circle font-scale="1" />
+        {{ $t("page.versions.informationBlock.message") }}
+      </p>
+      <p>
+        <b-link
+          v-if="versions.find((x) => x.version == page.version - 1)"
+          :to="`/space/${page.spaceKey}/${page.id}/version/${page.version - 1}`"
+          >{{ $t("page.versions.informationBlock.previous") }} &lt;=
+        </b-link>
+        {{ $t("page.versions.version") }}: {{ this.page.version }}
+        <b-link
+          v-if="versions.find((x) => x.version == page.version + 1)"
+          :to="`/space/${page.spaceKey}/${page.id}/version/${page.version + 1}`"
+        >
+          =&gt; {{ $t("page.versions.informationBlock.next") }}</b-link
+        >
+        <b-link v-else :to="`/space/${page.spaceKey}/${page.id}`">
+          =&gt; {{ $t("page.versions.informationBlock.current") }}</b-link
+        >
+      </p>
     </b-card>
 
     <div class="pb-2 page-title">
@@ -103,7 +132,14 @@
       </p>
     </div>
     <div>
+      <EditorJsComponent
+        v-if="this.page.editorType == 'EditorJs'"
+        ref="editorjs"
+        :readOnly="true"
+        :initialized="() => editorJsLoaded=true"
+      />
       <vue-markdown
+        v-else
         :toc="true"
         :html="this.$store.state.application.info.allowHtml"
         :source="this.page.content"
@@ -137,7 +173,14 @@ import {
   BIconInfoCircle,
 } from "bootstrap-vue";
 import { replaceRelativeLinksToRoute } from "@/services/Utils";
-const VueMarkdown = () => import(/* webpackChunkName: "vue-markdown-component" */"@/thirdparty/VueMarkdown");
+const VueMarkdown = () =>
+  import(
+    /* webpackChunkName: "vue-markdown-component" */ "@/thirdparty/VueMarkdown"
+  );
+const EditorJsComponent = () =>
+  import(
+    /* webpackChunkName: "editorjs-component" */ "@/thirdparty/EditorJsComponent.vue"
+  );
 import FavoriteService from "@/services/favoriteService";
 import PageService from "@/services/pageService";
 import ProfileService from "@/services/profileService";
@@ -150,26 +193,31 @@ export default {
       breadcrumbs: [],
       comments: [],
       inFavorite: false,
+      editorJsLoaded: false,
     };
   },
   components: {
     VueMarkdown,
+    EditorJsComponent,
     CommentCreate,
     Comment,
     BIconPencilFill,
     BIconStarFill,
     BIconStar,
     BIconThreeDots,
-    BIconInfoCircle
+    BIconInfoCircle,
   },
   props: {
     space: Object,
     page: Object,
     userPermissions: Object,
     versions: Array,
-    historyMode: Boolean
+    historyMode: Boolean,
   },
   computed: {
+    editorJs() {
+      return this.$refs.editorjs.editor;
+    },
     isArchived() {
       return this.space.status == "Archived";
     },
@@ -245,6 +293,34 @@ export default {
       else favorite = await FavoriteService.getPage(this.page.id);
       await FavoriteService.delete(favorite.id);
     },
+    initPage() {
+      this.initBreadcrumbs();
+      this.checkInFavorites();
+      this.loadComments();
+      if(this.page.editorType == 'EditorJs'){
+        this.initEditorJsPage(this.editorJs, this.page.content);
+        return;
+      }
+      setTimeout(() => hljs.highlightAll(), 100);
+      setTimeout(this.scrollToAnchor, 100);
+      setTimeout(replaceRelativeLinksToRoute, 250, "page-content");
+      return;
+    },
+    initEditorJsPage(editor, data) {
+      if(!this.editorJsLoaded){
+        setTimeout(this.initEditorJsPage, 1000, editor, data);
+      }
+      setTimeout(
+        (ed, data) => {
+          ed.render({
+            blocks: data.filter((value) => Object.keys(value).length !== 0), // filter through array and remove empty objects
+          });
+        },
+        500,
+        editor,
+        data
+      );
+    },
     scrollToAnchor() {
       if (!window.location.hash) return;
       var hash = decodeURI(window.location.hash);
@@ -257,21 +333,11 @@ export default {
   watch: {
     // eslint-disable-next-line
     page: function (newValue, oldValue) {
-      this.initBreadcrumbs();
-      this.checkInFavorites();
-      this.loadComments();
-      setTimeout(() => hljs.highlightAll(), 100);
-      setTimeout(this.scrollToAnchor, 100);
-      setTimeout(replaceRelativeLinksToRoute, 250, "page-content");
+        this.initPage();
     },
   },
   mounted: function () {
-    this.initBreadcrumbs();
-    this.checkInFavorites();
-    this.loadComments();
-    setTimeout(() => hljs.highlightAll(), 100);
-    setTimeout(this.scrollToAnchor, 100);
-    setTimeout(replaceRelativeLinksToRoute, 250, "page-content");
+    this.initPage();
   },
 };
 </script>
@@ -320,6 +386,12 @@ export default {
   content: unset !important;
 }
 .page-dropdown {
-    min-width: 190px;
+  min-width: 190px;
+}
+
+/** EditorJs customization */
+/** Hide caption in images */
+.image-tool__caption{
+    display: hidden;
 }
 </style>

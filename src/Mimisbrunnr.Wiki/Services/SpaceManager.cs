@@ -58,7 +58,7 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
             Status = SpaceStatus.Actual
         };
         await _spaceRepository.Create(space);
-        var homePage = await _pageManager.Create(space.Id, name, $"# {description}   ", owner);
+        var homePage = await _pageManager.Create(space.Id, name, $"# {description}   ", description, owner, PageEditorType.MarkdownEditor);
         space.HomePageId = homePage.Id;
         await Update(space);
         return space;
