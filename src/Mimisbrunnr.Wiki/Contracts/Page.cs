@@ -17,10 +17,12 @@ public class Page : IHasId<string>
         string parentId,
         string name,
         string content,
+        string plainTextContent,
         DateTime created,
         DateTime updated,
         UserInfo createdBy,
-        UserInfo updatedBy)
+        UserInfo updatedBy,
+        PageEditorType editorType)
     {
         Id = id;
         Version = version;
@@ -28,10 +30,12 @@ public class Page : IHasId<string>
         ParentId = parentId;
         Name = name;
         Content = content;
+        PlainTextContent = plainTextContent;
         Created = created;
         Updated = updated;
         CreatedBy = createdBy;
         UpdatedBy = updatedBy;
+        EditorType = editorType;
     }
 
     public string Id { get; set; }
@@ -46,6 +50,8 @@ public class Page : IHasId<string>
 
     public string Content { get; set; }
 
+    public string PlainTextContent { get; set; }
+
     public DateTime Created { get; internal set; }
 
     public DateTime Updated { get; internal set; }
@@ -53,6 +59,8 @@ public class Page : IHasId<string>
     public UserInfo CreatedBy { get; internal set; }
 
     public UserInfo UpdatedBy { get; internal set; }
+
+    public PageEditorType EditorType {get; internal set; }
 
     public Page Clone()
     {
@@ -63,10 +71,12 @@ public class Page : IHasId<string>
             ParentId = ParentId,
             Name = Name,
             Content = Content,
+            PlainTextContent = PlainTextContent,
             Created = Created,
             Updated = Updated,
             CreatedBy = CreatedBy,
-            UpdatedBy = UpdatedBy
+            UpdatedBy = UpdatedBy,
+            EditorType = EditorType
         };
     }
 }

@@ -9,8 +9,11 @@ WORKDIR /build
 COPY . ./
 COPY --from=version /version /build/version
 RUN apt-get update -yq ;\
-	apt-get install curl gnupg -yq ;\
-	curl -sL https://deb.nodesource.com/setup_14.x | bash - ;\
+	apt-get install curl gnupg ca-certificates -yq ;\
+    mkdir -p /etc/apt/keyrings ;\
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg ;\
+	echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_18.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list ;\
+    apt-get update ;\
 	apt-get install -y nodejs
 
 RUN sed -i -e "s/<Version>0-develop<\/Version>/<Version>$(cat version | cut -c2- )<\/Version>/g" src/Mimisbrunnr.Web.Host/Mimisbrunnr.Web.Host.csproj;\

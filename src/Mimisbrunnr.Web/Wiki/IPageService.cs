@@ -24,4 +24,6 @@ public interface IPageService
     Task<PageModel> Copy(string sourcePageId, string destinationParentPageId, UserInfo copiedBy);
     
     Task<PageModel> Move(string sourcePageId, string destinationParentPageId, UserInfo movedBy);
+
+    Task UpdateEditorType(string pageId, PageEditorTypeUpdateModel model, UserInfo updatedBy);
 }

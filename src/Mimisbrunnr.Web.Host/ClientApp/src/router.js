@@ -52,7 +52,12 @@ export default new Router({
         {
             path: '/space/:key/:pageId/edit',
             name: 'pageEdit',
-            component: () => import(/* webpackChunkName: "editor" */ './views/Wiki/PageEdit.vue')
+            component: () => import(/* webpackChunkName: "editor-simplemde" */ './views/Wiki/PageEditor/SimpleMde.vue')
+        },
+        {
+            path: '/space/:key/:pageId/edit-editorjs',
+            name: 'pageEditEditorJs',
+            component: () => import(/* webpackChunkName: "editor-js-md" */ './views/Wiki/PageEditor/EditorJsMD.vue')
         },
         {
             path: '/profile/:email',

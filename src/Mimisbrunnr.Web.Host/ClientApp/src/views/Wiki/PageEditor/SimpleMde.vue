@@ -66,8 +66,9 @@ import { debounce, isImageFile } from "@/services/Utils.js";
 import DraftModal from "@/components/pageEditor/DraftModal.vue";
 import GuideModal from "@/components/pageEditor/GuideModal.vue";
 import ProfileService from "@/services/profileService";
+import PageService from "@/services/pageService";
 export default {
-  name: "PageEdit",
+  name: "SimpleMde",
   components: {
     VueSimplemde,
     VueMarkdown,
@@ -77,7 +78,7 @@ export default {
   },
   data() {
     return {
-      page: { content: "" },
+      page: { content: "", name: "" },
       draft: null,
       loaded: false,
       sideBySide: false,
@@ -157,54 +158,35 @@ export default {
     resetDraft: async function () {
       this.$bvModal.hide("draft-modal");
       this.draft = null;
-      await axios.delete(`/api/draft/${this.$route.params.pageId}`, {
-        validateStatus: false,
-      });
+      await PageService.deleteDraft(this.$route.params.pageId);
       this.loaded = true;
       this.initHandlers();
     },
     loadPage: async function () {
-      var request = await axios.get(`/api/page/${this.$route.params.pageId}`, {
-        validateStatus: false,
-      });
-      if (request.status != 200) {
-        this.$router.push("/error/unauthorized");
-        return;
+      try {
+        var page = await PageService.getPage(this.$route.params.pageId);
+        if (page == null) return;
+        this.page = page;
+      } catch (e) {
+        if (e == 401) this.$router.push("/error/unauthorized");
       }
-
-      this.page = request.data;
     },
     loadDraft: async function () {
-      var request = await axios.get(`/api/draft/${this.$route.params.pageId}`, {
-        validateStatus: false,
-      });
-
-      if (request.status == 404) return;
-      if (request.status != 200) {
-        this.$router.push("/error/unauthorized");
-        return;
+      try {
+        var draft = await PageService.getDraft(this.$route.params.pageId);
+        if (draft == null) return;
+        this.draft = draft;
+      } catch (e) {
+        if (e == 401) this.$router.push("/error/unauthorized");
       }
-
-      this.draft = request.data;
     },
     save: async function () {
-      var pageSaveRequest = await axios.put(
-        "/api/page/" + this.page.id,
-        this.page,
-        {
-          validateStatus: false,
-        }
-      );
-      if (pageSaveRequest.status != 200) {
-        alert("Cannot save page");
-        return;
-      }
-      this.$router.push("/space/" + this.page.spaceKey + "/" + this.page.id);
+      var isPageSaved = await PageService.savePage(this.page);
+      if (isPageSaved)
+        this.$router.push(`/space/${this.page.spaceKey}/${this.page.id}`);
     },
     saveDraft: debounce(async function () {
-      await axios.put("/api/draft/" + this.page.id, this.page, {
-        validateStatus: false,
-      });
+        await PageService.saveDraft(this.page.id, this.page);
     }, 1000),
     cancel: function () {
       this.$router.push("/space/" + this.page.spaceKey + "/" + this.page.id);

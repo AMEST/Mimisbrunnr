@@ -173,15 +173,18 @@ public class MongoDbStoreModule : RunnableModule
         {
             Background = true
         }));
-
         var nameKeyDefinition = Builders<Page>.IndexKeys.Ascending(x => x.Name);
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<Page>(nameKeyDefinition, new CreateIndexOptions()
         {
             Background = true
         }));
-
-        var contentTitleFullTextSearch = Builders<Page>.IndexKeys.Text(x => x.Name).Text(x => x.Content);
-        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Page>(contentTitleFullTextSearch, new CreateIndexOptions()
+        var plainTextMigrationKeyDefinition = Builders<Page>.IndexKeys.Ascending(x => x.EditorType).Ascending(x=> x.Content).Ascending(x => x.PlainTextContent);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Page>(plainTextMigrationKeyDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+        var contentTitleFullTextSearch = Builders<Page>.IndexKeys.Text(x => x.Name).Text(x => x.PlainTextContent);
+        await collection.Indexes.TryCreateOneAsync(new CreateIndexModel<Page>(contentTitleFullTextSearch, new CreateIndexOptions()
         {
             Background = true
         }));
@@ -198,6 +201,11 @@ public class MongoDbStoreModule : RunnableModule
         }));
         var pageIdAndVersionDefinition = Builders<HistoricalPage>.IndexKeys.Ascending(x => x.PageId).Ascending(x => x.Version);
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<HistoricalPage>(pageIdAndVersionDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+        var plainTextMigrationKeyDefinition = Builders<HistoricalPage>.IndexKeys.Ascending(x => x.EditorType).Ascending(x=> x.Content).Ascending(x => x.PlainTextContent);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<HistoricalPage>(plainTextMigrationKeyDefinition, new CreateIndexOptions()
         {
             Background = true
         }));

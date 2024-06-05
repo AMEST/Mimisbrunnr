@@ -11,7 +11,7 @@ internal class AbstractClassConverter<T> : JsonConverter<T>
 
     public override T Read(ref Utf8JsonReader reader, Type typeToConvert,
         JsonSerializerOptions options)
-    {
+    {      
         if (reader.TokenType == JsonTokenType.Null) return default;
 
         if (reader.TokenType != JsonTokenType.StartObject)

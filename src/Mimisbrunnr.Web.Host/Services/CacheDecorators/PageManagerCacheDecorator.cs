@@ -25,9 +25,9 @@ internal class PageManagerCacheDecorator : IPageManager
         return page;
     }
 
-    public async Task<Page> Create(string spaceId, string name, string content, UserInfo createdBy, string parentPageId = null)
+    public async Task<Page> Create(string spaceId, string name, string content, string plainTextContent, UserInfo createdBy, PageEditorType editorType = PageEditorType.MarkdownEditor, string parentPageId = null)
     {
-        var page = await _inner.Create(spaceId, name, content, createdBy, parentPageId);
+        var page = await _inner.Create(spaceId, name, content, plainTextContent, createdBy, editorType, parentPageId);
         await ClearCache(page);
         return page;
     }
@@ -80,6 +80,12 @@ internal class PageManagerCacheDecorator : IPageManager
     public async Task Update(Page page, UserInfo updatedBy)
     {
         await _inner.Update(page, updatedBy);
+        await ClearCache(page);
+    }
+
+    public async Task ChangeEditorType(Page page, PageEditorType editorType, UserInfo updatedBy)
+    {
+        await _inner.ChangeEditorType(page, editorType, updatedBy);
         await ClearCache(page);
     }
 
