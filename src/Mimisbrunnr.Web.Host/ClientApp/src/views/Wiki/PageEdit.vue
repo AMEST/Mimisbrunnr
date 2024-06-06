@@ -235,6 +235,7 @@ export default {
       setTimeout(
         (self) => {
           self.simplemde.codemirror.on("drop", self.dragAndDrop);
+          self.simplemde.codemirror.on("paste", self.paste);
           // eslint-disable-next-line
           self.simplemde.codemirror.on("change", (cm, ev) => self.saveDraft());
         },
@@ -244,6 +245,35 @@ export default {
     },
     insertTable: function () {
       this.simplemde.drawTable();
+    },
+    paste: async function (codeMirror, pasteEvent) {
+        var data = (pasteEvent.clipboardData || window.clipboardData).items;
+        var pasted = "";
+
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].type.indexOf("image") !== -1) {
+            var file = data[i].getAsFile();
+
+            var formData = new FormData();
+            formData.append("attachment", file);
+            await axios({
+                method: "post",
+                url: "/api/attachment/" + this.page.id,
+                data: formData,
+                validateStatus: false,
+            });
+            this.addAttachmentLink({ name: file.name });
+
+            } else if (data[i].type.indexOf("text/plain") !== -1) {
+                pasted += data[i].getAsString();
+            }
+        }
+        if (pasted.length === 0) 
+            return;
+
+        var cursor = codeMirror.getCursor();
+        codeMirror.setSelection(cursor, cursor);
+        codeMirror.replaceSelection(pasted);
     },
     dragAndDrop: async function (codeMirror, dropEvent) {
       if (dropEvent.dataTransfer.items.length == 0) return;
