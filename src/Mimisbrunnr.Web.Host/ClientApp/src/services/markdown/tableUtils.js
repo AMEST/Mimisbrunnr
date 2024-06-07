@@ -7,11 +7,11 @@
  * @returns {string} formatted markdown
  */
 export function formatMarkdownTables(text) {
-    // Поиск всех таблиц формата Markdown в тексте
+    // Search all tables in markdown document
     var regex = /(?:\|.*\|)\n(?:.*\|.*\n)*(?:.*\|.*)?/g;
     var tables = text.match(regex);
 
-    // Форматирование каждой таблицы
+    // Format tables
     for (var i = 0; i < tables.length; i++) {
         var formattedTable = formatMarkdownTable(tables[i]);
         text = text.replace(tables[i], formattedTable);
