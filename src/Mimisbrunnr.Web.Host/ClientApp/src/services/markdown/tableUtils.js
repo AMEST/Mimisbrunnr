@@ -124,7 +124,6 @@ export function insertMarkdownTableColumn(cm) {
         }
     }
     cm.replaceRange(newTable, { ch: 0, line: tableStart }, { ch: 0, line: tableStart + lines.length - 1});
-    cm.setCursor({ ch: newTable.split("\n")[0].length, line: tableStart });
 }
   
 /**
@@ -136,33 +135,40 @@ export function insertMarkdownTableRow(cm) {
 
     // Find table where cursor is
     const regex = /(?:\|.*\|)\n(?:.*\|.*\n)*(?:.*\|.*)?/g;
-    const match = regex.exec(cm.getValue());
-    const table = match ? match[0] : "";
-    const start = match ? match.index : 0;
+    const tables = cm.getValue().match(regex).reverse();
+    let tableStart = -1;
+    let lines = undefined;
 
-    let row = 0;
-    const lines = table.split("\n");
-    for (let i = 0; i < lines.length; i++) {
-        if (start + lines[i].length <= cursor.ch) {
-            row = i + 1;
+    for(let i = 0; i < tables.length; i++) {
+        let table = tables[i];
+        if(table === "") 
+            continue;
+
+        // Get table position
+        lines = table.split("\n");
+        if (cursor.line === 0 && cm.getLine(cursor.line) != lines[0])
+            continue;
+
+        for(let i = cursor.line; i >= 0; i--){
+            if(cm.getLine(i) != lines[0])
+                continue;
+            tableStart = i;
         }
+
+        if(tableStart !== -1)
+            break;
     }
 
-    if (row === 0)
+    if (tableStart == -1)
         return;
 
-    let newTable = "";
-    for (let i = 0; i < lines.length; i++) {
-        newTable += lines[i] + "\n";
-        if (i === row - 1) {
-            const cells = lines[i].split("|");
-            newTable += "|";
-            for (let j = 1; j < cells.length - 1; j++) {
-            newTable += cells[j].indexOf("\n") === -1 ? " " : "" + "|";
-            }
-            newTable += "\n";
-        }
+    let columns = lines[0].split('|').filter(i => i).length;
+    let newTable = lines.join('\n');
+    let newColumn = "|";
+    for (let i = 0; i < columns; i++) {
+        newColumn += "\t\t\t\t|";
     }
-    cm.replaceRange(newTable, { ch: 0, line: row - 1 }, { ch: 0, line: row });
-    cm.setCursor({ ch: 0, line: row });
+    newTable += newColumn + "\n";
+
+    cm.replaceRange(newTable, { ch: 0, line: tableStart }, { ch: 0, line: tableStart + lines.length - 1});
 }

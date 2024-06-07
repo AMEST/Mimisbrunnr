@@ -63,7 +63,7 @@ const VueMarkdown = () =>
   );
 import axios from "axios";
 import { debounce, isImageFile } from "@/services/Utils.js";
-import { formatMarkdownTables, insertMarkdownTableColumn } from "@/services/markdown/tableUtils";
+import { formatMarkdownTables, insertMarkdownTableColumn, insertMarkdownTableRow } from "@/services/markdown/tableUtils";
 import DraftModal from "@/components/pageEditor/DraftModal.vue";
 import GuideModal from "@/components/pageEditor/GuideModal.vue";
 import ProfileService from "@/services/profileService";
@@ -110,10 +110,16 @@ export default {
             title: "Format table",
           },
           {
-            name: "table-format",
+            name: "table-add-column",
             action: this.insertTableColumn,
-            className: "table-format",
+            className: "table-add-column",
             title: "Insert table column",
+          },
+          {
+            name: "table-add-row",
+            action: this.insertTableRow,
+            className: "table-add-row",
+            title: "Insert table row",
           },
           "|",
           {
@@ -261,12 +267,20 @@ export default {
       this.simplemde.drawTable();
     },
     formatTables: function() {
+        var cursor = this.simplemde.codemirror.getCursor();
         var formatted = formatMarkdownTables(this.page.content)
         this.page.content = "";
-        setTimeout(() => this.page.content = formatted,100);
+        setTimeout(() => {
+            this.page.content = formatted;
+        },100);
+        setTimeout(() => this.simplemde.codemirror.setCursor({ ch: cursor.ch, line: cursor.line }), 250);
     },
     insertTableColumn: function () {
         insertMarkdownTableColumn(this.simplemde.codemirror);
+    },
+    insertTableRow: function () {
+        insertMarkdownTableRow(this.simplemde.codemirror);
+        this.formatTables();
     },
     paste: async function (codeMirror, pasteEvent) {
         var data = (pasteEvent.clipboardData || window.clipboardData).items;
@@ -474,5 +488,23 @@ export default {
     position: relative;
     top: 0.55em;
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+CiAgPHBhdGggZmlsbD0iIzIxMjEyMSIgZD0iTTE3LjUgMTJjLjE5NiAwIC4zODkuMDEuNTc5LjAzMmwuMjgyLjA0LjE3My43MTZhMiAyIDAgMCAwIDIuMzY4IDEuNDg2bC4xNDMtLjAzNy42MDItLjE3OGE1LjUgNS41IDAgMCAxIC43NDUgMS4yODdsLjEwOC4yODMtLjQ0Ny40M2EyIDIgMCAwIDAtLjExNyAyLjc2bC4xMTcuMTIyLjQ0Ny40M2E1LjU1IDUuNTUgMCAwIDEtLjY3OCAxLjMzMWwtLjE3NS4yMzktLjYwMi0uMTc4YTIgMiAwIDAgMC0yLjQ3MSAxLjMwN2wtLjA0LjE0Mi0uMTczLjcxNmE1LjE3NCA1LjE3NCAwIDAgMS0xLjQ0LjA0bC0uMjgyLS4wNC0uMTczLS43MTZhMiAyIDAgMCAwLTIuMzY4LTEuNDg2bC0uMTQzLjAzNy0uNjAyLjE3OGE1LjUzNyA1LjUzNyAwIDAgMS0uNzQ1LTEuMjg3bC0uMTA4LS4yODIuNDQ3LS40M2EyIDIgMCAwIDAgLjExNy0yLjc2MWwtLjExNy0uMTIyLS40NDctLjQzYTUuNTUgNS41NSAwIDAgMSAuNjc4LTEuMzMxbC4xNzUtLjIzOS42MDIuMTc4YTIgMiAwIDAgMCAyLjQ3MS0xLjMwN2wuMDQtLjE0Mi4xNzItLjcxNmMuMjgtLjA0Ny41NjktLjA3Mi44NjItLjA3MlptLTYuMzI2IDRhNi41MiA2LjUyIDAgMCAwIC43MDMgNC43NjRsLjE0NS4yMzZIOS41di01aDEuNjc0Wk04IDE2djVINi4yNWEzLjI1IDMuMjUgMCAwIDEtMy4yNDUtMy4wNjZMMyAxNy43NVYxNmg1Wm05LjUgMGMtLjggMC0xLjQ1LjY3Mi0xLjQ1IDEuNVMxNi43IDE5IDE3LjUgMTljLjggMCAxLjQ1LS42NzIgMS40NS0xLjVTMTguMyAxNiAxNy41IDE2Wm0tMy02LjV2Mi4yMzJhNi41MyA2LjUzIDAgMCAwLTIuNzY4IDIuNzY4SDkuNXYtNWg1Wk04IDkuNXY1SDN2LTVoNVptMTMgMHYyLjUyMmE2LjUyIDYuNTIgMCAwIDAtNS0uODQ4VjkuNWg1Wk0xNy43NSAzYTMuMjUgMy4yNSAwIDAgMSAzLjI0NSAzLjA2NkwyMSA2LjI1VjhoLTVWM2gxLjc1Wk0xNC41IDN2NWgtNVYzaDVaTTggM3Y1SDNWNi4yNWEzLjI1IDMuMjUgMCAwIDEgMy4wNjYtMy4yNDVMNi4yNSAzSDhaIi8+Cjwvc3ZnPgo=") !important;
+}
+
+.table-add-column {
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: 16px !important;
+    position: relative;
+    top: 0.55em;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOCAxOCI+CiAgPHBhdGggZmlsbD0iIzQ5NGM0ZSIgZD0iTTE4IDE1YTEgMSAwIDAgMS0xIDFoLTF2MWExIDEgMCAwIDEtMiAwdi0xaC0xYTEgMSAwIDAgMSAwLTJoMXYtMWExIDEgMCAwIDEgMiAwdjFoMWExIDEgMCAwIDEgMSAxek0xNiAydjZoLTJWMmgyem0xLTJoLTRhMSAxIDAgMCAwLTEgMXY4YTEgMSAwIDAgMCAxIDFoNGExIDEgMCAwIDAgMS0xVjFhMSAxIDAgMCAwLTEtMXpNOSAwSDFhMSAxIDAgMCAwLTEgMXYxNmExIDEgMCAwIDAgMSAxaDhhMSAxIDAgMCAwIDEtMVYxYTEgMSAwIDAgMC0xLTF6TTQgMTZIMlYyaDJ2MTR6bTQgMEg2VjJoMnYxNHoiLz4KPC9zdmc+Cg==") !important;
+}
+
+.table-add-row {
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: 16px !important;
+    position: relative;
+    top: 0.55em;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOCAxOCI+CiAgPHBhdGggZmlsbD0iIzQ5NGM0ZSIgZD0iTTMgMTJhMSAxIDAgMCAxIDEgMXYxaDFhMSAxIDAgMCAxIDAgMkg0djFhMSAxIDAgMCAxLTIgMHYtMUgxYTEgMSAwIDAgMSAwLTJoMXYtMWExIDEgMCAwIDEgMS0xem03IDJoNnYyaC02di0yem0tMi0xdjRhMSAxIDAgMCAwIDEgMWg4YTEgMSAwIDAgMCAxLTF2LTRhMSAxIDAgMCAwLTEtMUg5YTEgMSAwIDAgMC0xIDF6TTAgMXY4YTEgMSAwIDAgMCAxIDFoMTZhMSAxIDAgMCAwIDEtMVYxYTEgMSAwIDAgMC0xLTFIMWExIDEgMCAwIDAtMSAxem0xNiA1djJIMlY2aDE0em0wLTR2MkgyVjJoMTR6Ii8+Cjwvc3ZnPgo=") !important;
 }
 </style>
