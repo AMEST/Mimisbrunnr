@@ -23,4 +23,5 @@ RUN sed -i -e "s/<Version>0-develop<\/Version>/<Version>$(cat version | cut -c2-
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS app
 WORKDIR /app
 COPY --from=build-env /dist/app/. .
+ENV ASPNETCORE_URLS=http://*:80
 CMD ["dotnet", "Mimisbrunnr.Web.Host.dll"]
