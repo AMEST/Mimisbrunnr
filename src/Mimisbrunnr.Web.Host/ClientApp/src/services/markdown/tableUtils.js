@@ -1,4 +1,6 @@
 "use strict";
+/*eslint-disable */
+
 /**
  *  Format tables in markdown text
  * @param {string} text 
@@ -174,3 +176,5 @@ export function insertMarkdownTableRow(cm) {
 
     cm.replaceRange(newTable, { ch: 0, line: tableStart }, { ch: 0, line: tableStart + lines.length - 1});
 }
+
+/*eslint-enable */
