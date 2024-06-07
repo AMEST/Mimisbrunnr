@@ -59,10 +59,12 @@ export function formatMarkdownTable(table) {
         formattedTable += "|";
         for (var j = 0; j < cols.length; j++) {
             var cell = cells[cols[j]];
+            if(cell !== undefined)
+                cell = cell.trim();
             var length = cell === undefined ? 0 : cell.length;
             var padding = maxWidths[j] - length;
             for (var k = 0; k < padding; k++) {
-                cell += "\t";
+                cell += i === 1 ? "-" : " ";
             }
             k = 0;
             formattedTable += cell + "|";
@@ -120,7 +122,7 @@ export function insertMarkdownTableColumn(cm) {
                 newTable += lines[i] + "------------|\n";
                 break;
             default:
-                newTable += lines[i] + "\t\t\t\t\t\t\t\t\t\t\t\t|\n";
+                newTable += lines[i] + "            |\n";
         }
     }
     cm.replaceRange(newTable, { ch: 0, line: tableStart }, { ch: 0, line: tableStart + lines.length - 1});
@@ -166,7 +168,7 @@ export function insertMarkdownTableRow(cm) {
     let newTable = lines.join('\n');
     let newColumn = "|";
     for (let i = 0; i < columns; i++) {
-        newColumn += "\t\t\t\t|";
+        newColumn += "    |";
     }
     newTable += newColumn + "\n";
 

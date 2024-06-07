@@ -438,6 +438,7 @@ export default {
 
 .vue-simplemde .CodeMirror {
   height: calc(100vh - var(--page-edit-height, 240px)) !important;
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
 }
 
 .page-edit-name {
