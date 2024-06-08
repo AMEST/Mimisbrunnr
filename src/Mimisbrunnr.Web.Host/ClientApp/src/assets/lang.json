@@ -295,29 +295,15 @@
                 "title": "Copy",
                 "copy": "Copy",
                 "cancel": "Cancel",
-                "type": {
-                    "label": "Destination type",
-                    "description": "Parent page or space"
-                },
-                "destination": {
-                    "label": "Destination",
-                    "description": "Parent page id or space key",
-                    "placeholder": "Enter page id or space key"
-                }
+                "parentSpace": "Space",
+                "parentPage": "Parent page"
             },
             "move": {
                 "title": "Move",
                 "move": "Move",
                 "cancel": "Cancel",
-                "type": {
-                    "label": "Destination type",
-                    "description": "Parent page or space"
-                },
-                "destination": {
-                    "label": "Destination",
-                    "description": "Parent page id or space key",
-                    "placeholder": "Enter page id or space key"
-                }
+                "parentSpace": "Space",
+                "parentPage": "Parent page"
             },
             "delete": {
                 "button": "Delete",
@@ -688,29 +674,15 @@
                 "title": "Копировать",
                 "copy": "Копировать",
                 "cancel": "Отмена",
-                "type": {
-                    "label": "Тип назначения",
-                    "description": "Родительская страница или пространство"
-                },
-                "destination": {
-                    "label": "Куда копировать",
-                    "description": "Родительская страница или пространство",
-                    "placeholder": "Введите id страницы или ключ пространства"
-                }
+                "parentSpace": "Пространство",
+                "parentPage": "Родительская страница"
             },
             "move": {
                 "title": "Перемещение",
                 "move": "Перемещение",
                 "cancel": "Отмена",
-                "type": {
-                    "label": "Тип назначения",
-                    "description": "Родительская страница или пространство"
-                },
-                "destination": {
-                    "label": "Куда перемещать",
-                    "description": "Родительская страница или пространство",
-                    "placeholder": "Введите id страницы или ключ пространства"
-                }
+                "parentSpace": "Пространство",
+                "parentPage": "Родительская страница"
             },
             "delete": {
                 "button": "Удалить",
