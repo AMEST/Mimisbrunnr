@@ -18,11 +18,12 @@
       v-if="userPermissions && userPermissions.canRemove"
       :pageDeletedCallback="loadPageTree"
     />
-    <copy-page v-if="userPermissions && userPermissions.canEdit" />
+    <copy-page v-if="userPermissions && userPermissions.canEdit" :actionCallBack="loadPageTree"/>
     <move-page
       v-if="
         userPermissions && userPermissions.canEdit && userPermissions.canRemove
       "
+      :actionCallBack="loadPageTree"
     />
     <permissions v-if="userPermissions && userPermissions.isAdmin" />
     <settings
@@ -67,7 +68,6 @@ const Permissions = () =>
   import(
     /* webpackChunkName: "space-modals-component" */ "@/components/space/modal/Permissions.vue"
   );
-import { showToast } from "@/services/Utils";
 import SpaceService from "@/services/spaceService";
 import PageService from "../../services/pageService";
 export default {
@@ -199,22 +199,11 @@ export default {
       this.page.updatedBy = selectedVersion.updatedBy;
     },
     loadPageTree: async function () {
-      var pageTreeRequest = await axios.get(
-        "/api/page/" + this.space.homePageId + "/tree",
-        {
-          validateStatus: false,
-        }
-      );
-      if (pageTreeRequest.status != 200) {
-        showToast(
-          `${pageTreeRequest.statusText} (${pageTreeRequest.status})`,
-          "Can't load page tree for this space",
-          "danger"
-        );
+      var pageTree = await PageService.getPageTree(this.space.homePageId);
+      if(pageTree == null)
         return false;
-      }
 
-      this.pageTree = pageTreeRequest.data;
+      this.pageTree = pageTree;
       return true;
     },
     changePageTitle: function () {

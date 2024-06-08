@@ -2,6 +2,16 @@ import axios from "axios";
 import { showToast } from "@/services/Utils";
 /*eslint-disable */
 var SpaceService = {
+    getSpaces: async function() {
+        var spacesRequest = await axios.get("/api/space", {
+            validateStatus: false,
+        });
+        if (spacesRequest.status == 200) 
+            return spacesRequest.data;
+        showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
+         "Error when get spaces", "warning");
+         return [];
+    },
     getSpace: async function (spaceKey) {
         var request = await axios.get(`/api/space/${spaceKey}`, {
             validateStatus: false,

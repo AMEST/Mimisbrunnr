@@ -70,3 +70,17 @@ export function replaceRelativeLinksToRoute(elementId){
         })
     }
 }
+
+export function flattenJSON(obj, result = []) {
+    if (obj.hasOwnProperty("page")) {
+      result.push(obj.page);
+    }
+  
+    if (obj.hasOwnProperty("childs")) {
+      obj.childs.forEach((child) => {
+        flattenJSON(child, result);
+      });
+    }
+  
+    return result;
+}

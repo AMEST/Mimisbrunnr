@@ -2,6 +2,23 @@ import axios from "axios";
 import { showToast } from "@/services/Utils";
 /*eslint-disable */
 var PageService = {
+    getPageTree: async function(pageId) {
+        var request = await axios.get(
+            "/api/page/" + pageId + "/tree",
+            {
+              validateStatus: false,
+            }
+          );
+        if (request.status == 200)
+            return request.data;
+
+        showToast(
+            `${request.statusText} (${request.status})`,
+            "Can't load page tree for this space",
+            "danger"
+        );
+        return null;
+    },
     getPage: async function (pageId) {
         var request = await axios.get(`/api/page/${pageId}`, {
             validateStatus: false,

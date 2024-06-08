@@ -47,6 +47,7 @@
 import axios from "axios";
 import SearchService from "@/services/searchService";
 import FavoriteService from "@/services/favoriteService";
+import SpaceService from "@/services/spaceService";
 import { getNameInitials, debounce } from "@/services/Utils";
 import FavoriteSpaceCard from "@/components/base/FavoriteSpaceCard.vue";
 import SpaceListItem from "@/components/spaceDirectory/SpaceListItem.vue";
@@ -78,10 +79,7 @@ export default {
       if (searchResult != null) this.spaces = searchResult;
     }, 300),
     loadSpaces: async function () {
-      var spacesRequest = await axios.get("/api/space", {
-        validateStatus: false,
-      });
-      if (spacesRequest.status == 200) this.spaces = spacesRequest.data;
+      this.spaces = await SpaceService.getSpaces();
     },
     loadFavorites: async function () {
       this.favoriteSpaces = await FavoriteService.getAll(15, 0, "space");

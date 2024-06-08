@@ -6,27 +6,25 @@
     :title="$t('page.move.title')"
     hide-header-close
   >
-    <div role="group">
-      <label>{{$t("page.move.type.label")}}:</label>
-      <b-form-select 
-        v-model="destinationType" 
-        class="form-select"
-        :options="types" 
-        :state="typeState"
-        required
-      ></b-form-select>
-      <b-form-text>{{$t("page.move.type.description")}}</b-form-text>
+  <div role="group">
+        <label>{{$t("page.move.parentSpace")}}:</label>
+        <v-select
+            v-model="selectedSpace" 
+            :options="spaces" 
+            @search="onSearch"
+            :get-option-label="(option) => `${option.name} (${option.key})`"
+            required
+          ></v-select>
     </div>
+    <br>
     <div role="group">
-      <label>{{$t("page.move.destination.label")}}:</label>
-      <b-form-input
-        v-model="destination"
-        required
-        :placeholder="$t('page.move.destination.placeholder')"
-        :state="destinationState"
-        trim
-      ></b-form-input>
-      <b-form-text>{{$t("page.move.destination.description")}}</b-form-text>
+        <label>{{$t("page.move.parentPage")}}:</label>
+        <v-select
+            v-model="selectedPage"  
+            :options="pages" 
+            :get-option-label="(option) => option.name"
+            required
+          ></v-select>
     </div>
     <template #modal-footer>
       <div align="right">
@@ -39,14 +37,23 @@
 
 <script>
 import axios from 'axios';
+import SpaceService from '@/services/spaceService';
+import PageService from '@/services/pageService';
+import SearchService from '@/services/searchService';
+import FavoriteService from '@/services/favoriteService';
+import { flattenJSON } from "@/services/Utils";
 export default {
   name: "MovePage",
   data() {
       return {
-          destination: '',
-          destinationType: '',
-          types: ["Space", "Page"]
+          selectedSpace: null,
+          spaces: [],
+          selectedPage: null,
+          pages: []
       }
+  },
+  props: {
+    actionCallBack: Function,
   },
   computed: {
     typeState() {
@@ -60,24 +67,63 @@ export default {
     pageAction: async function() {
       var pageId = this.$route.params.pageId;
       if(pageId == null) return;
-      var destinationPageId = "";
-      if(this.destinationType == 'Space'){
-        var spaceRequest = await axios.get("/api/space/" + this.destination);
-        destinationPageId = spaceRequest.data.homePageId;
-        
-      }else{
-        destinationPageId = this.destination;
-      }
-      var newPageRequest = await axios.post("/api/page/move/" + pageId + '/' + destinationPageId);
-      this.$router.push("/space/" + newPageRequest.data.spaceKey + '/' + newPageRequest.data.id);
+      if(this.selectedPage == null) return;
+
+      var newPageRequest = await axios.post("/api/page/move/" + pageId + '/' + this.selectedPage.id);
+
+      if (this.actionCallBack !== null && newPageRequest.data.spaceKey == this.$route.params.key)
+        this.actionCallBack();
+
+      if( newPageRequest.data.spaceKey != this.$route.params.key )
+        this.$router.push("/space/" + newPageRequest.data.spaceKey + '/' + newPageRequest.data.id);
       this.$bvModal.hide("page-move-modal");
+    },
+    onSearch: async function (query) {
+      var searchResult = await SearchService.findSpaces(query);
+      this.spaces = searchResult;
+    },
+    init: async function(){
+      var spaceKey = this.$route.params.key;
+      if (!spaceKey) 
+        return;
+      
+      this.selectedSpace = await SpaceService.getSpace(spaceKey);
+      await this.loadPages(this.selectedSpace.homePageId);
+      await this.loadBaseSpaces();
+    },
+    loadPages: async function(homePageId){
+      var spacePagesTree = await PageService.getPageTree(homePageId);
+      this.pages = flattenJSON(spacePagesTree);
+      this.selectedPage = this.pages.find(i => i.id == homePageId);
+    },
+    loadBaseSpaces: async function(){
+      var favorite = await FavoriteService.getAll(5, 0, "space");
+      var spaces = [];
+      if (favorite.length > 0)
+        spaces = favorite.map(i => i.space);
+      if (spaces.length == 0){
+        var allSpaces = await SpaceService.getSpaces();
+        spaces = allSpaces.slice(0, 5);
+      }
+      this.spaces = spaces;
     },
     close: function () {
       this.$bvModal.hide("page-move-modal");
     },
     onShow: function () {
-      this.destination = '';
-      this.destinationType = '';
+      this.selectedSpace = null;
+      this.spaces = [];
+      this.selectedPage = null;
+      this.pages = [];
+
+      this.init();
+    },
+  },
+  watch: {
+    // eslint-disable-next-line
+    selectedSpace(newValue, oldValue) {
+      if (newValue == null) return;
+      this.loadPages(newValue.homePageId);
     },
   },
 };
