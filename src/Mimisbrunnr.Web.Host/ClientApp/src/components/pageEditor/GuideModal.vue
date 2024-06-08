@@ -129,6 +129,17 @@ ___
 - H~2~O
 \`\`\`
 
+## Collapsable (spoiler)
++++ Click me!
+Hello, world!
++++
+
+\`\`\`
++++ Click me!
+Hello, world!
++++
+\`\`\`
+
 ## Custom containers
 ### Blocks
 ::: warning

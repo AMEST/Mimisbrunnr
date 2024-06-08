@@ -15,6 +15,7 @@ import insert from 'markdown-it-ins'
 import mark from 'markdown-it-mark'
 import toc from 'markdown-it-toc-and-anchor'
 import tasklists from 'markdown-it-task-lists'
+import MarkdownItCollapsible from "markdown-it-collapsible"
 
 export default {
   md: new markdownIt(),
@@ -153,7 +154,8 @@ export default {
       .use(mark)
       .use(tasklists, { enabled: this.taskLists })
       .use(emoji)
-      .use(require('markdown-it-imsize'));
+      .use(require('markdown-it-imsize'))
+      .use(MarkdownItCollapsible);
     
     var containerPlugin = require('markdown-it-container');
     // Blocks
