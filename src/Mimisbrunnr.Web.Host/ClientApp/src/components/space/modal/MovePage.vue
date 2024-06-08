@@ -55,14 +55,6 @@ export default {
   props: {
     actionCallBack: Function,
   },
-  computed: {
-    typeState() {
-      return this.destinationType.length > 0 ? true : false;
-    },
-    destinationState() {
-      return this.destination.length > 0 ? true : false;
-    },
-  },
   methods: {
     pageAction: async function() {
       var pageId = this.$route.params.pageId;
