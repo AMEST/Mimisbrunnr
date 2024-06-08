@@ -129,7 +129,7 @@ ___
 - H~2~O
 \`\`\`
 
-## Collapsable (spoiler)
+## Collapsible (spoiler)
 +++ Click me!
 Hello, world!
 +++
