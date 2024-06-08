@@ -35,6 +35,8 @@
           >{{ $t("page.versions.title") }}</b-dropdown-item
         >
         <b-dropdown-divider></b-dropdown-divider>
+        <b-dropdown-item @click="printPage">{{ $t("page.print") }}</b-dropdown-item>
+        <b-dropdown-divider></b-dropdown-divider>
         <b-dropdown-item
           href="#"
           v-b-modal.page-attachments-modal
@@ -84,31 +86,32 @@
             <b-link v-else :to="`/space/${page.spaceKey}/${page.id}`"> =&gt; {{$t("page.versions.informationBlock.current")}}</b-link>
         </p>
     </b-card>
-
-    <div class="pb-2 page-title">
-      <h2>{{ this.page.name }}</h2>
-      <p class="text-muted page-title-dates">
-        {{ $t("page.date.created") }}
-        <b-link :to="'/profile/' + this.page.createdBy.email">{{
-          this.page.createdBy.name
-        }}</b-link>
-        {{ $t("page.date.at") }}
-        {{ new Date(this.page.created).toLocaleString() }}.
-        {{ $t("page.date.updated") }}
-        <b-link :to="'/profile/' + this.page.updatedBy.email">{{
-          this.page.updatedBy.name
-        }}</b-link>
-        {{ $t("page.date.at") }}
-        {{ new Date(this.page.updated).toLocaleString() }}.
-      </p>
-    </div>
-    <div>
-      <vue-markdown
-        :toc="true"
-        :html="this.$store.state.application.info.allowHtml"
-        :source="this.page.content"
-        id="page-content"
-      ></vue-markdown>
+    <div class="page-content">
+        <div class="pb-2 page-title">
+        <h2>{{ this.page.name }}</h2>
+        <p class="text-muted page-title-dates">
+            {{ $t("page.date.created") }}
+            <b-link :to="'/profile/' + this.page.createdBy.email">{{
+            this.page.createdBy.name
+            }}</b-link>
+            {{ $t("page.date.at") }}
+            {{ new Date(this.page.created).toLocaleString() }}.
+            {{ $t("page.date.updated") }}
+            <b-link :to="'/profile/' + this.page.updatedBy.email">{{
+            this.page.updatedBy.name
+            }}</b-link>
+            {{ $t("page.date.at") }}
+            {{ new Date(this.page.updated).toLocaleString() }}.
+        </p>
+        </div>
+        <div>
+        <vue-markdown
+            :toc="true"
+            :html="this.$store.state.application.info.allowHtml"
+            :source="this.page.content"
+            id="page-content"
+        ></vue-markdown>
+        </div>
     </div>
     <br />
     <h3 v-if="comments.length > 0">
@@ -252,6 +255,22 @@ export default {
       var anchor = document.getElementById(hash.substring(1, hash.length));
       if (!anchor) return;
       anchor.scrollIntoView();
+    },
+    printPage(){
+        var source = document.getElementsByClassName("page-content")[0];
+        var styles = document.getElementsByTagName("style");
+        var printWindow = window.open('', '', `height=400,width=800`);
+        printWindow.document.write(`<html><head><title>${this.page.name}</title>`);
+        styles.forEach(s => {
+            printWindow.document.write(`<style>${s.innerHTML}</style>`);
+        });
+        printWindow.document.write("</head><body>");
+        printWindow.document.write(source.innerHTML);
+        printWindow.document.write("</body></html>");
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 1000);
     },
   },
   watch: {
