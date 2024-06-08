@@ -44,7 +44,6 @@
   </b-container>
 </template>
 <script>
-import axios from "axios";
 import SearchService from "@/services/searchService";
 import FavoriteService from "@/services/favoriteService";
 import SpaceService from "@/services/spaceService";
