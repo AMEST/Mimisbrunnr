@@ -10,6 +10,8 @@ export function formatMarkdownTables(text) {
     // Search all tables in markdown document
     var regex = /(?:\|.*\|)\n(?:.*\|.*\n)*(?:.*\|.*)?/g;
     var tables = text.match(regex);
+    if (!tables)
+        return text;
 
     // Format tables
     for (var i = 0; i < tables.length; i++) {
@@ -87,7 +89,12 @@ export function insertMarkdownTableColumn(cm) {
 
     // Find table where cursor is
     const regex = /(?:\|.*\|)\n(?:.*\|.*\n)*(?:.*\|.*)?/g;
-    const tables = cm.getValue().match(regex).reverse();
+    const matches = cm.getValue().match(regex)
+    if (!matches)
+        return;
+
+    const tables = matches.reverse();
+
     let tableStart = -1;
     let lines = undefined;
 
@@ -139,7 +146,11 @@ export function insertMarkdownTableRow(cm) {
 
     // Find table where cursor is
     const regex = /(?:\|.*\|)\n(?:.*\|.*\n)*(?:.*\|.*)?/g;
-    const tables = cm.getValue().match(regex).reverse();
+    const matches = cm.getValue().match(regex)
+    if (!matches)
+        return;
+
+    const tables = matches.reverse();
     let tableStart = -1;
     let lines = undefined;
 
