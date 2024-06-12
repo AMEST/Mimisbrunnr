@@ -28,7 +28,7 @@ jobs:
         dotnet-version: '6.0'
     - name: Build
       run: |
-        dotnet publish ./src/DataImport/Mimisbrunnr.DataImport.Cli/Mimisbrunnr.DataImport.Cli.csproj -c Release --self-contained -r ${{ matrix.rid }} -p:PublishSingleFile=true -p:PublishTrimmed=true -o ./bin/mimisbrunnr-import-cli-${{ matrix.rid }}
+        dotnet publish ./src/DataImport/Mimisbrunnr.DataImport.Cli/Mimisbrunnr.DataImport.Cli.csproj -c Release --self-contained -r ${{ matrix.rid }} -p:PublishSingleFile=true -o ./bin/mimisbrunnr-import-cli-${{ matrix.rid }}
         zip -r ${{ matrix.rid }} ./bin/mimisbrunnr-import-cli-${{ matrix.rid }}
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
@@ -59,7 +59,7 @@ jobs:
         dotnet-version: '6.0'
     - name: Build
       run: |
-        dotnet publish ./src/Migration/Mimisbrunnr.Migration.Persistent.Cli/Mimisbrunnr.Migration.Persistent.Cli.csproj -c Release --self-contained -r ${{ matrix.rid }} -p:PublishSingleFile=true -p:PublishTrimmed=true -o ./bin/mimisbrunnr-persistent-migration-cli-${{ matrix.rid }}
+        dotnet publish ./src/Migration/Mimisbrunnr.Migration.Persistent.Cli/Mimisbrunnr.Migration.Persistent.Cli.csproj -c Release --self-contained -r ${{ matrix.rid }} -p:PublishSingleFile=true -o ./bin/mimisbrunnr-persistent-migration-cli-${{ matrix.rid }}
         zip -r ${{ matrix.rid }} ./bin/mimisbrunnr-persistent-migration-cli-${{ matrix.rid }}
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
@@ -94,7 +94,7 @@ jobs:
         node-version: '14'
     - name: Build
       run: |
-        dotnet publish ./src/Mimisbrunnr.Web.Host/Mimisbrunnr.Web.Host.csproj -c Release --self-contained -r ${{ matrix.rid }} -p:PublishSingleFile=true -p:PublishTrimmed=true -o ./bin/mimisbrunnr-wiki-${{ matrix.rid }}
+        dotnet publish ./src/Mimisbrunnr.Web.Host/Mimisbrunnr.Web.Host.csproj -c Release --self-contained -r ${{ matrix.rid }} -p:PublishSingleFile=true -o ./bin/mimisbrunnr-wiki-${{ matrix.rid }}
         zip -r ${{ matrix.rid }} ./bin/mimisbrunnr-wiki-${{ matrix.rid }}
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2

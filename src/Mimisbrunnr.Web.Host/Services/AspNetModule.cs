@@ -43,7 +43,17 @@ internal class AspNetModule : Module
             })
             .AddOpenIdConnect(options =>
             {
-                Configuration.AppConfiguration.GetSection("Openid").Bind(options);
+                var openIdConfiguration = Configuration.AppConfiguration.GetSection("Openid").Get<OpenIdConfiguration>();
+                options.Authority = openIdConfiguration.Authority;
+                options.ResponseType = openIdConfiguration.ResponseType;
+                options.ClientId = openIdConfiguration.ClientId;
+                options.ClientSecret = openIdConfiguration.ClientSecret;
+
+                if(openIdConfiguration.Scope?.Length > 0){
+                    options.Scope.Clear();
+                    foreach(var scope in openIdConfiguration.Scope)
+                        options.Scope.Add(scope);
+                }
             })
             .AddPolicyScheme(JwtOrCookeSchemeName, JwtOrCookeSchemeName, options =>
             {
