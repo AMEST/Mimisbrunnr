@@ -91,7 +91,7 @@ jobs:
     - name: Setup NodeJs
       uses: actions/setup-node@v1
       with:
-        node-version: '14'
+        node-version: '18'
     - name: Build
       run: |
         dotnet publish ./src/Mimisbrunnr.Web.Host/Mimisbrunnr.Web.Host.csproj -c Release --self-contained -r ${{ matrix.rid }} -p:PublishSingleFile=true -o ./bin/mimisbrunnr-wiki-${{ matrix.rid }}
