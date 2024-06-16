@@ -39,16 +39,15 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         _logger = logger;
     }
 
-    public async Task<SpaceModel[]> GetAll(UserInfo requestedBy)
+    public async Task<SpaceModel[]> GetAll(UserInfo requestedBy, int? take = 0, int? skip = 0)
     {
         await _permissionService.EnsureAnonymousAllowed(requestedBy);
-        var spaces = await _spaceManager.GetAll();
         if (requestedBy is null)
-            return spaces.Where(x => x.Type == SpaceType.Public).Select(x => x.ToModel()).ToArray();
+            return (await _spaceManager.GetPublicSpaces(take, skip)).Select(x => x.ToModel()).ToArray();
 
         var user = await _userManager.GetByEmail(requestedBy.Email);
         if (user.Role == UserRole.Admin)
-            return spaces.Select(x => x.ToModel()).ToArray();
+            return (await _spaceManager.GetAll(take, skip)).Select(x => x.ToModel()).ToArray();
 
         var visibleSpaces = await FindUserVisibleSpaces(requestedBy);
         return visibleSpaces.Select(x => x.ToModel()).ToArray();

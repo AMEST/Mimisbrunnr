@@ -14,10 +14,57 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
         _pageManager = pageManager;
     }
 
-    public async Task<Space[]> GetAll()
+    public async Task<Space[]> GetAll(int? take = null, int? skip = null)
     {
-        var spaces = await _spaceRepository.GetAll().ToArrayAsync();
-        return spaces;
+        var query = _spaceRepository.GetAll();
+
+        if (take.HasValue)
+            query = query.Take(take.Value);
+        if (skip.HasValue)
+            query = query.Skip(skip.Value);
+
+        return await query.ToArrayAsync();
+    }
+
+    public async Task<Space[]> GetAllWithPermissions(UserInfo user = null,
+        string[] userGroups = null,
+        int? take = null,
+        int? skip = null)
+    {
+        var query = _spaceRepository.GetAll();
+        var permissions = new List<string>();
+
+        if (user != null)
+            permissions.Add($"user_{user.Email.ToLower()}");
+        if (userGroups != null)
+            permissions.AddRange(userGroups.Select(g => $"group_{g.ToLower()}"));
+
+        if (permissions.Count > 0)
+        {
+            var permissionsArray = permissions.ToArray();
+            query = query.Where(g => g.PermissionsFlat.Any(p => permissionsArray.Contains(p)) || g.Type == SpaceType.Public);
+        }
+
+        if (take.HasValue)
+            query = query.Take(take.Value);
+        if (skip.HasValue)
+            query = query.Skip(skip.Value);
+
+
+        return await query.ToArrayAsync();
+    }
+
+    public async Task<Space[]> GetPublicSpaces(int? take = null, int? skip = null)
+    {
+        var query = _spaceRepository.GetAll()
+            .Where(space => space.Type == SpaceType.Public);
+
+        if (take.HasValue)
+            query = query.Take(take.Value);
+        if (skip.HasValue)
+            query = query.Skip(skip.Value);
+
+        return await query.ToArrayAsync();
     }
 
     public async Task<Space> GetById(string id)
@@ -34,8 +81,8 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
 
     public async Task<Space> FindPersonalSpace(UserInfo user)
     {
-         var personalSpace = await _spaceRepository.GetAll().FirstOrDefaultAsync(
-            x => x.Type == SpaceType.Personal && x.Key == user.Email.ToUpper());
+        var personalSpace = await _spaceRepository.GetAll().FirstOrDefaultAsync(
+           x => x.Type == SpaceType.Personal && x.Key == user.Email.ToUpper());
         return personalSpace;
     }
 
@@ -60,12 +107,14 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
         await _spaceRepository.Create(space);
         var homePage = await _pageManager.Create(space.Id, name, $"# {description}   ", owner);
         space.HomePageId = homePage.Id;
+        space.UpdatePermissions();
         await Update(space);
         return space;
     }
 
     public async Task Update(Space space)
     {
+        space.UpdatePermissions();
         await _spaceRepository.Update(space);
     }
 
@@ -79,6 +128,7 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
 
         var newPermissions = new List<Permission>(space.Permissions) { permission };
         space.Permissions = newPermissions;
+        space.UpdatePermissions();
         await Update(space);
     }
 
@@ -99,11 +149,12 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
         if (space.Type == SpaceType.Personal && permission.IsAdmin)
             throw new InvalidOperationException("Cannot remove administrators from personal space");
 
-        var newPermissions = space.Permissions.Where(x => 
+        var newPermissions = space.Permissions.Where(x =>
             permission.User != null
             ? x.User is null || !x.User.Equals(permission.User)
             : x.Group is null || !x.Group.Equals(permission.Group));
         space.Permissions = newPermissions;
+        space.UpdatePermissions();
         await Update(space);
     }
 
