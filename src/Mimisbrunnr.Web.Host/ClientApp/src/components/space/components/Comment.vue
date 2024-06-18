@@ -2,7 +2,7 @@
   <b-card class="comment-card">
     <b-avatar
       class="comment-avatar"
-      :text="getUserInitials(comment.author.name)"
+      :text="getUserInitials(comment.author)"
       :src="comment.author.avatarUrl"
       :style="comment.author.avatarUrl ? 'background-color: transparent' : ''"
     ></b-avatar>
@@ -45,6 +45,7 @@ export default {
   },
   methods: {
     getUserInitials: function (name) {
+      if(!name) return "";
       return getInitials(name);
     },
     remove: async function() {

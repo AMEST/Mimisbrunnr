@@ -35,7 +35,7 @@ public static partial class UserMapper
         {
             Email = principal.FindFirst(ClaimTypes.Email)?.Value?.ToLower() ??
                     principal.FindFirst("email")?.Value?.ToLower(),
-            Name = principal.Identity?.Name,
+            Name = principal.Identity?.Name ?? principal.FindFirst("name")?.Value,
             AvatarUrl = principal.FindFirst("picture")?.Value
         };
         if (string.IsNullOrEmpty(user.Email))
