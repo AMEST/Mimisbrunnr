@@ -113,12 +113,34 @@ internal class PageManager : IPageManager
         return destinationPage;
     }
 
-    public async Task<Page> Move(Page source, Page destinationParentPage)
+    public async Task<Page> Move(Page source, Page destinationParentPage, bool withChilds = true)
     {
+        var originalParentId = source.ParentId;
+
         source.SpaceId = destinationParentPage.SpaceId;
         source.ParentId = destinationParentPage.Id;
         await _pageRepository.Update(source);
-        return source;
+
+        if (withChilds)
+        {
+            var childs = await GetAllChilds(source);
+            foreach (var child in childs)
+            {
+                child.SpaceId = destinationParentPage.SpaceId;
+                await _pageRepository.Update(child);
+            }
+            return source;
+        }
+
+        var firstLevelChilds = await _pageRepository.GetAll()
+            .Where(x => x.ParentId == source.Id)
+            .ToArrayAsync();
+        foreach (var child in firstLevelChilds)
+        {
+            child.ParentId = originalParentId;
+            await _pageRepository.Update(child);
+        }
+    return source;
     }
 
     public Task Remove(Page page, bool deleteChild = false)

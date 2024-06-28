@@ -112,8 +112,8 @@ public class PageController : ControllerBase
     [ProducesResponseType(typeof(PageModel), 200)]
     [ProducesResponseType(401)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> Move([FromRoute] string sourcePageId, [FromRoute] string destinationParentPageId)
+    public async Task<IActionResult> Move([FromRoute] string sourcePageId, [FromRoute] string destinationParentPageId, [FromQuery] bool? withChilds = null)
     {
-        return Ok(await _pageService.Move(sourcePageId, destinationParentPageId, User?.ToInfo()));
+        return Ok(await _pageService.Move(sourcePageId, destinationParentPageId, withChilds ?? true, User?.ToInfo()));
     }
 }
