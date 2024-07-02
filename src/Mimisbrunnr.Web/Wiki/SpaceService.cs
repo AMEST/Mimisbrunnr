@@ -17,7 +17,6 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
     private readonly ISpaceManager _spaceManager;
     private readonly IUserManager _userManager;
     private readonly IUserGroupManager _userGroupManager;
-    private readonly IDistributedCache _distributedCache;
     private readonly IApplicationConfigurationManager _applicationConfigurationManager;
     private readonly ILogger<SpaceService> _logger;
 
@@ -25,7 +24,6 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         ISpaceManager spaceManager,
         IUserManager userManager,
         IUserGroupManager userGroupManager,
-        IDistributedCache distributedCache,
         IApplicationConfigurationManager applicationConfigurationManager,
         ILogger<SpaceService> logger
     )
@@ -34,7 +32,6 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         _spaceManager = spaceManager;
         _userManager = userManager;
         _userGroupManager = userGroupManager;
-        _distributedCache = distributedCache;
         _applicationConfigurationManager = applicationConfigurationManager;
         _logger = logger;
     }
@@ -98,7 +95,6 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         EnsureSpaceExists(space);
 
         await _spaceManager.AddPermission(space, model.ToEntity());
-        await ClearUserVisibleSpacesAfterChangingPermissions(model);
 
         return model;
     }
@@ -112,7 +108,6 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
             throw new SpaceNotFoundException();
 
         await _spaceManager.UpdatePermission(space, model.ToEntity());
-        await ClearUserVisibleSpacesAfterChangingPermissions(model);
     }
 
     public async Task RemovePermission(string key, SpacePermissionModel model, UserInfo removedBy)
@@ -123,7 +118,6 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         EnsureSpaceExists(space);
 
         await _spaceManager.RemovePermission(space, model.ToEntity());
-        await ClearUserVisibleSpacesAfterChangingPermissions(model);
     }
 
     public async Task<SpaceModel> Create(SpaceCreateModel model, UserInfo createdBy)
@@ -245,35 +239,6 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         return await _spaceManager.GetAllWithPermissions(userInfo, userGroups.Select(x => x.Name).ToArray(), take, skip);
     }
 
-    private async Task ClearUserVisibleSpacesAfterChangingPermissions(SpacePermissionModel permissionModel)
-    {
-        if (permissionModel?.User is not null)
-        {
-            await _distributedCache.RemoveAsync(CreateUserVisibleSpacesCacheKey(permissionModel.User.Email));
-            return;
-        }
-
-        var group = await _userGroupManager.FindByName(permissionModel?.Group.Name);
-        if (group is null) throw new GroupNotFoundException();
-
-        var usersInGroup = await _userGroupManager.GetUsersInGroup(group);
-        var clearTasks = new List<Task>();
-        foreach (var user in usersInGroup)
-            clearTasks.Add(_distributedCache.RemoveAsync(CreateUserVisibleSpacesCacheKey(user.Email)));
-
-        await Task.WhenAll(clearTasks);
-    }
-
-    private Task AddVisibleSpacesToCache(string cacheKey, IEnumerable<Space> spaces)
-    {
-        return _distributedCache.SetAsync(cacheKey, spaces,
-            new DistributedCacheEntryOptions()
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2)
-            }
-        );
-    }
-
     private static void EnsureIsNotAnonymous(UserInfo userInfo)
     {
         if (userInfo == null)
@@ -301,7 +266,4 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
             x.Group != null && groups.Any(g => g.Name.Equals(x.Group.Name)));
         return userPermission ?? groupPermission;
     }
-
-    private static string CreateUserVisibleSpacesCacheKey(string email) =>
-        $"user_visible_spaces_cache_email_{email.ToLower()}";
 }
