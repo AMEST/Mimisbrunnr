@@ -7,7 +7,6 @@ namespace Mimisbrunnr.Web.Host.Services.CacheDecorators;
 
 internal class SpaceManagerCacheDecorator : ISpaceManager
 {
-    private const string SpacesCacheKey = "space_cache";
     private readonly TimeSpan _maxCacheTime = TimeSpan.FromDays(1);
     private readonly TimeSpan _slidingCacheTime = TimeSpan.FromHours(8);
     private readonly ISpaceManager _inner;
@@ -48,21 +47,19 @@ internal class SpaceManagerCacheDecorator : ISpaceManager
         return _inner.FindPersonalSpace(user);
     }
 
-    public async Task<Space[]> GetAll()
+    public Task<Space[]> GetAll(int? take = null, int? skip = null)
     {
-        var cached = await _cache.GetAsync<Space[]>(SpacesCacheKey);
-        if (cached is not null)
-            return cached;
+        return _inner.GetAll(take, skip);
+    }
 
-        cached = await _inner.GetAll();
+    public Task<Space[]> GetAllWithPermissions(UserInfo user = null, string[] userGroups = null, int? take = null, int? skip = null)
+    {
+        return _inner.GetAllWithPermissions(user, userGroups, take, skip);
+    }
 
-        await _cache.SetAsync(SpacesCacheKey,
-         cached, new DistributedCacheEntryOptions()
-         {
-             AbsoluteExpirationRelativeToNow = _maxCacheTime,
-             SlidingExpiration = _slidingCacheTime
-         });
-        return cached;
+    public Task<Space[]> GetPublicSpaces(int? take = null, int? skip = null)
+    {
+        return _inner.GetPublicSpaces(take, skip);
     }
 
     public async Task<Space> GetById(string id)
@@ -131,7 +128,6 @@ internal class SpaceManagerCacheDecorator : ISpaceManager
             AbsoluteExpirationRelativeToNow = _maxCacheTime,
             SlidingExpiration = _slidingCacheTime
         });
-        await _cache.RemoveAsync(SpacesCacheKey);
     }
 
     private async Task DeleteSpaceFromCache(Space space)
@@ -139,7 +135,6 @@ internal class SpaceManagerCacheDecorator : ISpaceManager
         if (space is null) return;
         await _cache.RemoveAsync(GetSpaceCacheKey(space.Key));
         await _cache.RemoveAsync(GetSpaceCacheKeyById(space.Id));
-        await _cache.RemoveAsync(SpacesCacheKey);
     }
 
     private static string GetSpaceCacheKey(string spaceKey) => $"space_cache_key_{spaceKey}";
