@@ -37,9 +37,9 @@ internal class PageManagerCacheDecorator : IPageManager
         return _inner.FindByName(name);
     }
 
-    public Task<Page[]> GetAllChilds(Page page)
+    public Task<Page[]> GetAllChilds(Page page, bool lightContract = true)
     {
-        return _inner.GetAllChilds(page);
+        return _inner.GetAllChilds(page, lightContract);
     }
 
     public async Task<Page[]> GetAllOnSpace(Space space)
@@ -63,9 +63,9 @@ internal class PageManagerCacheDecorator : IPageManager
         return cached;
     }
 
-    public async Task<Page> Move(Page source, Page destinationParentPage)
+    public async Task<Page> Move(Page source, Page destinationParentPage, bool withChilds = true)
     {
-        var copiedPage = await _inner.Move(source, destinationParentPage);
+        var copiedPage = await _inner.Move(source, destinationParentPage, withChilds);
         await ClearCache(source);
         await ClearCache(copiedPage);
         return copiedPage;
