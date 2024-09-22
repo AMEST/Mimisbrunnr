@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid class="spaces-container h-100vh">
+  <b-container fluid class="spaces-container h-100vh" id="space-container">
     <b-container class="text-left">
       <br />
       <div v-if="!this.isAnonymous">
@@ -56,6 +56,9 @@ export default {
     spaces: [],
     favoriteSpaces: [],
     searchText: "",
+    scrollMax: 0,
+    offset: 0,
+    batchSize: 12
   }),
   components: {
     FavoriteSpaceCard,
@@ -78,7 +81,11 @@ export default {
       if (searchResult != null) this.spaces = searchResult;
     }, 300),
     loadSpaces: async function () {
-      this.spaces = await SpaceService.getSpaces();
+      var spacesBatch = await SpaceService.getSpaces(this.batchSize, this.offset);
+      for (const space of spacesBatch)
+        this.spaces.push(space);
+      if(spacesBatch.length > 2)
+        this.scrollMax = this.scrollMax - 100;
     },
     loadFavorites: async function () {
       this.favoriteSpaces = await FavoriteService.getAll(15, 0, "space");
@@ -88,8 +95,28 @@ export default {
     // eslint-disable-next-line
     searchText(newValue, oldValue) {
       if (newValue.length > 2) this.search();
-      if (newValue.length == 0) this.loadSpaces();
+      if (newValue.length == 0) {
+        this.spaces = [];
+        this.scrollMax = 0;
+        this.offset = 0;
+        this.loadSpaces();
+      }
     },
+  },
+  mounted: function (){
+    var self = this;
+    var spaceContainer = window.document.getElementById("space-container");
+    spaceContainer.onscroll = function () {
+        var headerNavHeight = window.document.getElementById("header-nav").clientHeight;
+        var wh = window.innerHeight-headerNavHeight;
+        if ((spaceContainer.scrollTop + wh > spaceContainer.scrollHeight - wh / 2) && (self.scrollMax != spaceContainer.scrollHeight)) {
+            // eslint-disable-next-line
+            console.log(`Download next ${self.batchSize} spaces. scrollTop: ${spaceContainer.scrollTop}`);
+            self.scrollMax = spaceContainer.scrollHeight
+            self.offset += self.batchSize;
+            self.loadSpaces();
+        }
+    }
   },
   created: async function () {
     document.title = `${this.$t("spaceDirectory.title")} - ${

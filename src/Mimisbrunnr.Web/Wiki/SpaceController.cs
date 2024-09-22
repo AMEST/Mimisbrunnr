@@ -35,9 +35,9 @@ public class SpaceController : ControllerBase
     [AllowAnonymous]
     [ProducesResponseType(typeof(SpaceModel[]), 200)]
     [ProducesResponseType(401)]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] int? take = null, [FromQuery] int? skip = null)
     {
-        return Ok(await _spaceService.GetAll(User?.ToInfo()));
+        return Ok(await _spaceService.GetAll(User?.ToInfo(), take, skip));
     }
 
     [HttpGet("{key}")]
