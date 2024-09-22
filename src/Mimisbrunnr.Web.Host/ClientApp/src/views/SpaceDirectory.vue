@@ -85,7 +85,7 @@ export default {
       for (const space of spacesBatch)
         this.spaces.push(space);
       if(spacesBatch.length > 2)
-        this.scrollMax = this.scrollMax - 200;
+        this.scrollMax = this.scrollMax - 100;
     },
     loadFavorites: async function () {
       this.favoriteSpaces = await FavoriteService.getAll(15, 0, "space");
@@ -95,7 +95,12 @@ export default {
     // eslint-disable-next-line
     searchText(newValue, oldValue) {
       if (newValue.length > 2) this.search();
-      if (newValue.length == 0) this.loadSpaces();
+      if (newValue.length == 0) {
+        this.spaces = [];
+        this.scrollMax = 0;
+        this.offset = 0;
+        this.loadSpaces();
+      }
     },
   },
   mounted: function (){
