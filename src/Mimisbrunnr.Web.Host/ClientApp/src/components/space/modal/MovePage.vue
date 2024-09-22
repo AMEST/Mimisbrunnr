@@ -109,6 +109,7 @@ export default {
       this.spaces = [];
       this.selectedPage = null;
       this.pages = [];
+      this.withChilds = false;
 
       this.init();
     },
