@@ -304,7 +304,8 @@
                 "move": "Move",
                 "cancel": "Cancel",
                 "parentSpace": "Space",
-                "parentPage": "Parent page"
+                "parentPage": "Parent page",
+                "withChilds": "Move with child pages"
             },
             "delete": {
                 "button": "Delete",
@@ -684,7 +685,8 @@
                 "move": "Перемещение",
                 "cancel": "Отмена",
                 "parentSpace": "Пространство",
-                "parentPage": "Родительская страница"
+                "parentPage": "Родительская страница",
+                "withChilds": "Перемещение вместе с дочерними страницами"
             },
             "delete": {
                 "button": "Удалить",

@@ -10,7 +10,7 @@ public interface IPageManager
 
     Task<Page[]> FindByName(string name);
 
-    Task<Page[]> GetAllChilds(Page page);
+    Task<Page[]> GetAllChilds(Page page, bool lightContract = true);
 
     Task<Page> GetById(string id);
 
