@@ -37,26 +37,30 @@ internal class PageManager : IPageManager
             .Where(x => x.Name.Contains(name)).ToArrayAsync();
     }
 
-    public async Task<Page[]> GetAllChilds(Page page)
+    public async Task<Page[]> GetAllChilds(Page page, bool lightContract = true)
     {
         var flatChildsList = new List<Page>();
-        var childs = await _pageRepository
+        var childsQuery = _pageRepository
             .GetAll()
-            .Where(x => x.ParentId == page.Id)
-            .Select(x => new Page
+            .Where(x => x.ParentId == page.Id);
+        if (lightContract)
+            childsQuery = childsQuery.Select(x => new Page
             {
                 Id = x.Id,
                 ParentId = x.ParentId,
                 SpaceId = x.SpaceId,
                 Name = x.Name
-            })
-            .ToListAsync();
+            });
+
+        var childs = await childsQuery.ToArrayAsync();
+        if (childs.Length == 0)
+            return Array.Empty<Page>();
 
         flatChildsList.AddRange(childs);
 
         var getChildTasks = new List<Task<Page[]>>();
         foreach (var child in childs)
-            getChildTasks.Add(GetAllChilds(child));
+            getChildTasks.Add(GetAllChilds(child, lightContract));
 
         await Task.WhenAll(getChildTasks);
 
@@ -113,12 +117,34 @@ internal class PageManager : IPageManager
         return destinationPage;
     }
 
-    public async Task<Page> Move(Page source, Page destinationParentPage)
+    public async Task<Page> Move(Page source, Page destinationParentPage, bool withChilds = true)
     {
+        var originalParentId = source.ParentId;
+
         source.SpaceId = destinationParentPage.SpaceId;
         source.ParentId = destinationParentPage.Id;
         await _pageRepository.Update(source);
-        return source;
+
+        if (withChilds)
+        {
+            var childs = await GetAllChilds(source, lightContract: false);
+            foreach (var child in childs)
+            {
+                child.SpaceId = destinationParentPage.SpaceId;
+                await _pageRepository.Update(child);
+            }
+            return source;
+        }
+
+        var firstLevelChilds = await _pageRepository.GetAll()
+            .Where(x => x.ParentId == source.Id)
+            .ToArrayAsync();
+        foreach (var child in firstLevelChilds)
+        {
+            child.ParentId = originalParentId;
+            await _pageRepository.Update(child);
+        }
+    return source;
     }
 
     public Task Remove(Page page, bool deleteChild = false)

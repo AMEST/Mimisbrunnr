@@ -26,6 +26,7 @@
             required
           ></v-select>
     </div>
+    <b-form-checkbox v-model="withChilds">&nbsp;{{$t("page.move.withChilds")}}</b-form-checkbox>
     <template #modal-footer>
       <div align="right">
         <b-button variant="warning" class="mr-05em" @click="pageAction">{{$t("page.move.move")}}</b-button>
@@ -49,7 +50,8 @@ export default {
           selectedSpace: null,
           spaces: [],
           selectedPage: null,
-          pages: []
+          pages: [],
+          withChilds: false,
       }
   },
   props: {
@@ -61,7 +63,7 @@ export default {
       if(pageId == null) return;
       if(this.selectedPage == null) return;
 
-      var newPageRequest = await axios.post("/api/page/move/" + pageId + '/' + this.selectedPage.id);
+      var newPageRequest = await axios.post(`/api/page/move/${pageId}/${this.selectedPage.id}?withChilds=${this.withChilds}`);
 
       if (this.actionCallBack !== null && newPageRequest.data.spaceKey == this.$route.params.key)
         this.actionCallBack();
@@ -107,6 +109,7 @@ export default {
       this.spaces = [];
       this.selectedPage = null;
       this.pages = [];
+      this.withChilds = false;
 
       this.init();
     },

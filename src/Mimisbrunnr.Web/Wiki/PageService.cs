@@ -145,7 +145,7 @@ internal class PageService : IPageService
         return copiedPage.ToModel(destinationSpace.Key);
     }
 
-    public async Task<PageModel> Move(string sourcePageId, string destinationParentPageId, UserInfo movedBy)
+    public async Task<PageModel> Move(string sourcePageId, string destinationParentPageId, bool withChilds, UserInfo movedBy)
     {
         var sourcePage = await _pageManager.GetById(sourcePageId) 
             ?? throw new PageNotFoundException($"Source page with id `{sourcePageId}` not found");
@@ -174,7 +174,7 @@ internal class PageService : IPageService
             await _permissionService.EnsureEditPermission(destinationSpace.Key, movedBy);
         }
 
-        var movedPage = await _pageManager.Move(sourcePage, destinationParentPage);
+        var movedPage = await _pageManager.Move(sourcePage, destinationParentPage, withChilds);
 
         await _distributedCache.RemoveAsync(GetPageTreeCacheKey(sourceSpace.HomePageId));
         if (!sourcePage.Id.Equals(destinationSpace.Id))

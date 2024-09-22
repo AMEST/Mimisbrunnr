@@ -10,7 +10,7 @@ public interface IPageManager
 
     Task<Page[]> FindByName(string name);
 
-    Task<Page[]> GetAllChilds(Page page);
+    Task<Page[]> GetAllChilds(Page page, bool lightContract = true);
 
     Task<Page> GetById(string id);
 
@@ -24,7 +24,7 @@ public interface IPageManager
 
     Task<Page> Copy(Page source, Page destinationParentPage);
 
-    Task<Page> Move(Page source, Page destinationParentPage);
+    Task<Page> Move(Page source, Page destinationParentPage, bool withChilds = true);
 
     Task Remove(Page page, bool deleteChild = false);
 
