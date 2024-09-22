@@ -25,6 +25,7 @@ export default {
 .version{
     position: absolute;
     bottom: 1em;
+    max-width: 90%;
 }
 @media (max-width: 860px) {
   .version {

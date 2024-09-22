@@ -95,10 +95,8 @@ export default {
       var spaces = [];
       if (favorite.length > 0)
         spaces = favorite.map(i => i.space);
-      if (spaces.length == 0){
-        var allSpaces = await SpaceService.getSpaces();
-        spaces = allSpaces.slice(0, 5);
-      }
+      if (spaces.length == 0)
+        spaces = await SpaceService.getSpaces(5, 0);
       this.spaces = spaces;
     },
     close: function () {

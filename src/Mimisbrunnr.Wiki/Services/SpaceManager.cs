@@ -18,10 +18,10 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
     {
         var query = _spaceRepository.GetAll();
 
-        if (take.HasValue)
-            query = query.Take(take.Value);
         if (skip.HasValue)
             query = query.Skip(skip.Value);
+        if (take.HasValue)
+            query = query.Take(take.Value);
 
         return await query.ToArrayAsync();
     }
@@ -45,11 +45,10 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
             query = query.Where(g => g.PermissionsFlat.Any(p => permissionsArray.Contains(p)) || g.Type == SpaceType.Public);
         }
 
-        if (take.HasValue)
-            query = query.Take(take.Value);
         if (skip.HasValue)
             query = query.Skip(skip.Value);
-
+        if (take.HasValue)
+            query = query.Take(take.Value);
 
         return await query.ToArrayAsync();
     }
@@ -59,10 +58,10 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
         var query = _spaceRepository.GetAll()
             .Where(space => space.Type == SpaceType.Public);
 
-        if (take.HasValue)
-            query = query.Take(take.Value);
         if (skip.HasValue)
             query = query.Skip(skip.Value);
+        if (take.HasValue)
+            query = query.Take(take.Value);
 
         return await query.ToArrayAsync();
     }

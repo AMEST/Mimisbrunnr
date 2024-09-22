@@ -35,7 +35,7 @@ namespace Mimisbrunnr.Storage.MongoDb.Migrations
 
         private static async Task<Space[]> GetBatch(IRepository<Space> repository, int page)
         {
-            return await repository.GetAll().Take(BatchSize).Skip(BatchSize * page).ToArrayAsync();
+            return await repository.GetAll().Skip(BatchSize * page).Take(BatchSize).ToArrayAsync();
         }
 
     }
