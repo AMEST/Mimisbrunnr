@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Mimisbrunnr.Wiki.Contracts;
+﻿using Mimisbrunnr.Wiki.Contracts;
 using Skidbladnir.Repository.Abstractions;
 
 namespace Mimisbrunnr.Wiki.Services;
@@ -37,41 +36,9 @@ internal class PageManager : IPageManager
             .Where(x => x.Name.Contains(name)).ToArrayAsync();
     }
 
-    public async Task<Page[]> GetAllChilds(Page page, bool lightContract = true)
+    public Task<Page[]> GetAllChilds(Page page, bool lightContract = true)
     {
-        var flatChildsList = new List<Page>();
-        var childsQuery = _pageRepository
-            .GetAll()
-            .Where(x => x.ParentId == page.Id);
-        if (lightContract)
-            childsQuery = childsQuery.Select(x => new Page
-            {
-                Id = x.Id,
-                ParentId = x.ParentId,
-                SpaceId = x.SpaceId,
-                Name = x.Name
-            });
-
-        var childs = await childsQuery.ToArrayAsync();
-        if (childs.Length == 0)
-            return Array.Empty<Page>();
-
-        flatChildsList.AddRange(childs);
-
-        var getChildTasks = new List<Task<Page[]>>();
-        foreach (var child in childs)
-            getChildTasks.Add(GetAllChilds(child, lightContract));
-
-        await Task.WhenAll(getChildTasks);
-
-        foreach (var innerChildsTask in getChildTasks)
-        {
-            var innerChilds = innerChildsTask.Result;
-            if (innerChilds != null && innerChilds.Length > 0)
-                flatChildsList.AddRange(innerChilds);
-        }
-
-        return flatChildsList.ToArray();
+        return GetAllChilds([page.Id], lightContract);
     }
 
     public Task<Page> GetById(string id)
@@ -237,6 +204,31 @@ internal class PageManager : IPageManager
         var allVersions = await GetAllVersions(page);
         foreach (var version in allVersions)
             await _historicalPageRepository.Delete(version);
+    }
+    
+    private async Task<Page[]> GetAllChilds(string[] pageIds, bool lightContract = true)
+    {
+        var childsQuery = _pageRepository
+            .GetAll()
+            .Where(x => pageIds.Contains(x.ParentId));
+        if (lightContract)
+            childsQuery = childsQuery.Select(x => new Page
+            {
+                Id = x.Id,
+                ParentId = x.ParentId,
+                SpaceId = x.SpaceId,
+                Name = x.Name
+            });
+
+        var childs = await childsQuery.ToListAsync();
+        if (childs.Count == 0)
+            return Array.Empty<Page>();
+        
+        var innerChilds = await GetAllChilds(childs.Select(x => x.Id).ToArray(), lightContract);
+        if (innerChilds.Length > 0)
+            childs.AddRange(innerChilds);
+
+        return childs.ToArray();
     }
 
 }
