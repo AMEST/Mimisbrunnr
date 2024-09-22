@@ -9,7 +9,7 @@
       ></b-avatar>
       <b>{{ space.name }}</b>
     </div>
-    <div class="space-actions">
+    <div class="space-actions" v-if="this.$store.state.application.profile">
       <b-button variant="light" @click="star">
         <b-icon-star-fill v-if="inFavorite" variant="warning" />
         <b-icon-star v-else />
@@ -26,6 +26,7 @@ export default {
   name: "SpaceListItem",
   props: {
     space: Object,
+    callBack: Function
   },
   data() {
     return {
@@ -50,11 +51,15 @@ export default {
         await FavoriteService.addSpace(this.space.key);
       }
       this.inFavorite = !this.inFavorite;
+      if (this.callBack)
+        this.callBack();
     },
     unStar: async function () {
       var favorite = await FavoriteService.getSpace(this.space.key);
       if (favorite == null) return;
       await FavoriteService.delete(favorite.id);
+      if (this.callBack)
+        this.callBack();
     },
   },
   created: async function () {

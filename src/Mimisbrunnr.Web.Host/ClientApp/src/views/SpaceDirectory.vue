@@ -37,6 +37,7 @@
           v-for="space in spaces"
           :key="space.key"
           :space="space"
+          :callBack="loadFavorites"
           button
         />
       </b-list-group>
