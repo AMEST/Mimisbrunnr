@@ -40,7 +40,7 @@ internal class SearchService : ISearchService
 
         var pages = await _pageSearcher.Search(text);
         var userSpaces = await _spaceDisplayService.FindUserVisibleSpaces(searchBy);
-        var userSpacesId = userSpaces.Select(x => x.Id);
+        var userSpacesId = userSpaces.Select(x => x.Id).ToArray();
         return pages.Where(x => userSpacesId.Contains(x.SpaceId)).Select(x => x.ToModel(userSpaces.First(s => s.Id == x.SpaceId).Key));
     }
 

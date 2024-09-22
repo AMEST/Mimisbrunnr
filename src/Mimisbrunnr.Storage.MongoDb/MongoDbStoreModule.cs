@@ -18,7 +18,11 @@ namespace Mimisbrunnr.Storage.MongoDb;
 
 public class MongoDbStoreModule : RunnableModule
 {
-    public override Type[] DependsModules => new[] { typeof(PersonalSpaceAvatarMigrationModule) };
+    public override Type[] DependsModules => [ 
+        typeof(PersonalSpaceAvatarMigrationModule),
+        typeof(SpacesFlatPermissionMigrationModule)
+     ];
+     
     public override void Configure(IServiceCollection services)
     {
         // Register conventions
@@ -149,6 +153,12 @@ public class MongoDbStoreModule : RunnableModule
 
         var personalSpaceSearch = Builders<Space>.IndexKeys.Ascending(x => x.Type).Ascending(x => x.Permissions);
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<Space>(personalSpaceSearch, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+
+        var visibleSpaces = Builders<Space>.IndexKeys.Ascending(x => x.PermissionsFlat).Ascending(x => x.Type);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Space>(visibleSpaces, new CreateIndexOptions()
         {
             Background = true
         }));

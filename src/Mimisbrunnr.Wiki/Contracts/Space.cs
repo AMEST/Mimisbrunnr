@@ -23,6 +23,7 @@ public class Space : IHasId<string>
         Status = status;
         Permissions = permissions;
     }
+    
     public string Id { get; set; }
 
     public string Key { get; internal set; }
@@ -39,5 +40,16 @@ public class Space : IHasId<string>
 
     public SpaceStatus Status { get; internal set; }
 
+    public string[] PermissionsFlat { get; private set; }
+
     public IEnumerable<Permission> Permissions { get; internal set; }
+
+    public void UpdatePermissions()
+    {
+        var flatUsers = Permissions.Where(x => x.User != null)
+            .Select(x => $"user_{x.User.Email?.ToLower()}");
+        var flatGroup = Permissions.Where(x => x.Group != null)
+            .Select(x => $"group_{x.Group.Name?.ToLower()}");
+        PermissionsFlat = flatUsers.Concat(flatGroup).ToArray();
+    }
 }

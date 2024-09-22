@@ -5,7 +5,7 @@ namespace Mimisbrunnr.Web.Wiki;
 
 public interface ISpaceService
 {
-    Task<SpaceModel[]> GetAll(UserInfo requestedBy);
+    Task<SpaceModel[]> GetAll(UserInfo requestedBy, int? take = null, int? skip = null);
 
     Task<SpaceModel> GetByKey(string key, UserInfo requestedBy);
 
