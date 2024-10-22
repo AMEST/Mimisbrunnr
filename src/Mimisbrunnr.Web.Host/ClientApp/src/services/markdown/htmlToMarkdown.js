@@ -1,3 +1,4 @@
+//TODO: Migrate to showdown or turndown
 export function htmlToMarkdown(html) {
     const headerRegex = /<h([1-6])[^>]*>(.*?)<\/h\1>/g;
     const paragraphRegex = /<p[^>]*>(.*?)<\/p>/g;
