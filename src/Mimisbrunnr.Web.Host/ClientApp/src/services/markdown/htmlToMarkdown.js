@@ -1,72 +1,17 @@
-//TODO: Migrate to showdown or turndown
-export function htmlToMarkdown(html) {
-    const headerRegex = /<h([1-6])[^>]*>(.*?)<\/h\1>/g;
-    const paragraphRegex = /<p[^>]*>(.*?)<\/p>/g;
-    const linkRegex = /<a[^>]*href="([^"]+)"[^>]*>(.*?)<\/a>/g;
-    const imageSrcRegex = /<img[^>]*src="([^"]+)"[^>]*>/g;
-    const imageAltRegex = /<img[^>]*alt="([^"]+)"[^>]*>/g;
-    const boldRegex = /<strong[^>]*>(.*?)<\/strong>/g;
-    const italicRegex = /<em[^>]*>(.*?)<\/em>/g;
-    const hrRegex = /<hr\s*.*?\/?>/g;
-    const listItemRegex = /<li[^>]*>(.*?)<\/li>/g;
-    const ulRegex = /<ul[^>]*>(.*?)<\/ul>/gs;
-    const olRegex = /<ol[^>]*>(.*?)<\/ol>/gs;
-    const metaCharsetRegex = /<meta\s+charset='utf-8'\s*\/?>/g;
+import showdown from 'showdown';
+
+export function removeSpacesInsideTags(html) {
+    return html.replace(/<([^>]+)>/g, (match, p1) => {
+        return `<${p1.replace(/\s+/g, ' ').trim()}>`;
+    });
+}
+
+//eslint-disable-next-line
+export function sanitize(html, removeMeta, removeEmptyTags, removeAttribute, removeComments) {
+    const metaCharsetRegex = /<meta[^>]*>/g;
     const emptyTagRegex = /<[^>]*>\s*<\/[^>]*>/g;
-    const brRegex = /<br\s*.*?\/?>/g;
     const attributesRegex = /<[^>]*>/g;
-    const inlineCodeRegex = /<code[^>]*>(.*?)<\/code>/gs;
-    const codeRegex = /^(\s*)<code[^>]*>(.*?)<\/code>(\s*)\$/gm;
-
-    function replaceHeaders(match, level, text) {
-        return `${'#'.repeat(parseInt(level, 10))} ${text}`;
-    }
-
-    function replaceParagraphs(match, text) {
-        return `\n${text}\n`;
-    }
-
-    function replaceLinks(match, url, text) {
-        return ` [${text}](${url}) `;
-    }
-
-    function replaceImages(html) {
-        let src = imageSrcRegex.exec(html);
-        let alt = imageAltRegex.exec(html);
-        src = src ? src[1] : '';
-        alt = alt ? alt[1] : 'img';
-        return `![${alt || src}](${src || alt})`;
-    }
-
-    function replaceBold(match, text) {
-        return `**${text}**`;
-    }
-
-    function replaceItalic(match, text) {
-        return `*${text}*`;
-    }
-
-    // eslint-disable-next-line
-    function replaceHr(match) {
-        return `\n---\n`;
-    }
-
-    function replaceListItems(match, text) {
-        return `- ${text}`;
-    }
-
-    function replaceUl(match, text) {
-        return `\n${text.replace(listItemRegex, replaceListItems)}\n`;
-    }
-
-    function replaceOl(match, text) {
-        return `\n${text.replace(listItemRegex, replaceListItems)}\n`;
-    }
-
-    // eslint-disable-next-line
-    function replaceBr(match) {
-        return '  \n';
-    }
+    const commentRegex = /<!--[^>]*>/g;
 
     function removeAttributes(match) {
         return match.replace(/<[^>]*>/g, (tag) => {
@@ -74,30 +19,142 @@ export function htmlToMarkdown(html) {
         });
     }
 
-    function replaceInlineCode(match, text) {
-        return `\`${text}\``;
-    }
+    if(removeMeta)
+        html = html.replace(metaCharsetRegex, '');
+    if(removeEmptyTags)
+        html = html.replace(emptyTagRegex, '');
+    if(removeAttribute)
+        html = removeSpacesInsideTags(html.replace(attributesRegex, removeAttributes));
+    if(removeComments)
+        html = html.replace(commentRegex, '');
+    return html;
+}
 
-    function replaceCode(match, leadingSpaces, text, trailingSpaces) {
-        return `${leadingSpaces}\`\`\`\n\${text}\n\`\`\`${trailingSpaces}`;
-    }
+//eslint-disable-next-line
+export function fixShowdownNodeSubParser(){
+    showdown.subParser('makeMarkdown.node', function (node, globals, spansOnly) {
+        'use strict';
 
-    let markdown = html
-        .replace(headerRegex, replaceHeaders)
-        .replace(paragraphRegex, replaceParagraphs)
-        .replace(linkRegex, replaceLinks)
-        .replace(/<img[^>]*\/?>/g, replaceImages)
-        .replace(boldRegex, replaceBold)
-        .replace(italicRegex, replaceItalic)
-        .replace(hrRegex, replaceHr)
-        .replace(ulRegex, replaceUl)
-        .replace(olRegex, replaceOl)
-        .replace(brRegex, replaceBr)
-        .replace(metaCharsetRegex, '')
-        .replace(emptyTagRegex, '')
-        .replace(attributesRegex, removeAttributes)
-        .replace(codeRegex, replaceCode)
-        .replace(inlineCodeRegex, replaceInlineCode);
+        spansOnly = spansOnly || false;
 
-    return markdown.trim();
+        let txt = '';
+
+        // edge case of text without wrapper paragraph
+        if (node.nodeType === 3) {
+          return showdown.subParser('makeMarkdown.txt')(node, globals);
+        }
+
+        // HTML comment
+        if (node.nodeType === 8) {
+          return '<!--' + node.data + '-->\n\n';
+        }
+
+        // process only node elements
+        if (node.nodeType !== 1) {
+          return '';
+        }
+
+        const tagName = node.tagName.toLowerCase();
+
+        switch (tagName) {
+
+          //
+          // BLOCKS
+          //
+          case 'h1':
+            if (!spansOnly) { txt = showdown.subParser('makeMarkdown.header')(node, globals, 1) + '\n\n'; }
+            break;
+          case 'h2':
+            if (!spansOnly) { txt = showdown.subParser('makeMarkdown.header')(node, globals, 2) + '\n\n'; }
+            break;
+          case 'h3':
+            if (!spansOnly) { txt = showdown.subParser('makeMarkdown.header')(node, globals, 3) + '\n\n'; }
+            break;
+          case 'h4':
+            if (!spansOnly) { txt = showdown.subParser('makeMarkdown.header')(node, globals, 4) + '\n\n'; }
+            break;
+          case 'h5':
+            if (!spansOnly) { txt = showdown.subParser('makeMarkdown.header')(node, globals, 5) + '\n\n'; }
+            break;
+          case 'h6':
+            if (!spansOnly) { txt = showdown.subParser('makeMarkdown.header')(node, globals, 6) + '\n\n'; }
+            break;
+
+          case 'p':
+            if (!spansOnly) { txt = showdown.subParser('makeMarkdown.paragraph')(node, globals) + '\n\n'; }
+            break;
+
+          case 'blockquote':
+            if (!spansOnly) { txt = showdown.subParser('makeMarkdown.blockquote')(node, globals) + '\n\n'; }
+            break;
+
+          case 'hr':
+            if (!spansOnly) { txt = showdown.subParser('makeMarkdown.hr')(node, globals) + '\n\n'; }
+            break;
+
+          case 'ol':
+            if (!spansOnly) { txt = showdown.subParser('makeMarkdown.list')(node, globals, 'ol') + '\n\n'; }
+            break;
+
+          case 'ul':
+            if (!spansOnly) { txt = showdown.subParser('makeMarkdown.list')(node, globals, 'ul') + '\n\n'; }
+            break;
+
+          case 'precode':
+            if (!spansOnly) { txt = showdown.subParser('makeMarkdown.codeBlock')(node, globals) + '\n\n'; }
+            break;
+
+          case 'pre':
+            if (!spansOnly) { txt = showdown.subParser('makeMarkdown.pre')(node, globals) + '\n\n'; }
+            break;
+
+          case 'table':
+            if (!spansOnly) { txt = showdown.subParser('makeMarkdown.table')(node, globals) + '\n\n'; }
+            break;
+
+          //
+          // SPANS
+          //
+          case 'code':
+            txt = showdown.subParser('makeMarkdown.codeSpan')(node, globals);
+            break;
+
+          case 'em':
+          case 'i':
+            txt = showdown.subParser('makeMarkdown.emphasis')(node, globals);
+            break;
+
+          case 'strong':
+          case 'b':
+            txt = showdown.subParser('makeMarkdown.strong')(node, globals);
+            break;
+
+          case 'del':
+            txt = showdown.subParser('makeMarkdown.strikethrough')(node, globals);
+            break;
+
+          case 'a':
+            txt = showdown.subParser('makeMarkdown.links')(node, globals);
+            break;
+
+          case 'img':
+            txt = showdown.subParser('makeMarkdown.image')(node, globals);
+            break;
+          case 'br':
+            txt = node.outerHTML + '\n';
+            break;
+          default:
+            txt = node.outerHTML + ' ';
+        }
+        return txt;
+      });
+}
+
+
+export function htmlToMarkdown(html) {
+    var sanitizedHtml = sanitize(html, true, false, true, false);
+    fixShowdownNodeSubParser();
+    var converter = new showdown.Converter();
+    var markdown = converter.makeMarkdown(sanitizedHtml);
+    return sanitize(markdown, false, true, false, true);
 }
