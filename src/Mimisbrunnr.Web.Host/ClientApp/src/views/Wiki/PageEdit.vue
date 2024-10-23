@@ -64,6 +64,7 @@ const VueMarkdown = () =>
 import axios from "axios";
 import { debounce, isImageFile } from "@/services/Utils.js";
 import { formatMarkdownTables, insertMarkdownTableColumn, insertMarkdownTableRow } from "@/services/markdown/tableUtils";
+import { htmlToMarkdown } from "@/services/markdown/htmlToMarkdown";
 import DraftModal from "@/components/pageEditor/DraftModal.vue";
 import GuideModal from "@/components/pageEditor/GuideModal.vue";
 import ProfileService from "@/services/profileService";
@@ -269,13 +270,17 @@ export default {
         this.formatTables();
     },
     paste: async function (codeMirror, pasteEvent) {
+        pasteEvent.preventDefault();
         var data = (pasteEvent.clipboardData || window.clipboardData).items;
+        var imageData = null;
         var pasted = "";
-
         for (var i = 0; i < data.length; i++) {
-            if (data[i].type.indexOf("image") !== -1) {
-            var file = data[i].getAsFile();
+            if(data[i].type.indexOf("image") !== -1)
+                imageData = data[i];
+        }
 
+        if(imageData){
+            let file = imageData.getAsFile();
             var formData = new FormData();
             formData.append("attachment", file);
             await axios({
@@ -285,15 +290,18 @@ export default {
                 validateStatus: false,
             });
             this.addAttachmentLink({ name: file.name });
-
-            } else if (data[i].type.indexOf("text/plain") !== -1) {
-                try{
-                    pasted += data[i].getAsString();
-                }catch (e) {
-                    //nothing
-                }
-            }
+            return;
         }
+        try{
+            pasted = pasteEvent.clipboardData.getData('text/html');
+            pasted = htmlToMarkdown(pasted);
+            if (!pasted)
+                pasted = pasteEvent.clipboardData.getData('text/plain');
+        }catch(e) {
+            console.error(e);
+            pasted = pasteEvent.clipboardData.getData('text/plain');
+        }
+
         if (pasted.length === 0) 
             return;
 
@@ -452,7 +460,7 @@ export default {
 }
 .editor-preview-side {
   height: calc(100vh - var(--page-edit-height, 240px));
-  top: 152.75px;
+  top: 161.75px;
 }
 .side-by-side-switch {
   display: inline-block;

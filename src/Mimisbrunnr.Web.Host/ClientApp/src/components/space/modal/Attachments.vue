@@ -5,24 +5,32 @@
     centered
     :title="$t('page.attachments.title')"
   >
-    <b-alert v-if="this.attachments.length == 0" show variant="light">{{
-      $t("page.attachments.empty")
-    }}</b-alert>
-    <b-list-group-item
-      button
-      v-for="attachment in this.attachments"
-      :key="attachment.name"
-    >
-      <span v-on:click="selectAttachment(attachment)">{{
-        attachment.name
-      }}</span>
-      <span class="text-muted" style="float: right">
-        <b-icon-trash
-          v-on:click="deleteAttachment(attachment)"
-          style="cursor: pointer"
-        />
-      </span>
-    </b-list-group-item>
+    <b-overlay :show="uploadOverlay" rounded="sm">
+        <b-alert v-if="this.attachments.length == 0" show variant="light">{{
+        $t("page.attachments.empty")
+        }}</b-alert>
+        <b-list-group-item
+        button
+        v-for="attachment in this.attachments"
+        :key="attachment.name"
+        >
+        <span v-on:click="selectAttachment(attachment)">{{
+            attachment.name
+        }}</span>
+        <span class="text-muted" style="float: right">
+            <b-icon-trash
+            v-on:click="deleteAttachment(attachment)"
+            style="cursor: pointer"
+            />
+        </span>
+        </b-list-group-item>
+        <template #overlay>
+            <div class="text-center">
+                <b-progress :value="uploadProgress" variant="info" show-progress striped animated height="20px" class="mt-2"></b-progress>
+                <p>{{$t("page.attachments.uploading")}}</p>
+            </div>
+      </template>
+    </b-overlay>
     <template #modal-footer>
       <b-input-group style="width: 100%">
         <b-form-file
@@ -52,6 +60,8 @@ export default {
     return {
       newAttachment: null,
       attachments: [],
+      uploadOverlay: false,
+      uploadProgress: 0,
     };
   },
   components: {
@@ -76,6 +86,9 @@ export default {
         return;
       }
       this.attachments = attachmentRequest.data;
+      this.newAttachment = null;
+      this.uploadOverlay = false;
+      this.uploadProgress = 0;
     },
     selectAttachment: async function (attachment) {
       console.log("[select]", attachment);
@@ -100,6 +113,8 @@ export default {
       await this.init();
     },
     uploadAttachment: async function () {
+      var self = this;
+      this.uploadOverlay = true;
       var formData = new FormData();
       formData.append("attachment", this.newAttachment);
       await axios({
@@ -107,6 +122,10 @@ export default {
         url: "/api/attachment/" + this.page.id,
         data: formData,
         validateStatus: false,
+        onUploadProgress: (evt) => {
+            if (evt.lengthComputable)
+                self.uploadProgress = Math.round((evt.loaded / evt.total) * 100);
+        }
       });
       await this.init();
     },
