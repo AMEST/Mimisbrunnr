@@ -305,25 +305,33 @@ public class MongoDbStoreModule : RunnableModule
     private static async Task CreateFavoriteIndexes(BaseMongoDbContext mongoContext)
     {
         var collection = mongoContext.GetCollection<Favorite>();
-        var userIdKeyDefinition = Builders<Favorite>.IndexKeys.Ascending(x => x.OwnerEmail);
+        var userIdKeyDefinition = Builders<Favorite>.IndexKeys
+            .Ascending("_t")
+            .Ascending(x => x.OwnerEmail);
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<Favorite>(userIdKeyDefinition, new CreateIndexOptions()
         {
             Background = true
         }));
         var favoriteUserIndex = Builders<FavoriteUser>.IndexKeys
-            .Ascending(x => x.OwnerEmail).Ascending(x => x.UserEmail);
+            .Ascending("_t")
+            .Ascending(x => x.OwnerEmail)
+            .Ascending(x => x.UserEmail);
         await collection.OfType<FavoriteUser>().Indexes.CreateOneAsync(new CreateIndexModel<FavoriteUser>(favoriteUserIndex, new CreateIndexOptions()
         {
             Background = true
         }));
         var favoriteSpaceIndex = Builders<FavoriteSpace>.IndexKeys
-            .Ascending(x => x.OwnerEmail).Ascending(x => x.SpaceKey);
+            .Ascending("_t")
+            .Ascending(x => x.OwnerEmail)
+            .Ascending(x => x.SpaceKey);
         await collection.OfType<FavoriteSpace>().Indexes.CreateOneAsync(new CreateIndexModel<FavoriteSpace>(favoriteSpaceIndex, new CreateIndexOptions()
         {
             Background = true
         }));
         var favoritePageIndex = Builders<FavoritePage>.IndexKeys
-            .Ascending(x => x.OwnerEmail).Ascending(x => x.PageId);
+            .Ascending("_t")
+            .Ascending(x => x.OwnerEmail)
+            .Ascending(x => x.PageId);
         await collection.OfType<FavoritePage>().Indexes.CreateOneAsync(new CreateIndexModel<FavoritePage>(favoritePageIndex, new CreateIndexOptions()
         {
             Background = true
