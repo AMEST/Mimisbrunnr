@@ -29,7 +29,7 @@ internal class FavoritesManager : IFavoritesManager
     {
         if (filter is null)
         {
-            return await _repository.GetAll().Where(x => x.OwnerEmail == email).ToArrayAsync(token);
+            return await _repository.GetAllByType<Favorite>().Where(x => x.OwnerEmail == email).ToArrayAsync(token);
         }
         if (!filter.Type.HasValue)
             return await GetFiltered<Favorite>(email, filter, token);
