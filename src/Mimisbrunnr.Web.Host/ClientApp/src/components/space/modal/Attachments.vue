@@ -32,8 +32,8 @@
                     show-progress 
                     striped 
                     animated 
-                    height="20px" 
-                    class="mt-2">
+                    height="25px" 
+                    class="mt-2 attachment-progressbar">
                 </b-progress>
                 <p>{{$t("page.attachments.uploading")}}</p>
             </div>
@@ -143,4 +143,10 @@ export default {
 </script>
 
 <style>
+.attachment-progressbar {
+    min-width: 300px;
+}
+.attachment-progressbar .progress-bar {
+    font-size: 11px!important;
+}
 </style>
