@@ -6,27 +6,35 @@
     :title="$t('page.attachments.title')"
   >
     <b-overlay :show="uploadOverlay" rounded="sm">
-        <b-alert v-if="this.attachments.length == 0" show variant="light">{{
-        $t("page.attachments.empty")
-        }}</b-alert>
+        <b-alert v-if="this.attachments.length == 0" show variant="light">
+            {{$t("page.attachments.empty")}}
+        </b-alert>
         <b-list-group-item
-        button
-        v-for="attachment in this.attachments"
-        :key="attachment.name"
+            button
+            v-for="attachment in this.attachments"
+            :key="attachment.name"
         >
-        <span v-on:click="selectAttachment(attachment)">{{
-            attachment.name
-        }}</span>
+        <span v-on:click="selectAttachment(attachment)">
+            {{attachment.name}}
+        </span>
         <span class="text-muted" style="float: right">
             <b-icon-trash
-            v-on:click="deleteAttachment(attachment)"
-            style="cursor: pointer"
+                v-on:click="deleteAttachment(attachment)"
+                style="cursor: pointer"
             />
         </span>
         </b-list-group-item>
         <template #overlay>
             <div class="text-center">
-                <b-progress :value="uploadProgress" variant="info" show-progress striped animated height="20px" class="mt-2"></b-progress>
+                <b-progress 
+                    :value="uploadProgress" 
+                    variant="info" 
+                    show-progress 
+                    striped 
+                    animated 
+                    height="20px" 
+                    class="mt-2">
+                </b-progress>
                 <p>{{$t("page.attachments.uploading")}}</p>
             </div>
       </template>
@@ -38,13 +46,14 @@
           :placeholder="$t('page.attachments.placeholder')"
           drop-placeholder="Drop file here..."
           style="width: 80%"
-        ></b-form-file>
+        >
+        </b-form-file>
         <b-input-group-append>
           <b-button
-            @click="uploadAttachment"
-            variant="primary"
-            >{{ $t("page.attachments.upload") }}</b-button
-          >
+                @click="uploadAttachment"
+                variant="primary">
+                {{ $t("page.attachments.upload") }}
+          </b-button>
         </b-input-group-append>
       </b-input-group>
     </template>
