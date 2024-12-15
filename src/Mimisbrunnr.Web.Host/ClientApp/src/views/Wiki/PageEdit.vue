@@ -452,7 +452,7 @@ export default {
 }
 .editor-preview-side {
   height: calc(100vh - var(--page-edit-height, 240px));
-  top: 152.75px;
+  top: 161.75px;
 }
 .side-by-side-switch {
   display: inline-block;
