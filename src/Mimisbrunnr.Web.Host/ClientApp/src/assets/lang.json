@@ -290,7 +290,8 @@
                 "upload": "Upload",
                 "browse": "Browse",
                 "placeholder": "Choose a file",
-                "empty": "No attachments on this page"
+                "empty": "No attachments on this page",
+                "uploading": "Uploading...."
             },
             "copy": {
                 "title": "Copy",
@@ -671,7 +672,8 @@
                 "upload": "Загрузить",
                 "browse": "Выбрать",
                 "placeholder": "Выберите файл",
-                "empty": "На этой странице нет вложений"
+                "empty": "На этой странице нет вложений",
+                "uploading": "Загрузка...."
             },
             "copy": {
                 "title": "Копировать",
