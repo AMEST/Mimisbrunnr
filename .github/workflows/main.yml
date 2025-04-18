@@ -25,10 +25,10 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '6.0'
+        dotnet-version: '8.0'
     - name: Build
       run: |
-        dotnet publish ./src/DataImport/Mimisbrunnr.DataImport.Cli/Mimisbrunnr.DataImport.Cli.csproj -c Release --self-contained -r ${{ matrix.rid }} -p:PublishSingleFile=true -o ./bin/mimisbrunnr-import-cli-${{ matrix.rid }}
+        dotnet publish ./src/DataImport/Mimisbrunnr.DataImport.Cli/Mimisbrunnr.DataImport.Cli.csproj -c Release --self-contained -r ${{ matrix.rid }} -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o ./bin/mimisbrunnr-import-cli-${{ matrix.rid }}
         zip -r ${{ matrix.rid }} ./bin/mimisbrunnr-import-cli-${{ matrix.rid }}
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
@@ -56,10 +56,10 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '6.0'
+        dotnet-version: '8.0'
     - name: Build
       run: |
-        dotnet publish ./src/Migration/Mimisbrunnr.Migration.Persistent.Cli/Mimisbrunnr.Migration.Persistent.Cli.csproj -c Release --self-contained -r ${{ matrix.rid }} -p:PublishSingleFile=true -o ./bin/mimisbrunnr-persistent-migration-cli-${{ matrix.rid }}
+        dotnet publish ./src/Migration/Mimisbrunnr.Migration.Persistent.Cli/Mimisbrunnr.Migration.Persistent.Cli.csproj -c Release --self-contained -r ${{ matrix.rid }} -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o ./bin/mimisbrunnr-persistent-migration-cli-${{ matrix.rid }}
         zip -r ${{ matrix.rid }} ./bin/mimisbrunnr-persistent-migration-cli-${{ matrix.rid }}
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
@@ -87,14 +87,14 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '6.0'
+        dotnet-version: '8.0'
     - name: Setup NodeJs
       uses: actions/setup-node@v1
       with:
         node-version: '18'
     - name: Build
       run: |
-        dotnet publish ./src/Mimisbrunnr.Web.Host/Mimisbrunnr.Web.Host.csproj -c Release --self-contained -r ${{ matrix.rid }} -p:PublishSingleFile=true -o ./bin/mimisbrunnr-wiki-${{ matrix.rid }}
+        dotnet publish ./src/Mimisbrunnr.Web.Host/Mimisbrunnr.Web.Host.csproj -c Release --self-contained -r ${{ matrix.rid }} -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o ./bin/mimisbrunnr-wiki-${{ matrix.rid }}
         zip -r ${{ matrix.rid }} ./bin/mimisbrunnr-wiki-${{ matrix.rid }}
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
@@ -139,7 +139,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '6.0'
+        dotnet-version: '8.0'
     - name: Pack package
       run: dotnet pack ./src/Integration/Mimisbrunnr.Integration.Client/Mimisbrunnr.Integration.Client.csproj -c Release -p:PackageVersion=${{ steps.version.outputs.version }}
     - name: Publish
