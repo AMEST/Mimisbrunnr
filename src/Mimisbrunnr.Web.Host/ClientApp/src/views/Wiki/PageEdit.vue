@@ -243,11 +243,90 @@ export default {
           self.simplemde.codemirror.on("paste", self.paste);
           // eslint-disable-next-line
           self.simplemde.codemirror.on("change", (cm, ev) => self.saveDraft());
+          self.simplemde.codemirror.on("mousedown", self.handleMacroHover);
           window.cm = this.simplemde.codemirror;
         },
         1000,
         this
       );
+    },
+
+    handleMacroHover: function(cm, event) {
+      const pos = cm.coordsChar({left: event.clientX, top: event.clientY});
+      const line = cm.getLine(pos.line);
+      const macroRegex = /\{\{macro:[^}]+\}\}/g;
+      let match;
+      
+      while ((match = macroRegex.exec(line)) !== null) {
+        if (pos.ch >= match.index && pos.ch <= match.index + match[0].length) {
+          this.showMacroButtons(cm, pos, match[0]);
+          return;
+        }
+      }
+      this.hideMacroButtons();
+    },
+
+    showMacroButtons: function(cm, pos, macroContent) {
+      this.hideMacroButtons();
+      const buttons = document.createElement('div');
+      buttons.className = 'macro-buttons';
+      
+      const editBtn = document.createElement('button');
+      editBtn.innerText = 'Изменить';
+      editBtn.onclick = () => this.editMacro(pos, macroContent);
+      
+      const deleteBtn = document.createElement('button');
+      deleteBtn.innerText = 'Удалить';
+      deleteBtn.onclick = () => this.deleteMacro(pos, macroContent);
+      
+      buttons.appendChild(editBtn);
+      buttons.appendChild(deleteBtn);
+      
+      const coords = cm.charCoords(pos);
+      buttons.style.position = 'absolute';
+      buttons.style.left = `${coords.left}px`;
+      buttons.style.top = `${coords.bottom}px`;
+      
+      document.body.appendChild(buttons);
+      this.currentMacroButtons = buttons;
+    },
+
+    hideMacroButtons: function() {
+      if (this.currentMacroButtons) {
+        document.body.removeChild(this.currentMacroButtons);
+        this.currentMacroButtons = null;
+      }
+    },
+
+    deleteMacro: function(pos) {
+      // Находим точное начало макроса
+      const lineText = this.simplemde.codemirror.getLine(pos.line);
+      const macroStart = lineText.lastIndexOf('{{macro:', pos.ch);
+      
+      if (macroStart === -1) {
+        this.hideMacroButtons();
+        return;
+      }
+      
+      // Находим конец макроса
+      const macroEnd = lineText.indexOf('}}', macroStart);
+      if (macroEnd === -1) {
+        this.hideMacroButtons();
+        return;
+      }
+      
+      // Удаляем весь макрос
+      const startPos = {line: pos.line, ch: macroStart};
+      const endPos = {line: pos.line, ch: macroEnd + 2}; // +2 чтобы захватить }}
+      
+      this.simplemde.codemirror.replaceRange('', startPos, endPos);
+      this.hideMacroButtons();
+    },
+
+    editMacro: function(pos, macroContent) {
+      // Заглушка для редактирования макроса
+      console.log('Editing macro at:', pos, 'Content:', macroContent);
+      this.hideMacroButtons();
     },
     insertTable: function () {
       this.simplemde.drawTable();
@@ -495,5 +574,41 @@ export default {
     position: relative;
     top: 0.55em;
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOCAxOCI+CiAgPHBhdGggZmlsbD0iIzQ5NGM0ZSIgZD0iTTMgMTJhMSAxIDAgMCAxIDEgMXYxaDFhMSAxIDAgMCAxIDAgMkg0djFhMSAxIDAgMCAxLTIgMHYtMUgxYTEgMSAwIDAgMSAwLTJoMXYtMWExIDEgMCAwIDEgMS0xem03IDJoNnYyaC02di0yem0tMi0xdjRhMSAxIDAgMCAwIDEgMWg4YTEgMSAwIDAgMCAxLTF2LTRhMSAxIDAgMCAwLTEtMUg5YTEgMSAwIDAgMC0xIDF6TTAgMXY4YTEgMSAwIDAgMCAxIDFoMTZhMSAxIDAgMCAwIDEtMVYxYTEgMSAwIDAgMC0xLTFIMWExIDEgMCAwIDAtMSAxem0xNiA1djJIMlY2aDE0em0wLTR2MkgyVjJoMTR6Ii8+Cjwvc3ZnPgo=") !important;
+}
+
+.mm-macro-block {
+    display: block;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    margin: 0 2px;
+    min-height: 24px;
+    max-width: 100px;
+    vertical-align: text-bottom;
+}
+.mm-macro-block:before{
+    content: "\00a7 Macro";
+    padding-left: 10px
+}
+
+.macro-buttons {
+    position: absolute;
+    background: white;
+    border: 1px solid #ddd;
+    padding: 4px;
+    z-index: 1000;
+    display: flex;
+    gap: 4px;
+}
+
+.macro-buttons button {
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 2px 6px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.macro-buttons button:hover {
+    background: #e0e0e0;
 }
 </style>
