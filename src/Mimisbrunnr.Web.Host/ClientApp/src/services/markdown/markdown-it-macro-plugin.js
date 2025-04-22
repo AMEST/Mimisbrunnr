@@ -14,7 +14,7 @@ function macroPlugin(md) {
           const encodedParams = encodeURI(paramAttributes);
   
           token.block = true;
-          token.content = `<div id="macro_${id}" aria-name="${name}" aria-params="${encodedParams}"></div>`;
+          token.content = `<div id="macro_${id}" class="mm-macro-block" aria-type="macros" aria-name="${name}" aria-params="${encodedParams}"></div>`;
           token.map = [start, state.pos];
           token.markup = '{{'; // markup will be set to '{{' for proper handling
         }

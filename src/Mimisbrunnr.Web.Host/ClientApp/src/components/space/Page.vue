@@ -272,6 +272,12 @@ export default {
             printWindow.close();
         }, 1000);
     },
+    processMacroses(){
+        var macroses = document.querySelectorAll('[aria-type="macros"]');
+        macroses.forEach(x => {
+            console.log(`Founded macros id="${x.id}" name="${x.getAttribute("aria-name")}" params="${x.getAttribute("aria-params")}"`)
+        });
+    },
   },
   watch: {
     // eslint-disable-next-line
@@ -282,6 +288,7 @@ export default {
       setTimeout(() => hljs.highlightAll(), 100);
       setTimeout(this.scrollToAnchor, 100);
       setTimeout(replaceRelativeLinksToRoute, 250, "page-content");
+      setTimeout(this.processMacroses, 300);
     },
   },
   mounted: function () {
@@ -291,6 +298,7 @@ export default {
     setTimeout(() => hljs.highlightAll(), 100);
     setTimeout(this.scrollToAnchor, 100);
     setTimeout(replaceRelativeLinksToRoute, 250, "page-content");
+    setTimeout(this.processMacroses, 300);
   },
 };
 </script>
