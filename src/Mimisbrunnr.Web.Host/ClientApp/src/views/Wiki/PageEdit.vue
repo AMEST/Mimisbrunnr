@@ -272,11 +272,11 @@ export default {
       buttons.className = 'macro-buttons';
       
       const editBtn = document.createElement('button');
-      editBtn.innerText = 'Изменить';
+      editBtn.innerText = this.$t("pageEditor.macroMenu.edit");
       editBtn.onclick = () => this.editMacro(pos, macroContent);
       
       const deleteBtn = document.createElement('button');
-      deleteBtn.innerText = 'Удалить';
+      deleteBtn.innerText = this.$t("pageEditor.macroMenu.delete");
       deleteBtn.onclick = () => this.deleteMacro(pos, macroContent);
       
       buttons.appendChild(editBtn);

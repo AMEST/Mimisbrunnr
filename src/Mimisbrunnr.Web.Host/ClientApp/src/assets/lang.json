@@ -258,6 +258,10 @@
                 "changed": "Last changes from {FIO} were made on {DATE}",
                 "continue": "Continue editing",
                 "reset": "Reset changes"
+            },
+            "macroMenu": {
+                "edit": "Edit",
+                "delete": "Delete"
             }
         },
         "page": {
@@ -640,6 +644,10 @@
                 "changed": "Последние изменения от {FIO} произведены {DATE}",
                 "continue": "Продолжить редактирование",
                 "reset": "Сбросить изменения"
+            },
+            "macroMenu": {
+                "edit": "Изменить",
+                "delete": "Удалить"
             }
         },
         "page": {
