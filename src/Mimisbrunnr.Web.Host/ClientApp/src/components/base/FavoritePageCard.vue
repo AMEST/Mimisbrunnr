@@ -38,6 +38,7 @@ export default {
   computed: {
     favoritePageContent() {
         var favoriteContent = this.favorite.page.content;
+        //eslint-disable-next-line
         favoriteContent = favoriteContent.replaceAll(/__|\*|\#|(?:\[([^\]]*)\]\([^)]*\))/g, "");
         return favoriteContent;
     }
