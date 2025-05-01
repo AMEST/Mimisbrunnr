@@ -44,7 +44,7 @@ internal class ApplicationConfigurationManager : IApplicationConfigurationManage
         if(configuration is not null)
             return configuration;
         
-        configuration = _repository.GetAll().SingleOrDefault();
+        configuration = await _repository.GetAll().FirstOrDefaultAsync();
         if(configuration == null)
             return null;
 
