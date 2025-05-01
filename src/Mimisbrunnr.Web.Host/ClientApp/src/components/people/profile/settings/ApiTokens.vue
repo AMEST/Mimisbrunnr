@@ -68,6 +68,8 @@ export default {
             cancelTitle: this.$t("profile.settings.tokens.approveModal.cancel"),
             okTitle: this.$t("profile.settings.tokens.approveModal.ok"),
             okVariant: 'danger',
+            headerClass: 'p-2 border-bottom-0',
+            footerClass: 'p-2 border-top-0',
       });
       if(!approve) return;
       await axios.delete(`/api/account/token/${token.id}`);

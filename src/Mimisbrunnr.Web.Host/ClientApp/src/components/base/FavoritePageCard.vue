@@ -17,8 +17,8 @@
     </b-card-text>
     <b-card-text>
       <i>
-        {{ favorite.page.content.substring(0, 80) }}
-        {{ favorite.page.content.length > 80 ? "..." : "" }}
+        {{ favoritePageContent.substring(0, 80) }}
+        {{ favoritePageContent.length > 80 ? "..." : "" }}
       </i>
     </b-card-text>
   </b-card>
@@ -34,6 +34,13 @@ export default {
   components: {
     BIconStarFill,
     BIconFileEarmarkText
+  },
+  computed: {
+    favoritePageContent() {
+        var favoriteContent = this.favorite.page.content;
+        favoriteContent = favoriteContent.replaceAll(/__|\*|\#|(?:\[([^\]]*)\]\([^)]*\))/g, "");
+        return favoriteContent;
+    }
   },
   methods: {
     goToPage() {

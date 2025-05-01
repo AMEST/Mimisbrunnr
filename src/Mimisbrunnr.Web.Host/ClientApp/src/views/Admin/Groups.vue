@@ -105,6 +105,8 @@ export default {
             cancelTitle: this.$t("admin.groups.approveModal.cancel"),
             okTitle: this.$t("admin.groups.approveModal.ok"),
             okVariant: 'danger',
+            headerClass: 'p-2 border-bottom-0',
+            footerClass: 'p-2 border-top-0',
         });
         if(!approve) return;
         await GroupService.deleteGroup(group);
