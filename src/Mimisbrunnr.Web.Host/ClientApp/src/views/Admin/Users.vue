@@ -114,21 +114,61 @@ export default {
       this.loading = false;
     },
     promote: async function (email) {
+        var approve = await this.$bvModal.msgBoxConfirm(this.$t("admin.users.approveModal.promote"), {
+            title: this.$t("admin.users.approveModal.title"),
+            centered: true,
+            size: 'sm',
+            buttonSize: 'sm',
+            cancelTitle: this.$t("admin.users.approveModal.cancel"),
+            okTitle: this.$t("admin.users.approveModal.ok"),
+            okVariant: 'danger',
+        });
+        if(!approve) return;
         var promoted = await UserService.promote(email);
         if(!promoted) return;
         this.users.filter( x => x.email == email)[0].isAdmin = true;
     },
     demote: async function (email) {
+        var approve = await this.$bvModal.msgBoxConfirm(this.$t("admin.users.approveModal.demote"), {
+            title: this.$t("admin.users.approveModal.title"),
+            centered: true,
+            size: 'sm',
+            buttonSize: 'sm',
+            cancelTitle: this.$t("admin.users.approveModal.cancel"),
+            okTitle: this.$t("admin.users.approveModal.ok"),
+            okVariant: 'danger',
+        });
+        if(!approve) return;
         var demoted = await UserService.demote(email);
         if(!demoted) return;
         this.users.filter( x => x.email == email)[0].isAdmin = false;
     },
     enable: async function (email) {
+        var approve = await this.$bvModal.msgBoxConfirm(this.$t("admin.users.approveModal.enable"), {
+            title: this.$t("admin.users.approveModal.title"),
+            centered: true,
+            size: 'sm',
+            buttonSize: 'sm',
+            cancelTitle: this.$t("admin.users.approveModal.cancel"),
+            okTitle: this.$t("admin.users.approveModal.ok"),
+            okVariant: 'danger',
+        });
+        if(!approve) return;
         var enabled = await UserService.enable(email);
         if(!enabled) return;
         this.users.filter( x => x.email == email)[0].enable = true;
     },
     disable: async function (email) {
+        var approve = await this.$bvModal.msgBoxConfirm(this.$t("admin.users.approveModal.disable"), {
+            title: this.$t("admin.users.approveModal.title"),
+            centered: true,
+            size: 'sm',
+            buttonSize: 'sm',
+            cancelTitle: this.$t("admin.users.approveModal.cancel"),
+            okTitle: this.$t("admin.users.approveModal.ok"),
+            okVariant: 'danger',
+        });
+        if(!approve) return;
         var disabled = await UserService.disable(email);
         if(!disabled) return;
         this.users.filter( x => x.email == email)[0].enable = false;

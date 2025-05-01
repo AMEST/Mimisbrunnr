@@ -60,6 +60,16 @@ export default {
       this.tokens = tokenRequest.data;
     },
     revoke: async function (token) {
+      var approve = await this.$bvModal.msgBoxConfirm(this.$t("profile.settings.tokens.approveModal.revoke"), {
+            title: this.$t("profile.settings.tokens.approveModal.title"),
+            centered: true,
+            size: 'sm',
+            buttonSize: 'sm',
+            cancelTitle: this.$t("profile.settings.tokens.approveModal.cancel"),
+            okTitle: this.$t("profile.settings.tokens.approveModal.ok"),
+            okVariant: 'danger',
+      });
+      if(!approve) return;
       await axios.delete(`/api/account/token/${token.id}`);
       await this.load();
     },

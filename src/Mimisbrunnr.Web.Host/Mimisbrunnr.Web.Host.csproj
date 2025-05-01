@@ -12,6 +12,7 @@
         <Copyright>Klabukov Erik</Copyright>
         <Version>0-develop</Version>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     </PropertyGroup>
 
     <ItemGroup>

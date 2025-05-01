@@ -210,8 +210,8 @@ export default {
       var newPage = {
         spaceKey: spaceKey,
         parentPageId: parentPageId,
-        name: "New page",
-        content: "**Page content**",
+        name: this.$t("newPage.defaultTitle"),
+        content: this.$t("newPage.defaultContent"),
       };
       var createPageRequest = await axios.post("/api/page", newPage, {
         validateStatus: false,
