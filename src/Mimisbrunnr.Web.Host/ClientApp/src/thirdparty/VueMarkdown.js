@@ -145,7 +145,6 @@ export default {
   },
 
   render(createElement) {
-    console.log(macroPlugin);
     this.md = new markdownIt()
       .use(macroPlugin)
       .use(subscript)
@@ -185,10 +184,6 @@ export default {
     this.md.use(containerPlugin, "align-center");
     this.md.use(containerPlugin, "align-right");
     this.md.use(containerPlugin, "align-left");
-
-    const input = "# My personal space\n\n @[toc] \n\n---\nAll configuration may be configured in `appsettings.json` or in Environment variables\n\n## Authentication\nasdasd\n* `Openid:Authority` - openid authority (example: `https://accounts.google.com`)\n* `Openid:ClientId` - client id in openid provider \n\n\n{{macro:name=test_macro&id=test_id&param1=value1&param2=value2}}\n";
-      
-    console.log(this.md.render(input));
 
     this.md.set({
       html: this.html,

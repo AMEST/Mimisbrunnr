@@ -349,4 +349,10 @@ export default {
 .page-dropdown {
     min-width: 190px;
 }
+#page-content p{
+    display: inline;
+}
+#page-content .mm-macro-block{
+    display: inline-block;
+}
 </style>
