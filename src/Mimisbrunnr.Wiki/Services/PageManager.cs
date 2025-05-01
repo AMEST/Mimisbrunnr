@@ -10,12 +10,14 @@ internal class PageManager : IPageManager
     private readonly IAttachmentManager _attachmentManager;
     private readonly IDraftManager _draftManager;
     private readonly ICommentManager _commentManager;
+    private readonly IPluginService _pluginService;
 
     public PageManager(IRepository<Page> pageRepository,
         IRepository<HistoricalPage> historicalPageRepository,
         IAttachmentManager attachmentManager,
         IDraftManager draftManager,
-        ICommentManager commentManager
+        ICommentManager commentManager,
+        IPluginService pluginService
     )
     {
         _pageRepository = pageRepository;
@@ -23,6 +25,7 @@ internal class PageManager : IPageManager
         _attachmentManager = attachmentManager;
         _draftManager = draftManager;
         _commentManager = commentManager;
+        _pluginService = pluginService;
     }
 
     public Task<Page[]> GetAllOnSpace(Space space)
@@ -161,6 +164,7 @@ internal class PageManager : IPageManager
         await _historicalPageRepository.DeleteAll( x => x.PageId == page.Id );
         await _draftManager.Remove(page.Id);
         await _commentManager.RemoveAll(page);
+        await _pluginService.DeleteAllStateInPage(page.Id);
         await _pageRepository.Delete(page);
     }
 
@@ -172,6 +176,7 @@ internal class PageManager : IPageManager
             await _attachmentManager.RemoveAll(child);
             await _draftManager.Remove(child.Id);
             await _commentManager.RemoveAll(child);
+            await _pluginService.DeleteAllStateInPage(child.Id);
             await _pageRepository.Delete(child);
             await _historicalPageRepository.DeleteAll( x => x.PageId == child.Id );
         }
@@ -180,6 +185,7 @@ internal class PageManager : IPageManager
         await _historicalPageRepository.DeleteAll( x => x.PageId == page.Id );
         await _draftManager.Remove(page.Id);
         await _commentManager.RemoveAll(page);
+        await _pluginService.DeleteAllStateInPage(page.Id);
         await _pageRepository.Delete(page);
     }
 

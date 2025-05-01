@@ -299,7 +299,6 @@ export default {
     },
 
     deleteMacro: function(pos) {
-      // Находим точное начало макроса
       const lineText = this.simplemde.codemirror.getLine(pos.line);
       const macroStart = lineText.lastIndexOf('{{macro:', pos.ch);
       
@@ -307,24 +306,20 @@ export default {
         this.hideMacroButtons();
         return;
       }
-      
-      // Находим конец макроса
       const macroEnd = lineText.indexOf('}}', macroStart);
       if (macroEnd === -1) {
         this.hideMacroButtons();
         return;
       }
       
-      // Удаляем весь макрос
       const startPos = {line: pos.line, ch: macroStart};
-      const endPos = {line: pos.line, ch: macroEnd + 2}; // +2 чтобы захватить }}
+      const endPos = {line: pos.line, ch: macroEnd + 2};
       
       this.simplemde.codemirror.replaceRange('', startPos, endPos);
       this.hideMacroButtons();
     },
 
     editMacro: function(pos, macroContent) {
-      // Заглушка для редактирования макроса
       console.log('Editing macro at:', pos, 'Content:', macroContent);
       this.hideMacroButtons();
     },
@@ -541,7 +536,7 @@ export default {
   position: relative;
   top: -3px;
 }
-@media (max-width: 575px) {
+@media (max-width: 600px) {
   .side-by-side-switch {
     display: none !important;
   }
@@ -576,16 +571,16 @@ export default {
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOCAxOCI+CiAgPHBhdGggZmlsbD0iIzQ5NGM0ZSIgZD0iTTMgMTJhMSAxIDAgMCAxIDEgMXYxaDFhMSAxIDAgMCAxIDAgMkg0djFhMSAxIDAgMCAxLTIgMHYtMUgxYTEgMSAwIDAgMSAwLTJoMXYtMWExIDEgMCAwIDEgMS0xem03IDJoNnYyaC02di0yem0tMi0xdjRhMSAxIDAgMCAwIDEgMWg4YTEgMSAwIDAgMCAxLTF2LTRhMSAxIDAgMCAwLTEtMUg5YTEgMSAwIDAgMC0xIDF6TTAgMXY4YTEgMSAwIDAgMCAxIDFoMTZhMSAxIDAgMCAwIDEtMVYxYTEgMSAwIDAgMC0xLTFIMWExIDEgMCAwIDAtMSAxem0xNiA1djJIMlY2aDE0em0wLTR2MkgyVjJoMTR6Ii8+Cjwvc3ZnPgo=") !important;
 }
 
-.mm-macro-block {
-    display: block;
+.editor-preview .mm-macro-block {
+    display: inline-block;
     background-color: #f0f0f0;
     border: 1px solid #ddd;
     margin: 0 2px;
     min-height: 24px;
-    max-width: 100px;
+    width: 100px;
     vertical-align: text-bottom;
 }
-.mm-macro-block:before{
+.editor-preview .mm-macro-block:before{
     content: "\00a7 Macro";
     padding-left: 10px
 }
@@ -610,5 +605,8 @@ export default {
 
 .macro-buttons button:hover {
     background: #e0e0e0;
+}
+.editor-preview-side p{
+    display: inline;
 }
 </style>
