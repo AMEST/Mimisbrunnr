@@ -9,6 +9,7 @@
     <PackageTags>client; mimisbrunnr; wiki;</PackageTags>
     <RepositoryUrl>https://github.com/AMEST/Mimisbrunnr</RepositoryUrl>
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 
   <ItemGroup>

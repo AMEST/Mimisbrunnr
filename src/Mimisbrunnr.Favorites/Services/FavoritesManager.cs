@@ -63,7 +63,9 @@ internal class FavoritesManager : IFavoritesManager
         where T : Favorite
     {
         var query = _repository.GetAllByType<T>().Where(x => x.OwnerEmail == email);
-
+        
+        if (filter.Skip.HasValue || filter.Count.HasValue)
+            query = query.OrderBy(x => x.Id);
         if (filter.Skip.HasValue)
             query = query.Skip(filter.Skip.Value);
         if (filter.Count.HasValue)

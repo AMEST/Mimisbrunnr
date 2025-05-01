@@ -163,6 +163,12 @@
                     "name": "Name",
                     "description": "Description"
                 },
+                "approveModal":{
+                    "title": "Confirm the action",
+                    "deleteGroup": "Are you sure you want to delete the group? All permissions issued on group are lost",
+                    "ok": "Yes",
+                    "cancel": "No"
+                },
                 "loadMore": "Load more"
             },
             "users":{
@@ -180,6 +186,15 @@
                     "promote": "Promote",
                     "demote": "Demote"
                 },
+                "approveModal":{
+                    "title": "Confirm the action",
+                    "promote": "Are you sure you want to give administrator rights to the user?",
+                    "demote": "Do you really want to take away the user's administrator rights?\nAttention: If you take them away from yourself, you will lose access to administration!",
+                    "disable": "Are you sure you want to disable this user? Once disabled, they will not be able to interact with the wiki.",
+                    "enable": "Enabling the user will restore access to the wiki. Are you sure?",
+                    "ok": "Yes",
+                    "cancel": "No"
+                },
                 "loadMore": "Load more"
             }
         },
@@ -195,7 +210,13 @@
                     "createNewDescription": "To issue a new token, specify its validity period in days. After issuance, keep the token with you as it will only appear once",
                     "days": "Days",
                     "create": "Create",
-                    "empty": "There are no issued tokens"
+                    "empty": "There are no issued tokens",
+                    "approveModal":{
+                        "title": "Confirm the action",
+                        "revoke": "Are you sure you want to revoke the issued API Token?",
+                        "ok": "Yes",
+                        "cancel": "No"
+                    }
                 },
                 "profile": {
                     "title": "Profile"
@@ -379,6 +400,10 @@
                     "content": "Archive"
                 }
             }
+        },
+        "newPage": {
+            "defaultTitle": "New page",
+            "defaultContent": "_Add your information here_"
         }
     },
     "ru": {
@@ -545,6 +570,12 @@
                     "name": "Имя",
                     "description": "Описание"
                 },
+                "approveModal":{
+                    "title": "Подтвердите действие",
+                    "deleteGroup": "Вы уверены, что хотите удалить группу? Все доступы выданные на нее будут утеряны",
+                    "ok": "Да",
+                    "cancel": "Нет"
+                },
                 "loadMore": "Загрузить еще"
             },
             "users":{
@@ -562,6 +593,16 @@
                     "promote": "Повысить",
                     "demote": "Понизить"
                 },
+                "approveModal":{
+                    "title": "Подтвердите действие",
+                    "promote": "Вы уверены, что хотите предоставить пользователю права администратора?",
+                    "demote": "Вы действительно хотите отобрать у пользователя права администратора?\nВнимание: если вы отнимете их у себя, вы потеряете доступ к администрированию!",
+                    "disable": "Вы уверены, что хотите отключить этого пользователя? После отключения он не сможет взаимодействовать с вики.",
+                    "enable": "Включение пользователя восстановит доступ к вики. Вы уверены?",
+                    "ok": "Да",
+                    "cancel": "Нет"
+
+                },
                 "loadMore": "Загрузить еще"
             }
         },
@@ -577,7 +618,13 @@
                     "createNewDescription": "Для выпуска нового токена, укажите время его действия в днях. После выпуска, сохраните токен у себя так как он отобразится только один раз",
                     "days": "Дней",
                     "create": "Создать",
-                    "empty": "Нет ни одного выпущенного токена"
+                    "empty": "Нет ни одного выпущенного токена",
+                    "approveModal":{
+                        "title": "Подтвердите действие",
+                        "revoke": "Вы действительно хотите отозвать выпущенный API Token?",
+                        "ok": "Да",
+                        "cancel": "Нет"
+                    }
                 },
                 "profile": {
                     "title": "Профиль"
@@ -761,6 +808,10 @@
                     "content": "В архиве"
                 }
             }
+        },
+        "newPage": {
+            "defaultTitle": "Новая страница",
+            "defaultContent": "_Добавьте свою информацию сюда_"
         }
     }
 }

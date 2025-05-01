@@ -42,7 +42,7 @@
         {{ $t("admin.groups.loadMore") }}
       </b-button>
     </b-card>
-    <group-modal />
+    <group-modal :createAction="loadGroups" />
   </b-container>
 </template>
 
@@ -97,7 +97,21 @@ export default {
       this.loading = false;
     },
     removeGroup: async function (group) {
-      await GroupService.deleteGroup(group);
+        var approve = await this.$bvModal.msgBoxConfirm(this.$t("admin.groups.approveModal.deleteGroup"), {
+            title: this.$t("admin.groups.approveModal.title"),
+            centered: true,
+            size: 'sm',
+            buttonSize: 'sm',
+            cancelTitle: this.$t("admin.groups.approveModal.cancel"),
+            okTitle: this.$t("admin.groups.approveModal.ok"),
+            okVariant: 'danger',
+            headerClass: 'p-2 border-bottom-0',
+            footerClass: 'p-2 border-top-0',
+        });
+        if(!approve) return;
+        await GroupService.deleteGroup(group);
+        this.groups = [];
+        this.loadGroups();
     },
   },
   mounted() {

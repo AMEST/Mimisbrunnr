@@ -312,11 +312,28 @@ public class MongoDbStoreModule : RunnableModule
         {
             Background = true
         }));
+        var idTypeEmailKeyDefinition = Builders<Favorite>.IndexKeys
+            .Ascending("_t")
+            .Ascending("_id")
+            .Ascending(x => x.OwnerEmail);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Favorite>(idTypeEmailKeyDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
         var favoriteUserIndex = Builders<FavoriteUser>.IndexKeys
             .Ascending("_t")
             .Ascending(x => x.OwnerEmail)
             .Ascending(x => x.UserEmail);
         await collection.OfType<FavoriteUser>().Indexes.CreateOneAsync(new CreateIndexModel<FavoriteUser>(favoriteUserIndex, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+        var favoriteUserWithIdIndex = Builders<FavoriteUser>.IndexKeys
+            .Ascending("_t")
+            .Ascending("_id")
+            .Ascending(x => x.OwnerEmail)
+            .Ascending(x => x.UserEmail);
+        await collection.OfType<FavoriteUser>().Indexes.CreateOneAsync(new CreateIndexModel<FavoriteUser>(favoriteUserWithIdIndex, new CreateIndexOptions()
         {
             Background = true
         }));
@@ -328,11 +345,29 @@ public class MongoDbStoreModule : RunnableModule
         {
             Background = true
         }));
+        var favoriteSpaceWithIdIndex = Builders<FavoriteSpace>.IndexKeys
+            .Ascending("_t")
+            .Ascending("_id")
+            .Ascending(x => x.OwnerEmail)
+            .Ascending(x => x.SpaceKey);
+        await collection.OfType<FavoriteSpace>().Indexes.CreateOneAsync(new CreateIndexModel<FavoriteSpace>(favoriteSpaceWithIdIndex, new CreateIndexOptions()
+        {
+            Background = true
+        }));
         var favoritePageIndex = Builders<FavoritePage>.IndexKeys
             .Ascending("_t")
             .Ascending(x => x.OwnerEmail)
             .Ascending(x => x.PageId);
         await collection.OfType<FavoritePage>().Indexes.CreateOneAsync(new CreateIndexModel<FavoritePage>(favoritePageIndex, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+        var favoritePageWithIdIndex = Builders<FavoritePage>.IndexKeys
+            .Ascending("_t")
+            .Ascending("_id")
+            .Ascending(x => x.OwnerEmail)
+            .Ascending(x => x.PageId);
+        await collection.OfType<FavoritePage>().Indexes.CreateOneAsync(new CreateIndexModel<FavoritePage>(favoritePageWithIdIndex, new CreateIndexOptions()
         {
             Background = true
         }));

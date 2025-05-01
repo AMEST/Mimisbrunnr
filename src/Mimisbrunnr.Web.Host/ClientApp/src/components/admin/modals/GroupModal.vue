@@ -29,11 +29,16 @@ export default {
       description: "",
     };
   },
+  props: {
+    createAction: Function,
+  },
   methods: {
     ok: async function () {
       var created = await GroupService.createGroup(this.name, this.description);
-      if (created)
+      if (created){
         this.$bvModal.hide("group-modal");
+        this.createAction();
+      }
     },
     onShow: function () {
       this.name = "";

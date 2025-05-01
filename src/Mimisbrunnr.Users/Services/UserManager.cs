@@ -19,6 +19,7 @@ internal class UserManager : IUserManager, IUserSearcher
             return _userRepository.GetAll().ToArrayAsync();
 
         return _userRepository.GetAll()
+            .OrderBy(x => x.Id)
             .Skip(offset.Value)
             .Take(DefaultMaxUserGet)
             .ToArrayAsync();
