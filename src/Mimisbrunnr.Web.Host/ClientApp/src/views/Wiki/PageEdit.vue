@@ -276,15 +276,16 @@ export default {
             if (data[i].type.indexOf("image") !== -1) {
             var file = data[i].getAsFile();
 
+            var newFileName = `${new Date().getTime()}_${file.name}`;
             var formData = new FormData();
-            formData.append("attachment", file);
+            formData.append("attachment", file, newFileName);
             await axios({
                 method: "post",
                 url: "/api/attachment/" + this.page.id,
                 data: formData,
                 validateStatus: false,
             });
-            this.addAttachmentLink({ name: file.name });
+            this.addAttachmentLink({ name: newFileName });
 
             } else if (data[i].type.indexOf("text/plain") !== -1) {
                 try{
@@ -319,15 +320,16 @@ export default {
       }
       if (dropItem.kind == "file") {
         var droppedFile = dropItem.getAsFile();
+        var newFileName = `${new Date().getTime()}_${droppedFile.name}`;
         var formData = new FormData();
-        formData.append("attachment", droppedFile);
+        formData.append("attachment", droppedFile, newFileName);
         await axios({
           method: "post",
           url: "/api/attachment/" + this.page.id,
           data: formData,
           validateStatus: false,
         });
-        this.addAttachmentLink({ name: droppedFile.name });
+        this.addAttachmentLink({ name: newFileName });
         return;
       }
     },
