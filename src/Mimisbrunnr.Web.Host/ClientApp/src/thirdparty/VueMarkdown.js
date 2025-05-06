@@ -16,6 +16,7 @@ import mark from 'markdown-it-mark'
 import toc from 'markdown-it-toc-and-anchor'
 import tasklists from 'markdown-it-task-lists'
 import MarkdownItCollapsible from "markdown-it-collapsible"
+import macroPlugin from '@/services/markdown/markdown-it-macro-plugin'
 
 export default {
   md: new markdownIt(),
@@ -145,6 +146,7 @@ export default {
 
   render(createElement) {
     this.md = new markdownIt()
+      .use(macroPlugin)
       .use(subscript)
       .use(superscript)
       .use(footnote)
