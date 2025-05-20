@@ -6,6 +6,11 @@
         <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     </PropertyGroup>
 
+    <PropertyGroup>
+    <DocumentationFile>Mimisbrunnr.Web.xml</DocumentationFile>
+  </PropertyGroup>
+
+
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
