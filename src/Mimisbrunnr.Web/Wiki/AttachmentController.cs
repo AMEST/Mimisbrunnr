@@ -6,6 +6,9 @@ using Mimisbrunnr.Integration.Wiki;
 
 namespace Mimisbrunnr.Web.Wiki;
 
+/// <summary>
+/// Controller for managing page attachments
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
@@ -19,6 +22,11 @@ public class AttachmentController : ControllerBase
         _attachmentService = attachmentService;
     }
 
+    /// <summary>
+    /// Get all attachments for a page
+    /// </summary>
+    /// <param name="pageId">ID of the page</param>
+    /// <returns>List of attachments</returns>
     [HttpGet("{pageId}")]
     [ProducesResponseType(typeof(AttachmentModel[]), 200)]
     [ProducesResponseType(401)]
@@ -32,6 +40,12 @@ public class AttachmentController : ControllerBase
         return Ok(attachments);
     }
 
+    /// <summary>
+    /// Get attachment content
+    /// </summary>
+    /// <param name="pageId">ID of the page</param>
+    /// <param name="name">Name of the attachment</param>
+    /// <returns>Attachment file content</returns>
     [HttpGet("{pageId}/{name}")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(Stream), 200)]
@@ -45,6 +59,10 @@ public class AttachmentController : ControllerBase
         return File(attachmentContent, MimeTypes.GetMimeType(name));
     }
 
+    /// <summary>
+    /// Upload an attachment to a page
+    /// </summary>
+    /// <param name="pageId">ID of the page</param>
     [HttpPost("{pageId}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(401)]
@@ -59,6 +77,11 @@ public class AttachmentController : ControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Remove an attachment from a page
+    /// </summary>
+    /// <param name="pageId">ID of the page</param>
+    /// <param name="name">Name of the attachment</param>
     [HttpDelete("{pageId}/{name}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(401)]

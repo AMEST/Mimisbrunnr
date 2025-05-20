@@ -43,11 +43,6 @@ internal class CommentManager : ICommentManager
 
     public async Task RemoveAll(Page page)
     {
-        var comments = await GetComments(page);
-        var removeTasks = new List<Task>();
-        foreach(var comment in comments)
-            removeTasks.Add(_repository.Delete(comment));
-
-        await Task.WhenAll(removeTasks);
+        await _repository.DeleteAll( x => x.PageId == page.Id);
     }
 }

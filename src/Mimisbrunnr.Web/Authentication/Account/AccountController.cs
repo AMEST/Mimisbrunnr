@@ -5,6 +5,9 @@ using Mimisbrunnr.Web.Mapping;
 
 namespace Mimisbrunnr.Web.Authentication.Account;
 
+/// <summary>
+/// Controller for managing user authentication and tokens
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
@@ -17,6 +20,11 @@ public class AccountController : ControllerBase
         _tokenService = tokenService;
     }
 
+    /// <summary>
+    /// Initiate login process with optional redirect
+    /// </summary>
+    /// <param name="redirectUri">URI to redirect to after login</param>
+    /// <returns>Challenge result for authentication</returns>
     [HttpGet("login")]
     [AllowAnonymous]
     public IActionResult Login([FromQuery] string redirectUri = null)
@@ -36,6 +44,10 @@ public class AccountController : ControllerBase
         return Challenge(properties, "OpenIdConnect");
     }
     
+    /// <summary>
+    /// Log out the current user
+    /// </summary>
+    /// <returns>Redirect to home page</returns>
     [HttpGet("[action]")]
     public async Task<IActionResult> Logout()
     {
@@ -43,6 +55,10 @@ public class AccountController : ControllerBase
         return Redirect("/");
     }
 
+    /// <summary>
+    /// Get all tokens for the current user
+    /// </summary>
+    /// <returns>List of user tokens</returns>
     [HttpGet("token")]
     [ProducesResponseType(typeof(IEnumerable<TokenModel>), 200)]
     [ProducesResponseType(401)]
@@ -52,6 +68,11 @@ public class AccountController : ControllerBase
         return Ok(tokens);
     }
 
+    /// <summary>
+    /// Create a new token for the current user
+    /// </summary>
+    /// <param name="request">Token creation parameters</param>
+    /// <returns>Created token information</returns>
     [HttpPost("token")]
     [ProducesResponseType(typeof(TokenCreateResult), 200)]
     [ProducesResponseType(400)]
@@ -65,6 +86,10 @@ public class AccountController : ControllerBase
         return Ok(token);
     }
 
+    /// <summary>
+    /// Revoke/delete a token
+    /// </summary>
+    /// <param name="id">ID of the token to revoke</param>
     [HttpDelete("token/{id}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(401)]

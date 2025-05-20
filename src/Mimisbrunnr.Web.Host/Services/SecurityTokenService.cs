@@ -89,14 +89,14 @@ internal class SecurityTokenService : ISecurityTokenService
     private ClaimsPrincipal CreatePrincipal(Users.User user, string tokenId)
     {
         return new ClaimsPrincipal(
-            new ClaimsIdentity(new List<Claim>
-            {
+            new ClaimsIdentity(
+            [
                 new(ClaimTypes.NameIdentifier, user.Email),
                 new(ClaimTypes.Email, user.Email),
                 new(ClaimTypes.Name, user.Name),
                 new(ClaimTypes.Role, user.Role.ToString()),
                 new("TokenId", tokenId)
-            }));
+            ]));
     }
 
     public ClaimsPrincipal GetPrincipal(string token)
@@ -108,7 +108,7 @@ internal class SecurityTokenService : ISecurityTokenService
         }
         catch (Exception e)
         {
-            _logger.LogError("Error validation token", e);
+            _logger.LogError(e, "Error validation token");
             return null;
         }
     }

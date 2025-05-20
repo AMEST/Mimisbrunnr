@@ -20,8 +20,8 @@ namespace Mimisbrunnr.Web;
 
 public class WebModule : Module
 {
-    public override Type[] DependsModules => new[] { typeof(WebInfrastructureModule), typeof(UsersModule), 
-        typeof(WikiModule), typeof(FavoritesModule) };
+    public override Type[] DependsModules => [ typeof(WebInfrastructureModule), typeof(UsersModule), 
+        typeof(WikiModule), typeof(FavoritesModule) ];
 
     public override void Configure(IServiceCollection services)
     {

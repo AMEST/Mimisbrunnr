@@ -259,3 +259,4 @@ paket-files/
 __pycache__/
 *.pyc
 src/Mimisbrunnr.Web.Host/persistent-storage/
+src/Mimisbrunnr.Web/Mimisbrunnr.Web.xml

@@ -8,8 +8,12 @@ namespace Mimisbrunnr.Web.Mapping;
 [Mapper]
 public static partial class ApplicationMapper
 {
+    [MapperIgnoreTarget(nameof(ApplicationConfiguration.Id))]
+    [MapperIgnoreTarget(nameof(ApplicationConfiguration.CustomCss))]
+    [MapperIgnoreTarget(nameof(ApplicationConfiguration.CustomHomepageSpaceKey))]
     public static partial ApplicationConfiguration ToEntity(this QuickstartModel model);
 
+    [MapperIgnoreSource(nameof(ApplicationConfiguration.Id))]
     public static partial ApplicationConfigurationModel ToModel(this ApplicationConfiguration applicationConfiguration);
 
     public static QuickstartModel ToQuickStartModel(this ApplicationConfiguration model)

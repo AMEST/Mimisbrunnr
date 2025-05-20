@@ -150,15 +150,15 @@ internal class PageManager : IPageManager
 
     private async Task RemoveOnlyPage(Page page)
     {
-        var childs = await _pageRepository.GetAll().Where(x => x.ParentId == page.Id).ToListAsync();
+        var childs = await _pageRepository.GetAll().Where(x => x.ParentId == page.Id).ToArrayAsync();
         foreach (var child in childs)
         {
             child.ParentId = page.ParentId;
             await _pageRepository.Update(child);
         }
 
-        await RemoveAttachments(page);
-        await RemoveAllPageVersions(page);
+        await _attachmentManager.RemoveAll(page);
+        await _historicalPageRepository.DeleteAll( x => x.PageId == page.Id );
         await _draftManager.Remove(page.Id);
         await _commentManager.RemoveAll(page);
         await _pageRepository.Delete(page);
@@ -169,41 +169,24 @@ internal class PageManager : IPageManager
         var allChilds = await GetAllChilds(page);
         foreach (var child in allChilds)
         {
-            await RemoveAttachments(child);
+            await _attachmentManager.RemoveAll(child);
             await _draftManager.Remove(child.Id);
-            await _commentManager.RemoveAll(page);
+            await _commentManager.RemoveAll(child);
             await _pageRepository.Delete(child);
-            await RemoveAllPageVersions(child);
+            await _historicalPageRepository.DeleteAll( x => x.PageId == child.Id );
         }
 
-        await RemoveAttachments(page);
-        await RemoveAllPageVersions(page);
+        await _attachmentManager.RemoveAll(page);
+        await _historicalPageRepository.DeleteAll( x => x.PageId == page.Id );
         await _draftManager.Remove(page.Id);
         await _commentManager.RemoveAll(page);
         await _pageRepository.Delete(page);
-    }
-
-    private async Task RemoveAttachments(Page page)
-    {
-        var attachments = await _attachmentManager.GetAttachments(page);
-        var removeTasks = new List<Task>();
-        foreach (var attachment in attachments)
-            removeTasks.Add(_attachmentManager.Remove(page, attachment.Name));
-
-        await Task.WhenAll(removeTasks);
     }
 
     private async Task SaveCurrentPageVersion(string id)
     {
         var currentPage = await GetById(id);
         await _historicalPageRepository.Create(HistoricalPage.Create(currentPage));
-    }
-
-    private async Task RemoveAllPageVersions(Page page)
-    {
-        var allVersions = await GetAllVersions(page);
-        foreach (var version in allVersions)
-            await _historicalPageRepository.Delete(version);
     }
     
     private async Task<Page[]> GetAllChilds(string[] pageIds, bool lightContract = true)
@@ -222,13 +205,13 @@ internal class PageManager : IPageManager
 
         var childs = await childsQuery.ToListAsync();
         if (childs.Count == 0)
-            return Array.Empty<Page>();
+            return [];
         
         var innerChilds = await GetAllChilds(childs.Select(x => x.Id).ToArray(), lightContract);
         if (innerChilds.Length > 0)
             childs.AddRange(innerChilds);
 
-        return childs.ToArray();
+        return [.. childs];
     }
 
 }

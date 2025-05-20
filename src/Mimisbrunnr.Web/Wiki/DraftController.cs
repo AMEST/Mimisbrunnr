@@ -5,6 +5,9 @@ using Mimisbrunnr.Web.Mapping;
 
 namespace Mimisbrunnr.Web.Wiki;
 
+/// <summary>
+/// Controller for managing page drafts
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
@@ -18,6 +21,11 @@ public class DraftController : ControllerBase
         _draftService = draftService;
     }
 
+    /// <summary>
+    /// Get a draft by page ID
+    /// </summary>
+    /// <param name="pageId">ID of the page</param>
+    /// <returns>The draft for the specified page</returns>
     [HttpGet("{pageId}")]
     [ProducesResponseType(typeof(DraftModel), 200)]
     [ProducesResponseType(401)]
@@ -32,6 +40,11 @@ public class DraftController : ControllerBase
         return Ok(draft);
     }
 
+    /// <summary>
+    /// Update or create a draft for a page
+    /// </summary>
+    /// <param name="pageId">ID of the page</param>
+    /// <param name="updateModel">Draft content to update</param>
     [HttpPut("{pageId}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(401)]
@@ -43,6 +56,10 @@ public class DraftController : ControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Delete a draft
+    /// </summary>
+    /// <param name="pageId">ID of the page</param>
     [HttpDelete("{pageId}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(401)]

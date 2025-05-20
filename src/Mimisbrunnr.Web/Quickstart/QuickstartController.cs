@@ -4,6 +4,9 @@ using Mimisbrunnr.Web.Mapping;
 
 namespace Mimisbrunnr.Web.Quickstart;
 
+/// <summary>
+/// Controller for managing quickstart and initialization
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
@@ -16,6 +19,10 @@ public class QuickstartController : ControllerBase
         _quickstartService = quickstartService;
     }
 
+    /// <summary>
+    /// Get the current quickstart state
+    /// </summary>
+    /// <returns>Quickstart configuration</returns>
     [HttpGet]
     [AllowAnonymous]
     [ProducesResponseType(typeof(QuickstartModel), 200)]
@@ -25,6 +32,10 @@ public class QuickstartController : ControllerBase
         return Ok(state);
     }
 
+    /// <summary>
+    /// Get initialization status
+    /// </summary>
+    /// <returns>Whether the application is initialized</returns>
     [HttpGet("initialize")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(InitializeState), 200)]
@@ -34,6 +45,11 @@ public class QuickstartController : ControllerBase
         return Ok(new InitializeState() { IsInitialized = state });
     }
 
+    /// <summary>
+    /// Initialize the application
+    /// </summary>
+    /// <param name="model">Initialization parameters</param>
+    /// <returns>200 if successful, 400 if initialization fails</returns>
     [HttpPost("initialize")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]

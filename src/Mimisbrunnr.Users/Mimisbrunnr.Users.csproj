@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Skidbladnir.Modules" Version="1.7.0" />
-      <PackageReference Include="Skidbladnir.Repository.Abstractions" Version="1.7.0" />
+      <PackageReference Include="Skidbladnir.Modules" Version="2.0.0" />
+      <PackageReference Include="Skidbladnir.Repository.Abstractions" Version="2.0.0" />
     </ItemGroup>
 
 </Project>

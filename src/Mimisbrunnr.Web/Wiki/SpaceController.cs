@@ -10,6 +10,9 @@ using Mimisbrunnr.DataImport;
 
 namespace Mimisbrunnr.Web.Wiki;
 
+/// <summary>
+/// Controller for managing wiki spaces
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
@@ -31,6 +34,12 @@ public class SpaceController : ControllerBase
         _spaceService = spaceService;
     }
 
+    /// <summary>
+    /// Get all spaces
+    /// </summary>
+    /// <param name="take">Number of spaces to return</param>
+    /// <param name="skip">Number of spaces to skip</param>
+    /// <returns>List of spaces</returns>
     [HttpGet]
     [AllowAnonymous]
     [ProducesResponseType(typeof(SpaceModel[]), 200)]
@@ -40,6 +49,11 @@ public class SpaceController : ControllerBase
         return Ok(await _spaceService.GetAll(User?.ToInfo(), take, skip));
     }
 
+    /// <summary>
+    /// Get a space by key
+    /// </summary>
+    /// <param name="key">Space key</param>
+    /// <returns>Space information</returns>
     [HttpGet("{key}")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(SpaceModel), 200)]
@@ -50,6 +64,11 @@ public class SpaceController : ControllerBase
         return Ok(await _spaceService.GetByKey(key, User?.ToInfo()));
     }
 
+    /// <summary>
+    /// Get user permissions for a space
+    /// </summary>
+    /// <param name="key">Space key</param>
+    /// <returns>User permissions for the space</returns>
     [HttpGet("{key}/permission")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(UserPermissionModel), 200)]
@@ -60,6 +79,11 @@ public class SpaceController : ControllerBase
         return Ok(await _spaceService.GetPermission(key, User?.ToInfo()));
     }
 
+    /// <summary>
+    /// Get all permissions for a space
+    /// </summary>
+    /// <param name="key">Space key</param>
+    /// <returns>List of space permissions</returns>
     [HttpGet("{key}/permissions")]
     [ProducesResponseType(typeof(SpacePermissionModel[]), 200)]
     [ProducesResponseType(401)]
@@ -70,6 +94,12 @@ public class SpaceController : ControllerBase
         return Ok(await _spaceService.GetSpacePermissions(key, User?.ToInfo()));
     }
 
+    /// <summary>
+    /// Add permissions to a space
+    /// </summary>
+    /// <param name="key">Space key</param>
+    /// <param name="model">Permission to add</param>
+    /// <returns>Added permission</returns>
     [HttpPost("{key}/permissions")]
     [ProducesResponseType(typeof(SpacePermissionModel), 200)]
     [ProducesResponseType(401)]
@@ -80,6 +110,11 @@ public class SpaceController : ControllerBase
         return Ok(await _spaceService.AddPermission(key, model, User?.ToInfo()));
     }
 
+    /// <summary>
+    /// Update permissions for a space
+    /// </summary>
+    /// <param name="key">Space key</param>
+    /// <param name="model">Updated permission</param>
     [HttpPut("{key}/permissions")]
     [ProducesResponseType(200)]
     [ProducesResponseType(401)]
@@ -90,6 +125,12 @@ public class SpaceController : ControllerBase
         await _spaceService.UpdatePermission(key, model, User?.ToInfo());
         return Ok();
     }
+
+    /// <summary>
+    /// Remove permissions from a space
+    /// </summary>
+    /// <param name="key">Space key</param>
+    /// <param name="model">Permission to remove</param>
     [HttpDelete("{key}/permissions")]
     [ProducesResponseType(200)]
     [ProducesResponseType(401)]
@@ -101,6 +142,11 @@ public class SpaceController : ControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Create a new space
+    /// </summary>
+    /// <param name="createModel">Space creation parameters</param>
+    /// <returns>Created space</returns>
     [HttpPost]
     [ProducesResponseType(typeof(SpaceModel), 200)]
     [ProducesResponseType(401)]
@@ -109,6 +155,10 @@ public class SpaceController : ControllerBase
         return Ok(await _spaceService.Create(createModel, User?.ToInfo()));
     }
 
+    /// <summary>
+    /// Import space data from a zip file
+    /// </summary>
+    /// <returns>Imported space</returns>
     [HttpPost("import")]
     [ProducesResponseType(typeof(SpaceModel), 200)]
     [ProducesResponseType(401)]
@@ -134,6 +184,11 @@ public class SpaceController : ControllerBase
         return Ok(createdSpace);
     }
 
+    /// <summary>
+    /// Update a space
+    /// </summary>
+    /// <param name="key">Space key</param>
+    /// <param name="updateModel">Space update parameters</param>
     [HttpPut("{key}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(401)]
@@ -144,6 +199,10 @@ public class SpaceController : ControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Archive a space
+    /// </summary>
+    /// <param name="key">Space key</param>
     [HttpPost("{key}/archive")]
     [ProducesResponseType(typeof(SpaceModel), 200)]
     [ProducesResponseType(401)]
@@ -154,6 +213,10 @@ public class SpaceController : ControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Unarchive a space
+    /// </summary>
+    /// <param name="key">Space key</param>
     [HttpPost("{key}/unarchive")]
     [ProducesResponseType(typeof(SpaceModel), 200)]
     [ProducesResponseType(401)]
@@ -164,6 +227,10 @@ public class SpaceController : ControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Delete a space
+    /// </summary>
+    /// <param name="key">Space key</param>
     [HttpDelete("{key}")]
     [ProducesResponseType(typeof(SpaceModel), 200)]
     [ProducesResponseType(401)]
