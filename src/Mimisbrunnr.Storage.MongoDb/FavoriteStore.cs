@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Mimisbrunnr.Favorites.Contracts;
 using Mimisbrunnr.Favorites.Services;
 using MongoDB.Driver;
@@ -22,9 +23,24 @@ public class FavoriteStore : IFavoriteStore
         return _favoriteRepository.Create(obj, cancellationToken);
     }
 
+    public Task CreateAll(IEnumerable<Favorite> objs, CancellationToken cancellationToken = default)
+    {
+        return _favoriteRepository.CreateAll(objs, cancellationToken);
+    }
+
     public Task Delete(Favorite obj, CancellationToken cancellationToken = default)
     {
         return _favoriteRepository.Delete(obj, cancellationToken);
+    }
+
+    public Task DeleteAll(IEnumerable<Favorite> objs, CancellationToken cancellationToken = default)
+    {
+        return _favoriteRepository.DeleteAll(objs, cancellationToken);
+    }
+
+    public Task DeleteAll(Expression<Func<Favorite, bool>> filter, CancellationToken cancellationToken = default)
+    {
+        return _favoriteRepository.DeleteAll(filter, cancellationToken);
     }
 
     public IQueryable<Favorite> GetAll()

@@ -19,12 +19,12 @@ namespace Mimisbrunnr.Web.Host;
 
 internal class StartupModule : Module
 {
-    public override Type[] DependsModules => new[]
-    {
+    public override Type[] DependsModules =>
+    [
         typeof(AspNetModule), typeof(MongoDbStoreModule), typeof(WebModule),
         typeof(PersistentModule), typeof(MetricsModule),
         typeof(ConfluenceDataImportModule), typeof(WebCacheModule),
-    };
+    ];
 
     public override void Configure(IServiceCollection services)
     {

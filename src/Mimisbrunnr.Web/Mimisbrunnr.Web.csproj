@@ -28,8 +28,8 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
-      <PackageReference Include="Riok.Mapperly" Version="2.5.0" />
-      <PackageReference Include="Skidbladnir.Modules" Version="1.7.0" />
+      <PackageReference Include="Riok.Mapperly" Version="4.2.1" />
+      <PackageReference Include="Skidbladnir.Modules" Version="2.0.0" />
     </ItemGroup>
 
 </Project>

@@ -38,7 +38,7 @@ internal class UserGroupManager : IUserGroupManager
         {
             Name = name,
             Description = description,
-            OwnerEmails = new[] { ownerEmail }
+            OwnerEmails = [ownerEmail]
         };
         await _groupRepository.Create(gorup);
         return gorup;

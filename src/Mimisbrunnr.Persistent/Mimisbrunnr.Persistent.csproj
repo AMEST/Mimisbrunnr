@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Skidbladnir.Modules" Version="1.7.0" />
-    <PackageReference Include="Skidbladnir.Storage.GridFS" Version="1.7.0" />
-    <PackageReference Include="Skidbladnir.Storage.LocalFileStorage" Version="1.7.0" />
-    <PackageReference Include="Skidbladnir.Storage.S3" Version="1.7.0" />
-    <PackageReference Include="Skidbladnir.Storage.WebDav" Version="1.7.0" />
+    <PackageReference Include="Skidbladnir.Modules" Version="2.0.0" />
+    <PackageReference Include="Skidbladnir.Storage.GridFS" Version="2.0.0" />
+    <PackageReference Include="Skidbladnir.Storage.LocalFileStorage" Version="2.0.0" />
+    <PackageReference Include="Skidbladnir.Storage.S3" Version="2.0.0" />
+    <PackageReference Include="Skidbladnir.Storage.WebDav" Version="2.0.0" />
   </ItemGroup>
 
 </Project>
