@@ -36,9 +36,9 @@
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.6" />
         <PackageReference Include="prometheus-net.AspNetCore" Version="6.0.0" />
         <PackageReference Include="prometheus-net.DotNetRuntime" Version="4.2.4" />
-        <PackageReference Include="Skidbladnir.Caching.Distributed.MongoDB" Version="1.7.0" />
-        <PackageReference Include="Skidbladnir.DataProtection.MongoDb" Version="1.7.0" />
-        <PackageReference Include="Skidbladnir.Modules" Version="1.7.0" />
+        <PackageReference Include="Skidbladnir.Caching.Distributed.MongoDB" Version="2.0.0" />
+        <PackageReference Include="Skidbladnir.DataProtection.MongoDb" Version="2.0.0" />
+        <PackageReference Include="Skidbladnir.Modules" Version="2.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
         <PackageReference Include="VueCliMiddleware" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="3.1.21" />

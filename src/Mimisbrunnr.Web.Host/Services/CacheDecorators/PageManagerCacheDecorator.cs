@@ -107,15 +107,19 @@ internal class PageManagerCacheDecorator : IPageManager
 
     private Task StoreInCache(Page page)
     {
+        if (page is null)
+            return Task.CompletedTask;
         return _cache.SetAsync(key: GetPageCacheName(page.Id), entry: page, options: new DistributedCacheEntryOptions()
-        {
-            AbsoluteExpirationRelativeToNow = _maxCacheTime,
-            SlidingExpiration = _slidingCacheTime
-        });
+            {
+                AbsoluteExpirationRelativeToNow = _maxCacheTime,
+                SlidingExpiration = _slidingCacheTime
+            });
     }
 
     private Task StoreInCache(Page[] pages, Space space)
     {
+        if (space is null)
+            return Task.CompletedTask;
         return _cache.SetAsync(key: GetSpacePagesCacheName(space.Id), entry: pages, options: new DistributedCacheEntryOptions()
         {
             AbsoluteExpirationRelativeToNow = _maxCacheTime,
@@ -125,6 +129,8 @@ internal class PageManagerCacheDecorator : IPageManager
 
     private async Task ClearCache(Page page)
     {
+        if (page is null)
+            return;
         await _cache.RemoveAsync(GetPageCacheName(page.Id));
         await _cache.RemoveAsync(GetSpacePagesCacheName(page.SpaceId));
     }

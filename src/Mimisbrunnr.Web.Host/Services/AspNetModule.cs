@@ -94,6 +94,10 @@ internal class AspNetModule : Module
                 Type = "string",
                 Example = new OpenApiString("02:00:00")
             });
+            var filePath = Path.Combine(AppContext.BaseDirectory, "Mimisbrunnr.Web.xml");
+            if (File.Exists(filePath))
+                options.IncludeXmlComments(filePath);
+
         });
 
         services.AddResponseCompression(options =>

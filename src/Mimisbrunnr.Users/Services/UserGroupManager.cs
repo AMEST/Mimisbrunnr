@@ -34,14 +34,14 @@ internal class UserGroupManager : IUserGroupManager
 
     public async Task<Group> Add(string name, string description, string ownerEmail)
     {
-        var gorup = new Group()
+        var group = new Group()
         {
             Name = name,
             Description = description,
-            OwnerEmails = new[] { ownerEmail }
+            OwnerEmails = [ownerEmail]
         };
-        await _groupRepository.Create(gorup);
-        return gorup;
+        await _groupRepository.Create(group);
+        return group;
     }
 
     public Task Update(Group userGroup)
@@ -55,12 +55,7 @@ internal class UserGroupManager : IUserGroupManager
         if (!groupExist)
             return;
 
-        var usersGroups = await _userGroupsRepository.GetAll().Where(x => x.GroupId == userGroup.Id).ToArrayAsync();
-        foreach (var userInGroup in usersGroups)
-        {
-            await _userGroupsRepository.Delete(userInGroup);
-        }
-
+        await _userGroupsRepository.DeleteAll(x => x.GroupId == userGroup.Id);
         await _groupRepository.Delete(userGroup);
     }
 
@@ -96,7 +91,7 @@ internal class UserGroupManager : IUserGroupManager
                 groups.Add(group);
         }
 
-        return groups.ToArray();
+        return [.. groups];
     }
 
     public async Task<User[]> GetUsersInGroup(Group group)
@@ -109,6 +104,6 @@ internal class UserGroupManager : IUserGroupManager
             if(user is not null)
                 users.Add(user);
         }
-        return users.ToArray();
+        return [.. users];
     }
 }

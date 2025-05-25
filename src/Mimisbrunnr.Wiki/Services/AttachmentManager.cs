@@ -43,13 +43,17 @@ internal class AttachmentManager : IAttachmentManager
         if (attachment is null)
             return;
 
-        try
-        {
-            await _fileStorage.DeleteAsync(attachment.Path);
-        }
-        catch (FileNotFoundException) { }
+        await Remove(attachment);
+    }
 
-        await _attachmentRepository.Delete(attachment);
+    public async Task RemoveAll(Page page)
+    {
+        var attachments = await GetAttachments(page);
+        var attachmentRemoveTasks = new List<Task>();
+        foreach (var attachment in attachments)
+            attachmentRemoveTasks.Add(Remove(attachment));
+            
+        await Task.WhenAll(attachmentRemoveTasks);
     }
 
     public async Task Upload(Page page, Stream content, string name, UserInfo uploadedBy)
@@ -84,4 +88,16 @@ internal class AttachmentManager : IAttachmentManager
             mLock.Release();
         }
     }
+
+    private async Task Remove(Attachment attachment)
+    {
+        try
+        {
+            await _fileStorage.DeleteAsync(attachment.Path);
+        }
+        catch (FileNotFoundException) { }
+
+        await _attachmentRepository.Delete(attachment);
+    }
+
 }

@@ -8,6 +8,9 @@ using Mimisbrunnr.Wiki.Contracts;
 
 namespace Mimisbrunnr.Web.Group;
 
+/// <summary>
+/// Controller for managing user groups
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
@@ -21,6 +24,11 @@ public class GroupController : ControllerBase
         _groupService = groupService;
     }
 
+    /// <summary>
+    /// Get all groups
+    /// </summary>
+    /// <param name="filter">Optional filter criteria</param>
+    /// <returns>List of groups</returns>
     [HttpGet]
     [ProducesResponseType(typeof(GroupModel[]), 200)]
     [ProducesResponseType(401)]
@@ -29,6 +37,11 @@ public class GroupController : ControllerBase
         return Ok(await _groupService.GetAll(filter, User?.ToInfo()));
     }
 
+    /// <summary>
+    /// Get a group by name
+    /// </summary>
+    /// <param name="name">Name of the group</param>
+    /// <returns>The group information</returns>
     [HttpGet("{name}")]
     [ProducesResponseType(typeof(GroupModel), 200)]
     [ProducesResponseType(401)]
@@ -37,6 +50,11 @@ public class GroupController : ControllerBase
         return Ok(await _groupService.Get(name, User?.ToInfo()));
     }
 
+    /// <summary>
+    /// Get users in a group
+    /// </summary>
+    /// <param name="name">Name of the group</param>
+    /// <returns>List of users in the group</returns>
     [HttpGet("{name}/users")]
     [ProducesResponseType(typeof(UserModel[]), 200)]
     [ProducesResponseType(401)]
@@ -46,7 +64,10 @@ public class GroupController : ControllerBase
         return Ok(await _groupService.GetUsers(name, User?.ToInfo()));
     }
 
-
+    /// <summary>
+    /// Create a new group
+    /// </summary>
+    /// <param name="model">Group creation parameters</param>
     [HttpPost]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
@@ -57,6 +78,11 @@ public class GroupController : ControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Update a group
+    /// </summary>
+    /// <param name="name">Name of the group to update</param>
+    /// <param name="model">Group update parameters</param>
     [HttpPut("{name}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
@@ -69,6 +95,10 @@ public class GroupController : ControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Delete a group
+    /// </summary>
+    /// <param name="name">Name of the group to delete</param>
     [HttpDelete("{name}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
@@ -81,6 +111,11 @@ public class GroupController : ControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Add a user to a group
+    /// </summary>
+    /// <param name="name">Name of the group</param>
+    /// <param name="email">Email of the user to add</param>
     [HttpPost("{name}/{email}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
@@ -93,6 +128,11 @@ public class GroupController : ControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Remove a user from a group
+    /// </summary>
+    /// <param name="name">Name of the group</param>
+    /// <param name="email">Email of the user to remove</param>
     [HttpDelete("{name}/{email}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]

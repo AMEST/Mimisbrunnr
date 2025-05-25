@@ -6,6 +6,9 @@ using Mimisbrunnr.Web.Mapping;
 
 namespace Mimisbrunnr.Web.Wiki;
 
+/// <summary>
+/// Controller for managing page comments
+/// </summary>
 [Route("api/Page/{pageId}/comments")]
 [ApiController]
 [Authorize]
@@ -19,6 +22,11 @@ public class CommentController : ControllerBase
         _commentService = commentService;
     }
     
+    /// <summary>
+    /// Get all comments for a page
+    /// </summary>
+    /// <param name="pageId">ID of the page</param>
+    /// <returns>List of comments</returns>
     [HttpGet]
     [AllowAnonymous]
     [ProducesResponseType(typeof(CommentModel[]), 200)]
@@ -33,6 +41,12 @@ public class CommentController : ControllerBase
         return Ok(comments);
     }
     
+    /// <summary>
+    /// Get a specific comment by ID
+    /// </summary>
+    /// <param name="pageId">ID of the page</param>
+    /// <param name="commentId">ID of the comment</param>
+    /// <returns>The requested comment</returns>
     [HttpGet("{commentId}")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(CommentModel), 200)]
@@ -45,6 +59,12 @@ public class CommentController : ControllerBase
         return Ok(comment);
     }
     
+    /// <summary>
+    /// Create a new comment on a page
+    /// </summary>
+    /// <param name="pageId">ID of the page</param>
+    /// <param name="model">Comment content</param>
+    /// <returns>The created comment</returns>
     [HttpPost]
     [ProducesResponseType(typeof(CommentModel), 200)]
     [ProducesResponseType(401)]
@@ -62,6 +82,11 @@ public class CommentController : ControllerBase
         }
     }
     
+    /// <summary>
+    /// Delete a comment
+    /// </summary>
+    /// <param name="pageId">ID of the page</param>
+    /// <param name="commentId">ID of the comment</param>
     [HttpDelete("{commentId}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(401)]

@@ -11,4 +11,6 @@ public interface IAttachmentManager
     Task Upload(Page page, Stream content, string name, UserInfo uploadedBy);
 
     Task Remove(Page page, string name);
+
+    Task RemoveAll(Page page);
 }
