@@ -1,19 +1,23 @@
+using Microsoft.Extensions.Logging;
 using Mimisbrunnr.Wiki.Contracts;
 using Skidbladnir.Repository.Abstractions;
 
 namespace Mimisbrunnr.Wiki.Services;
 
-internal class PluginService : IPluginService
+internal class PluginManager : IPluginManager
 {
     private readonly IRepository<Plugin> _pluginRepository;
     private readonly IRepository<MacroState> _macroStateRepository;
+    private readonly Logger<PluginManager> _logger;
 
-    public PluginService(IRepository<Plugin> pluginRepository,
-        IRepository<MacroState> macroStateRepository
+    public PluginManager(IRepository<Plugin> pluginRepository,
+        IRepository<MacroState> macroStateRepository,
+        Logger<PluginManager> logger
     )
     {
         _pluginRepository = pluginRepository;
         _macroStateRepository = macroStateRepository;
+        _logger = logger;
     }
 
     public async Task<MacroState> CreateOrUpdateState(MacroState macroState)
@@ -56,6 +60,24 @@ internal class PluginService : IPluginService
         await _macroStateRepository.Delete(state);
     }
 
+    public async Task Disable(string id)
+    {
+        var plugin = await _pluginRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
+        if (plugin is null)
+            return;
+        plugin.Disabled = true;
+        await _pluginRepository.Update(plugin);
+    }
+
+    public async Task Enable(string id)
+    {
+        var plugin = await _pluginRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
+        if (plugin is null)
+            return;
+        plugin.Disabled = false;
+        await _pluginRepository.Update(plugin);
+    }
+
     public async Task<MacroState> GetMacroState(string pageId, string macroUniqueId)
     {
         var state = await _macroStateRepository.GetAll()
@@ -81,7 +103,29 @@ internal class PluginService : IPluginService
 
     public async Task InstallPlugin(Plugin plugin, UserInfo userInfo)
     {
-        throw new NotImplementedException();
+        using var _ = _logger.BeginScope("Installing plugin `{pluginIdentifier}` by user {userEmail}", plugin.PluginIdentifier, userInfo.Email);
+        var pluginInDatabase = await _pluginRepository.GetAll().FirstOrDefaultAsync(x => x.PluginIdentifier == plugin.PluginIdentifier);
+        if (pluginInDatabase is not null && pluginInDatabase.Version == plugin.Version)
+        {
+            _logger.LogInformation("Plugin `{pluginName}` updating skipped. Version equals {oldVersion}=={newVersion}", plugin.Name, pluginInDatabase.Version, plugin.Version);
+            return;
+        }
+
+        if (pluginInDatabase is null)
+        {
+            plugin.InstalledBy = userInfo;
+            plugin.Installation = DateTime.UtcNow;
+            await _pluginRepository.Create(plugin);
+            _logger.LogInformation("Plugin `{pluginName}` with version {version} installed successful", plugin.Name, plugin.Version);
+            return;
+        }
+
+        pluginInDatabase.InstalledBy = userInfo;
+        pluginInDatabase.Installation = DateTime.UtcNow;
+        pluginInDatabase.Version = plugin.Version;
+        pluginInDatabase.Macros = plugin.Macros;
+        await _pluginRepository.Update(pluginInDatabase);
+        _logger.LogInformation("Plugin `{pluginName}` with version {version} updated successful", plugin.Name, plugin.Version);
     }
 
     public async Task UnInstall(Plugin plugin)

@@ -10,14 +10,14 @@ internal class PageManager : IPageManager
     private readonly IAttachmentManager _attachmentManager;
     private readonly IDraftManager _draftManager;
     private readonly ICommentManager _commentManager;
-    private readonly IPluginService _pluginService;
+    private readonly IPluginManager _pluginService;
 
     public PageManager(IRepository<Page> pageRepository,
         IRepository<HistoricalPage> historicalPageRepository,
         IAttachmentManager attachmentManager,
         IDraftManager draftManager,
         ICommentManager commentManager,
-        IPluginService pluginService
+        IPluginManager pluginService
     )
     {
         _pageRepository = pageRepository;
