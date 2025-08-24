@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Mimisbrunnr.Integration.User;
 
+namespace Mimisbrunnr.Integration.Plugin;
 /// <summary>
 /// Represents a plugin in the Mimisbrunnr system.
 /// </summary>

@@ -29,10 +29,13 @@ internal class PluginManager : IPluginManager
         if (!string.IsNullOrWhiteSpace(macroState.Id))
         {
             state = await _macroStateRepository.GetAll().FirstOrDefaultAsync(x => x.Id == macroState.Id);
-            if (macroState.PageId != state.PageId || macroState.MacroIdentifierOnPage != state.MacroIdentifierOnPage)
+            if (state is null)
+                throw new InvalidOperationException("State with specified Id not found");
+            if (macroState.PageId != state?.PageId || macroState.MacroIdentifierOnPage != state?.MacroIdentifierOnPage)
                 throw new InvalidOperationException("PageId and UniqueId in store not equals in updating state by Id");
             state.Params = macroState.Params;
             await _macroStateRepository.Update(state);
+            return state;
         }
 
         state = await _macroStateRepository.GetAll().FirstOrDefaultAsync(x => x.PageId == macroState.PageId && x.MacroIdentifierOnPage == macroState.MacroIdentifierOnPage);
@@ -78,6 +81,14 @@ internal class PluginManager : IPluginManager
         await _pluginRepository.Update(plugin);
     }
 
+    public async Task<Macro> GetMacro(string macroIdentifier)
+    {
+        var pluginWithMacro = await _pluginRepository.GetAll().FirstOrDefaultAsync(x => x.Macros.Any(m => m.MacroIdentifier == macroIdentifier));
+        if (pluginWithMacro is null)
+            return null;
+        return pluginWithMacro.Macros.FirstOrDefault(x => x.MacroIdentifier == macroIdentifier);
+    }
+
     public async Task<MacroState> GetMacroState(string pageId, string macroUniqueId)
     {
         var state = await _macroStateRepository.GetAll()
@@ -89,6 +100,11 @@ internal class PluginManager : IPluginManager
             PageId = pageId,
             MacroIdentifierOnPage = macroUniqueId
         };
+    }
+
+    public Task<Plugin> GetPlugin(string pluginIdentifier)
+    {
+        return _pluginRepository.GetAll().FirstOrDefaultAsync(x => x.PluginIdentifier == pluginIdentifier);
     }
 
     public async Task<Plugin[]> GetPlugins(int? skip = null, int? top = null)
@@ -128,14 +144,16 @@ internal class PluginManager : IPluginManager
         _logger.LogInformation("Plugin `{pluginName}` with version {version} updated successful", plugin.Name, plugin.Version);
     }
 
-    public async Task UnInstall(Plugin plugin)
+    public async Task UnInstall(Plugin plugin, UserInfo userInfo)
     {
+        using var _ = _logger.BeginScope("Uninstalling plugin `{pluginIdentifier}` by user {userEmail}", plugin.PluginIdentifier, userInfo.Email);
         var macroIdentifiers = plugin.Macros.Select(x => x.MacroIdentifier).ToArray();
         var states = await _macroStateRepository.GetAll().Where(x => macroIdentifiers.Contains(x.MacroIdentifier)).ToArrayAsync();
         foreach (var state in states)
             await _macroStateRepository.Delete(state);
 
         await _pluginRepository.Delete(plugin);
+        _logger.LogInformation("Plugin `{pluginName}` with version {version} successful uninstalled with deleting all macro states", plugin.Name, plugin.Version);
     }
 
 }

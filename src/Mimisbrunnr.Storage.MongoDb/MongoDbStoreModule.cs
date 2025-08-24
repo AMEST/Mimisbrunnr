@@ -390,13 +390,29 @@ public class MongoDbStoreModule : RunnableModule
     {
         var collection = mongoDbContext.GetCollection<MacroState>();
         var pageIdAndMacroIdentifierOnPageKeyDefinition = Builders<MacroState>.IndexKeys.Ascending(x => x.PageId).Ascending(x => x.MacroIdentifierOnPage);
-        await collection.Indexes.CreateOneAsync(new CreateIndexModel<MacroState>(pageIdAndMacroIdentifierOnPageKeyDefinition, new CreateIndexOptions() {
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<MacroState>(pageIdAndMacroIdentifierOnPageKeyDefinition, new CreateIndexOptions()
+        {
             Background = true,
             Unique = true
         }));
         var macroIdentifierKeyDefinition = Builders<MacroState>.IndexKeys.Ascending(x => x.MacroIdentifier);
-        await collection.Indexes.CreateOneAsync(new CreateIndexModel<MacroState>(macroIdentifierKeyDefinition, new CreateIndexOptions() {
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<MacroState>(macroIdentifierKeyDefinition, new CreateIndexOptions()
+        {
             Background = true,
         }));
+
+        var pluginCollection = mongoDbContext.GetCollection<Plugin>();
+        var pluginIdentifierKeyDefinition = Builders<Plugin>.IndexKeys.Ascending(x => x.PluginIdentifier);
+        await pluginCollection.Indexes.CreateOneAsync(new CreateIndexModel<Plugin>(pluginIdentifierKeyDefinition, new CreateIndexOptions()
+        {
+            Unique = true,
+            Background = true
+        }));
+        var pluginMacroIdentifierKetDefinition = Builders<Plugin>.IndexKeys.Ascending("Macros.MacroIdentifier");
+        await pluginCollection.Indexes.CreateOneAsync(new CreateIndexModel<Plugin>(pluginMacroIdentifierKetDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+
     }
 }

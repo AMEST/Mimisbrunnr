@@ -8,6 +8,7 @@ using Mimisbrunnr.Web.Favorites;
 using Mimisbrunnr.Web.Feed;
 using Mimisbrunnr.Web.Group;
 using Mimisbrunnr.Web.Infrastructure;
+using Mimisbrunnr.Web.Plugin;
 using Mimisbrunnr.Web.Quickstart;
 using Mimisbrunnr.Web.Search;
 using Mimisbrunnr.Web.Services;
@@ -40,5 +41,6 @@ public class WebModule : Module
         services.AddSingleton<ITokenService, TokenService>();
         services.AddSingleton<IFavoriteService, FavoriteService>();
         services.AddSingleton<ICommentService, CommentService>();
+        services.AddSingleton<IPluginService, PluginService>();
     }
 }

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
+namespace Mimisbrunnr.Integration.Plugin;
 /// <summary>
 /// Represents a macro model used for defining and validating macros in the system.
 /// </summary>

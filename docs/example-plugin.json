@@ -1,0 +1,26 @@
+{
+  "Id": "550e8400-e29b-41d4-a716-446655440000",
+  "PluginIdentifier": "mimisbrunnr.plugin.example",
+  "Name": "Example Plugin",
+  "Version": "1.0.0",
+  "Macros": [
+    {
+      "MacroIdentifier": "mimisbrunnr.plugin.example.macro.hello",
+      "Name": "Hello World Macro",
+      "Description": "Displays a greeting message.",
+      "Params": ["name", "surname"],
+      "Template": "<ul><li>{{name}}</li><li>{{surname}}</li></ul>",
+      "SendUserToken": true,
+      "StoreParamsInDatabase": true
+    },
+    {
+      "MacroIdentifier": "mimisbrunnr.plugin.example.macro.default-params",
+      "Name": "Default Values Macro",
+      "Description": "Show default params macro",
+      "Params": [],
+      "Template": "<div>Predefined params with values: <br> <ul><li>Page Id: {{Page.Id}}</li> <li>Page Name: {{Page.Name}}</li> <li>Space Key: {{Space.Key}} </li> <li>Space Name: {{Space.Name}} </li> <li>User Email: {{User.Email}}</li> <li>User Name: {{User.Name}}</li> </ul></div>",
+      "SendUserToken": false,
+      "StoreParamsInDatabase": true
+    }
+  ]
+}
