@@ -8,8 +8,8 @@ public interface IPluginManager
     Task<Plugin> GetPlugin(string pluginIdentifier);
     Task InstallPlugin(Plugin plugin, UserInfo userInfo);
     Task UnInstall(Plugin plugin, UserInfo userInfo);
-    Task Enable(string id);
-    Task Disable(string id);
+    Task Enable(string pluginIdentifier);
+    Task Disable(string pluginIdentifier);
     Task<Macro> GetMacro(string macroIdentifier);
     Task<MacroState> GetMacroState(string pageId, string macroUniqueId);
     Task<MacroState> CreateOrUpdateState(MacroState macroState);

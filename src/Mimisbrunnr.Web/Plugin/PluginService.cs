@@ -32,16 +32,16 @@ public class PluginService : IPluginService
         _logger = logger;
     }
 
-    public Task DisablePlugin(string id, UserInfo userInfo)
+    public Task DisablePlugin(string pluginIdentifier, UserInfo userInfo)
     {
-        _logger.LogInformation("User {email} disable plugin with {id}", userInfo.Email, id);
-        return _pluginManager.Disable(id);
+        _logger.LogInformation("User {email} disable plugin with {id}", userInfo.Email, pluginIdentifier);
+        return _pluginManager.Disable(pluginIdentifier);
     }
 
-    public Task EnablePlugin(string id, UserInfo userInfo)
+    public Task EnablePlugin(string pluginIdentifier, UserInfo userInfo)
     {
-        _logger.LogInformation("User {email} enable plugin with {id}", userInfo.Email, id);
-        return _pluginManager.Enable(id);
+        _logger.LogInformation("User {email} enable plugin with {id}", userInfo.Email, pluginIdentifier);
+        return _pluginManager.Enable(pluginIdentifier);
     }
 
     public async Task<MacroModel[]> GetAvailableMacroses(int? skip = null, int? take = null)
@@ -93,17 +93,17 @@ public class PluginService : IPluginService
         await _permissionService.EnsureViewPermission(space.Key, userInfo);
 
         var state = await _pluginManager.GetMacroState(pageId, macroIdOnPage);
-        var macro = await _pluginManager.GetMacro(state.MacroIdentifier);
+        var macro = await _pluginManager.GetMacro(state.MacroIdentifier ?? userRequest.MacroIdentifier);
         foreach (var (key, value) in state.Params)
             if (!userRequest.Params.TryAdd(key, value))
                 userRequest.Params[key] = value;
 
-        userRequest.Params.Add("Page.Id", page.Id);
-        userRequest.Params.Add("Page.Name", page.Name);
-        userRequest.Params.Add("Space.Key", space.Key);
-        userRequest.Params.Add("Space.Name", space.Name);
-        userRequest.Params.Add("User.Email", userInfo?.Email ?? string.Empty);
-        userRequest.Params.Add("User.Name", userInfo?.Name ?? string.Empty);
+        userRequest.Params.Add("PageId", page.Id);
+        userRequest.Params.Add("PageName", page.Name);
+        userRequest.Params.Add("SpaceKey", space.Key);
+        userRequest.Params.Add("SpaceName", space.Name);
+        userRequest.Params.Add("UserEmail", userInfo?.Email ?? string.Empty);
+        userRequest.Params.Add("UserName", userInfo?.Name ?? string.Empty);
 
         if (!string.IsNullOrEmpty(macro.RenderUrl))
         {

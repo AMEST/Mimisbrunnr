@@ -15,6 +15,7 @@ public class WikiModule : Module
             .AddSingleton<ISpaceSearcher, SpaceManager>()
             .AddSingleton<IDraftManager, DraftManager>()
             .AddSingleton<ICommentManager, CommentManager>()
-            .AddSingleton<IPageManager, PageManager>();
+            .AddSingleton<IPageManager, PageManager>()
+            .AddSingleton<IPluginManager, PluginManager>();
     }
 }

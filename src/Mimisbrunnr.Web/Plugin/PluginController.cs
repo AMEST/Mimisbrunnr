@@ -38,10 +38,10 @@ public class PluginController : ControllerBase
     }
 
     [HttpPost("macros/{pageId}/{macroIdOnPage}/render")]
-    public Task<MacroStateModel> Render([FromRoute] string pageId, [FromRoute] string macroIdOnPage, [FromBody] MacroRenderUserRequest userRequest)
+    public Task<MacroRenderResponse> Render([FromRoute] string pageId, [FromRoute] string macroIdOnPage, [FromBody] MacroRenderUserRequest userRequest)
     {
         var userInfo = User?.ToInfo();
-        return _pluginService.GetMacroState(pageId, macroIdOnPage, userInfo);
+        return _pluginService.Render(pageId, macroIdOnPage, userRequest, userInfo);
     }
 
     [HttpPost("macros/state")]
@@ -74,19 +74,19 @@ public class PluginController : ControllerBase
         return _pluginService.UnInstallPlugin(macroIdentifier, userInfo);
     }
 
-    [HttpPost("{macroIdentifier}/disable")]
+    [HttpPost("{pluginIdentifier}/disable")]
     [RequiredAdminRole]
-    public Task DisablePlugin([FromRoute] string macroIdentifier)
+    public Task DisablePlugin([FromRoute] string pluginIdentifier)
     {
         var userInfo = User?.ToInfo();
-        return _pluginService.DisablePlugin(macroIdentifier, userInfo);
+        return _pluginService.DisablePlugin(pluginIdentifier, userInfo);
     }
 
-    [HttpPost("{macroIdentifier}/enable")]
+    [HttpPost("{pluginIdentifier}/enable")]
     [RequiredAdminRole]
-    public Task EnablePlugin([FromRoute] string macroIdentifier)
+    public Task EnablePlugin([FromRoute] string pluginIdentifier)
     {
         var userInfo = User?.ToInfo();
-        return _pluginService.EnablePlugin(macroIdentifier, userInfo);
+        return _pluginService.EnablePlugin(pluginIdentifier, userInfo);
     }
 }

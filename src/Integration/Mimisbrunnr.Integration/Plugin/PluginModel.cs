@@ -32,11 +32,11 @@ public class PluginModel
     /// <summary>
     /// User who installed this plugin.
     /// </summary>
-    public UserModel InstalledBy { get; internal set; }
+    public UserModel InstalledBy { get; set; }
     /// <summary>
     /// Date and time when the plugin was installed.
     /// </summary>
-    public DateTime Installation { get; internal set; }
+    public DateTime Installation { get; set; }
     /// <summary>
     /// Collection of macros provided by this plugin.
     /// </summary>

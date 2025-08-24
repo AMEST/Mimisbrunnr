@@ -8,11 +8,11 @@ internal class PluginManager : IPluginManager
 {
     private readonly IRepository<Plugin> _pluginRepository;
     private readonly IRepository<MacroState> _macroStateRepository;
-    private readonly Logger<PluginManager> _logger;
+    private readonly ILogger<PluginManager> _logger;
 
     public PluginManager(IRepository<Plugin> pluginRepository,
         IRepository<MacroState> macroStateRepository,
-        Logger<PluginManager> logger
+        ILogger<PluginManager> logger
     )
     {
         _pluginRepository = pluginRepository;
@@ -63,18 +63,18 @@ internal class PluginManager : IPluginManager
         await _macroStateRepository.Delete(state);
     }
 
-    public async Task Disable(string id)
+    public async Task Disable(string pluginIdentifier)
     {
-        var plugin = await _pluginRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
+        var plugin = await _pluginRepository.GetAll().FirstOrDefaultAsync(x => x.PluginIdentifier == pluginIdentifier);
         if (plugin is null)
             return;
         plugin.Disabled = true;
         await _pluginRepository.Update(plugin);
     }
 
-    public async Task Enable(string id)
+    public async Task Enable(string pluginIdentifier)
     {
-        var plugin = await _pluginRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
+        var plugin = await _pluginRepository.GetAll().FirstOrDefaultAsync(x => x.PluginIdentifier == pluginIdentifier);
         if (plugin is null)
             return;
         plugin.Disabled = false;

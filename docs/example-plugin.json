@@ -9,7 +9,7 @@
       "Name": "Hello World Macro",
       "Description": "Displays a greeting message.",
       "Params": ["name", "surname"],
-      "Template": "<ul><li>{{name}}</li><li>{{surname}}</li></ul>",
+      "Template": "<h1> Hello:</h1><br><ul><li>{{name}}</li><li>{{surname}}</li></ul>",
       "SendUserToken": true,
       "StoreParamsInDatabase": true
     },
@@ -18,7 +18,7 @@
       "Name": "Default Values Macro",
       "Description": "Show default params macro",
       "Params": [],
-      "Template": "<div>Predefined params with values: <br> <ul><li>Page Id: {{Page.Id}}</li> <li>Page Name: {{Page.Name}}</li> <li>Space Key: {{Space.Key}} </li> <li>Space Name: {{Space.Name}} </li> <li>User Email: {{User.Email}}</li> <li>User Name: {{User.Name}}</li> </ul></div>",
+      "Template": "<div>Predefined params with values: <br> <ul><li>Page Id: {{PageId}}</li> <li>Page Name: {{PageName}}</li> <li>Space Key: {{SpaceKey}} </li> <li>Space Name: {{SpaceName}} </li> <li>User Email: {{UserEmail}}</li> <li>User Name: {{UserName}}</li> </ul></div>",
       "SendUserToken": false,
       "StoreParamsInDatabase": true
     }

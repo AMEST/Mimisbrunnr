@@ -49,16 +49,16 @@ public interface IPluginService
     /// <summary>
     /// Enables a previously disabled plugin
     /// </summary>
-    /// <param name="macroIdentifier">Unique identifier of the plugin to enable</param>
+    /// <param name="pluginIdentifier">Unique identifier of the plugin to enable</param>
     /// <param name="userInfo">User information of the user performing the operation</param>
-    Task EnablePlugin(string macroIdentifier, UserInfo userInfo);
+    Task EnablePlugin(string pluginIdentifier, UserInfo userInfo);
 
     /// <summary>
     /// Disables an enabled plugin
     /// </summary>
-    /// <param name="macroIdentifier">Unique identifier of the plugin to disable</param>
+    /// <param name="pluginIdentifier">Unique identifier of the plugin to disable</param>
     /// <param name="userInfo">User information of the user performing the operation</param>
-    Task DisablePlugin(string macroIdentifier, UserInfo userInfo);
+    Task DisablePlugin(string pluginIdentifier, UserInfo userInfo);
 
     /// <summary>
     /// Retrieves the state of a macro on a specific page
