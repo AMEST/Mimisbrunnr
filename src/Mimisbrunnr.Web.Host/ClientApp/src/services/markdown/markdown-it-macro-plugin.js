@@ -1,7 +1,7 @@
 function macroPlugin(md) {
     function replaceMacro(state, start, end, silent) {
       const tail = state.src.slice(end);
-      const regex = /\{\{macro:name=([^|]+)\|id=([^|]+)\|([^}]+)\}\}/g;
+      const regex = /\{\{macro:name=([^|]+)\|id=([^|]+)\|([^}]*)\}\}/g;
       
       // Проверяем, есть ли хотя бы один макрос
       if (!regex.test(tail)) {
