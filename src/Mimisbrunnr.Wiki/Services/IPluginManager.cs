@@ -6,6 +6,7 @@ public interface IPluginManager
 {
     Task<Plugin[]> GetPlugins(int? skip = null, int? top = null);
     Task<Plugin> GetPlugin(string pluginIdentifier);
+    Task<Plugin> GetPluginByMacroIdentifier(string macroIdentifier);
     Task InstallPlugin(Plugin plugin, UserInfo userInfo);
     Task UnInstall(Plugin plugin, UserInfo userInfo);
     Task Enable(string pluginIdentifier);

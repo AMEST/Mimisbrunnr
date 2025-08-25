@@ -2,7 +2,7 @@
   "Id": "550e8400-e29b-41d4-a716-446655440000",
   "PluginIdentifier": "mimisbrunnr.plugin.example",
   "Name": "Example Plugin",
-  "Version": "1.0.0",
+  "Version": "1.0.0-a",
   "Macros": [
     {
       "MacroIdentifier": "mimisbrunnr.plugin.example.macro.hello",
@@ -19,6 +19,15 @@
       "Description": "Show default params macro",
       "Params": [],
       "Template": "<div>Predefined params with values: <br> <ul><li>Page Id: {{PageId}}</li> <li>Page Name: {{PageName}}</li> <li>Space Key: {{SpaceKey}} </li> <li>Space Name: {{SpaceName}} </li> <li>User Email: {{UserEmail}}</li> <li>User Name: {{UserName}}</li> </ul></div>",
+      "SendUserToken": false,
+      "StoreParamsInDatabase": true
+    },
+    {
+      "MacroIdentifier": "mimisbrunnr.plugin.example.macro.external-renderer",
+      "Name": "External Renderer Macro",
+      "Description": "Send request to external service for rendering macro",
+      "Params": ["say"],
+      "RenderUrl": "http://localhost:27080/render",
       "SendUserToken": false,
       "StoreParamsInDatabase": true
     }

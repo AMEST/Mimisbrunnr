@@ -1,3 +1,4 @@
+using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 using Mimisbrunnr.Integration.Plugin;
 using Mimisbrunnr.Integration.Wiki;
@@ -16,6 +17,7 @@ public class PluginService : IPluginService
     private readonly ISpaceManager _spaceManager;
     private readonly ITemplateRenderer _templateRenderer;
     private readonly ILogger<PluginService> _logger;
+    private readonly HttpClient _httpClient;
 
     public PluginService(IPermissionService permissionService,
         IPluginManager pluginManager,
@@ -30,6 +32,7 @@ public class PluginService : IPluginService
         _spaceManager = spaceManager;
         _templateRenderer = templateRenderer;
         _logger = logger;
+        _httpClient = new HttpClient();
     }
 
     public Task DisablePlugin(string pluginIdentifier, UserInfo userInfo)
@@ -107,10 +110,7 @@ public class PluginService : IPluginService
 
         if (!string.IsNullOrEmpty(macro.RenderUrl))
         {
-            return new MacroRenderResponse()
-            {
-                Html = "<span style=\"color: blue\"> test render via url</span>"
-            };
+            return await RenderRemoteMacro(macro, page, space, userInfo, userRequest.Params);
         }
 
         var renderResult = await _templateRenderer.Render(macro.Template, userRequest.Params.ToDictionary(x => x.Key, x => x.Value as object));
@@ -136,5 +136,21 @@ public class PluginService : IPluginService
             throw new PluginNotFoundException();
         await _pluginManager.UnInstall(installedPlugin, userInfo); ;
     }
-
+    
+    
+    private async Task<MacroRenderResponse> RenderRemoteMacro(Macro macro, Page page, Space space, UserInfo user, IDictionary<string, string> parameters)
+    {
+        var plugin = await _pluginManager.GetPluginByMacroIdentifier(macro.MacroIdentifier);
+        var renderRequest = new MacroRenderRequest()
+        {
+            PluginIdentifier = plugin.PluginIdentifier,
+            MacroIdentifier = macro.MacroIdentifier,
+            RequestedBy = user.ToModel(),
+            PageId = page.Id,
+            SpaceKey = space.Key,
+            Params = parameters
+        };
+        var response = await _httpClient.PostAsJsonAsync(macro.RenderUrl, renderRequest);
+        return await response.Content.ReadFromJsonAsync<MacroRenderResponse>();
+    }
 }

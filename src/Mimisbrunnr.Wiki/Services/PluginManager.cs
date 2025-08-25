@@ -83,7 +83,7 @@ internal class PluginManager : IPluginManager
 
     public async Task<Macro> GetMacro(string macroIdentifier)
     {
-        var pluginWithMacro = await _pluginRepository.GetAll().FirstOrDefaultAsync(x => x.Macros.Any(m => m.MacroIdentifier == macroIdentifier));
+        var pluginWithMacro = await GetPluginByMacroIdentifier(macroIdentifier);
         if (pluginWithMacro is null)
             return null;
         return pluginWithMacro.Macros.FirstOrDefault(x => x.MacroIdentifier == macroIdentifier);
@@ -105,6 +105,11 @@ internal class PluginManager : IPluginManager
     public Task<Plugin> GetPlugin(string pluginIdentifier)
     {
         return _pluginRepository.GetAll().FirstOrDefaultAsync(x => x.PluginIdentifier == pluginIdentifier);
+    }
+
+    public Task<Plugin> GetPluginByMacroIdentifier(string macroIdentifier)
+    {
+        return _pluginRepository.GetAll().FirstOrDefaultAsync(x => x.Macros.Any(m => m.MacroIdentifier == macroIdentifier));
     }
 
     public async Task<Plugin[]> GetPlugins(int? skip = null, int? top = null)
