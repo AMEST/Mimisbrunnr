@@ -97,9 +97,11 @@ public class PluginService : IPluginService
 
         var state = await _pluginManager.GetMacroState(pageId, macroIdOnPage);
         var macro = await _pluginManager.GetMacro(state.MacroIdentifier ?? userRequest.MacroIdentifier);
+        if (macro == null)
+            throw new MacroNotFoundException($"Macro {state.MacroIdentifier ?? userRequest.MacroIdentifier} not found");
         foreach (var (key, value) in state.Params)
-            if (!userRequest.Params.TryAdd(key, value))
-                userRequest.Params[key] = value;
+                if (!userRequest.Params.TryAdd(key, value))
+                    userRequest.Params[key] = value;
 
         userRequest.Params.Add("PageId", page.Id);
         userRequest.Params.Add("PageName", page.Name);

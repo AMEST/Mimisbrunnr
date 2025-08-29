@@ -19,8 +19,15 @@
             size="lg"
             switch
             @change="toggleSideBySide"
-            >{{ $t("pageEditor.sideBySide") }}</b-form-checkbox
+            >{{ $t("pageEditor.sideBySide") }}
+          </b-form-checkbox>
+          <b-button 
+            @click="showPreview" 
+            variant="secondary"
+            style="margin-right: 0.5em"
           >
+            {{ $t("pageEditor.preview") }}
+          </b-button>
           <b-button
             @click="save"
             variant="primary"
@@ -29,11 +36,11 @@
           >
             {{ $t("pageEditor.update") }}
           </b-button>
-          <b-button @click="cancel" variant="secondary">
-            {{ $t("pageEditor.close") }}
-          </b-button>
-        </div>
-      </div>
+      <b-button @click="cancel" variant="secondary">
+        {{ $t("pageEditor.close") }}
+      </b-button>
+    </div>
+  </div>
       <attachments :attachmentSelectAction="addAttachmentLink" :page="page" />
       <vue-markdown
         :html="this.$store.state.application.info.allowHtml"
@@ -41,7 +48,7 @@
         :postrender="renderMarkdown"
         :toc="true"
         style="display: none"
-        v-if="sideBySide"
+        v-if="sideBySide || previewModal"
       ></vue-markdown>
     </b-container>
     <draft-modal
@@ -51,6 +58,7 @@
       :resetCallBack="resetDraft"
     />
     <GuideModal />
+    <PagePreviewModal :htmlContent="renderedMarkdown" />
   </div>
 </template>
 
@@ -66,8 +74,10 @@ import { debounce, isImageFile } from "@/services/Utils.js";
 import { formatMarkdownTables, insertMarkdownTableColumn, insertMarkdownTableRow } from "@/services/markdown/tableUtils";
 import DraftModal from "@/components/pageEditor/DraftModal.vue";
 import GuideModal from "@/components/pageEditor/GuideModal.vue";
+import PagePreviewModal from "@/components/pageEditor/PagePreviewModal.vue";
 import ProfileService from "@/services/profileService";
 import PageService from "@/services/pageService";
+import PluginService from "@/services/pluginService";
 export default {
   name: "PageEdit",
   components: {
@@ -76,6 +86,7 @@ export default {
     Attachments,
     DraftModal,
     GuideModal,
+    PagePreviewModal,
   },
   data() {
     return {
@@ -83,6 +94,7 @@ export default {
       draft: null,
       loaded: false,
       sideBySide: false,
+      previewModal: false,
       mdeConfig: {
         toolbar: [
           "bold",
@@ -138,9 +150,9 @@ export default {
           },
         ],
         spellChecker: false,
-        renderedMarkdown: "",
         previewRender: this.previewRender,
       },
+    renderedMarkdown: "<br/>",
     };
   },
   computed: {
@@ -297,7 +309,6 @@ export default {
         this.currentMacroButtons = null;
       }
     },
-
     deleteMacro: function(pos) {
       const lineText = this.simplemde.codemirror.getLine(pos.line);
       const macroStart = lineText.lastIndexOf('{{macro:', pos.ch);
@@ -318,7 +329,6 @@ export default {
       this.simplemde.codemirror.replaceRange('', startPos, endPos);
       this.hideMacroButtons();
     },
-
     editMacro: function(pos, macroContent) {
       console.log('Editing macro at:', pos, 'Content:', macroContent);
       this.hideMacroButtons();
@@ -476,12 +486,17 @@ export default {
     },
     // eslint-disable-next-line
     previewRender: function (plainText) {
-      return this.renderedMarkdown || "";
+      return this.renderedMarkdown || "<br/>";
     },
     renderMarkdown: function (html) {
       this.renderedMarkdown = html;
       return html;
     },
+    showPreview: function() {
+      this.previewModal = true;
+      this.$bvModal.show('page-preview-modal');
+      setTimeout(() => PluginService.renderMacroOnPage(this.page.id, "page-preview-modal"), 800)
+    }
   },
   mounted: function () {
     this.init();
@@ -536,7 +551,7 @@ export default {
   position: relative;
   top: -3px;
 }
-@media (max-width: 600px) {
+@media (max-width: 620px) {
   .side-by-side-switch {
     display: none !important;
   }

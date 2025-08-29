@@ -270,6 +270,7 @@
         },
         "pageEditor": {
             "placeholder": "Page Name",
+            "preview": "Preview",
             "update": "Update",
             "close": "Close",
             "sideBySide": "Side-By-Side",
@@ -682,6 +683,7 @@
         },
         "pageEditor": {
             "placeholder": "Имя страницы",
+            "preview": "Предпросмотр",
             "update": "Сохранить",
             "close": "Закрыть",
             "sideBySide": "Сплит-режим",

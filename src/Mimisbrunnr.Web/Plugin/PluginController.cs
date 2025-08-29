@@ -9,6 +9,8 @@ namespace Mimisbrunnr.Web.Plugin;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
+[HandlePluginErrors]
+[HandleWikiErrors]
 public class PluginController : ControllerBase
 {
     private readonly IPluginService _pluginService;

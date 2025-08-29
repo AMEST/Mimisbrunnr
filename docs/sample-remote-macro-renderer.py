@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+import html
 import json
 
 app = Flask(__name__)
@@ -9,11 +10,11 @@ def render_macro():
     print(json.dumps(data))
 
     # Формируем HTML
-    html = f"""
+    html_content = f"""
     <div>
         <style>
             body {{ font-family: Arial, sans-serif; margin: 20px; }}
-            .container {{ border: 1px solid #ddd; padding: 20px; border-radius: 5px; max-width: 800px; }}
+            .container {{ border: none; padding: 20px; border-radius: 5px; max-width: 800px; }}
             .header {{ background-color: #f5f5f5; padding: 10px; margin-bottom: 20px; border-radius: 5px; }}
             .params-table {{ width: 100%; border-collapse: collapse; margin-top: 10px; }}
             .params-table th, .params-table td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
@@ -43,21 +44,24 @@ def render_macro():
 
     params = data.get('params', {})
     for key, value in params.items():
-        html += f"""
+        html_content += f"""
                     <tr>
                         <td>{key}</td>
                         <td>{value}</td>
                     </tr>
         """
 
-    html += """
+    html_content += """
                 </tbody>
             </table>
         </div>
     </div>
     """
 
-    return jsonify({'Html': html})
+    # Экранируем кавычки для корректного отображения в srcdoc
+    escaped_html = html.escape(html_content)
+    result_html = f'<iframe srcdoc="{escaped_html}" style="width: 100%; height: 800px; border: none;"></iframe>'
+    return jsonify({'Html': result_html})
 
 if __name__ == '__main__':
     app.run("0.0.0.0", 27080, debug=True)
