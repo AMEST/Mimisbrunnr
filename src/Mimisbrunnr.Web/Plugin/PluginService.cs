@@ -99,6 +99,9 @@ public class PluginService : IPluginService
         var macro = await _pluginManager.GetMacro(state.MacroIdentifier ?? userRequest.MacroIdentifier);
         if (macro == null)
             throw new MacroNotFoundException($"Macro {state.MacroIdentifier ?? userRequest.MacroIdentifier} not found");
+        var plugin = await _pluginManager.GetPluginByMacroIdentifier(macro.MacroIdentifier);
+        if(plugin.Disabled)
+            throw new MacroNotFoundException($"Macro {state.MacroIdentifier ?? userRequest.MacroIdentifier} not found");
         foreach (var (key, value) in state.Params)
                 if (!userRequest.Params.TryAdd(key, value))
                     userRequest.Params[key] = value;

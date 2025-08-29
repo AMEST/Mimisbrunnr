@@ -109,6 +109,7 @@
             :toc="true"
             :html="this.$store.state.application.info.allowHtml"
             :source="this.page.content"
+            :postrender="processMacroses"
             id="page-content"
         ></vue-markdown>
         </div>
@@ -144,6 +145,7 @@ const VueMarkdown = () => import(/* webpackChunkName: "vue-markdown-component" *
 import FavoriteService from "@/services/favoriteService";
 import PageService from "@/services/pageService";
 import ProfileService from "@/services/profileService";
+import PluginService from "@/services/pluginService";
 import CommentCreate from "@/components/space/components/CommentCreate.vue";
 import Comment from "@/components/space/components/Comment.vue";
 export default {
@@ -272,11 +274,9 @@ export default {
             printWindow.close();
         }, 1000);
     },
-    processMacroses(){
-        var macroses = document.querySelectorAll('[aria-type="macros"]');
-        macroses.forEach(x => {
-            console.log(`Founded macros id="${x.id}" name="${x.getAttribute("aria-name")}" params="${x.getAttribute("aria-params")}"`)
-        });
+    processMacroses(html){
+        setTimeout(() => PluginService.renderMacroOnPage(this.page.id), 500);
+        return html;
     },
   },
   watch: {
@@ -288,7 +288,6 @@ export default {
       setTimeout(() => hljs.highlightAll(), 100);
       setTimeout(this.scrollToAnchor, 100);
       setTimeout(replaceRelativeLinksToRoute, 250, "page-content");
-      setTimeout(this.processMacroses, 300);
     },
   },
   mounted: function () {
@@ -298,7 +297,6 @@ export default {
     setTimeout(() => hljs.highlightAll(), 100);
     setTimeout(this.scrollToAnchor, 100);
     setTimeout(replaceRelativeLinksToRoute, 250, "page-content");
-    setTimeout(this.processMacroses, 300);
   },
 };
 </script>
