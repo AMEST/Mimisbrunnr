@@ -196,6 +196,40 @@
                     "cancel": "No"
                 },
                 "loadMore": "Load more"
+            },
+            "plugins": {
+                "title": "Plugins",
+                "loadMore": "Load more",
+                "installButton": "Install",
+                "installModal": {
+                    "title": "Plugin installing",
+                    "fileLabel": "Select plugin json",
+                    "filePlaceholder": ".json",
+                    "infoBlock": "The following plugin will be installed",
+                    "pluginName": "Plugin name",
+                    "pluginVersion": "Plugin version",
+                    "installButton": "Install plugin" 
+                },
+                "table": {
+                    "fields": {
+                        "name": "Plugin name",
+                        "version": "Version",
+                        "actions": ""
+                    },
+                    "details": "Show details",
+                    "disable": "Disable plugin",
+                    "enable": "Enable plugin",
+                    "uninstall": "Uninstall"
+                },
+                "details": {
+                    "identifier": "Plugin identifier",
+                    "installedBy": "Installed by",
+                    "installedAt": "Installed at",
+                    "macrosInfo": "Macros list",
+                    "macrosName": "Macros name",
+                    "macrosDescription": "Description",
+                    "sendUserToken": "Sending user token"
+                }
             }
         },
         "profile": {
@@ -609,6 +643,40 @@
 
                 },
                 "loadMore": "Загрузить еще"
+            },
+            "plugins": {
+                "title": "Плагины",
+                "loadMore": "Загрузить еще",
+                "installButton": "Установить",
+                "installModal": {
+                    "title": "Установка плагина",
+                    "fileLabel": "Выберите конфигурацию плагина",
+                    "filePlaceholder": ".json",
+                    "infoBlock": "Будет установлен следующий плагин",
+                    "pluginName": "Имя плагина",
+                    "pluginVersion": "Версия плагина",
+                    "installButton": "Установить плагин" 
+                },
+                "table": {
+                    "fields": {
+                        "name": "Название плагина",
+                        "version": "Версия",
+                        "actions": ""
+                    },
+                    "details": "Подробнее",
+                    "disable": "Отключить плагин",
+                    "enable": "Включить плагин",
+                    "uninstall": "Удалить"
+                },
+                "details": {
+                    "identifier": "Идентификатор плагина",
+                    "installedBy": "Установил",
+                    "installedAt": "Дата установки",
+                    "macrosInfo": "Список макросов",
+                    "macrosName": "Имя макроса",
+                    "macrosDescription": "Описание макроса",
+                    "sendUserToken": "Отправляется ли токен пользователя"
+                }
             }
         },
         "profile": {

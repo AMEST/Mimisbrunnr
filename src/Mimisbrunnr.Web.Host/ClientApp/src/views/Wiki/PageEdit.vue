@@ -58,7 +58,10 @@
       :resetCallBack="resetDraft"
     />
     <GuideModal />
-    <PagePreviewModal :htmlContent="renderedMarkdown" />
+    <PagePreviewModal 
+      :htmlContent="renderedMarkdown"
+      @close="previewModal = $event"
+    />
   </div>
 </template>
 

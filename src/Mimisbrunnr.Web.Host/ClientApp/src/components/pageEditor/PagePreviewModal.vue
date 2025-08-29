@@ -4,6 +4,7 @@
     size="xl"
     title="Page Preview"
     hide-footer
+    @hide="$emit('close', false)"
   >
     <div class="page-preview-modal-body" v-if="htmlContent" v-html="htmlContent"></div>
   </b-modal>

@@ -7,7 +7,6 @@ namespace Mimisbrunnr.Web.Mapping;
 [Mapper]
 public static partial class PluginMapper
 {
-    [MapperIgnoreSource(nameof(Mimisbrunnr.Wiki.Contracts.Plugin.Disabled))]
     public static partial PluginModel ToModel(this Mimisbrunnr.Wiki.Contracts.Plugin plugin);
 
     [MapperIgnoreSource(nameof(Macro.Disabled))]

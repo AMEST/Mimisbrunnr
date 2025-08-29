@@ -38,6 +38,10 @@ public class PluginModel
     /// </summary>
     public DateTime Installation { get; set; }
     /// <summary>
+    /// Flag indicates is plugins disabled 
+    /// </summary>
+    public bool Disabled { get; set; }
+    /// <summary>
     /// Collection of macros provided by this plugin.
     /// </summary>
     public MacroModel[] Macros { get; set; } = [];
