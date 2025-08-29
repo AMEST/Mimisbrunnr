@@ -2,10 +2,12 @@ using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 using Mimisbrunnr.Integration.Plugin;
 using Mimisbrunnr.Integration.Wiki;
+using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.Plugin;
 using Mimisbrunnr.Web.Services;
+using Mimisbrunnr.Web.User;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;
 
@@ -15,7 +17,9 @@ public class PluginService : IPluginService
     private readonly IPluginManager _pluginManager;
     private readonly IPageManager _pageManager;
     private readonly ISpaceManager _spaceManager;
+    private readonly IUserManager _userManager;
     private readonly ITemplateRenderer _templateRenderer;
+    private readonly ISecurityTokenService _tokenService;
     private readonly ILogger<PluginService> _logger;
     private readonly HttpClient _httpClient;
 
@@ -23,14 +27,18 @@ public class PluginService : IPluginService
         IPluginManager pluginManager,
         IPageManager pageManager,
         ISpaceManager spaceManager,
+        IUserManager userManager,
         ITemplateRenderer templateRenderer,
+        ISecurityTokenService tokenService,
         ILogger<PluginService> logger)
     {
         _permissionService = permissionService;
         _pluginManager = pluginManager;
         _pageManager = pageManager;
         _spaceManager = spaceManager;
+        _userManager = userManager;
         _templateRenderer = templateRenderer;
+        _tokenService = tokenService;
         _logger = logger;
         _httpClient = new HttpClient();
     }
@@ -115,7 +123,7 @@ public class PluginService : IPluginService
 
         if (!string.IsNullOrEmpty(macro.RenderUrl))
         {
-            return await RenderRemoteMacro(macro, page, space, userInfo, userRequest.Params);
+            return await RenderRemoteMacro(plugin, macro, page, space, userInfo, userRequest.Params);
         }
 
         var renderResult = await _templateRenderer.Render(macro.Template, userRequest.Params.ToDictionary(x => x.Key, x => x.Value as object));
@@ -143,16 +151,22 @@ public class PluginService : IPluginService
     }
     
     
-    private async Task<MacroRenderResponse> RenderRemoteMacro(Macro macro, Page page, Space space, UserInfo user, IDictionary<string, string> parameters)
+    private async Task<MacroRenderResponse> RenderRemoteMacro(Plugin plugin, Macro macro, Page page, Space space, UserInfo userInfo, IDictionary<string, string> parameters)
     {
-        var plugin = await _pluginManager.GetPluginByMacroIdentifier(macro.MacroIdentifier);
+        var userToken = string.Empty;
+        if (macro.SendUserToken)
+        {
+            var user = await _userManager.GetByEmail(userInfo.Email);
+            userToken = await _tokenService.GenerateAccessToken(user, TimeSpan.FromMinutes(15), true);
+        }
         var renderRequest = new MacroRenderRequest()
         {
             PluginIdentifier = plugin.PluginIdentifier,
             MacroIdentifier = macro.MacroIdentifier,
-            RequestedBy = user.ToModel(),
+            RequestedBy = userInfo.ToModel(),
             PageId = page.Id,
             SpaceKey = space.Key,
+            UserToken = userToken,
             Params = parameters
         };
         var response = await _httpClient.PostAsJsonAsync(macro.RenderUrl, renderRequest);
