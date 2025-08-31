@@ -62,6 +62,15 @@
       :htmlContent="renderedMarkdown"
       @close="previewModal = $event"
     />
+    <MacroParamEdit
+      :pageId="page.id"
+      :macroIdentifier="hoveredMacro.name"
+      :macroIdOnPage="hoveredMacro.id"
+      :parameters="hoveredMacro.params"
+      :macroContent="hoveredMacro.macroContent"
+      @save="handleMacroSave"
+      @close="closeMacroEditModal"
+    />
   </div>
 </template>
 
@@ -78,6 +87,7 @@ import { formatMarkdownTables, insertMarkdownTableColumn, insertMarkdownTableRow
 import DraftModal from "@/components/pageEditor/DraftModal.vue";
 import GuideModal from "@/components/pageEditor/GuideModal.vue";
 import PagePreviewModal from "@/components/pageEditor/PagePreviewModal.vue";
+import MacroParamEdit from "@/components/pageEditor/MacroParamEdit.vue";
 import ProfileService from "@/services/profileService";
 import PageService from "@/services/pageService";
 import PluginService from "@/services/pluginService";
@@ -90,6 +100,7 @@ export default {
     DraftModal,
     GuideModal,
     PagePreviewModal,
+    MacroParamEdit,
   },
   data() {
     return {
@@ -155,7 +166,13 @@ export default {
         spellChecker: false,
         previewRender: this.previewRender,
       },
-    renderedMarkdown: "<br/>",
+      renderedMarkdown: "<br/>",
+      hoveredMacro: {
+        id: null,
+        name: null,
+        params: {},
+        macroContent: null
+      }
     };
   },
   computed: {
@@ -333,8 +350,55 @@ export default {
       this.hideMacroButtons();
     },
     editMacro: function(pos, macroContent) {
-      console.log('Editing macro at:', pos, 'Content:', macroContent);
+      try {
+        const regex = /\{\{macro:name=([^|]+)\|id=([^|]+)\|([^}]*)\}\}/g;
+        const match = regex.exec(macroContent);
+        if (!match) return;
+        const [, name, id, parameters] = match;
+        if(!name || !id) return;
+
+        const paramsDict = {};
+        parameters.split('|').map(x => x.split("=")).forEach(x => paramsDict[x[0]] = x[1])
+
+        this.hoveredMacro.id = id;
+        this.hoveredMacro.name = name;
+        this.hoveredMacro.params = paramsDict;
+        this.hoveredMacro.macroContent = macroContent;
+        this.$bvModal.show('macro-param-edit-modal');
+      } catch (error) {
+        console.error('Error editing macro:', error);
+        this.$bvToast.toast(this.$t('pageEditor.macroEditor.errors.editFailed'), {
+          title: this.$t('pageEditor.macroEditor.error'),
+          variant: 'danger',
+          solid: true
+        });
+      }
       this.hideMacroButtons();
+    },
+    closeMacroEditModal: function(){
+        this.hoveredMacro = {
+            id: null,
+            name: null,
+            params: {},
+            macroContent: null
+        }
+    },
+    handleMacroSave(macroContent, params, macroIdOnPage, macroIdentifier) {
+      try {
+        let paramsArray = [];
+        for(const key in params)
+            paramsArray.push(`${key}=${params[key]}`);
+        const newMacro = `{{macro:name=${macroIdentifier}|id=${macroIdOnPage}|${paramsArray.join("|")}}}`
+        this.page.content = this.page.content.replaceAll(macroContent, newMacro);
+      } catch (error) {
+        console.error('Error saving macro params:', error);
+        this.$bvToast.toast(this.$t('pageEditor.macroEditor.errors.saveFailed'), {
+          title: this.$t('pageEditor.macroEditor.error'),
+          variant: 'danger',
+          solid: true
+        });
+      }
+      this.$refs.markdownEditor.simplemde.value(this.page.content);
     },
     insertTable: function () {
       this.simplemde.drawTable();

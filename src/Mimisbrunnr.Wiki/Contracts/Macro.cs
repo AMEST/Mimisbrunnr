@@ -9,6 +9,6 @@ public class Macro
     public string RenderUrl { get; set; }
     public string Template { get; set; }
     public bool SendUserToken { get; set; }
-    public bool StoreParamsInDatabase { get; internal set; }
+    public bool StoreParamsInDatabase { get; set; }
     public bool Disabled { get; internal set; }
 }

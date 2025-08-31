@@ -19,7 +19,7 @@ function macroPlugin(md) {
         // Добавляем текст перед макросом
         if (match.index > lastIndex) {
           const text = tail.slice(lastIndex, match.index);
-          if (!silent) {
+          if (!silent && state.pending != text && !state.tokens.find(x => text.indexOf(x.content) !== -1)) {
             const textToken = state.push('text', '', 0);
             textToken.content = text;
           }

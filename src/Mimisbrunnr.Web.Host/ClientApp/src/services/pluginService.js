@@ -51,6 +51,24 @@ var PluginService = {
         return null;
     },
 
+    saveMacroState: async function(pageId, macroId, macroIdOnPage, parameters) {
+        const requestBody = {
+            pageId: pageId,
+            macroIdentifier: macroId,
+            macroIdentifierOnPage: macroIdOnPage,
+            params: parameters
+        };
+        
+        var request = await axios.post('/api/plugin/macro/state', requestBody, {
+            validateStatus: false,
+        });
+        if (request.status == 200)
+            return request.data;
+        showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
+         "Error when saving macro state", "warning");
+        return null;
+    },
+
     installPlugin: async function(model) {
         var request = await axios.post("/api/plugin", model, {
             validateStatus: false,

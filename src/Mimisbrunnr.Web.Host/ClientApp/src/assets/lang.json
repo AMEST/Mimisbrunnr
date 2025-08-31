@@ -318,6 +318,17 @@
             "macroMenu": {
                 "edit": "Edit",
                 "delete": "Delete"
+            },
+            "macroEditor":{
+                "title": "Macro params editor",
+                "error": "Macro editing error",
+                "paramsEmpty": "The macro has no parameters that can be configured or changed",
+                "save": "Save",
+                "cancel": "Cancel",
+                "errors": {
+                    "editFailed": "Macro edit failed",
+                    "saveFailed": "Macro saving failed"
+                }
             }
         },
         "page": {
@@ -765,6 +776,17 @@
             "macroMenu": {
                 "edit": "Изменить",
                 "delete": "Удалить"
+            },
+            "macroEditor":{
+                "title": "Редактор параметров макроса",
+                "paramsEmpty": "У макроса нет параметров, которые можно настроить и изменять",
+                "save": "Сохранить",
+                "cancel": "Отмена",
+                "error": "Ошибка редактирования макроса",
+                "errors": {
+                    "editFailed": "Ошибка при попытке редактирования макроса",
+                    "saveFailed": "Ошибка сохранения макроса"
+                }
             }
         },
         "page": {

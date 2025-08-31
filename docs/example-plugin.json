@@ -2,7 +2,7 @@
   "Id": "550e8400-e29b-41d4-a716-446655440000",
   "PluginIdentifier": "mimisbrunnr.plugin.example",
   "Name": "Example Plugin",
-  "Version": "1.0.0-a",
+  "Version": "1.0.1-a",
   "Macros": [
     {
       "MacroIdentifier": "mimisbrunnr.plugin.example.macro.hello",
@@ -11,7 +11,7 @@
       "Params": ["name", "surname"],
       "Template": "<h1> Hello:</h1><br><ul><li>{{name}}</li><li>{{surname}}</li></ul>",
       "SendUserToken": true,
-      "StoreParamsInDatabase": true
+      "StoreParamsInDatabase": false
     },
     {
       "MacroIdentifier": "mimisbrunnr.plugin.example.macro.default-params",
@@ -20,7 +20,7 @@
       "Params": [],
       "Template": "<div>Predefined params with values: <br> <ul><li>Page Id: {{PageId}}</li> <li>Page Name: {{PageName}}</li> <li>Space Key: {{SpaceKey}} </li> <li>Space Name: {{SpaceName}} </li> <li>User Email: {{UserEmail}}</li> <li>User Name: {{UserName}}</li> </ul></div>",
       "SendUserToken": false,
-      "StoreParamsInDatabase": true
+      "StoreParamsInDatabase": false
     },
     {
       "MacroIdentifier": "mimisbrunnr.plugin.example.macro.external-renderer",
@@ -28,8 +28,8 @@
       "Description": "Send request to external service for rendering macro",
       "Params": ["say"],
       "RenderUrl": "http://localhost:27080/render",
-      "SendUserToken": false,
-      "StoreParamsInDatabase": true
+      "StoreParamsInDatabase": true,
+      "SendUserToken": true
     }
   ]
 }

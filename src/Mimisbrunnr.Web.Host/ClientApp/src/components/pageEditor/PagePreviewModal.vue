@@ -29,3 +29,14 @@ export default {
     overflow-x: auto;
 }
 </style>
+<style>
+.page-preview-modal-body .mm-macro-block{
+    display: inline-block;
+}
+.page-preview-modal-body p {
+    display: inline;
+}
+.mm-macro-block + p {
+    display: block;
+}
+</style>
