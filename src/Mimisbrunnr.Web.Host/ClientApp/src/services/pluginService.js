@@ -59,7 +59,7 @@ var PluginService = {
             params: parameters
         };
         
-        var request = await axios.post('/api/plugin/macro/state', requestBody, {
+        var request = await axios.post('/api/plugin/macros/state', requestBody, {
             validateStatus: false,
         });
         if (request.status == 200)

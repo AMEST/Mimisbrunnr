@@ -3,7 +3,7 @@ function macroPlugin(md) {
       const tail = state.src.slice(end);
       const regex = /\{\{macro:name=([^|]+)\|id=([^|]+)\|([^}]*)\}\}/g;
       
-      // Проверяем, есть ли хотя бы один макрос
+      // Check if there is at least one macro
       if (!regex.test(tail)) {
         return false;
       }
@@ -12,11 +12,11 @@ function macroPlugin(md) {
       let lastIndex = 0;
       let found = false;
 
-      // Сбрасываем lastIndex для повторного использования регулярного выражения
+      // Reset lastIndex to reuse the regular expression
       regex.lastIndex = 0;
       
       while ((match = regex.exec(tail)) !== null) {
-        // Добавляем текст перед макросом
+        // Add text before the macro
         if (match.index > lastIndex) {
           const text = tail.slice(lastIndex, match.index);
           if (!silent && state.pending != text && !state.tokens.find(x => text.indexOf(x.content) !== -1)) {
@@ -45,7 +45,7 @@ function macroPlugin(md) {
         found = true;
       }
 
-      // Добавляем оставшийся текст после последнего макроса
+      // Add the remaining text after the last macro
       if (lastIndex < tail.length) {
         const text = tail.slice(lastIndex);
         if (!silent) {

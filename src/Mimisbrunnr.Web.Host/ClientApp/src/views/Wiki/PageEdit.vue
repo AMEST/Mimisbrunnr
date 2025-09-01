@@ -189,7 +189,7 @@ export default {
         this.$router.push("/error/unauthorized");
         return;
       }
-
+      this.hideMacroButtons();
       await this.loadPage();
       await this.loadDraft();
       if (this.draft != null) {
@@ -282,7 +282,6 @@ export default {
         this
       );
     },
-
     handleMacroHover: function(cm, event) {
       const pos = cm.coordsChar({left: event.clientX, top: event.clientY});
       const line = cm.getLine(pos.line);
@@ -567,6 +566,9 @@ export default {
   },
   mounted: function () {
     this.init();
+  },
+  destroyed: function() {
+    this.hideMacroButtons();
   },
   watch: {
     // eslint-disable-next-line
