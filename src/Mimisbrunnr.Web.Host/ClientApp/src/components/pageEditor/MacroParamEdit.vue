@@ -4,7 +4,7 @@
     size="lg"
     :title="$t('pageEditor.macroEditor.title')"
     @shown="onShow"
-    @hide="$emit('close')"
+    @hide="onHide"
   >
     <b-form v-if="macroDefinition && macroDefinition.params && macroDefinition.params.length > 0 && currentParams">
       <b-form-group
@@ -66,6 +66,11 @@ export default {
     async onShow(){
         await this.loadMacroDefinition();
         await this.loadCurrentParams();
+    },
+    onHide() {
+        this.macroDefinition = null;
+        this.currentParams = null;
+        this.$emit('close');
     },
     async loadMacroDefinition() {
       try {
