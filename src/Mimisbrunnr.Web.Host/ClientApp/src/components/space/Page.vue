@@ -353,4 +353,7 @@ export default {
 #page-content .mm-macro-block{
     display: inline-block;
 }
+#page-content .mm-macro-block + p {
+    display: block;
+}
 </style>
