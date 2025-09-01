@@ -23,7 +23,7 @@
             <b-skeleton-img v-else card-img="top" aspect="4:6"></b-skeleton-img>
           </b-col>
           <b-col>
-            <b-card-body :title="macro.name">
+            <b-card-body :title="macro.name" title-tag="h5">
               <b-card-text>
                 {{ macro.description }}
               </b-card-text>
