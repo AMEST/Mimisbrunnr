@@ -71,6 +71,7 @@
       @save="handleMacroSave"
       @close="closeMacroEditModal"
     />
+    <MacrosListModal @insert="insertMacro"/>
   </div>
 </template>
 
@@ -88,6 +89,7 @@ import DraftModal from "@/components/pageEditor/DraftModal.vue";
 import GuideModal from "@/components/pageEditor/GuideModal.vue";
 import PagePreviewModal from "@/components/pageEditor/PagePreviewModal.vue";
 import MacroParamEdit from "@/components/pageEditor/MacroParamEdit.vue";
+import MacrosListModal from "@/components/pageEditor/MacrosListModal.vue";
 import ProfileService from "@/services/profileService";
 import PageService from "@/services/pageService";
 import PluginService from "@/services/pluginService";
@@ -101,6 +103,7 @@ export default {
     GuideModal,
     PagePreviewModal,
     MacroParamEdit,
+    MacrosListModal,
   },
   data() {
     return {
@@ -126,7 +129,7 @@ export default {
           "image",
           {
             name: "table1",
-            action: this.insertTable,
+            action: () => this.simplemde.drawTable(),
             className: "fa fa-table",
             title: "Insert table",
           },
@@ -138,7 +141,7 @@ export default {
           },
           {
             name: "table-add-column",
-            action: this.insertTableColumn,
+            action: () => insertMarkdownTableColumn(this.simplemde.codemirror),
             className: "table-add-column",
             title: "Insert table column",
           },
@@ -151,14 +154,20 @@ export default {
           "|",
           {
             name: "attachment",
-            action: this.openAttachments,
+            action: () => this.$bvModal.show("page-attachments-modal"),
             className: "fa fa-paperclip",
             title: "Add attachment",
+          },
+            {
+            name: "macroses",
+            action: () => this.$bvModal.show("macros-list-modal"),
+            className: "fa fa-plus",
+            title: "Insert macros",
           },
           "|",
           {
             name: "guide",
-            action: this.openGuide,
+            action: () => this.$bvModal.show("guide-modal"),
             className: "fa fa-question-circle",
             title: "Show guide",
           },
@@ -245,14 +254,6 @@ export default {
     }, 1000),
     cancel: function () {
       this.$router.push("/space/" + this.page.spaceKey + "/" + this.page.id);
-    },
-    // eslint-disable-next-line
-    openAttachments: function (editor) {
-      this.$bvModal.show("page-attachments-modal");
-    },
-    // eslint-disable-next-line
-    openGuide: function (editor) {
-      this.$bvModal.show("guide-modal");
     },
     addAttachmentLink: function (attachment) {
       var linkToAttach = `/api/attachment/${this.page.id}/${encodeURIComponent(
@@ -399,8 +400,11 @@ export default {
       }
       this.$refs.markdownEditor.simplemde.value(this.page.content);
     },
-    insertTable: function () {
-      this.simplemde.drawTable();
+    insertMacro(macroInfo){
+      let params = macroInfo.storeParamsInDatabase ? '' : macroInfo.params.map(x => `${x}=`).join("|");
+      const cursor = this.simplemde.codemirror.getCursor();
+      this.simplemde.codemirror.setSelection(cursor, cursor);
+      this.simplemde.codemirror.replaceSelection(`{{macro:name=${macroInfo.macroIdentifier}|id=mid-${new Date().getTime()}|${params}}}`);
     },
     formatTables: function() {
         var cursor = this.simplemde.codemirror.getCursor();
@@ -410,9 +414,6 @@ export default {
             this.page.content = formatted;
         },100);
         setTimeout(() => this.simplemde.codemirror.setCursor({ ch: cursor.ch, line: cursor.line }), 250);
-    },
-    insertTableColumn: function () {
-        insertMarkdownTableColumn(this.simplemde.codemirror);
     },
     insertTableRow: function () {
         insertMarkdownTableRow(this.simplemde.codemirror);

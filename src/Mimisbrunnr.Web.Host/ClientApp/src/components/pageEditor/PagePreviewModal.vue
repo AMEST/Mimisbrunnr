@@ -2,7 +2,7 @@
   <b-modal
     id="page-preview-modal"
     size="xl"
-    title="Page Preview"
+    :title="$t('pageEditor.previewModal.title')"
     hide-footer
     @hide="$emit('close', false)"
   >
