@@ -23,7 +23,7 @@
     </b-alert>
 
     <template #modal-footer>
-      <b-button variant="primary" @click="saveParams">
+      <b-button variant="primary" @click="saveParams" v-if="macroDefinition && macroDefinition.params && macroDefinition.params.length > 0">
         {{ $t('pageEditor.macroEditor.save') }}
       </b-button>
       <b-button variant="secondary" @click="$bvModal.hide('macro-param-edit-modal')">
