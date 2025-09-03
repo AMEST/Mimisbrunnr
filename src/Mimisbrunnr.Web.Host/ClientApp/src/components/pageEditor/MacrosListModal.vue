@@ -18,7 +18,7 @@
               v-if="macro.icon"
               :src="macro.icon"
               alt="Macro image"
-              class="rounded-0"
+              class="rounded-0 macro-icon "
             ></b-card-img>
             <b-skeleton-img v-else card-img="top" aspect="4:6"></b-skeleton-img>
           </b-col>
@@ -92,5 +92,11 @@ export default {
   display: flex;
   justify-content: center;
   padding: 1rem;
+}
+.macro-icon {
+    width: 64px;
+    height: 64px;
+    margin-left: 1.5em;
+    margin-top: 2.1em;
 }
 </style>

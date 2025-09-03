@@ -168,7 +168,7 @@ export default {
         const success = await PluginService.installPlugin(pluginInfo);
         if (success) {
           this.$bvToast.toast(this.$t('admin.plugins.installSuccess'), {
-            title: this.$t('common.success'),
+            title: this.$t('admin.plugins.success'),
             variant: 'success',
             solid: true
           });
@@ -176,7 +176,7 @@ export default {
         }
       } catch (error) {
         this.$bvToast.toast(error.message, {
-          title: this.$t('common.error'),
+          title: this.$t('admin.plugins.error'),
           variant: 'danger',
           solid: true
         });

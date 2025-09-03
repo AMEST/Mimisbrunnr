@@ -24,6 +24,10 @@ public class MacroModel : IValidatableObject
     [MaxLength(1024)]
     public string Description { get; set; }
     /// <summary>
+    /// Icon link or data string (data:image/png;base64,....)
+    /// </summary>
+    public string Icon { get; set; }
+    /// <summary>
     /// Gets or sets the parameters for the macro.
     /// </summary>
     public string[] Params { get; set; }

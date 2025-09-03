@@ -5,6 +5,7 @@ public class Macro
     public string MacroIdentifier { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
+    public string Icon { get; set; }
     public string[] Params { get; set; }
     public string RenderUrl { get; set; }
     public string Template { get; set; }

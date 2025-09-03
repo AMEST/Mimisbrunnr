@@ -201,6 +201,9 @@
                 "title": "Plugins",
                 "loadMore": "Load more",
                 "installButton": "Install",
+                "installSuccess": "Installing successful",
+                "success": "Completed",
+                "error": "Error",
                 "installModal": {
                     "title": "Plugin installing",
                     "fileLabel": "Select plugin json",
@@ -667,6 +670,9 @@
                 "title": "Плагины",
                 "loadMore": "Загрузить еще",
                 "installButton": "Установить",
+                "installSuccess": "Установка успешно завершена",
+                "success": "Завершено",
+                "error": "Ошибка",
                 "installModal": {
                     "title": "Установка плагина",
                     "fileLabel": "Выберите конфигурацию плагина",
