@@ -78,7 +78,6 @@ export default {
 }
 
 .macros-content {
-  padding: 1rem;
   background-color: white;
 }
 </style>
