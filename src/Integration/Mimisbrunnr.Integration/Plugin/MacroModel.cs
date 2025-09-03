@@ -32,6 +32,10 @@ public class MacroModel : IValidatableObject
     /// </summary>
     public string[] Params { get; set; }
     /// <summary>
+    /// Default values for params
+    /// </summary>
+    public IDictionary<string, string> DefaultValues { get; set; } = new Dictionary<string, string>();
+    /// <summary>
     /// Gets or sets the URL for rendering the macro externally.
     /// </summary>
     public string RenderUrl { get; set; }

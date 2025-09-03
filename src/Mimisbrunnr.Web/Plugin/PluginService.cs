@@ -113,6 +113,9 @@ public class PluginService : IPluginService
         foreach (var (key, value) in state.Params)
                 if (!userRequest.Params.TryAdd(key, value))
                     userRequest.Params[key] = value;
+        foreach (var (key, value) in macro.DefaultValues)
+            if (!userRequest.Params.ContainsKey(key))
+                userRequest.Params.Add(key, value);
 
         userRequest.Params.Add("PageId", page.Id);
         userRequest.Params.Add("PageName", page.Name);

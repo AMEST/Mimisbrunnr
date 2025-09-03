@@ -172,6 +172,7 @@ export default {
             variant: 'success',
             solid: true
           });
+          this.plugins = [];
           this.loadPlugins();
         }
       } catch (error) {

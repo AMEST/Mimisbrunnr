@@ -2,7 +2,7 @@
   "Id": "550e8400-e29b-41d4-a716-446655440000",
   "PluginIdentifier": "mimisbrunnr.plugin.example",
   "Name": "Example Plugin",
-  "Version": "1.0.1-b",
+  "Version": "1.0.0-d",
   "Macros": [
     {
       "MacroIdentifier": "mimisbrunnr.plugin.example.macro.hello",
@@ -10,7 +10,7 @@
       "Description": "Displays a greeting message.",
       "Icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAB2AAAAdgB+lymcgAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAXQSURBVHic1ZttiJVFFMd/d/e62sbVMnuTNje11a1dTVCzF0uCJILoSy/YC36IMKgPIUEEEUhQn+pLQphEFoVRKkEUERFlYm5GaFupi20vUm1qrlk3t33tw9zbzpz73Gde7jPd2x+Ge88zz8w5c2bmzJkz80AyOoANQA8wAIwDEw2Y/gIOA68DdwJTqrTHGQVgEzDSAI0LSYeA1aGNvxjobYBG1JpGgfWujc6VfgvAbqAr4Z0jqGkwD5iZkD8KfOTKMGMUgAXAWQl5a4FXXCvahKnF8dKzNvHeCuBDKrW+xlPwLNEM3AL0CZlOA3NcKujAnPNjwH0WhlsEs/7S83piBspo63JtcSm4QRR6waFMHjggygUbnwzRBhSZlKkItKYVyAM3iWdDwKMOzL4FFmr0DcD7rpJGwhHgNeD+Et0KXAe8l1boV7KxvtsybUo41mDK9UDay01YhogHkixxPXBU0LPSXm5CWfssMJJRPbWiRdCpcuWBR4CXgAs9GU0Htmv0kGf5WJgm6FS58qXfr0vJBwsEXfQsHwvTBZ0qV1MNjM4XtJx79YKXXLUo4DxBH6+hriwhjV6qXFmOgJ8FXUD5BbF2ln8Dr1LpgbZb5MoMTwuBrhb5DxKn4TLdLPju0/JOY+nkWkbAZYI+JOhjNdTtA51PE3CpRh9GbeyqIp+WacHl2v8TwG8i/03UFnoVtSm6GkZRy/Be7VkbpmMnOyUznFESoDzUdsdi5InVmNPjKVuB0J7pxDQ+fYH1ZI2FgrbKFaoAGTn6MrCerLFU0L22AqE2YIWgewQ9D7iVDKK0VXAUtQRKP1+Xa4iIHfMFk/NsBDhTyzsb5XzEXv6eFzLNxAzf73JpSMgUaAW6NboX09+eD5wTUK8vrhL0MiaDvACfuVQSooBlmFNHDv/9rsxrwASwWTy7UtBOMoTYADn/9wp6GFgJLEG5wzHQX0o65IiI1gnvYM7FjliMPNAM/M6kTNH8/2ZgUGP0SyxGnliK2SlbXQv62oDFmLG/nZ7lY+F6QTvL5asAG6O7ibsEHgPuSpBrpUWuzLBDCNQt8k8Qr/HlJDddTaVnupJyREAOs3ePUzmC5PlcjHRQ8Fwk8nf4NMpnGezCdHA+oXKvfRvwOMobjIFB4EnxTE7LjyPxrojwPByLkSe2Ycp1RSxGbwhGS2Ix8kAO82jvJJFOqXOoNb/MaDAWI090YnbK274VuNqA+cAFGr0LdY+gjBbUEihD5VlhBHiLSvdXBmKjLX/3YGr6MZEvb5jE8gHkAexm8c61vg1zdYSWC1ruAOUGKQZmYUZ8Jd8RVJwiCvSrJ2NUnr89RPy7hHswT34LmIHZoN2fiw1oQe0ByjgInBLvbATeBeaGCOGAP1C9q4fAlmMa4j0hFbsoYDEwVaPl/r+MpD16TMj1vppcqXCxAYuyYBQB8mTKGgFOgosCZMDjQAijCNBPpsYIPAUKUUAjHILkMA9B+lEHod5wUYB+E6QI/BTCKGNchLoYWYbv7ZZ/YVNAM6ZlL2936w3pD3wTWpFNAXMwV4Bop62ekJczgkelTQGzBf1DKKOMIfccwfeTbArIjFHGkHINhFZkU4C8cNQoCjhX0MFy2TxBeY32T8/6Z6A8tqxPiTsF3YX64sUHA8BXNgVMFbTPbdC5qE1U6l3djLDd/koinrFNAdlzPveB7+C/aXwtWGdTgIzBy7mXhks8hakHirYp8L2gV6G+0bMhV3q3jFHgWervRM0G7tXo72wFWlEfJ5aDDkWUG2rD7ZjBjA98JY2EFzHlesKl0MuiUA/pH0d0Yx5VTaA+Yas31qF2jWWZhlHBXivaUTstvUF9qEtQ+hQqoA5LTol3P6e+IfR2VPBUhuw2gvsh4lqSP0E7iVLGNNSuUS6blPJ/9BA4K0xB3VZLmrL7gWvw/MZhPWYQ8v+a9lVRihNuRAVF692IkDQMPId5pS8IeZSV34oa3voq0UhpHHWc9ynK2icavH8AGtU1N1MhYx0AAAAASUVORK5CYII=",
       "Params": ["name", "surname"],
-      "Template": "<h1> Hello:</h1><br><ul><li>{{name}}</li><li>{{surname}}</li></ul>",
+      "Template": "<h1> Hello:</h1><br><ul><li>{{name}}</li><li>{{surname}}</li></ul> <style>div[aria-name=\"mimisbrunnr.plugin.example.macro.hello\"]{display: block!important;}</style>",
       "SendUserToken": true,
       "StoreParamsInDatabase": false
     },
@@ -28,6 +28,9 @@
       "Name": "External Renderer Macro",
       "Description": "Send request to external service for rendering macro",
       "Params": ["say"],
+      "DefaultValues": {
+        "say": "hello world"
+      },
       "RenderUrl": "http://localhost:27080/render",
       "StoreParamsInDatabase": true,
       "SendUserToken": true

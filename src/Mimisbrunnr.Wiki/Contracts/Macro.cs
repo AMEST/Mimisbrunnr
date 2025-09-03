@@ -7,6 +7,7 @@ public class Macro
     public string Description { get; set; }
     public string Icon { get; set; }
     public string[] Params { get; set; }
+    public IDictionary<string, string> DefaultValues { get; set; } = new Dictionary<string, string>();
     public string RenderUrl { get; set; }
     public string Template { get; set; }
     public bool SendUserToken { get; set; }

@@ -402,9 +402,12 @@ export default {
     },
     insertMacro(macroInfo){
       let params = macroInfo.storeParamsInDatabase ? '' : macroInfo.params.map(x => `${x}=`).join("|");
+      const macroContent = `{{macro:name=${macroInfo.macroIdentifier}|id=mid-${new Date().getTime()}|${params}}}`;
       const cursor = this.simplemde.codemirror.getCursor();
       this.simplemde.codemirror.setSelection(cursor, cursor);
-      this.simplemde.codemirror.replaceSelection(`{{macro:name=${macroInfo.macroIdentifier}|id=mid-${new Date().getTime()}|${params}}}`);
+      this.simplemde.codemirror.replaceSelection(macroContent);
+      if (macroInfo.params && macroInfo.params.length > 0)
+        this.editMacro(cursor, macroContent);
     },
     formatTables: function() {
         var cursor = this.simplemde.codemirror.getCursor();

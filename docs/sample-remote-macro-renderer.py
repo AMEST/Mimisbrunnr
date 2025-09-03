@@ -57,10 +57,11 @@ def render_macro():
         </div>
     </div>
     """
+    disable_inline = "<style>div[aria-name=\"mimisbrunnr.plugin.example.macro.external-renderer\"] { display: block!important;}</style>"
 
     # Экранируем кавычки для корректного отображения в srcdoc
     escaped_html = html.escape(html_content)
-    result_html = f'<br/><iframe srcdoc="{escaped_html}" style="width: 800px; height: 800px; border: none;"></iframe>'
+    result_html = f'<br/><iframe srcdoc="{escaped_html}" style="width: 800px; height: 800px; border: none;"></iframe>{disable_inline}'
     return jsonify({'Html': result_html})
 
 if __name__ == '__main__':

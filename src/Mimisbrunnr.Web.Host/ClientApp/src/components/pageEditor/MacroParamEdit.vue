@@ -66,6 +66,14 @@ export default {
     async onShow(){
         await this.loadMacroDefinition();
         await this.loadCurrentParams();
+        for(const paramName of this.macroDefinition.params){
+            if(this.currentParams[paramName])
+                continue;
+            if(!this.macroDefinition.defaultValues[paramName])
+                continue;
+            this.currentParams[paramName] = this.macroDefinition.defaultValues[paramName];
+        }
+        this.$forceUpdate();
     },
     onHide() {
         this.macroDefinition = null;
