@@ -162,6 +162,18 @@ var PluginService = {
                 showToast(`Error rendering macro: ${error.message}`, 'Macro Rendering Error', 'error');
             }
         }
+
+        // executing script inside macros
+        macroDivs.forEach(div => {
+            const directScript = Array.from(div.children).find(child => child.tagName === 'SCRIPT');
+            if (directScript) {
+                try {
+                    new Function(directScript.textContent)();
+                } catch (e) {
+                    console.error('Error macro script executing:', e);
+                }
+            }
+        });
     }
 }
 export default PluginService

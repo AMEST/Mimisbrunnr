@@ -1,3 +1,4 @@
+using System.Web;
 using Stubble.Core;
 using Stubble.Core.Builders;
 using Stubble.Core.Interfaces;
@@ -20,7 +21,13 @@ namespace Mimisbrunnr.Web.Infrastructure
 
         public async Task<string> Render(string template, IDictionary<string, object> parameters)
         {
+            parameters.Add(nameof(UrlEscape), UrlEscape);
             return await _stubble.RenderAsync(template, parameters);
+        }
+
+        private static object UrlEscape(string str, Func<string, string> render)
+        {
+            return HttpUtility.UrlEncode(render(str));
         }
     }
 }

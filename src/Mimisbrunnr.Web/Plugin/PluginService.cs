@@ -117,6 +117,7 @@ public class PluginService : IPluginService
             if (!userRequest.Params.ContainsKey(key))
                 userRequest.Params.Add(key, value);
 
+        userRequest.Params.Add("MacroIdOnPage", macroIdOnPage);
         userRequest.Params.Add("PageId", page.Id);
         userRequest.Params.Add("PageName", page.Name);
         userRequest.Params.Add("SpaceKey", space.Key);
