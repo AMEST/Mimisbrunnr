@@ -2,7 +2,7 @@
   "Id": "550e8400-e25b-41d4-a716-446653440000",
   "PluginIdentifier": "mm.plugin.default",
   "Name": "Default Mimisbrunnr Plugin",
-  "Version": "1.0.0-c",
+  "Version": "1.0.0-d",
   "Macros": [
     {
       "MacroIdentifier": "mm.plugin.default.anchor",
@@ -20,7 +20,7 @@
       "Description": "Add list with attachments",
       "Icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgLTEuODMgNDcgNDciIHdpZHRoPSI2NHB4IiBoZWlnaHQ9IjY0cHgiPgogIDxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzIzMWYyMCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KICAgIDxwYXRoIGQ9Ik0yOC41IDM1LjdILjVWNDBzLjI5IDIuNyAyLjU4IDIuN0gzMi42cy00LjA5LTEuNTQtNC4wOS0zLjU1WiIvPgogICAgPHBhdGggZD0iTTMyLjY1IDQyLjg0czQuODUuMDMgNC44NS03LjE0di0zMVMzOC4zMy42OSA0MS43OC42OUg5LjFzLTMuNiAxLjE0LTMuNiA0LjN2MzAuNyIvPgogICAgPHBhdGggZD0iTTM3LjUgNy43aDlWNC45MlM0Ni4xMS41IDQyIC41TTExLjUgMjMuN2gxOW0tMTkgNGgxOW0tMTktMTJoMTltLTE5LTRoMTltLTE5IDhoMTkiLz4KICA8L2c+Cjwvc3ZnPgo=",
       "Params": [],
-      "Template": "<script>fetch(`/api/attachment/{{PageId}}`).then(r=>r.json()).then(a=>{let l=a.map(f=>`<li><a href=\"/api/attachment/{{PageId}}/${f.name}\" target=\"_blank\">${f.name}</a></li>`).join('');document.getElementById(`macro_{{MacroIdOnPage}}`).setAttribute(`style`,`display: block!important`);document.getElementById(`macro_{{MacroIdOnPage}}`).innerHTML=`<ul>${l}</ul>`;});</script>",
+      "Template": "<script>fetch(`/api/attachment/{{PageId}}`).then(r=>r.json()).then(a=>{let l=a.map(f=>`<li><a href=\"/api/attachment/{{PageId}}/${f.name}\" target=\"_blank\">${f.name}</a></li>`).join('');document.querySelectorAll(`div[id='macro_{{MacroIdOnPage}}']`).forEach(x => {x.setAttribute(`style`,`display: block!important`);x.innerHTML=`<ul>${l}</ul>`;});});</script>",
       "SendUserToken": false,
       "StoreParamsInDatabase": false
     }
