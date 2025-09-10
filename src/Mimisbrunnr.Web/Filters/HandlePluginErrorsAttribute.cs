@@ -23,6 +23,10 @@ public class HandlePluginErrorsAttribute : ExceptionFilterAttribute
                 context.Result = new ObjectResult(new { message = macroNotFoundEx.Message }) { StatusCode = 404 };
                 context.ExceptionHandled = true;
                 break;
+            case RemoteMacroRenderException remoteRenderException:
+                context.Result = new ObjectResult(new { message = remoteRenderException.Message }) { StatusCode = 500 };
+                context.ExceptionHandled = true;
+                break;
         }
 
         return base.OnExceptionAsync(context);

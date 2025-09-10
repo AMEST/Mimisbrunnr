@@ -173,7 +173,14 @@ public class PluginService : IPluginService
             UserToken = userToken,
             Params = parameters
         };
-        var response = await _httpClient.PostAsJsonAsync(macro.RenderUrl, renderRequest);
-        return await response.Content.ReadFromJsonAsync<MacroRenderResponse>();
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync(macro.RenderUrl, renderRequest);
+            return await response.Content.ReadFromJsonAsync<MacroRenderResponse>();
+        }
+        catch(Exception e)
+        {
+            throw new RemoteMacroRenderException($"Error while rendering remote macro: {e.Message}");
+        }
     }
 }

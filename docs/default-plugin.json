@@ -2,15 +2,19 @@
   "Id": "550e8400-e25b-41d4-a716-446653440000",
   "PluginIdentifier": "mm.plugin.default",
   "Name": "Default Mimisbrunnr Plugin",
-  "Version": "1.0.0-d",
+  "Version": "1.0.0-g",
   "Macros": [
     {
       "MacroIdentifier": "mm.plugin.default.anchor",
       "Name": "Anchor",
       "Description": "Create anchors inside the page that can be a hyperlink.",
       "Icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHZpZXdCb3g9IjAgMCAyMDQuODUgMjA0Ljg1IiB3aWR0aD0iNjRweCIgaGVpZ2h0PSI2NHB4Ij4KICA8cGF0aCBmaWxsPSIjMDEwMDAyIiBkPSJtMTM5LjUyIDEyOC42IDE2LjgzIDE2LjMzcy0yMC42NCAyOS44OC00Mi43MiAzMC40N2MuNDggMCAuMTEtODQuMDkuMDQtMTA0LjQ3IDE0LjY5LTQuOCAyNS40LTE4LjE4IDI1LjQtMzQuMTIgMC0yMC0xNi43LTM2LjIxLTM3LjI3LTM2LjIxLTIwLjYyIDAtMzcuMzIgMTYuMi0zNy4zMiAzNi4yIDAgMTUuNjggMTAuMzggMjguOTMgMjQuNzUgMzMuOTdsLjEgMTA0LjI3Yy0yNi42NC0xLjgzLTQyLjA2LTI3LjQ3LTQyLjA2LTI3LjQ3bDE4LTE3LjQxTDAgMTIwLjVsOS44OSA2My4zIDE3LjM2LTE2Ljc5YzE1LjAzIDEyLjEgMzIuMDIgMzcuMjQgNzIuODggMzcuMjQgNTEuMzMtMS4zIDYzLjE4LTI4LjkzIDc2LjM0LTM5LjhsMTkgMTguNTEgOS4zOC02My45LTY1LjMzIDkuNTN6TTgyLjU2IDM2LjJjMC0xMC4yOSA4LjYtMTguNjUgMTkuMjItMTguNjVzMTkuMjUgOC4zNiAxOS4yNSAxOC42NmMwIDEwLjMyLTguNjQgMTguNjgtMTkuMjUgMTguNjhTODIuNTYgNDYuNTMgODIuNTYgMzYuMnoiLz4KPC9zdmc+Cg==",
-      "Params": ["name"],
+      "Params": [
+        "name"
+      ],
+      "DefaultValues": {},
       "Template": "<a name=\"{{#UrlEscape}}{{name}}{{/UrlEscape}}\"></a>",
+      "RenderUrl": "",
       "SendUserToken": false,
       "StoreParamsInDatabase": false
     },
@@ -20,7 +24,21 @@
       "Description": "Add list with attachments",
       "Icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgLTEuODMgNDcgNDciIHdpZHRoPSI2NHB4IiBoZWlnaHQ9IjY0cHgiPgogIDxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzIzMWYyMCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KICAgIDxwYXRoIGQ9Ik0yOC41IDM1LjdILjVWNDBzLjI5IDIuNyAyLjU4IDIuN0gzMi42cy00LjA5LTEuNTQtNC4wOS0zLjU1WiIvPgogICAgPHBhdGggZD0iTTMyLjY1IDQyLjg0czQuODUuMDMgNC44NS03LjE0di0zMVMzOC4zMy42OSA0MS43OC42OUg5LjFzLTMuNiAxLjE0LTMuNiA0LjN2MzAuNyIvPgogICAgPHBhdGggZD0iTTM3LjUgNy43aDlWNC45MlM0Ni4xMS41IDQyIC41TTExLjUgMjMuN2gxOW0tMTkgNGgxOW0tMTktMTJoMTltLTE5LTRoMTltLTE5IDhoMTkiLz4KICA8L2c+Cjwvc3ZnPgo=",
       "Params": [],
-      "Template": "<script>fetch(`/api/attachment/{{PageId}}`).then(r=>r.json()).then(a=>{let l=a.map(f=>`<li><a href=\"/api/attachment/{{PageId}}/${f.name}\" target=\"_blank\">${f.name}</a></li>`).join('');document.querySelectorAll(`div[id='macro_{{MacroIdOnPage}}']`).forEach(x => {x.setAttribute(`style`,`display: block!important`);x.innerHTML=`<ul>${l}</ul>`;});});</script>",
+      "DefaultValues": {},
+      "Template": "<script>\n  fetch(`/api/attachment/{{PageId}}`)\n    .then(response => response.json())\n    .then(attachments => {\n      const listItems = attachments\n        .map(file =>\n          `<li>\n            <a href=\"/api/attachment/{{PageId}}/${file.name}\" target=\"_blank\">\n              ${file.name}\n            </a>\n          </li>`\n        )\n        .join('');\n\n      document.querySelectorAll(`div[id='macro_{{MacroIdOnPage}}']`)\n        .forEach(container => {\n          container.setAttribute('style', 'display: block!important');\n          container.innerHTML = `<ul>${listItems}</ul>`;\n        });\n    });\n</script>\n",
+      "RenderUrl": "",
+      "SendUserToken": false,
+      "StoreParamsInDatabase": false
+    },
+    {
+      "MacroIdentifier": "mm.plugin.default.page-tree",
+      "Name": "Page tree",
+      "Description": "Adds a list of child pages",
+      "Icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNjRweCIgaGVpZ2h0PSI2NHB4Ij4KICA8cGF0aCBkPSJNNDIxLjI5IDEyMS40N1Y2MC43M0gzMDIuODJMMjQyLjA4IDBIMjAuMjh2MzkwLjUzSDkwLjd2NjAuNzRoNzAuNDRWNTEyaDMzMC41N1YxMjEuNDdINDIxLjN6bS0xNzAuMy02OS41NSA4LjgxIDguODFMMjg0LjA1IDg1bDE0Ljg3IDE0Ljg3SDI1MVY1MS45MnpNNTAuNyAzNjAuMTNWMzAuNDJoMTY5Ljg4djk5Ljg2aDk5Ljg2djIyOS44NEg1MC43em03MC40NCA2MC43M3YtMzAuMzJoMjI5LjcyVjEwOC43N2wtMTcuNjItMTcuNjJoNTcuNjR2MzI5LjdIMTIxLjEzem0zNDAuMTcgNjAuNzNIMTkxLjU3di0zMC4zMWgyMjkuNzJWMTUxLjg5aDQwLjAxdjMyOS43eiIvPgo8L3N2Zz4K",
+      "Params": [],
+      "DefaultValues": {},
+      "Template": "<script>\n  const containers = document.querySelectorAll(`div[id='macro_{{MacroIdOnPage}}']`);\n  if (!containers) return;\n\n  function renderTree(data) {\n    if (!data || !data.childs || !data.childs.length) return '';\n\n    let ul = document.createElement('ul');\n    ul.style.listStyleType = 'none';\n    ul.style.paddingLeft = '20px';\n\n    data.childs.forEach(item => {\n      let li = document.createElement('li');\n      let a = document.createElement('a');\n      a.href = `/space/${item.page.spaceKey}/${item.page.id}`;\n      a.textContent = item.page.name;\n      a.style.display = 'block';\n      a.style.padding = '4px 0';\n      li.appendChild(a);\n\n      if (item.childs && item.childs.length) {\n        let childUl = renderTree(item);\n        if (childUl) li.appendChild(childUl);\n      }\n\n      ul.appendChild(li);\n    });\n\n    return ul;\n  }\n\n  fetch(\"/api/page/{{PageId}}/tree\")\n    .then(response => response.json())\n    .then(data => {\n      containers.forEach( container => {\n          container.innerHTML = '';\n          container.appendChild(renderTree(data));\n          container.setAttribute(`style`,`display: block!important`);\n      });\n    })\n    .catch(error => {\n      containers.forEach(x => x.innerHTML = `<div style='color: red;'>Error loading page tree: ${error.message}</div>`);\n    });\n</script>",
+      "RenderUrl": "",
       "SendUserToken": false,
       "StoreParamsInDatabase": false
     }

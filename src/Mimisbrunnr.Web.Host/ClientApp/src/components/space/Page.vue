@@ -287,6 +287,7 @@ export default {
         setTimeout(async () => {
             await PluginService.renderMacroOnPage(this.page.id);
             this.scrollToAnchor();
+            replaceRelativeLinksToRoute("page-content");
         }, 500);
         return html;
     },
