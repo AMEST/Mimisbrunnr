@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plugin Editor</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .section { margin-bottom: 20px; }
+    label { display: block; margin: 10px 0 5px; }
+    input, textarea { width: 100%; padding: 8px; }
+    textarea { height: 100px; }
+    .macro { border: 1px solid #ccc; padding: 15px; margin: 10px 0; }
+    .buttons { margin-top: 20px; }
+    button { padding: 8px 15px; margin-right: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Plugin Editor</h1>
+  
+  <div class="section">
+    <h2>Plugin Info</h2>
+    <label>ID:</label>
+    <input type="text" id="pluginId">
+    
+    <label>Plugin Identifier:</label>
+    <input type="text" id="pluginIdentifier">
+    
+    <label>Name:</label>
+    <input type="text" id="pluginName">
+    
+    <label>Version:</label>
+    <input type="text" id="pluginVersion">
+  </div>
+
+  <div class="section">
+    <h2>Macros</h2>
+    <div id="macrosContainer"></div>
+    <button onclick="addMacro()">Add Macro</button>
+  </div>
+
+  <div class="buttons">
+    <button onclick="loadPlugin()">Load Plugin</button>
+    <button onclick="savePlugin()">Save Plugin</button>
+  </div>
+
+  <script>
+    let currentPlugin = {
+      Id: "",
+      PluginIdentifier: "",
+      Name: "",
+      Version: "",
+      Macros: []
+    };
+
+    function addMacro() {
+      const container = document.getElementById('macrosContainer');
+      const macroDiv = document.createElement('div');
+      macroDiv.className = 'macro';
+      macroDiv.innerHTML = `
+        <h3>Macro</h3>
+        <label>Macro Identifier:</label>
+        <input type="text" class="macroIdentifier">
+        
+        <label>Name:</label>
+        <input type="text" class="macroName">
+        
+        <label>Description:</label>
+        <textarea class="macroDescription"></textarea>
+        
+        <label>Icon (URL or file):</label>
+        <input type="text" class="macroIcon">
+        <input type="file" class="macroIconFile" accept="image/*">
+        <img class="macroIconPreview" style="width: 32px; height: 32px; margin-top: 5px; display: none;">
+        
+        <label>Params (comma separated):</label>
+        <input type="text" class="macroParams">
+        
+        <label>Default params (param1=value1&amp;&amp;param2=value2):</label>
+        <input type="text" class="macroDefaultParams">
+        
+        <label>Template:</label>
+        <textarea class="macroTemplate"></textarea>
+        
+        <label>Render URL:</label>
+        <input type="text" class="macroRenderUrl">
+        
+        <label>
+          <input type="checkbox" class="macroSendUserToken"> Send User Token
+        </label>
+        
+        <label>
+          <input type="checkbox" class="macroStoreParams"> Store Params in Database
+        </label>
+      `;
+      container.appendChild(macroDiv);
+
+      // Add event listeners for new macro
+      const iconFileInput = macroDiv.querySelector('.macroIconFile');
+      const iconPreview = macroDiv.querySelector('.macroIconPreview');
+      const iconUrlInput = macroDiv.querySelector('.macroIcon');
+      
+      iconFileInput.addEventListener('change', handleIconFileUpload);
+      
+      iconUrlInput.addEventListener('input', () => {
+        iconPreview.src = iconUrlInput.value;
+        iconPreview.style.display = iconUrlInput.value ? 'block' : 'none';
+      });
+      
+      iconFileInput.addEventListener('change', () => {
+        iconPreview.src = iconFileInput.files[0] ? 
+          URL.createObjectURL(iconFileInput.files[0]) : '';
+        iconPreview.style.display = iconFileInput.files[0] ? 'block' : 'none';
+      });
+
+      const templateInput = macroDiv.querySelector('.macroTemplate');
+      const renderUrlInput = macroDiv.querySelector('.macroRenderUrl');
+      
+      templateInput.addEventListener('input', () => {
+        renderUrlInput.disabled = !!templateInput.value.trim();
+      });
+      
+      renderUrlInput.addEventListener('input', () => {
+        templateInput.disabled = !!renderUrlInput.value.trim();
+      });
+    }
+
+    function handleIconFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result;
+        const macroDiv = event.target.closest('.macro');
+        macroDiv.querySelector('.macroIcon').value = base64;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function loadPlugin() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      
+      input.onchange = e => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = () => {
+          try {
+            currentPlugin = JSON.parse(reader.result);
+            updateForm();
+          } catch (error) {
+            alert('Error parsing JSON file');
+          }
+        };
+        
+        reader.readAsText(file);
+      };
+      
+      input.click();
+    }
+
+    function validatePlugin() {
+      // Validate required fields
+      if (!currentPlugin.Id || !currentPlugin.PluginIdentifier || 
+          !currentPlugin.Name || !currentPlugin.Version) {
+        alert('Please fill all required plugin fields');
+        return false;
+      }
+
+      // Validate macros
+      const macroIdentifiers = new Set();
+      for (const macro of currentPlugin.Macros) {
+        if (!macro.MacroIdentifier || !macro.Name) {
+          alert('Please fill all required macro fields');
+          return false;
+        }
+
+        if (macroIdentifiers.has(macro.MacroIdentifier)) {
+          alert(`Duplicate MacroIdentifier: ${macro.MacroIdentifier}`);
+          return false;
+        }
+        macroIdentifiers.add(macro.MacroIdentifier);
+
+        if (macro.Template && macro.RenderUrl) {
+          alert('Macro cannot have both Template and RenderUrl');
+          return false;
+        }
+
+        if (!macro.Template && !macro.RenderUrl) {
+          alert('Macro must have either Template or RenderUrl');
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    function savePlugin() {
+      collectFormData();
+      
+      if (!validatePlugin()) {
+        return;
+      }
+
+      const json = JSON.stringify(currentPlugin, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'plugin.json';
+      a.click();
+      
+      URL.revokeObjectURL(url);
+    }
+
+    function updateForm() {
+      document.getElementById('pluginId').value = currentPlugin.Id;
+      document.getElementById('pluginIdentifier').value = currentPlugin.PluginIdentifier;
+      document.getElementById('pluginName').value = currentPlugin.Name;
+      document.getElementById('pluginVersion').value = currentPlugin.Version;
+      
+      const container = document.getElementById('macrosContainer');
+      container.innerHTML = '';
+      
+      currentPlugin.Macros.forEach(macro => {
+        addMacro();
+        const lastMacro = container.lastElementChild;
+        lastMacro.querySelector('.macroIdentifier').value = macro.MacroIdentifier;
+        lastMacro.querySelector('.macroName').value = macro.Name;
+        lastMacro.querySelector('.macroDescription').value = macro.Description;
+        const iconInput = lastMacro.querySelector('.macroIcon');
+        const iconPreview = lastMacro.querySelector('.macroIconPreview');
+        iconInput.value = macro.Icon || '';
+        if (macro.Icon) {
+          iconPreview.src = macro.Icon;
+          iconPreview.style.display = 'block';
+        }
+        lastMacro.querySelector('.macroParams').value = macro.Params?.join(', ') || '';
+        lastMacro.querySelector('.macroDefaultParams').value = macro.DefaultValues 
+          ? Object.entries(macro.DefaultValues)
+              .map(([key, value]) => `${key}=${value}`)
+              .join('&&')
+          : '';
+        lastMacro.querySelector('.macroTemplate').value = macro.Template || '';
+        lastMacro.querySelector('.macroRenderUrl').value = macro.RenderUrl || '';
+        lastMacro.querySelector('.macroSendUserToken').checked = macro.SendUserToken || false;
+        lastMacro.querySelector('.macroStoreParams').checked = macro.StoreParamsInDatabase || false;
+      });
+    }
+
+    function collectFormData() {
+      currentPlugin.Id = document.getElementById('pluginId').value;
+      currentPlugin.PluginIdentifier = document.getElementById('pluginIdentifier').value;
+      currentPlugin.Name = document.getElementById('pluginName').value;
+      currentPlugin.Version = document.getElementById('pluginVersion').value;
+
+      currentPlugin.Macros = [];
+      const macros = document.querySelectorAll('.macro');
+      macros.forEach(macro => {
+        const macroData = {
+          MacroIdentifier: macro.querySelector('.macroIdentifier').value,
+          Name: macro.querySelector('.macroName').value,
+          Description: macro.querySelector('.macroDescription').value,
+          Icon: macro.querySelector('.macroIcon').value,
+          Params: macro.querySelector('.macroParams').value
+            .split(',')
+            .map(p => p.trim())
+            .filter(p => p),
+          DefaultValues: macro.querySelector('.macroDefaultParams').value
+            .split('&&')
+            .reduce((acc, pair) => {
+              const [key, value] = pair.split('=');
+              if (key && value) acc[key] = value;
+              return acc;
+            }, {}),
+          Template: macro.querySelector('.macroTemplate').value,
+          RenderUrl: macro.querySelector('.macroRenderUrl').value,
+          SendUserToken: macro.querySelector('.macroSendUserToken').checked,
+          StoreParamsInDatabase: macro.querySelector('.macroStoreParams').checked
+        };
+        currentPlugin.Macros.push(macroData);
+      });
+    }
+  </script>
+</body>
+</html>

@@ -7,7 +7,7 @@
     {
       "MacroIdentifier": "mm.plugin.default.anchor",
       "Name": "Anchor",
-      "Description": "Creates anchors inside the page that can be a hyperlink.",
+      "Description": "Create anchors inside the page that can be a hyperlink.",
       "Icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHZpZXdCb3g9IjAgMCAyMDQuODUgMjA0Ljg1IiB3aWR0aD0iNjRweCIgaGVpZ2h0PSI2NHB4Ij4KICA8cGF0aCBmaWxsPSIjMDEwMDAyIiBkPSJtMTM5LjUyIDEyOC42IDE2LjgzIDE2LjMzcy0yMC42NCAyOS44OC00Mi43MiAzMC40N2MuNDggMCAuMTEtODQuMDkuMDQtMTA0LjQ3IDE0LjY5LTQuOCAyNS40LTE4LjE4IDI1LjQtMzQuMTIgMC0yMC0xNi43LTM2LjIxLTM3LjI3LTM2LjIxLTIwLjYyIDAtMzcuMzIgMTYuMi0zNy4zMiAzNi4yIDAgMTUuNjggMTAuMzggMjguOTMgMjQuNzUgMzMuOTdsLjEgMTA0LjI3Yy0yNi42NC0xLjgzLTQyLjA2LTI3LjQ3LTQyLjA2LTI3LjQ3bDE4LTE3LjQxTDAgMTIwLjVsOS44OSA2My4zIDE3LjM2LTE2Ljc5YzE1LjAzIDEyLjEgMzIuMDIgMzcuMjQgNzIuODggMzcuMjQgNTEuMzMtMS4zIDYzLjE4LTI4LjkzIDc2LjM0LTM5LjhsMTkgMTguNTEgOS4zOC02My45LTY1LjMzIDkuNTN6TTgyLjU2IDM2LjJjMC0xMC4yOSA4LjYtMTguNjUgMTkuMjItMTguNjVzMTkuMjUgOC4zNiAxOS4yNSAxOC42NmMwIDEwLjMyLTguNjQgMTguNjgtMTkuMjUgMTguNjhTODIuNTYgNDYuNTMgODIuNTYgMzYuMnoiLz4KPC9zdmc+Cg==",
       "Params": ["name"],
       "Template": "<a name=\"{{#UrlEscape}}{{name}}{{/UrlEscape}}\"></a>",
