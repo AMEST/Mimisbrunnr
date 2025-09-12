@@ -180,6 +180,7 @@ public class PluginService : IPluginService
         }
         catch(Exception e)
         {
+            _logger.LogError(e, "Error while rendering remote macro");
             throw new RemoteMacroRenderException($"Error while rendering remote macro: {e.Message}");
         }
     }

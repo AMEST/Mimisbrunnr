@@ -61,7 +61,7 @@ def render_macro():
 
     # Экранируем кавычки для корректного отображения в srcdoc
     escaped_html = html.escape(html_content)
-    result_html = f'<br/><iframe srcdoc="{escaped_html}" style="width: 800px; height: 800px; border: none;"></iframe>{disable_inline}'
+    result_html = f'<br/><iframe srcdoc="{escaped_html}" style="width: 100%; height: 800px; border: none;"></iframe>{disable_inline}'
     return jsonify({'Html': result_html})
 
 if __name__ == '__main__':

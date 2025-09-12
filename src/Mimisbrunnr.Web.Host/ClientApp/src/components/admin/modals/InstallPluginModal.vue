@@ -69,7 +69,7 @@ export default {
           this.pluginInfo = JSON.parse(e.target.result)
         } catch (error) {
           this.$bvToast.toast(this.$t('admin.plugins.installModal.invalidFileError'), {
-            title: this.$t('common.error'),
+            title: this.$t('admin.plugins.error'),
             variant: 'danger',
             solid: true
           })

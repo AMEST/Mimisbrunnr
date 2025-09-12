@@ -33,7 +33,7 @@ export default {
 .page-preview-modal-body .mm-macro-block{
     display: inline-block;
 }
-.page-preview-modal-body p {
+.page-preview-modal-body p:has(+ .mm-macro-block) {
     display: inline;
 }
 .mm-macro-block + p {

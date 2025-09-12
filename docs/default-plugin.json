@@ -2,7 +2,7 @@
   "Id": "550e8400-e25b-41d4-a716-446653440000",
   "PluginIdentifier": "mm.plugin.default",
   "Name": "Default Mimisbrunnr Plugin",
-  "Version": "1.0.0-g",
+  "Version": "1.0.0-a",
   "Macros": [
     {
       "MacroIdentifier": "mm.plugin.default.anchor",
@@ -13,7 +13,7 @@
         "name"
       ],
       "DefaultValues": {},
-      "Template": "<a name=\"{{#UrlEscape}}{{name}}{{/UrlEscape}}\"></a>",
+      "Template": "<a name=\"{{#UrlEncode}}{{name}}{{/UrlEncode}}\"></a>",
       "RenderUrl": "",
       "SendUserToken": false,
       "StoreParamsInDatabase": false

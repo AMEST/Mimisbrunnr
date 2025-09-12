@@ -356,7 +356,7 @@ export default {
 .page-dropdown {
     min-width: 190px;
 }
-#page-content p{
+#page-content p:has(+ .mm-macro-block){
     display: inline;
 }
 #page-content .mm-macro-block{
