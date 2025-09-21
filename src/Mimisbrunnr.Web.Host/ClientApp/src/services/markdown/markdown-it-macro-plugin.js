@@ -19,6 +19,8 @@ function macroPlugin(md) {
         // Add text before the macro
         if (match.index > lastIndex) {
           const text = tail.slice(lastIndex, match.index);
+          if (text.indexOf(state.pending) !== -1)
+            state.pending = '';
           if (!silent && state.pending != text && !state.tokens.find(x => text.indexOf(x.content) !== -1)) {
             const textToken = state.push('text', '', 0);
             textToken.content = text;
@@ -51,6 +53,7 @@ function macroPlugin(md) {
         if (!silent) {
           const textToken = state.push('text', '', 0);
           textToken.content = text;
+          state.pos = tail.length;
         }
       }
 
