@@ -2,7 +2,7 @@
   "Id": "550e8400-e25b-41d4-a716-446653440000",
   "PluginIdentifier": "mm.plugin.default",
   "Name": "Default Mimisbrunnr Plugin",
-  "Version": "1.0.0-b",
+  "Version": "1.0.0-c",
   "Macros": [
     {
       "MacroIdentifier": "mm.plugin.default.anchor",
@@ -79,6 +79,20 @@
       "RenderUrl": "",
       "SendUserToken": false,
       "StoreParamsInDatabase": true
+    },
+    {
+      "MacroIdentifier": "mm.plugin.default.simple-mention",
+      "Name": "Simple mention",
+      "Description": "Simple user mention macro",
+      "Icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNjRweCIgaGVpZ2h0PSI2NHB4Ij4KICA8cGF0aCBkPSJNNDIxLjI5IDEyMS40N1Y2MC43M0gzMDIuODJMMjQyLjA4IDBIMjAuMjh2MzkwLjUzSDkwLjd2NjAuNzRoNzAuNDRWNTEyaDMzMC41N1YxMjEuNDdINDIxLjN6bS0xNzAuMy02OS41NSA4LjgxIDguODFMMjg0LjA1IDg1bDE0Ljg3IDE0Ljg3SDI1MVY1MS45MnpNNTAuNyAzNjAuMTNWMzAuNDJoMTY5Ljg4djk5Ljg2aDk5Ljg2djIyOS44NEg1MC43em03MC40NCA2MC43M3YtMzAuMzJoMjI5LjcyVjEwOC43N2wtMTcuNjItMTcuNjJoNTcuNjR2MzI5LjdIMTIxLjEzem0zNDAuMTcgNjAuNzNIMTkxLjU3di0zMC4zMWgyMjkuNzJWMTUxLjg5aDQwLjAxdjMyOS43eiIvPgo8L3N2Zz4K",
+      "Params": [
+        "email"
+      ],
+      "DefaultValues": {},
+      "Template": "<span id=\"mention-{{MacroIdOnPage}}\">@...</span>\n\n<script>\n  const email = '{{email}}'.trim();\n  const uniqueId = '{{MacroIdOnPage}}';\n  const element = document.getElementById('mention-' + uniqueId);\n  \n  if (!email) {\n    element.innerHTML = '<span style=\"color: #dc3545; font-weight: 500;\">Email is empty</span>';\n    return;\n  }\n\n  fetch('/api/user/' + encodeURIComponent(email))\n    .then(response => response.status === 200 ? response.json() : Promise.reject())\n    .then(userData => {\n      const name = userData?.name || email;\n      element.innerHTML = `<a href=\"/profile/${email}\" style=\"color: #0d6efd; background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 2px 6px; font-weight: 500;\">@${name}</a>`;\n    })\n    .catch(() => {\n      element.innerHTML = `<span style=\"color: #6c757d; font-style: italic;\">@unknown(${email})</span>`;\n    });\n</script>",
+      "RenderUrl": "",
+      "SendUserToken": false,
+      "StoreParamsInDatabase": false
     }
   ]
 }
