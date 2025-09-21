@@ -2,7 +2,7 @@
   "Id": "550e8400-e25b-41d4-a716-446653440000",
   "PluginIdentifier": "mm.plugin.default",
   "Name": "Default Mimisbrunnr Plugin",
-  "Version": "1.0.0-a",
+  "Version": "1.0.0-b",
   "Macros": [
     {
       "MacroIdentifier": "mm.plugin.default.anchor",
@@ -65,6 +65,20 @@
       "RenderUrl": "",
       "SendUserToken": false,
       "StoreParamsInDatabase": false
+    },
+    {
+      "MacroIdentifier": "mm.plugin.default.user-card",
+      "Name": "User card",
+      "Description": "User card with info",
+      "Icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiIgd2lkdGg9IjY0cHgiPgogIDxwYXRoIGZpbGw9IiM0NDQiIGQ9Ik0xNSAzdjEwSDFWM2gxNHptMS0xSDB2MTJoMTZWMnoiLz4KICA8cGF0aCBmaWxsPSIjNDQ0IiBkPSJNOCA1aDZ2MUg4VjV6bTAgMmg2djFIOFY3em0wIDJoM3YxSDhWOXpNNS40IDdINXYtLjFjLjYtLjIgMS0uOCAxLTEuNEM2IDQuNyA1LjMgNCA0LjUgNFMzIDQuNyAzIDUuNWMwIC43LjQgMS4yIDEgMS40VjdoLS40QzIuNyA3IDIgNy43IDIgOC42VjExaDVWOC42QzcgNy43IDYuMyA3IDUuNCA3eiIvPgo8L3N2Zz4K",
+      "Params": [
+        "email"
+      ],
+      "DefaultValues": {},
+      "Template": "<div class=\"user-card-container\" id=\"user-card-{{MacroIdOnPage}}\">\n  <div class=\"card\" style=\"width: 13rem;\">\n    <div class=\"card-body text-center\">\n      <div class=\"user-content\">\n        <div class=\"spinner-border text-primary\" role=\"status\">\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n\n<script>\n  const email = '{{email}}'.trim();\n  const uniqueId = '{{MacroIdOnPage}}';\n  const container = document.querySelector('#user-card-' + uniqueId + ' .user-content');\n  \n  if (!email) {\n    container.innerHTML = '<p class=\"text-danger\">Email is empty</p>';\n    return;\n  }\n\n  function escapeHtml(unsafe) {\n    if (!unsafe) return '';\n    return unsafe\n      .toString()\n      .replace(/&/g, \"&amp;\")\n      .replace(/</g, \"&lt;\")\n      .replace(/>/g, \"&gt;\")\n      .replace(/\"/g, \"&quot;\")\n      .replace(/'/g, \"&#039;\");\n  }\n  function shouldDisplayField(value) {\n    return value !== null && value !== undefined && value !== '' && value !== 'null' && value !== 'undefined';\n  }\n  function createOptionalField(icon, value, title = '') {\n    if (!shouldDisplayField(value)) return '';\n    \n    return `\n      <div class=\"user-field\" title=\"${escapeHtml(title)}\">\n        ${icon}\n        <span class=\"text-muted small\">${escapeHtml(value)}</span>\n      </div>\n    `;\n  }\n  fetch('/api/user/' + encodeURIComponent(email), {\n    headers: {\n      'Accept': 'application/json',\n    },\n    credentials: 'same-origin'\n  })\n  .then(response => {\n    if (response.ok) {\n      return response.json();\n    }\n    throw new Error('HTTP ' + response.status);\n  })\n  .then(userData => {\n    const safeEmail = escapeHtml(userData.email || email);\n    const safeName = escapeHtml(userData.name);\n    const avatarUrl = userData.avatarUrl || 'https://via.placeholder.com/80';\n\n    const optionalFields = [\n      createOptionalField('💼', userData.post, 'Post'),\n      createOptionalField('📍', userData.location, 'Location'),\n      createOptionalField('🏢', userData.organization, 'Organization')\n    ].filter(field => field !== '').join('');\n    \n    container.innerHTML = `\n      <img src=\"${escapeHtml(avatarUrl)}\" \n           class=\"rounded-circle mb-3\" \n           alt=\"Аватар пользователя\" \n           width=\"80\" \n           height=\"80\"\n           onerror=\"this.src='https://via.placeholder.com/80'\">\n      <h5 class=\"card-title mb-2\">${safeName || 'Без имени'}</h5>\n      <p class=\"card-text text-muted mb-3\">${safeEmail}</p>\n      \n      ${optionalFields ? `<div class=\"optional-fields mb-3\">${optionalFields}</div>` : ''}\n      \n      <div class=\"d-grid gap-2\">\n        <a href=\"mailto:${safeEmail}\" class=\"btn btn-primary btn-sm\">\n          <i class=\"bi bi-envelope\"></i> Написать\n        </a>\n      </div>\n    `;\n  })\n  .catch(error => {\n    console.warn('User data loading failed:', error);\n    container.innerHTML = `\n      <p class=\"text-muted\">@unknown(${escapeHtml(email)})</p>\n    `;\n  });\n</script>\n\n<style>\n.user-card-container .card {\n  margin: 10px 0;\n  border: 1px solid #e9ecef;\n  border-radius: 0.5rem;\n}\n.user-card-container .card-body {\n  padding: 1.5rem;\n}\n.user-card-container .optional-fields {\n  border-top: 1px solid #f1f3f4;\n  padding-top: 1rem;\n  margin-top: 0.5rem;\n}\n.user-card-container .user-field {\n  margin-bottom: 0.5rem;\n  line-height: 1.3;\n}\n.user-card-container .user-field:last-child {\n  margin-bottom: 0;\n}\n.user-card-container .user-field i {\n  color: #6c757d;\n  width: 16px;\n}\n.user-card-container .text-muted.small {\n  font-size: 0.875rem;\n}\n</style>",
+      "RenderUrl": "",
+      "SendUserToken": false,
+      "StoreParamsInDatabase": true
     }
   ]
 }
