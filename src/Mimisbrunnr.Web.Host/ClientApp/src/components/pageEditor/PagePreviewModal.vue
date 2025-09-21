@@ -6,7 +6,7 @@
     hide-footer
     @hide="$emit('close', false)"
   >
-    <div class="page-preview-modal-body" v-if="htmlContent" v-html="htmlContent"></div>
+    <div class="page-preview-modal-body" id="page-content" v-if="htmlContent" v-html="htmlContent"></div>
   </b-modal>
 </template>
 

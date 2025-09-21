@@ -565,7 +565,7 @@ export default {
     showPreview: function() {
       this.previewModal = true;
       this.$bvModal.show('page-preview-modal');
-      setTimeout(() => PluginService.renderMacroOnPage(this.page.id, "page-preview-modal"), 400);
+      setTimeout(() => PluginService.renderMacroOnPage(this.page.id, "page-preview-modal"), 300);
     }
   },
   mounted: function () {

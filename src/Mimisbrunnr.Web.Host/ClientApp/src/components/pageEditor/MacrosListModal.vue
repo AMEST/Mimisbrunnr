@@ -3,6 +3,9 @@
         size="lg" 
         :title="$t('pageEditor.macrosListModal.title')"
         hide-footer>
+    <b-alert v-if="this.macros.length == 0" show variant="light">
+            {{$t("pageEditor.macrosListModal.empty")}}
+    </b-alert>
     <b-card-group deck>
       <b-card
         v-for="macro in macros"

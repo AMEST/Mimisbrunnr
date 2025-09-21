@@ -288,7 +288,7 @@ export default {
             await PluginService.renderMacroOnPage(this.page.id);
             this.scrollToAnchor();
             replaceRelativeLinksToRoute("page-content");
-        }, 500);
+        }, 200);
         return html;
     },
   },

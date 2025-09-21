@@ -134,7 +134,8 @@ var PluginService = {
         }
         const macroDivs = searchRoot.querySelectorAll('div[aria-type="macros"]');
         
-        for (const div of macroDivs) {
+        // Process all macros in parallel
+        await Promise.all(Array.from(macroDivs).map(async (div) => {
             try {
                 const macroId = div.id.replace('macro_', '');
                 const macroName = div.getAttribute('aria-name');
@@ -161,9 +162,9 @@ var PluginService = {
                 console.error('Error rendering macro:', error);
                 showToast(`Error rendering macro: ${error.message}`, 'Macro Rendering Error', 'error');
             }
-        }
+        }));
 
-        // executing script inside macros
+        // executing script inside macros (after all macros are rendered)
         macroDivs.forEach(div => {
             const directScript = Array.from(div.children).find(child => child.tagName === 'SCRIPT');
             if (directScript) {

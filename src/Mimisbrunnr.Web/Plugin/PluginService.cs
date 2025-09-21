@@ -7,7 +7,6 @@ using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.Plugin;
 using Mimisbrunnr.Web.Services;
-using Mimisbrunnr.Web.User;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;
 
@@ -117,6 +116,8 @@ public class PluginService : IPluginService
             if (!userRequest.Params.ContainsKey(key))
                 userRequest.Params.Add(key, value);
 
+        var user = await _userManager.GetByEmail(userInfo.Email);
+
         userRequest.Params.Add("MacroIdOnPage", macroIdOnPage);
         userRequest.Params.Add("PageId", page.Id);
         userRequest.Params.Add("PageName", page.Name);
@@ -124,11 +125,10 @@ public class PluginService : IPluginService
         userRequest.Params.Add("SpaceName", space.Name);
         userRequest.Params.Add("UserEmail", userInfo?.Email ?? string.Empty);
         userRequest.Params.Add("UserName", userInfo?.Name ?? string.Empty);
+        userRequest.Params.Add("UserRole", user.Role.ToString());
 
         if (!string.IsNullOrEmpty(macro.RenderUrl))
-        {
-            return await RenderRemoteMacro(plugin, macro, page, space, userInfo, userRequest.Params);
-        }
+            return await RenderRemoteMacro(plugin, macro, page, space, user, userRequest.Params);
 
         var renderResult = await _templateRenderer.Render(macro.Template, userRequest.Params.ToDictionary(x => x.Key, x => x.Value as object));
         return new MacroRenderResponse()
@@ -155,19 +155,21 @@ public class PluginService : IPluginService
     }
     
     
-    private async Task<MacroRenderResponse> RenderRemoteMacro(Plugin plugin, Macro macro, Page page, Space space, UserInfo userInfo, IDictionary<string, string> parameters)
+    private async Task<MacroRenderResponse> RenderRemoteMacro(Plugin plugin,
+        Macro macro,
+        Page page,
+        Space space,
+        User user,
+        IDictionary<string, string> parameters)
     {
-        var userToken = string.Empty;
-        if (macro.SendUserToken)
-        {
-            var user = await _userManager.GetByEmail(userInfo.Email);
-            userToken = await _tokenService.GenerateAccessToken(user, TimeSpan.FromMinutes(15), true);
-        }
+        var userToken = macro.SendUserToken
+            ? await _tokenService.GenerateAccessToken(user, TimeSpan.FromMinutes(15), true) 
+            : string.Empty;
         var renderRequest = new MacroRenderRequest()
         {
             PluginIdentifier = plugin.PluginIdentifier,
             MacroIdentifier = macro.MacroIdentifier,
-            RequestedBy = userInfo.ToModel(),
+            RequestedBy = user.ToModel(),
             PageId = page.Id,
             SpaceKey = space.Key,
             UserToken = userToken,

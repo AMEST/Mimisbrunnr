@@ -232,6 +232,12 @@
                     "macrosName": "Macros name",
                     "macrosDescription": "Description",
                     "sendUserToken": "Sending user token"
+                },
+                "approveModal": {
+                    "title": "Confirm the action",
+                    "uninstall": "Are you sure you want to delete the plugin? All data will be erased.",
+                    "ok": "Yes",
+                    "cancel": "No"
                 }
             }
         },
@@ -317,7 +323,8 @@
             "macrosListModal": {
                 "title": "Macros list",
                 "previous": "Previous",
-                "next": "Next"
+                "next": "Next",
+                "empty": "There are currently no macros available for use."
             },
             "draftModal":{
                 "title": "There are pending changes.",
@@ -701,6 +708,12 @@
                     "macrosName": "Имя макроса",
                     "macrosDescription": "Описание макроса",
                     "sendUserToken": "Отправляется ли токен пользователя"
+                },
+                "approveModal": {
+                    "title": "Подтвердите действие",
+                    "uninstall": "Вы уверены, что хотите удалить плагин? Все данные будут стерты.",
+                    "ok": "Да",
+                    "cancel": "Нет"
                 }
             }
         },
@@ -786,7 +799,8 @@
             "macrosListModal": {
                 "title": "Список макросов",
                 "previous": "Назад",
-                "next": "Вперед"
+                "next": "Вперед",
+                "empty": "На данный момент нет доступных макросов для использования."
             },
             "draftModal":{
                 "title": "Есть несохраненные изменения",

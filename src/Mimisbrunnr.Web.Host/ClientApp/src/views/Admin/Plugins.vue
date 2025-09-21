@@ -155,6 +155,8 @@ export default {
       }
     },
     async uninstallPlugin(identifier) {
+      var approve = await this.approve(this.$t("admin.plugins.approveModal.uninstall"));
+      if(!approve) return;
       const success = await PluginService.unInstallPlugin(identifier);
       if (success) {
         this.plugins = this.plugins.filter(p => p.pluginIdentifier !== identifier);
@@ -182,6 +184,19 @@ export default {
           solid: true
         });
       }
+    },
+    approve: async function(message) {
+        return await this.$bvModal.msgBoxConfirm(message, {
+            title: this.$t("admin.plugins.approveModal.title"),
+            centered: true,
+            size: 'sm',
+            buttonSize: 'sm',
+            cancelTitle: this.$t("admin.plugins.approveModal.cancel"),
+            okTitle: this.$t("admin.plugins.approveModal.ok"),
+            okVariant: 'danger',
+            headerClass: 'p-2 border-bottom-0',
+            footerClass: 'p-2 border-top-0',
+        });
     }
   },
   mounted() {
