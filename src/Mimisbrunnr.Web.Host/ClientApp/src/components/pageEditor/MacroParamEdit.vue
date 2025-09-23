@@ -6,7 +6,8 @@
     @shown="onShow"
     @hide="onHide"
   >
-    <b-form v-if="macroDefinition && macroDefinition.params && macroDefinition.params.length > 0 && currentParams">
+    <b-form v-if="macroDefinition && macroDefinition.params && macroDefinition.params.length > 0 && currentParams"
+        @submit.prevent="() => {}">
       <b-form-group
         v-for="param in macroDefinition.params"
         :key="param"
