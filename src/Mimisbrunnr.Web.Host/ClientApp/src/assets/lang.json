@@ -196,6 +196,51 @@
                     "cancel": "No"
                 },
                 "loadMore": "Load more"
+            },
+            "plugins": {
+                "title": "Plugins",
+                "loadMore": "Load more",
+                "installButton": "Install",
+                "defaultPluginInstallButton": "Install default plugin",
+                "openPluginEditor": "Open plugin editor",
+                "installSuccess": "Installing successful",
+                "success": "Completed",
+                "error": "Error",
+                "installModal": {
+                    "title": "Plugin installing",
+                    "fileLabel": "Select plugin json",
+                    "filePlaceholder": ".json",
+                    "infoBlock": "The following plugin will be installed",
+                    "pluginName": "Plugin name",
+                    "pluginVersion": "Plugin version",
+                    "installButton": "Install plugin" 
+                },
+                "table": {
+                    "fields": {
+                        "name": "Plugin name",
+                        "version": "Version",
+                        "actions": ""
+                    },
+                    "details": "Show details",
+                    "disable": "Disable plugin",
+                    "enable": "Enable plugin",
+                    "uninstall": "Uninstall"
+                },
+                "details": {
+                    "identifier": "Plugin identifier",
+                    "installedBy": "Installed by",
+                    "installedAt": "Installed at",
+                    "macrosInfo": "Macros list",
+                    "macrosName": "Macros name",
+                    "macrosDescription": "Description",
+                    "sendUserToken": "Sending user token"
+                },
+                "approveModal": {
+                    "title": "Confirm the action",
+                    "uninstall": "Are you sure you want to delete the plugin? All data will be erased.",
+                    "ok": "Yes",
+                    "cancel": "No"
+                }
             }
         },
         "profile": {
@@ -270,15 +315,40 @@
         },
         "pageEditor": {
             "placeholder": "Page Name",
+            "preview": "Preview",
             "update": "Update",
             "close": "Close",
             "sideBySide": "Side-By-Side",
+            "previewModal":{
+                "title": "Page preview"
+            },
+            "macrosListModal": {
+                "title": "Macros list",
+                "previous": "Previous",
+                "next": "Next",
+                "empty": "There are currently no macros available for use."
+            },
             "draftModal":{
                 "title": "There are pending changes.",
                 "content": "There are pending changes for the current page. Changes are in draft. You can continue editing the draft, or reset the changes and edit the page from scratch.",
                 "changed": "Last changes from {FIO} were made on {DATE}",
                 "continue": "Continue editing",
                 "reset": "Reset changes"
+            },
+            "macroMenu": {
+                "edit": "Edit",
+                "delete": "Delete"
+            },
+            "macroEditor":{
+                "title": "Macro params editor",
+                "error": "Macro editing error",
+                "paramsEmpty": "The macro has no parameters that can be configured or changed",
+                "save": "Save",
+                "cancel": "Cancel",
+                "errors": {
+                    "editFailed": "Macro edit failed",
+                    "saveFailed": "Macro saving failed"
+                }
             }
         },
         "page": {
@@ -604,6 +674,51 @@
 
                 },
                 "loadMore": "Загрузить еще"
+            },
+            "plugins": {
+                "title": "Плагины",
+                "loadMore": "Загрузить еще",
+                "installButton": "Установить",
+                "defaultPluginInstallButton": "Установить дефолтный плагин",
+                "openPluginEditor": "Открыть редактор плагинов",
+                "installSuccess": "Установка успешно завершена",
+                "success": "Завершено",
+                "error": "Ошибка",
+                "installModal": {
+                    "title": "Установка плагина",
+                    "fileLabel": "Выберите конфигурацию плагина",
+                    "filePlaceholder": ".json",
+                    "infoBlock": "Будет установлен следующий плагин",
+                    "pluginName": "Имя плагина",
+                    "pluginVersion": "Версия плагина",
+                    "installButton": "Установить плагин" 
+                },
+                "table": {
+                    "fields": {
+                        "name": "Название плагина",
+                        "version": "Версия",
+                        "actions": ""
+                    },
+                    "details": "Подробнее",
+                    "disable": "Отключить плагин",
+                    "enable": "Включить плагин",
+                    "uninstall": "Удалить"
+                },
+                "details": {
+                    "identifier": "Идентификатор плагина",
+                    "installedBy": "Установил",
+                    "installedAt": "Дата установки",
+                    "macrosInfo": "Список макросов",
+                    "macrosName": "Имя макроса",
+                    "macrosDescription": "Описание макроса",
+                    "sendUserToken": "Отправляется ли токен пользователя"
+                },
+                "approveModal": {
+                    "title": "Подтвердите действие",
+                    "uninstall": "Вы уверены, что хотите удалить плагин? Все данные будут стерты.",
+                    "ok": "Да",
+                    "cancel": "Нет"
+                }
             }
         },
         "profile": {
@@ -678,15 +793,40 @@
         },
         "pageEditor": {
             "placeholder": "Имя страницы",
+            "preview": "Предпросмотр",
             "update": "Сохранить",
             "close": "Закрыть",
             "sideBySide": "Сплит-режим",
+            "previewModal":{
+                "title": "Предпросмотр страницы"
+            },
+            "macrosListModal": {
+                "title": "Список макросов",
+                "previous": "Назад",
+                "next": "Вперед",
+                "empty": "На данный момент нет доступных макросов для использования."
+            },
             "draftModal":{
                 "title": "Есть несохраненные изменения",
                 "content": "Для текущей страницы есть незаконченные изменения. Изменения находятся в черновике. Вы можете продолжить редактирование черновика или сбросить изменения и редактировать страницу с нуля.",
                 "changed": "Последние изменения от {FIO} произведены {DATE}",
                 "continue": "Продолжить редактирование",
                 "reset": "Сбросить изменения"
+            },
+            "macroMenu": {
+                "edit": "Изменить",
+                "delete": "Удалить"
+            },
+            "macroEditor":{
+                "title": "Редактор параметров макроса",
+                "paramsEmpty": "У макроса нет параметров, которые можно настроить и изменять",
+                "save": "Сохранить",
+                "cancel": "Отмена",
+                "error": "Ошибка редактирования макроса",
+                "errors": {
+                    "editFailed": "Ошибка при попытке редактирования макроса",
+                    "saveFailed": "Ошибка сохранения макроса"
+                }
             }
         },
         "page": {

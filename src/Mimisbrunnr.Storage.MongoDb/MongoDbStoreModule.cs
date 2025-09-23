@@ -18,11 +18,11 @@ namespace Mimisbrunnr.Storage.MongoDb;
 
 public class MongoDbStoreModule : RunnableModule
 {
-    public override Type[] DependsModules => [ 
+    public override Type[] DependsModules => [
         typeof(PersonalSpaceAvatarMigrationModule),
         typeof(SpacesFlatPermissionMigrationModule)
      ];
-     
+
     public override void Configure(IServiceCollection services)
     {
         // Register conventions
@@ -50,6 +50,8 @@ public class MongoDbStoreModule : RunnableModule
                 .AddEntity<UserToken, UserTokenMap>()
                 .AddEntity<Favorite, FavoriteMap>()
                 .AddEntity<Comment, CommentMap>()
+                .AddEntity<Plugin, PluginMap>()
+                .AddEntity<MacroState, MacroStateMap>()
         );
         BsonClassMap.RegisterClassMap(new FavoriteUserMap());
         BsonClassMap.RegisterClassMap(new FavoriteSpaceMap());
@@ -78,6 +80,7 @@ public class MongoDbStoreModule : RunnableModule
             await CreateUserTokenIndexes(baseMongoContext);
             await CreateFavoriteIndexes(baseMongoContext);
             await CreateCommentIndexes(baseMongoContext);
+            await CreatePluginIndexes(baseMongoContext);
         }
         catch (Exception e)
         {
@@ -381,5 +384,35 @@ public class MongoDbStoreModule : RunnableModule
         {
             Background = true
         }));
+    }
+
+    private static async Task CreatePluginIndexes(BaseMongoDbContext mongoDbContext)
+    {
+        var collection = mongoDbContext.GetCollection<MacroState>();
+        var pageIdAndMacroIdentifierOnPageKeyDefinition = Builders<MacroState>.IndexKeys.Ascending(x => x.PageId).Ascending(x => x.MacroIdentifierOnPage);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<MacroState>(pageIdAndMacroIdentifierOnPageKeyDefinition, new CreateIndexOptions()
+        {
+            Background = true,
+            Unique = true
+        }));
+        var macroIdentifierKeyDefinition = Builders<MacroState>.IndexKeys.Ascending(x => x.MacroIdentifier);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<MacroState>(macroIdentifierKeyDefinition, new CreateIndexOptions()
+        {
+            Background = true,
+        }));
+
+        var pluginCollection = mongoDbContext.GetCollection<Plugin>();
+        var pluginIdentifierKeyDefinition = Builders<Plugin>.IndexKeys.Ascending(x => x.PluginIdentifier);
+        await pluginCollection.Indexes.CreateOneAsync(new CreateIndexModel<Plugin>(pluginIdentifierKeyDefinition, new CreateIndexOptions()
+        {
+            Unique = true,
+            Background = true
+        }));
+        var pluginMacroIdentifierKetDefinition = Builders<Plugin>.IndexKeys.Ascending("Macros.MacroIdentifier");
+        await pluginCollection.Indexes.CreateOneAsync(new CreateIndexModel<Plugin>(pluginMacroIdentifierKetDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+
     }
 }

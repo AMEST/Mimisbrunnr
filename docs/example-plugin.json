@@ -1,0 +1,51 @@
+{
+  "Id": "550e8400-e29b-41d4-a716-446655440000",
+  "PluginIdentifier": "mimisbrunnr.plugin.example",
+  "Name": "Example Plugin",
+  "Version": "1.0.0-d",
+  "Macros": [
+    {
+      "MacroIdentifier": "mimisbrunnr.plugin.example.macro.hello",
+      "Name": "Hello World Macro",
+      "Description": "Displays a greeting message.",
+      "Icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgLTEuODMgNDcgNDciIHdpZHRoPSI2NHB4IiBoZWlnaHQ9IjY0cHgiPgogIDxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzIzMWYyMCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KICAgIDxwYXRoIGQ9Ik0yOC41IDM1LjdILjVWNDBzLjI5IDIuNyAyLjU4IDIuN0gzMi42cy00LjA5LTEuNTQtNC4wOS0zLjU1WiIvPgogICAgPHBhdGggZD0iTTMyLjY1IDQyLjg0czQuODUuMDMgNC44NS03LjE0di0zMVMzOC4zMy42OSA0MS43OC42OUg5LjFzLTMuNiAxLjE0LTMuNiA0LjN2MzAuNyIvPgogICAgPHBhdGggZD0iTTM3LjUgNy43aDlWNC45MlM0Ni4xMS41IDQyIC41TTExLjUgMjMuN2gxOW0tMTkgNGgxOW0tMTktMTJoMTltLTE5LTRoMTltLTE5IDhoMTkiLz4KICA8L2c+Cjwvc3ZnPgo=",
+      "Params": [
+        "name",
+        "surname"
+      ],
+      "DefaultValues": {},
+      "Template": "<h1> Hello:</h1><br><ul><li>{{name}}</li><li>{{surname}}</li></ul> <style>div[aria-name=\"mimisbrunnr.plugin.example.macro.hello\"]{display: block!important;}</style>",
+      "RenderUrl": "",
+      "SendUserToken": true,
+      "StoreParamsInDatabase": false
+    },
+    {
+      "MacroIdentifier": "mimisbrunnr.plugin.example.macro.default-params",
+      "Name": "Default Values Macro",
+      "Description": "Show default params macro",
+      "Icon": "",
+      "Params": [],
+      "DefaultValues": {},
+      "Template": "<div>Predefined params with values: <br> <ul><li>Page Id: {{PageId}}</li> <li>Page Name: {{PageName}}</li> <li>Space Key: {{SpaceKey}} </li> <li>Space Name: {{SpaceName}} </li> <li>User Email: {{UserEmail}}</li> <li>User Name: {{UserName}}</li> <li>Macro Identifier on page: {{MacroIdOnPage}}</li> </ul></div>",
+      "RenderUrl": "",
+      "SendUserToken": false,
+      "StoreParamsInDatabase": false
+    },
+    {
+      "MacroIdentifier": "mimisbrunnr.plugin.example.macro.external-renderer",
+      "Name": "External Renderer Macro",
+      "Description": "Send request to external service for rendering macro",
+      "Icon": "",
+      "Params": [
+        "say"
+      ],
+      "DefaultValues": {
+        "say": "hello world"
+      },
+      "Template": "",
+      "RenderUrl": "http://localhost:27080/render",
+      "SendUserToken": true,
+      "StoreParamsInDatabase": true
+    }
+  ]
+}

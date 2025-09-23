@@ -11,6 +11,8 @@ namespace Mimisbrunnr.Web.Host.Services;
 
 internal class SecurityTokenService : ISecurityTokenService
 {
+    private const string TokenIdClaim = "TokenId";
+    private const string SystemTokenClaim = "SystemToken";
     private readonly BearerTokenConfiguration _configuration;
     private readonly IRepository<UserToken> _userTokenRepository;
     private readonly ILogger<SecurityTokenService> _logger;
@@ -36,13 +38,17 @@ internal class SecurityTokenService : ISecurityTokenService
         if (principal is null)
             return false;
 
-        var tokenId = principal.FindFirstValue("TokenId");
+        var tokenId = principal.FindFirstValue(TokenIdClaim);
+        var systemTokenString = principal.FindFirstValue(SystemTokenClaim);
+        if (!string.IsNullOrEmpty(systemTokenString) && bool.TryParse(systemTokenString, out var systemToken) && systemToken)
+            return true;
+
         var hasRevoked = await _userTokenRepository.GetAll().AnyAsync(x => x.Id == tokenId && x.Revoked);
 
         return !hasRevoked;
     }
 
-    public async Task<string> GenerateAccessToken(Users.User user, TimeSpan? tokenLifeTime = null)
+    public async Task<string> GenerateAccessToken(Users.User user, TimeSpan? tokenLifeTime = null, bool systemToken = false)
     {
         var lifetime = tokenLifeTime ?? TimeSpan.FromDays(30);
         var userToken = new UserToken
@@ -51,9 +57,12 @@ internal class SecurityTokenService : ISecurityTokenService
             Expired = DateTime.UtcNow + lifetime,
             UserId = user.Id,
         };
-        await _userTokenRepository.Create(userToken);
+        if (!systemToken)
+            await _userTokenRepository.Create(userToken);
+        else
+            userToken.Id = Guid.Empty.ToString();
 
-        var principal = CreatePrincipal(user, userToken.Id);
+        var principal = CreatePrincipal(user, userToken.Id, systemToken);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -86,7 +95,7 @@ internal class SecurityTokenService : ISecurityTokenService
         await _userTokenRepository.Update(userToken);
     }
 
-    private ClaimsPrincipal CreatePrincipal(Users.User user, string tokenId)
+    private ClaimsPrincipal CreatePrincipal(Users.User user, string tokenId, bool systemToken)
     {
         return new ClaimsPrincipal(
             new ClaimsIdentity(
@@ -95,7 +104,8 @@ internal class SecurityTokenService : ISecurityTokenService
                 new(ClaimTypes.Email, user.Email),
                 new(ClaimTypes.Name, user.Name),
                 new(ClaimTypes.Role, user.Role.ToString()),
-                new("TokenId", tokenId)
+                new(TokenIdClaim, tokenId),
+                new(SystemTokenClaim, $"{systemToken}")
             ]));
     }
 

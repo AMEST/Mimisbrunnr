@@ -109,6 +109,7 @@
             :toc="true"
             :html="this.$store.state.application.info.allowHtml"
             :source="this.page.content"
+            :postrender="postProcess"
             id="page-content"
         ></vue-markdown>
         </div>
@@ -144,6 +145,7 @@ const VueMarkdown = () => import(/* webpackChunkName: "vue-markdown-component" *
 import FavoriteService from "@/services/favoriteService";
 import PageService from "@/services/pageService";
 import ProfileService from "@/services/profileService";
+import PluginService from "@/services/pluginService";
 import CommentCreate from "@/components/space/components/CommentCreate.vue";
 import Comment from "@/components/space/components/Comment.vue";
 export default {
@@ -153,6 +155,7 @@ export default {
       breadcrumbs: [],
       comments: [],
       inFavorite: false,
+      anchorScrolled: false,
     };
   },
   components: {
@@ -249,12 +252,17 @@ export default {
       await FavoriteService.delete(favorite.id);
     },
     scrollToAnchor() {
+      if (this.anchorScrolled) return;
       if (!window.location.hash) return;
       var hash = decodeURI(window.location.hash);
       if (hash.length == 1) return;
-      var anchor = document.getElementById(hash.substring(1, hash.length));
+      const anchorName = hash.substring(1, hash.length);
+      var anchor = document.getElementById(anchorName);
+      if (!anchor) 
+        anchor = document.getElementsByName(anchorName)[0];
       if (!anchor) return;
       anchor.scrollIntoView();
+      this.anchorScrolled = true;
     },
     printPage(){
         var source = document.getElementsByClassName("page-content")[0];
@@ -272,25 +280,32 @@ export default {
             printWindow.close();
         }, 1000);
     },
+    postProcess(html){
+        setTimeout(() => hljs.highlightAll(), 100);
+        setTimeout(this.scrollToAnchor, 100);
+        setTimeout(replaceRelativeLinksToRoute, 100, "page-content");
+        setTimeout(async () => {
+            await PluginService.renderMacroOnPage(this.page.id);
+            this.scrollToAnchor();
+            replaceRelativeLinksToRoute("page-content");
+        }, 200);
+        return html;
+    },
   },
   watch: {
     // eslint-disable-next-line
     page: function (newValue, oldValue) {
+      this.anchorScrolled = false;
       this.initBreadcrumbs();
       this.checkInFavorites();
       this.loadComments();
-      setTimeout(() => hljs.highlightAll(), 100);
-      setTimeout(this.scrollToAnchor, 100);
-      setTimeout(replaceRelativeLinksToRoute, 250, "page-content");
     },
   },
   mounted: function () {
+    this.anchorScrolled = false;
     this.initBreadcrumbs();
     this.checkInFavorites();
     this.loadComments();
-    setTimeout(() => hljs.highlightAll(), 100);
-    setTimeout(this.scrollToAnchor, 100);
-    setTimeout(replaceRelativeLinksToRoute, 250, "page-content");
   },
 };
 </script>
@@ -341,4 +356,14 @@ export default {
 .page-dropdown {
     min-width: 190px;
 }
+#page-content p:has(+ .mm-macro-block){
+    display: inline;
+}
+#page-content .mm-macro-block{
+    display: inline-block;
+}
+#page-content .mm-macro-block + p {
+    display: block;
+}
+
 </style>

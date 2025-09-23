@@ -16,7 +16,7 @@ public interface ISecurityTokenService
     /// <summary>
     ///     Generate access token
     /// </summary>
-    Task<string> GenerateAccessToken(User user, TimeSpan? tokenLifeTime = null);
+    Task<string> GenerateAccessToken(User user, TimeSpan? tokenLifeTime = null, bool systemToken = false);
 
     /// <summary>
     ///     Ensure token not revoked by user and is exists in database

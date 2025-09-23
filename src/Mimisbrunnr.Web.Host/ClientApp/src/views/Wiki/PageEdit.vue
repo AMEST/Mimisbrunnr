@@ -19,8 +19,15 @@
             size="lg"
             switch
             @change="toggleSideBySide"
-            >{{ $t("pageEditor.sideBySide") }}</b-form-checkbox
+            >{{ $t("pageEditor.sideBySide") }}
+          </b-form-checkbox>
+          <b-button 
+            @click="showPreview" 
+            variant="secondary"
+            style="margin-right: 0.5em"
           >
+            {{ $t("pageEditor.preview") }}
+          </b-button>
           <b-button
             @click="save"
             variant="primary"
@@ -29,11 +36,11 @@
           >
             {{ $t("pageEditor.update") }}
           </b-button>
-          <b-button @click="cancel" variant="secondary">
-            {{ $t("pageEditor.close") }}
-          </b-button>
-        </div>
-      </div>
+      <b-button @click="cancel" variant="secondary">
+        {{ $t("pageEditor.close") }}
+      </b-button>
+    </div>
+  </div>
       <attachments :attachmentSelectAction="addAttachmentLink" :page="page" />
       <vue-markdown
         :html="this.$store.state.application.info.allowHtml"
@@ -41,7 +48,7 @@
         :postrender="renderMarkdown"
         :toc="true"
         style="display: none"
-        v-if="sideBySide"
+        v-if="sideBySide || previewModal"
       ></vue-markdown>
     </b-container>
     <draft-modal
@@ -51,6 +58,20 @@
       :resetCallBack="resetDraft"
     />
     <GuideModal />
+    <PagePreviewModal 
+      :htmlContent="renderedMarkdown"
+      @close="previewModal = $event"
+    />
+    <MacroParamEdit
+      :pageId="page.id"
+      :macroIdentifier="hoveredMacro.name"
+      :macroIdOnPage="hoveredMacro.id"
+      :parameters="hoveredMacro.params"
+      :macroContent="hoveredMacro.macroContent"
+      @save="handleMacroSave"
+      @close="closeMacroEditModal"
+    />
+    <MacrosListModal @insert="insertMacro"/>
   </div>
 </template>
 
@@ -66,8 +87,12 @@ import { debounce, isImageFile } from "@/services/Utils.js";
 import { formatMarkdownTables, insertMarkdownTableColumn, insertMarkdownTableRow } from "@/services/markdown/tableUtils";
 import DraftModal from "@/components/pageEditor/DraftModal.vue";
 import GuideModal from "@/components/pageEditor/GuideModal.vue";
+import PagePreviewModal from "@/components/pageEditor/PagePreviewModal.vue";
+import MacroParamEdit from "@/components/pageEditor/MacroParamEdit.vue";
+import MacrosListModal from "@/components/pageEditor/MacrosListModal.vue";
 import ProfileService from "@/services/profileService";
 import PageService from "@/services/pageService";
+import PluginService from "@/services/pluginService";
 export default {
   name: "PageEdit",
   components: {
@@ -76,6 +101,9 @@ export default {
     Attachments,
     DraftModal,
     GuideModal,
+    PagePreviewModal,
+    MacroParamEdit,
+    MacrosListModal,
   },
   data() {
     return {
@@ -83,6 +111,7 @@ export default {
       draft: null,
       loaded: false,
       sideBySide: false,
+      previewModal: false,
       mdeConfig: {
         toolbar: [
           "bold",
@@ -100,7 +129,7 @@ export default {
           "image",
           {
             name: "table1",
-            action: this.insertTable,
+            action: () => this.simplemde.drawTable(),
             className: "fa fa-table",
             title: "Insert table",
           },
@@ -112,7 +141,7 @@ export default {
           },
           {
             name: "table-add-column",
-            action: this.insertTableColumn,
+            action: () => insertMarkdownTableColumn(this.simplemde.codemirror),
             className: "table-add-column",
             title: "Insert table column",
           },
@@ -125,22 +154,34 @@ export default {
           "|",
           {
             name: "attachment",
-            action: this.openAttachments,
+            action: () => this.$bvModal.show("page-attachments-modal"),
             className: "fa fa-paperclip",
             title: "Add attachment",
+          },
+            {
+            name: "macroses",
+            action: () => this.$bvModal.show("macros-list-modal"),
+            className: "fa fa-plus",
+            title: "Insert macros",
           },
           "|",
           {
             name: "guide",
-            action: this.openGuide,
+            action: () => this.$bvModal.show("guide-modal"),
             className: "fa fa-question-circle",
             title: "Show guide",
           },
         ],
         spellChecker: false,
-        renderedMarkdown: "",
         previewRender: this.previewRender,
       },
+      renderedMarkdown: "<br/>",
+      hoveredMacro: {
+        id: null,
+        name: null,
+        params: {},
+        macroContent: null
+      }
     };
   },
   computed: {
@@ -157,7 +198,7 @@ export default {
         this.$router.push("/error/unauthorized");
         return;
       }
-
+      this.hideMacroButtons();
       await this.loadPage();
       await this.loadDraft();
       if (this.draft != null) {
@@ -214,14 +255,6 @@ export default {
     cancel: function () {
       this.$router.push("/space/" + this.page.spaceKey + "/" + this.page.id);
     },
-    // eslint-disable-next-line
-    openAttachments: function (editor) {
-      this.$bvModal.show("page-attachments-modal");
-    },
-    // eslint-disable-next-line
-    openGuide: function (editor) {
-      this.$bvModal.show("guide-modal");
-    },
     addAttachmentLink: function (attachment) {
       var linkToAttach = `/api/attachment/${this.page.id}/${encodeURIComponent(
         attachment.name
@@ -243,14 +276,138 @@ export default {
           self.simplemde.codemirror.on("paste", self.paste);
           // eslint-disable-next-line
           self.simplemde.codemirror.on("change", (cm, ev) => self.saveDraft());
+          self.simplemde.codemirror.on("mousedown", self.handleMacroHover);
           window.cm = this.simplemde.codemirror;
         },
         1000,
         this
       );
     },
-    insertTable: function () {
-      this.simplemde.drawTable();
+    handleMacroHover: function(cm, event) {
+      const pos = cm.coordsChar({left: event.clientX, top: event.clientY});
+      const line = cm.getLine(pos.line);
+      const macroRegex = /\{\{macro:[^}]+\}\}/g;
+      let match;
+      
+      while ((match = macroRegex.exec(line)) !== null) {
+        if (pos.ch >= match.index && pos.ch <= match.index + match[0].length) {
+          this.showMacroButtons(cm, pos, match[0]);
+          return;
+        }
+      }
+      this.hideMacroButtons();
+    },
+
+    showMacroButtons: function(cm, pos, macroContent) {
+      this.hideMacroButtons();
+      const buttons = document.createElement('div');
+      buttons.className = 'macro-buttons';
+      
+      const editBtn = document.createElement('button');
+      editBtn.innerText = this.$t("pageEditor.macroMenu.edit");
+      editBtn.onclick = () => this.editMacro(pos, macroContent);
+      
+      const deleteBtn = document.createElement('button');
+      deleteBtn.innerText = this.$t("pageEditor.macroMenu.delete");
+      deleteBtn.onclick = () => this.deleteMacro(pos, macroContent);
+      
+      buttons.appendChild(editBtn);
+      buttons.appendChild(deleteBtn);
+      
+      const coords = cm.charCoords(pos);
+      buttons.style.position = 'absolute';
+      buttons.style.left = `${coords.left}px`;
+      buttons.style.top = `${coords.bottom}px`;
+      
+      document.body.appendChild(buttons);
+      this.currentMacroButtons = buttons;
+    },
+
+    hideMacroButtons: function() {
+      if (this.currentMacroButtons) {
+        document.body.removeChild(this.currentMacroButtons);
+        this.currentMacroButtons = null;
+      }
+    },
+    deleteMacro: function(pos) {
+      const lineText = this.simplemde.codemirror.getLine(pos.line);
+      const macroStart = lineText.lastIndexOf('{{macro:', pos.ch);
+      
+      if (macroStart === -1) {
+        this.hideMacroButtons();
+        return;
+      }
+      const macroEnd = lineText.indexOf('}}', macroStart);
+      if (macroEnd === -1) {
+        this.hideMacroButtons();
+        return;
+      }
+      
+      const startPos = {line: pos.line, ch: macroStart};
+      const endPos = {line: pos.line, ch: macroEnd + 2};
+      
+      this.simplemde.codemirror.replaceRange('', startPos, endPos);
+      this.hideMacroButtons();
+    },
+    editMacro: function(pos, macroContent) {
+      try {
+        const regex = /\{\{macro:name=([^|]+)\|id=([^|]+)\|([^}]*)\}\}/g;
+        const match = regex.exec(macroContent);
+        if (!match) return;
+        const [, name, id, parameters] = match;
+        if(!name || !id) return;
+
+        const paramsDict = {};
+        parameters.split('|').map(x => x.split("=")).forEach(x => paramsDict[x[0]] = x[1])
+
+        this.hoveredMacro.id = id;
+        this.hoveredMacro.name = name;
+        this.hoveredMacro.params = paramsDict;
+        this.hoveredMacro.macroContent = macroContent;
+        this.$bvModal.show('macro-param-edit-modal');
+      } catch (error) {
+        console.error('Error editing macro:', error);
+        this.$bvToast.toast(this.$t('pageEditor.macroEditor.errors.editFailed'), {
+          title: this.$t('pageEditor.macroEditor.error'),
+          variant: 'danger',
+          solid: true
+        });
+      }
+      this.hideMacroButtons();
+    },
+    closeMacroEditModal: function(){
+        this.hoveredMacro = {
+            id: null,
+            name: null,
+            params: {},
+            macroContent: null
+        }
+    },
+    handleMacroSave(macroContent, params, macroIdOnPage, macroIdentifier) {
+      try {
+        let paramsArray = [];
+        for(const key in params)
+            paramsArray.push(`${key}=${params[key]}`);
+        const newMacro = `{{macro:name=${macroIdentifier}|id=${macroIdOnPage}|${paramsArray.join("|")}}}`
+        this.page.content = this.page.content.replaceAll(macroContent, newMacro);
+      } catch (error) {
+        console.error('Error saving macro params:', error);
+        this.$bvToast.toast(this.$t('pageEditor.macroEditor.errors.saveFailed'), {
+          title: this.$t('pageEditor.macroEditor.error'),
+          variant: 'danger',
+          solid: true
+        });
+      }
+      this.$refs.markdownEditor.simplemde.value(this.page.content);
+    },
+    insertMacro(macroInfo){
+      let params = macroInfo.storeParamsInDatabase ? '' : macroInfo.params.map(x => `${x}=`).join("|");
+      const macroContent = `{{macro:name=${macroInfo.macroIdentifier}|id=mid-${new Date().getTime()}|${params}}}`;
+      const cursor = this.simplemde.codemirror.getCursor();
+      this.simplemde.codemirror.setSelection(cursor, cursor);
+      this.simplemde.codemirror.replaceSelection(macroContent);
+      if (macroInfo.params && macroInfo.params.length > 0)
+        this.editMacro(cursor, macroContent);
     },
     formatTables: function() {
         var cursor = this.simplemde.codemirror.getCursor();
@@ -260,9 +417,6 @@ export default {
             this.page.content = formatted;
         },100);
         setTimeout(() => this.simplemde.codemirror.setCursor({ ch: cursor.ch, line: cursor.line }), 250);
-    },
-    insertTableColumn: function () {
-        insertMarkdownTableColumn(this.simplemde.codemirror);
     },
     insertTableRow: function () {
         insertMarkdownTableRow(this.simplemde.codemirror);
@@ -402,15 +556,23 @@ export default {
     },
     // eslint-disable-next-line
     previewRender: function (plainText) {
-      return this.renderedMarkdown || "";
+      return this.renderedMarkdown || "<br/>";
     },
     renderMarkdown: function (html) {
       this.renderedMarkdown = html;
       return html;
     },
+    showPreview: function() {
+      this.previewModal = true;
+      this.$bvModal.show('page-preview-modal');
+      setTimeout(() => PluginService.renderMacroOnPage(this.page.id, "page-preview-modal"), 300);
+    }
   },
   mounted: function () {
     this.init();
+  },
+  destroyed: function() {
+    this.hideMacroButtons();
   },
   watch: {
     // eslint-disable-next-line
@@ -462,7 +624,7 @@ export default {
   position: relative;
   top: -3px;
 }
-@media (max-width: 575px) {
+@media (max-width: 620px) {
   .side-by-side-switch {
     display: none !important;
   }
@@ -496,4 +658,44 @@ export default {
     top: 0.55em;
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOCAxOCI+CiAgPHBhdGggZmlsbD0iIzQ5NGM0ZSIgZD0iTTMgMTJhMSAxIDAgMCAxIDEgMXYxaDFhMSAxIDAgMCAxIDAgMkg0djFhMSAxIDAgMCAxLTIgMHYtMUgxYTEgMSAwIDAgMSAwLTJoMXYtMWExIDEgMCAwIDEgMS0xem03IDJoNnYyaC02di0yem0tMi0xdjRhMSAxIDAgMCAwIDEgMWg4YTEgMSAwIDAgMCAxLTF2LTRhMSAxIDAgMCAwLTEtMUg5YTEgMSAwIDAgMC0xIDF6TTAgMXY4YTEgMSAwIDAgMCAxIDFoMTZhMSAxIDAgMCAwIDEtMVYxYTEgMSAwIDAgMC0xLTFIMWExIDEgMCAwIDAtMSAxem0xNiA1djJIMlY2aDE0em0wLTR2MkgyVjJoMTR6Ii8+Cjwvc3ZnPgo=") !important;
 }
+
+.editor-preview .mm-macro-block {
+    display: inline-block;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    margin: 0 2px;
+    min-height: 24px;
+    width: 100px;
+    vertical-align: text-bottom;
+}
+.editor-preview .mm-macro-block:before{
+    content: "\00a7 Macro";
+    padding-left: 10px
+}
+
+.macro-buttons {
+    position: absolute;
+    background: white;
+    border: 1px solid #ddd;
+    padding: 4px;
+    z-index: 1000;
+    display: flex;
+    gap: 4px;
+}
+
+.macro-buttons button {
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 2px 6px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.macro-buttons button:hover {
+    background: #e0e0e0;
+}
+.editor-preview-side p:has(+ .mm-macro-block){
+    display: inline;
+}
+
 </style>

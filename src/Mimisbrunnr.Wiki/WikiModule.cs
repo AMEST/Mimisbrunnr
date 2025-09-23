@@ -14,6 +14,8 @@ public class WikiModule : Module
             .AddSingleton<IAttachmentManager, AttachmentManager>()
             .AddSingleton<ISpaceSearcher, SpaceManager>()
             .AddSingleton<IDraftManager, DraftManager>()
-            .AddSingleton<ICommentManager, CommentManager>();
+            .AddSingleton<ICommentManager, CommentManager>()
+            .AddSingleton<IPageManager, PageManager>()
+            .AddSingleton<IPluginManager, PluginManager>();
     }
 }

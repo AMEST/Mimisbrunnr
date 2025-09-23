@@ -52,7 +52,22 @@
         <ProjectReference Include="..\Mimisbrunnr.Persistent\Mimisbrunnr.Persistent.csproj" />
         <ProjectReference Include="..\DataImport\Mimisbrunnr.DataImport.Confluence\Mimisbrunnr.DataImport.Confluence.csproj" />
     </ItemGroup>
-    
+
+    <!-- Copy additional data -->
+    <Target Name="CopyFilesToClientApp" BeforeTargets="Build">
+        <Copy
+            SourceFiles="..\..\docs\default-plugin.json"
+            DestinationFolder="$(MSBuildProjectDirectory)\ClientApp\public\assets"
+            OverwriteReadOnlyFiles="true"
+            SkipUnchangedFiles="true"
+        />
+        <Copy
+            SourceFiles="..\..\docs\plugin-editor.html"
+            DestinationFolder="$(MSBuildProjectDirectory)\ClientApp\public\assets"
+            OverwriteReadOnlyFiles="true"
+            SkipUnchangedFiles="true"
+        />
+    </Target>    
     <!-- Vue Integration -->
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build">
         <!-- Build Target:  Ensure Node.js is installed -->

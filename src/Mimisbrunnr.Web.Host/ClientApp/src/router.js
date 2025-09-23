@@ -83,6 +83,11 @@ export default new Router({
             path: '/admin/users',
             name: 'UsersAdministration',
             component: () => import(/* webpackChunkName: "admin" */ './views/Admin/Users.vue')
+        },
+        {
+            path: '/admin/plugins',
+            name: 'PluginsAdministration',
+            component: () => import(/* webpackChunkName: "admin" */ './views/Admin/Plugins.vue')
         }
     ]
 })

@@ -34,7 +34,7 @@ export default {
                     name: "Plugins",
                     to: "/admin/plugins",
                     active: false,
-                    disabled: true
+                    disabled: false
                 },
             ]
         }

@@ -12,6 +12,7 @@
   <script>
 import EasyMDE from "easymde";
 import marked from "marked";
+import './codemirror-macro-mode';
 
 export default {
   name: "vue-simplemde",
@@ -118,6 +119,7 @@ export default {
         const val = this.simplemde.value();
         this.handleBlur(val);
       });
+      this.simplemde.codemirror.setOption('mode', 'markdown_with_macro');
     },
     addPreviewClass(className) {
       const wrapper = this.simplemde.codemirror.getWrapperElement();
@@ -161,6 +163,18 @@ export default {
 .vue-simplemde .editor-preview-active,
 .vue-simplemde .editor-preview-active-side {
   display: block;
+}
+
+.vue-simplemde .cm-macro-highlight {
+    display: inline-block;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    margin: 0 2px;
+    min-height: 24px;
+}
+.vue-simplemde .cm-macro-highlight:before{
+    content: "\00a7 ";
+    padding-left: 10px
 }
 </style>
   
