@@ -71,6 +71,8 @@ Support for the following features:
   - Profile page with avatar and last worked on
   - Settings (Manage personal api tokens, Profile settings _(Not implemented)_, Other settings _(Not implemented)_)
   - Favorites
+- Plugins
+  - Macros for pages (additional functional for pages)
 - Administration
   - Change wiki instance title
   - Enabling anonymous access (permission to read public spaces and access to wiki without authentication)
@@ -84,6 +86,13 @@ Support for the following features:
     - Disable
     - Enable
   - Manage groups 
+  - Manage plugins
+    - Install default plugin
+    - Install another plugins
+    - Disable
+    - Enable
+    - Remove (with clean all plugin data)
+    - Link to simple plugin editor
 - Hosting
   - Simple scalable
   - Three types of caching (one for single node and two for multiple nodes)
