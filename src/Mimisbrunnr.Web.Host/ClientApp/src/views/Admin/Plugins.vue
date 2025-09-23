@@ -4,6 +4,7 @@
     <b-card class="admin-plugin-card">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h3>{{ $t('admin.plugins.title') }}</h3>
+        <div class="default-plugin-install-button" @click="installDefaultPlugin">{{ $t('admin.plugins.defaultPluginInstallButton') }}</div>
         <b-button variant="primary" @click="$bvModal.show('install-plugin-modal')">
           {{ $t('admin.plugins.installButton') }}
         </b-button>
@@ -83,8 +84,11 @@
           {{ $t("admin.plugins.loadMore") }}
         </b-button>
       </div>
-      <InstallPluginModal @install="installPlugin" />
+      <InstallPluginModal :installingDefaultPlugin="defaultPluginInstall" @install="installPlugin" @onclose="installModalClosed" />
     </b-card>
+    <div align="right">
+        <a href="/assets/plugin-editor.html" target="_blank">{{ $t("admin.plugins.openPluginEditor") }}</a>
+    </div>
   </b-container>
 </template>
 
@@ -106,6 +110,7 @@ export default {
   data() {
     return {
       plugins: [],
+      defaultPluginInstall: false,
       loading: false,
     };
   },
@@ -162,6 +167,10 @@ export default {
         this.plugins = this.plugins.filter(p => p.pluginIdentifier !== identifier);
       }
     },
+    installDefaultPlugin() {
+        this.defaultPluginInstall = true;
+        this.$bvModal.show('install-plugin-modal');
+    },
     formatDate(dateString) {
       return new Date(dateString).toLocaleString();
     },
@@ -185,7 +194,10 @@ export default {
         });
       }
     },
-    approve: async function(message) {
+    installModalClosed() {
+        this.defaultPluginInstall = false;
+    },
+    async approve(message) {
         return await this.$bvModal.msgBoxConfirm(message, {
             title: this.$t("admin.plugins.approveModal.title"),
             centered: true,
@@ -229,5 +241,12 @@ export default {
 
 .load-more-button {
   width: 100%;
+}
+
+.default-plugin-install-button {
+    margin-left: auto; 
+    padding-right: 1em;
+    cursor: pointer;
+    color: grey;
 }
 </style>

@@ -6,11 +6,13 @@
       centered
       hide-footer
       @hidden="resetModal"
+      @shown="onShow"
     >
     <b-form @submit.prevent="handleSubmit">
       <b-form-group
         :label="$t('admin.plugins.installModal.fileLabel')"
         label-for="plugin-file"
+        v-if="!installingDefaultPlugin"
       >
         <b-form-file
           id="plugin-file"
@@ -54,6 +56,9 @@ export default {
       pluginInfo: null
     }
   },
+  props: {
+    installingDefaultPlugin: Boolean
+  },    
   watch: {
     file(newFile) {
       if (newFile) {
@@ -62,6 +67,11 @@ export default {
     }
   },
   methods: {
+    async onShow(){
+        if (!this.installingDefaultPlugin) return;
+        var defaultPluginRequest = await fetch("/assets/default-plugin.json");
+        this.pluginInfo = await defaultPluginRequest.json();
+    },
     readPluginFile(file) {
       const reader = new FileReader()
       reader.onload = (e) => {
@@ -79,12 +89,13 @@ export default {
       reader.readAsText(file)
     },
     handleSubmit() {
-      this.$emit('install', this.pluginInfo)
-      this.$bvModal.hide('install-plugin-modal')
+      this.$emit('install', this.pluginInfo);
+      this.$bvModal.hide('install-plugin-modal');
     },
     resetModal() {
       this.file = null
       this.pluginInfo = null
+      this.$emit('onclose');
     }
   }
 }
