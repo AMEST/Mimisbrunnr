@@ -358,7 +358,7 @@ export default {
         if(!name || !id) return;
 
         const paramsDict = {};
-        parameters.split('|').map(x => x.split("=")).forEach(x => paramsDict[x[0]] = x[1])
+        parameters.split('|').map(x => x.split("=")).forEach(x => paramsDict[x[0]] = decodeURI(x[1]))
 
         this.hoveredMacro.id = id;
         this.hoveredMacro.name = name;
@@ -387,7 +387,7 @@ export default {
       try {
         let paramsArray = [];
         for(const key in params)
-            paramsArray.push(`${key}=${params[key]}`);
+            paramsArray.push(`${key}=${encodeURI(params[key])}`);
         const newMacro = `{{macro:name=${macroIdentifier}|id=${macroIdOnPage}|${paramsArray.join("|")}}}`
         this.page.content = this.page.content.replaceAll(macroContent, newMacro);
       } catch (error) {

@@ -12,5 +12,6 @@ public class Macro
     public string Template { get; set; }
     public bool SendUserToken { get; set; }
     public bool StoreParamsInDatabase { get; set; }
+    public string CustomParamsEditor { get; set; }
     public bool Disabled { get; internal set; }
 }

@@ -51,6 +51,10 @@ public class MacroModel : IValidatableObject
     /// Gets or sets a value indicating whether to store macro parameters in the database.
     /// </summary>
     public bool StoreParamsInDatabase { get; set; }
+    /// <summary>
+    /// Custom params editor HTML
+    /// </summary>
+    public string CustomParamsEditor { get; set; }
 
     /// <summary>
     /// Validates the macro model to ensure it is configured correctly.

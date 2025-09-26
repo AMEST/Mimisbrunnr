@@ -2,7 +2,7 @@
   "Id": "550e8400-e29b-41d4-a716-446655440000",
   "PluginIdentifier": "mimisbrunnr.plugin.example",
   "Name": "Example Plugin",
-  "Version": "1.0.0-d",
+  "Version": "1.0.0-a",
   "Macros": [
     {
       "MacroIdentifier": "mimisbrunnr.plugin.example.macro.hello",
@@ -45,7 +45,8 @@
       "Template": "",
       "RenderUrl": "http://localhost:27080/render",
       "SendUserToken": true,
-      "StoreParamsInDatabase": true
+      "StoreParamsInDatabase": true,
+      "CustomParamsEditor": "<h3>Customization zone for macro params edit modal</h3> You can change style, controls or add additional functional into this modal for you macro here.<button class=\"btn btn-primary\" onclick=\"alert(document.getElementById('macro-identifier-on-page-input').value);\">Show current macro id on page</button>"
     }
   ]
 }
