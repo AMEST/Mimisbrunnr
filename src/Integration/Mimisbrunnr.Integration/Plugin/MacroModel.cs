@@ -68,5 +68,8 @@ public class MacroModel : IValidatableObject
             yield return new ValidationResult("Only one field must be configured", [nameof(RenderUrl), nameof(Template)]);
         if (!string.IsNullOrWhiteSpace(RenderUrl) && !RenderUrl.ToLowerInvariant().StartsWith("https://") && !RenderUrl.ToLowerInvariant().StartsWith("http://"))
             yield return new ValidationResult("RenderUrl must be a url to external render api", [nameof(RenderUrl)]);
+        char[] paramsSymbolsBlackList = ['\'', '"', '>', '<', '|', '=', '&'];
+        if (Params is not null && Params.Any(x => x.IndexOfAny(paramsSymbolsBlackList) >= 0))
+            yield return new ValidationResult("Any params contains restricted symbols", [nameof(Params)]);
     }
 }

@@ -31,9 +31,7 @@ function macroPlugin(md) {
           const token = state.push('html_inline', '', 0);
           const [, name, id, params] = match;
 
-          const paramArray = params.split('|');
-          const paramKeyValuePairs = paramArray.map(param => param.split('='));
-          const paramAttributes = paramKeyValuePairs.map(([key, value]) => `${key}=${decodeURI(value)}`).join('&');
+          const paramAttributes = params.replaceAll('|', '&');
           const encodedParams = encodeURI(paramAttributes);
 
           token.block = true;
