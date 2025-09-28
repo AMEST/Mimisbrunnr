@@ -13,11 +13,12 @@
         :key="param"
         :label="param"
       >
-        <b-form-input
-          v-model="currentParams[param]"
-          type="text"
-        />
+        <textarea v-model="currentParams[param]" class="textarea-input"></textarea>
       </b-form-group>
+      <b-form-input v-model="pageId" id="macro-pageid-input" hidden></b-form-input>
+      <b-form-input v-model="macroIdentifier" id="macro-identifier-input" hidden></b-form-input>
+      <b-form-input v-model="macroIdOnPage" id="macro-identifier-on-page-input" hidden></b-form-input>
+      <div v-if="macroDefinition.customParamsEditor" v-html="macroDefinition.customParamsEditor"></div>
     </b-form>
     <b-alert v-else show variant="light">
         {{$t("pageEditor.macroEditor.paramsEmpty")}}
@@ -121,3 +122,19 @@ export default {
   }
 };
 </script>
+
+<style>
+.textarea-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid rgb(204, 204, 204);
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    min-height: 40px;
+    resize: vertical;
+    height: 40px;
+}
+</style>

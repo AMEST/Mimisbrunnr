@@ -51,6 +51,10 @@ public class MacroModel : IValidatableObject
     /// Gets or sets a value indicating whether to store macro parameters in the database.
     /// </summary>
     public bool StoreParamsInDatabase { get; set; }
+    /// <summary>
+    /// Custom params editor HTML
+    /// </summary>
+    public string CustomParamsEditor { get; set; }
 
     /// <summary>
     /// Validates the macro model to ensure it is configured correctly.
@@ -64,5 +68,8 @@ public class MacroModel : IValidatableObject
             yield return new ValidationResult("Only one field must be configured", [nameof(RenderUrl), nameof(Template)]);
         if (!string.IsNullOrWhiteSpace(RenderUrl) && !RenderUrl.ToLowerInvariant().StartsWith("https://") && !RenderUrl.ToLowerInvariant().StartsWith("http://"))
             yield return new ValidationResult("RenderUrl must be a url to external render api", [nameof(RenderUrl)]);
+        char[] paramsSymbolsBlackList = ['\'', '"', '>', '<', '|', '=', '&'];
+        if (Params is not null && Params.Any(x => x.IndexOfAny(paramsSymbolsBlackList) >= 0))
+            yield return new ValidationResult("Any params contains restricted symbols", [nameof(Params)]);
     }
 }

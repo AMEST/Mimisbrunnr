@@ -146,7 +146,7 @@ var PluginService = {
                 paramsString.split('&').forEach(pair => {
                     const [key, value] = pair.split('=');
                     if(key)
-                        params[key] = value;
+                        params[key] = decodeURIComponent(value);
                 });
 
                 const userRequest = {
