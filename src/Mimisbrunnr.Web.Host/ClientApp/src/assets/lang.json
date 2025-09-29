@@ -263,6 +263,15 @@
                         "cancel": "No"
                     }
                 },
+                "userGroups": {
+                    "title": "User groups",
+                    "description": "List of groups the user is a member of",
+                    "empty": "You are not a member of any groups.",
+                    "fields": {
+                        "name": "Group name",
+                        "description": "Description"
+                    }
+                },
                 "profile": {
                     "title": "Profile"
                 },
@@ -739,6 +748,15 @@
                         "revoke": "Вы действительно хотите отозвать выпущенный API Token?",
                         "ok": "Да",
                         "cancel": "Нет"
+                    }
+                },
+                "userGroups": {
+                    "title": "Группы",
+                    "description": "Список групп в которых состоит пользователь",
+                    "empty": "Вы не состоите ни в одной группе.",
+                    "fields": {
+                        "name": "Название группы",
+                        "description": "Описание"
                     }
                 },
                 "profile": {
