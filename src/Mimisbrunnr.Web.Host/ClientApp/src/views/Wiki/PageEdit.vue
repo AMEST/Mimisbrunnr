@@ -385,11 +385,13 @@ export default {
     },
     handleMacroSave(macroContent, params, macroIdOnPage, macroIdentifier) {
       try {
+        const cursor = this.simplemde.codemirror.getCursor();
         let paramsArray = [];
         for(const key in params)
             paramsArray.push(`${key}=${encodeURIComponent(params[key])}`);
         const newMacro = `{{macro:name=${macroIdentifier}|id=${macroIdOnPage}|${paramsArray.join("|")}}}`
         this.page.content = this.page.content.replaceAll(macroContent, newMacro);
+        setTimeout(() => this.simplemde.codemirror.setCursor({ ch: cursor.ch, line: cursor.line }), 250);
       } catch (error) {
         console.error('Error saving macro params:', error);
         this.$bvToast.toast(this.$t('pageEditor.macroEditor.errors.saveFailed'), {
@@ -408,6 +410,7 @@ export default {
       this.simplemde.codemirror.replaceSelection(macroContent);
       if (macroInfo.params && macroInfo.params.length > 0)
         this.editMacro(cursor, macroContent);
+      setTimeout(() => this.simplemde.codemirror.setCursor({ ch: cursor.ch, line: cursor.line }), 250);
     },
     formatTables: function() {
         var cursor = this.simplemde.codemirror.getCursor();

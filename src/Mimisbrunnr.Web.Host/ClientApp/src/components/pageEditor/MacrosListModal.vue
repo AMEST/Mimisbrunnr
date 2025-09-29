@@ -16,7 +16,7 @@
         @click="insertMacro(macro)"
       >
         <b-row no-gutters>
-          <b-col md="4">
+          <b-col cols="4">
             <b-card-img
               v-if="macro.icon"
               :src="macro.icon"
