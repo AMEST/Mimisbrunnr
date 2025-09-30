@@ -8,6 +8,7 @@
   >
     <b-tabs pills card vertical>
       <api-tokens/>
+      <user-groups/>
       <b-tab :title="$t('profile.settings.profile.title')" disabled></b-tab>
       <b-tab :title="$t('profile.settings.other.title')" disabled></b-tab>
     </b-tabs>
@@ -16,9 +17,11 @@
 
 <script>
 import ApiTokens from '@/components/people/profile/settings/ApiTokens.vue';
+import UserGroups from '@/components/people/profile/settings/UserGroups.vue';
 export default {
   components: { 
-    ApiTokens 
+    ApiTokens,
+    UserGroups
   },
   name: "SettingsModal",
 };
