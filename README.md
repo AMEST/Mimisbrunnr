@@ -69,7 +69,7 @@ Support for the following features:
   - Generating user tokens for token authentication (for direct access to api)
 - Profile
   - Profile page with avatar and last worked on
-  - Settings (Manage personal api tokens, Profile settings _(Not implemented)_, Other settings _(Not implemented)_)
+  - Settings (Manage personal api tokens, User Groups, Profile settings _(Not implemented)_, Other settings _(Not implemented)_)
   - Favorites
 - Plugins
   - Macros for pages (additional functional for pages)
@@ -330,3 +330,4 @@ To use the CLI you need:
     --s3-access-key=minioAccessKey \
     --s3-secret-key=minioSecretKey
 ```
+
