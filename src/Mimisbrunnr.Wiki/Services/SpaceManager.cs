@@ -66,10 +66,16 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
         return await query.ToArrayAsync();
     }
 
-    public async Task<Space> GetById(string id)
+    public Task<Space> GetById(string id)
     {
-        var space = await _spaceRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
-        return space;
+        return _spaceRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public Task<Space[]> GetByIds(params string[] ids)
+    {
+        if (ids.Length == 0)
+            return Task.FromResult<Space[]>([]);
+        return _spaceRepository.GetAll().Where(x => ids.Contains(x.Id)).ToArrayAsync();
     }
 
     public async Task<Space> GetByKey(string key)
@@ -177,7 +183,7 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
         await _spaceRepository.Delete(space);
     }
 
-    public async Task<IEnumerable<Space>> Search(string text)
+    public async Task<Space[]> Search(string text)
     {
         var textLower = text.ToLower();
         var spaces = await _spaceRepository.GetAll()

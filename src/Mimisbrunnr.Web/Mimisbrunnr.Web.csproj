@@ -4,12 +4,9 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings> 
         <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <DocumentationFile>Mimisbrunnr.Web.xml</DocumentationFile>
     </PropertyGroup>
-
-    <PropertyGroup>
-    <DocumentationFile>Mimisbrunnr.Web.xml</DocumentationFile>
-  </PropertyGroup>
-
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />

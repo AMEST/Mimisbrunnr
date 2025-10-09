@@ -3,7 +3,7 @@
     <Menu activeMenuItem="Plugins" />
     <b-card class="admin-plugin-card">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3>{{ $t('admin.plugins.title') }}</h3>
+        <h3 style="margin-bottom: unset;">{{ $t('admin.plugins.title') }}</h3>
         <div class="default-plugin-install-button" @click="installDefaultPlugin">{{ $t('admin.plugins.defaultPluginInstallButton') }}</div>
         <b-button variant="primary" @click="$bvModal.show('install-plugin-modal')">
           {{ $t('admin.plugins.installButton') }}

@@ -72,6 +72,11 @@ internal class SpaceManagerCacheDecorator : ISpaceManager
         return cached;
     }
 
+    public Task<Space[]> GetByIds(params string[] ids)
+    {
+        return _inner.GetByIds(ids);
+    }
+
     public async Task<Space> GetByKey(string key)
     {
         var cached = await _cache.GetAsync<Space>(GetSpaceCacheKey(key));

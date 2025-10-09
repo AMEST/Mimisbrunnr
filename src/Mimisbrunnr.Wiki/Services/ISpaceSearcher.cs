@@ -4,5 +4,5 @@ namespace Mimisbrunnr.Wiki.Services;
 
 public interface ISpaceSearcher 
 {
-     Task<IEnumerable<Space>> Search(string text);
+     Task<Space[]> Search(string text);
 }

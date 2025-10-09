@@ -17,6 +17,7 @@ internal class SearchService : ISearchService
     private readonly IUserManager _userManager;
     private readonly IUserSearcher _userSearcher;
     private readonly ISpaceDisplayService _spaceDisplayService;
+    private readonly ISpaceManager _spaceManager;
 
     public SearchService(
         IPermissionService permissionService,
@@ -24,7 +25,8 @@ internal class SearchService : ISearchService
         ISpaceSearcher spaceSearcher,
         IUserSearcher userSearcher,
         IUserManager userManager,
-        ISpaceDisplayService spaceDisplayService)
+        ISpaceDisplayService spaceDisplayService,
+        ISpaceManager spaceManager)
     {
         _permissionService = permissionService;
         _pageSearcher = pageSearcher;
@@ -32,6 +34,7 @@ internal class SearchService : ISearchService
         _userManager = userManager;
         _userSearcher = userSearcher;
         _spaceDisplayService = spaceDisplayService;
+        _spaceManager = spaceManager;
     }
 
     public async Task<IEnumerable<PageModel>> SearchPages(string text, UserInfo searchBy)
@@ -39,6 +42,17 @@ internal class SearchService : ISearchService
         await _permissionService.EnsureAnonymousAllowed(searchBy);
 
         var pages = await _pageSearcher.Search(text);
+        if (pages.Length == 0)
+            return [];
+
+        var user = await _userManager.GetByEmail(searchBy?.Email);  
+        if (user?.Role == UserRole.Admin)
+        {
+            var spaceIds = pages.Select(x => x.SpaceId).Distinct().ToArray();
+            var spaces = await _spaceManager.GetByIds(spaceIds);
+            var foundedSpaceIds = spaces.Select(x => x.Id).ToArray();
+            return pages.Where(x => foundedSpaceIds.Contains(x.SpaceId)).Select(x => x.ToModel(spaces.FirstOrDefault(s => s.Id == x.SpaceId)?.Key));
+        } 
         var userSpaces = await _spaceDisplayService.FindUserVisibleSpaces(searchBy);
         var userSpacesId = userSpaces.Select(x => x.Id).ToArray();
         return pages.Where(x => userSpacesId.Contains(x.SpaceId)).Select(x => x.ToModel(userSpaces.First(s => s.Id == x.SpaceId).Key));
@@ -48,8 +62,10 @@ internal class SearchService : ISearchService
     {
         await _permissionService.EnsureAnonymousAllowed(searchBy);
 
-        var user = await _userManager.GetByEmail(searchBy?.Email);
         var spaces = await _spaceSearcher.Search(text);
+        if (spaces.Length == 0)
+            return [];
+        var user = await _userManager.GetByEmail(searchBy?.Email);
         if (user?.Role == UserRole.Admin)
             return spaces.Select(x => x.ToModel());
 
@@ -61,7 +77,10 @@ internal class SearchService : ISearchService
     {
         await _permissionService.EnsureAnonymousAllowed(searchBy);
 
+        var user = await _userManager.GetByEmail(searchBy?.Email);
         var users = await _userSearcher.Search(text);
-        return users.Select(x => x.ToModel());
+        return user?.Role == UserRole.Admin
+            ? users.Select(x => x.ToViewModel())
+            : users.Select(x => x.ToModel());
     }
 }
