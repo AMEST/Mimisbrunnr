@@ -16,12 +16,12 @@ internal class PageSearcher : IPageSearcher
             .WithReadPreference(ReadPreference.SecondaryPreferred);
     }
 
-    public async Task<IEnumerable<Page>> Search(string text)
+    public async Task<Page[]> Search(string text)
     {
         var results = await _collection
             .Find(Builders<Page>.Filter.Text(text))
             .Limit(100)
             .ToListAsync();
-        return results;
+        return [.. results];
     }
 }

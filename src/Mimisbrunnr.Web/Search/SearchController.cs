@@ -63,11 +63,10 @@ public class SearchController : ControllerBase
     [Authorize]
     [ProducesResponseType(typeof(IEnumerable<UserModel>), 200)]
     [ProducesResponseType(401)]
-    public async Task<IEnumerable<UserModel>> SearchUsers([FromQuery] string search)
+    public async Task<IActionResult> SearchUsers([FromQuery] string search)
     {
         if (string.IsNullOrEmpty(search))
-            return [];
-            
-        return await _searchService.SearchUsers(search, User?.ToInfo());
+            return Ok(Array.Empty<UserViewModel>());
+        return Ok(await _searchService.SearchUsers(search, User?.ToInfo()));
     }
 }

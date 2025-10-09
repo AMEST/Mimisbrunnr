@@ -4,5 +4,5 @@ namespace Mimisbrunnr.Wiki.Services;
 
 public interface IPageSearcher
 {
-     Task<IEnumerable<Page>> Search(string text);
+     Task<Page[]> Search(string text);
 }

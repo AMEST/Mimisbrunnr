@@ -17,6 +17,8 @@ public interface ISpaceManager
 
     Task<Space> GetById(string id);
 
+    Task<Space[]> GetByIds(params string[] ids);
+
     Task<Space> GetByKey(string key);
 
     Task<Space> FindPersonalSpace(UserInfo user);

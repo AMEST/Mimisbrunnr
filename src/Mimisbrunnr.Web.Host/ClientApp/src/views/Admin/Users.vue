@@ -2,12 +2,13 @@
   <b-container>
     <Menu activeMenuItem="Users" />
     <b-card :title="$t('admin.users.title')" class="admin-user-card">
+      <b-form-input class="search-field" v-model="searchText" size="sm" :placeholder="$t('people.search.placeholder')"></b-form-input>
       <b-table
         :items="users"
         :fields="fields"
         striped
         responsive="sm"
-        class="text-left"
+        class="text-left users-table"
       >
         <template #cell(name)="row">
           <s v-if="!row.item['enable']">{{ row.item["name"] }}</s>
@@ -72,6 +73,8 @@ import { BIconArrowClockwise } from "bootstrap-vue";
 import Menu from "@/components/admin/Menu.vue";
 import ProfileService from "@/services/profileService";
 import UserService from "@/services/userService";
+import SearchService from "@/services/searchService";
+import { debounce } from "@/services/Utils";
 export default {
   name: "UsersAdministration",
   components: {
@@ -80,6 +83,7 @@ export default {
   },
   data() {
     return {
+      searchText: "",
       users: [],
       loading: false,
     };
@@ -113,6 +117,10 @@ export default {
       for (let user of usersList) this.users.push(user);
       this.loading = false;
     },
+    search: debounce(async function () {
+      var searchResult = await SearchService.findUsers(this.searchText);
+      if (searchResult != null) this.users = searchResult;
+    }, 300),
     promote: async function (email) {
         var approve = await this.approve(this.$t("admin.users.approveModal.promote"));
         if(!approve) return;
@@ -155,6 +163,14 @@ export default {
         });
     }
   },
+  watch: {
+    // eslint-disable-next-line
+    searchText(newValue, oldValue) {
+      if (newValue.length > 2) this.search();
+      if (newValue.length == 0 && oldValue.length > 0) this.users = [];
+      if (newValue.length == 0) this.loadUsers();
+    },
+  },
   mounted() {
     document.title = `${this.$store.state.application.info.title}`;
     if (!ProfileService.isAdmin()) {
@@ -190,5 +206,11 @@ export default {
 
 .load-more-button {
   width: 100%;
+}
+</style>
+
+<style>
+.users-table table thead tr th {
+    border-top: 0!important;
 }
 </style>
