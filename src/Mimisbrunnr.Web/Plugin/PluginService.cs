@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 using Mimisbrunnr.Integration.Plugin;
+using Mimisbrunnr.Integration.User;
 using Mimisbrunnr.Integration.Wiki;
 using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Infrastructure;
@@ -120,7 +121,9 @@ public class PluginService : IPluginService
             if (!userRequest.Params.ContainsKey(key))
                 userRequest.Params.Add(key, value);
 
-        var user = await _userManager.GetByEmail(userInfo.Email);
+        var user = userInfo is not null
+            ? await _userManager.GetByEmail(userInfo.Email)
+            : null;
 
         userRequest.Params.Add("MacroIdOnPage", macroIdOnPage);
         userRequest.Params.Add("PageId", page.Id);
@@ -129,7 +132,7 @@ public class PluginService : IPluginService
         userRequest.Params.Add("SpaceName", space.Name);
         userRequest.Params.Add("UserEmail", userInfo?.Email ?? string.Empty);
         userRequest.Params.Add("UserName", userInfo?.Name ?? string.Empty);
-        userRequest.Params.Add("UserRole", user.Role.ToString());
+        userRequest.Params.Add("UserRole", user?.Role.ToString() ?? string.Empty);
 
         if (!string.IsNullOrEmpty(macro.RenderUrl))
             return await RenderRemoteMacro(plugin, macro, page, space, user, userRequest.Params);
@@ -166,14 +169,14 @@ public class PluginService : IPluginService
         User user,
         IDictionary<string, string> parameters)
     {
-        var userToken = macro.SendUserToken
+        var userToken = macro.SendUserToken && user is not null
             ? await _tokenService.GenerateAccessToken(user, TimeSpan.FromMinutes(15), true) 
             : string.Empty;
         var renderRequest = new MacroRenderRequest()
         {
             PluginIdentifier = plugin.PluginIdentifier,
             MacroIdentifier = macro.MacroIdentifier,
-            RequestedBy = user.ToModel(),
+            RequestedBy = user?.ToModel(),
             PageId = page.Id,
             SpaceKey = space.Key,
             UserToken = userToken,
