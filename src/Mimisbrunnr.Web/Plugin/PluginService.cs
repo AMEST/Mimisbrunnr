@@ -76,6 +76,8 @@ public class PluginService : IPluginService
 
     public async Task<MacroStateModel> GetMacroState(string pageId, string macroIdOnPage, UserInfo userInfo)
     {
+        await _permissionService.EnsureAnonymousAllowed(userInfo);
+
         var page = await _pageManager.GetById(pageId) ?? throw new PageNotFoundException();
         var space = await _spaceManager.GetById(page.SpaceId) ?? throw new SpaceNotFoundException();
         await _permissionService.EnsureViewPermission(space.Key, userInfo);
@@ -98,6 +100,8 @@ public class PluginService : IPluginService
 
     public async Task<MacroRenderResponse> Render(string pageId, string macroIdOnPage, MacroRenderUserRequest userRequest, UserInfo userInfo)
     {
+        await _permissionService.EnsureAnonymousAllowed(userInfo);
+        
         var page = await _pageManager.GetById(pageId) ?? throw new PageNotFoundException();
         var space = await _spaceManager.GetById(page.SpaceId) ?? throw new SpaceNotFoundException();
         await _permissionService.EnsureViewPermission(space.Key, userInfo);

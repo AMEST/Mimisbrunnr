@@ -33,6 +33,7 @@ public class PluginController : ControllerBase
     }
 
     [HttpGet("macros/{pageId}/{macroIdOnPage}/state")]
+    [AllowAnonymous]
     public Task<MacroStateModel> GetMacroState([FromRoute] string pageId, [FromRoute] string macroIdOnPage)
     {
         var userInfo = User?.ToInfo();
@@ -40,6 +41,7 @@ public class PluginController : ControllerBase
     }
 
     [HttpPost("macros/{pageId}/{macroIdOnPage}/render")]
+    [AllowAnonymous]
     public Task<MacroRenderResponse> Render([FromRoute] string pageId, [FromRoute] string macroIdOnPage, [FromBody] MacroRenderUserRequest userRequest)
     {
         var userInfo = User?.ToInfo();
