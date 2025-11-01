@@ -11,6 +11,9 @@ public class ApplicationConfigurationMap : EntityMapClass<ApplicationConfigurati
         ToCollection("Configuration");
         MapId(x => x.Id, BsonType.String);
         MapProperty(x => x.AllowAnonymous).SetIgnoreIfDefault(false);
+        MapProperty(x => x.UserAutoCreation)
+            .SetIgnoreIfDefault(false)
+            .SetDefaultValue(true);
         MapProperty(x => x.SwaggerEnabled).SetIgnoreIfDefault(false);
         MapProperty(x => x.AllowHtml)
             .SetIgnoreIfDefault(false)

@@ -115,6 +115,11 @@
                         "description": "Allow unauthorized (anonymous) users to read public wiki information",
                         "content": "Allow anonymous access"
                     },
+                    "autoUserCreation": {
+                        "label": "User creation",
+                        "description": "Automatic user creation after first sing in. If disabled, need create user manual",
+                        "content": "Enable automatic user creation"
+                    },
                     "markdown": {
                         "label": "Markdown settings",
                         "description": "Allow using html inside markdown on pages",
@@ -600,6 +605,11 @@
                         "label": "Режим доступности",
                         "description": "Разрешить неавторизованный (анонимный) доступ к чтению публичной информации из вики",
                         "content": "Разрешить анонимный доступ"
+                    },
+                    "autoUserCreation": {
+                        "label": "Создание пользователей",
+                        "description": "Автоматическое создание пользователей во время первого входа. Если выключено, то необходимо вручную создать пользователя",
+                        "content": "Включить автоматическое создание пользователей"
                     },
                     "markdown": {
                         "label": "Настройки Markdown",

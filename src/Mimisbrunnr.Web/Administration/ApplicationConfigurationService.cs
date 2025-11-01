@@ -35,6 +35,7 @@ namespace Mimisbrunnr.Web.Administration
             var configuration = await _configurationManager.Get();
             configuration.Title = model.Title;
             configuration.AllowAnonymous = model.AllowAnonymous;
+            configuration.UserAutoCreation = model.UserAutoCreation;
             configuration.AllowHtml = model.AllowHtml;
             configuration.SwaggerEnabled = model.SwaggerEnabled;
             configuration.CustomCss = model.CustomCss;

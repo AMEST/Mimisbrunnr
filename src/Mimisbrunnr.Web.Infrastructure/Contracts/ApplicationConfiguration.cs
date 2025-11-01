@@ -10,6 +10,8 @@ public class ApplicationConfiguration : IHasId<string>
 
     public bool AllowAnonymous { get; set; }
 
+    public bool UserAutoCreation { get; set; }
+
     public bool SwaggerEnabled { get; set; }
 
     public bool AllowHtml { get; set; }

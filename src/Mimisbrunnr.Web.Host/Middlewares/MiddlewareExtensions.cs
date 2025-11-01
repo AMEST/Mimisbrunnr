@@ -35,7 +35,7 @@ internal static class MiddlewareExtensions
                         context.Response.StatusCode = 403;
                         context.Response.ContentType = "text/html";
                         await context.Response.WriteAsync(@"
-                            <h2>Account has been disabled. Contact with administrators.</h2>
+                            <h2>Account has been disabled or not created. Contact with administrators.</h2>
                             <hr>
                             Mimisbrunnr wiki system.
                         ");
