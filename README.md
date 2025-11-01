@@ -217,7 +217,7 @@ services:
         max-file: "3"
 
   mongo-local:
-    image: mongo:5.0.9-focal
+    image: mongo:6.0-jammy
     environment:
       - "MONGO_INITDB_ROOT_PASSWORD=password"
       - "MONGO_INITDB_ROOT_USERNAME=app"
@@ -236,7 +236,7 @@ services:
         max-file: "3"
 
   redis-local:
-    image: redis:6.2.4-alpine
+    image: redis:6.2.20-alpine
     command: 
       - "redis-server"
       - '--maxmemory 120mb'
