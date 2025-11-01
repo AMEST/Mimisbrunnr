@@ -76,6 +76,7 @@ Support for the following features:
 - Administration
   - Change wiki instance title
   - Enabling anonymous access (permission to read public spaces and access to wiki without authentication)
+  - Enable / Disable automatic user creation upon authorization. If disabled, manual account creation (via the admin panel or API) is required for user authorization
   - Enable / Disable html in markdown
   - Enable / Disable swagger api documentation
   - Custom home page (use any public space home page as home page wiki instance)
