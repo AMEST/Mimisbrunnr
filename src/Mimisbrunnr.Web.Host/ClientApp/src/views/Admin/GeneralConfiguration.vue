@@ -20,6 +20,14 @@
           </b-form-checkbox>
         </b-form-group>
         <b-form-group
+          :label="$t('admin.general.fields.autoUserCreation.label')"
+          :description="$t('admin.general.fields.autoUserCreation.description')"
+        >
+          <b-form-checkbox v-model="info.userAutoCreation" switch>
+            &nbsp;{{ $t("admin.general.fields.autoUserCreation.content") }}
+          </b-form-checkbox>
+        </b-form-group>
+        <b-form-group
           :label="$t('admin.general.fields.markdown.label')"
           :description="$t('admin.general.fields.markdown.description')"
         >
@@ -90,6 +98,7 @@ export default {
       title: "",
       allowAnonymous: false,
       allowHtml: true,
+      userAutoCreation: true,
       swaggerEnabled: true,
       customCss: "",
       customHomepageEnabled: false,

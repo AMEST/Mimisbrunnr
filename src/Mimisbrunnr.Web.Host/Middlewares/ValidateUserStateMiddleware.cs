@@ -25,21 +25,28 @@ internal class ValidateUserStateMiddleware
         }
 
         var user = await userManager.GetByEmail(userInfo?.Email);
-        if (user is null || user.Enable)
+        if (user is not null && user.Enable)
         {
-            if (user is not null)
-                await SyncUser(userManager, user, userInfo);
+            await SyncUser(userManager, user, userInfo);
+            await _next(context);
+            return;
+        }
+
+        var appConfig = await applicationConfigurationService.Get();        
+        if ( user is null && appConfig.UserAutoCreation)
+        {
             await _next(context);
             return;
         }
 
         await context.SignOutAsync();
 
-        var appConfig = await applicationConfigurationService.Get();
         if (appConfig.AllowAnonymous)
+        {
             await _next(context);
-        else
-            context.Response.Redirect("/error/account-disabled");
+            return;
+        }
+        context.Response.Redirect("/error/account-disabled");
     }
 
     private static async Task SyncUser(IUserManager userManager, Users.User user, UserInfo userInfo)
