@@ -31,11 +31,11 @@ internal class EnsureUserAuthorizationHandler : IAuthorizationHandler
             return;
 
         var appConfiguration = await _applicationConfigurationManager.Get();
-        if (!appConfiguration.UserAutoCreation) 
+        if (!appConfiguration.UserAutoCreation)
         {
             _logger.LogWarning("New user authorized but automatic user creation disabled. Need create user manual (via api) or ignore. \nEmail: {Email}\nName: {Name}\nAvatar: {Avatar}",
                 userInfo?.Email, userInfo?.Name, userInfo?.AvatarUrl);
-                return;
+            return;
         }
         _logger.LogDebug("Add new user `{Email}`", userInfo.Email);
         await _userManager.Add(userInfo.Email, userInfo.Name, userInfo.AvatarUrl, UserRole.Employee);
