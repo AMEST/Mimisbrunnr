@@ -150,7 +150,7 @@ export default {
       if (pageId == null) return;
       var flatPageList = this.findPageTree(this.pageTree.childs, pageId);
       for (var i = 0; i < flatPageList.length; i++) {
-        if (flatPageList[i] == pageId) continue;
+        //if (flatPageList[i] == pageId) continue;
         var pageTreeItem = document.getElementById(flatPageList[i]);
         if (pageTreeItem == null) continue;
         var expandIcon = pageTreeItem.getElementsByClassName("vtl-icon");
