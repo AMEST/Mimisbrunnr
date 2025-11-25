@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Mimisbrunnr.Integration.User;
 
@@ -6,7 +7,7 @@ namespace Mimisbrunnr.Integration.User;
 /// Represents the data required to create a new user in the Mimisbrunnr system.
 /// This model is used during user registration and account creation processes.
 /// </summary>
-public class UserCreateModel
+public class UserCreateModel : IValidatableObject
 {
     [Required]
     /// <summary>
@@ -26,4 +27,13 @@ public class UserCreateModel
     /// If not provided, a default avatar will be generated.
     /// </summary>
     public string AvatarUrl { get; set; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        var emailSpan = Email.AsSpan();
+        if (emailSpan.Count('@') != 1 || emailSpan.Count(' ') > 0 || emailSpan.StartsWith("@") || emailSpan.EndsWith("@"))
+            return [new ValidationResult("Invalid email format")];
+
+        return [ValidationResult.Success];        
+    }
 }

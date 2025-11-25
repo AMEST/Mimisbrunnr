@@ -2,12 +2,19 @@
   <b-container>
     <Menu activeMenuItem="Users" />
     <b-card :title="$t('admin.users.title')" class="admin-user-card">
+      <b-button
+        size="sm"
+        class="user-add-button"
+        variant="success"
+        @click="$bvModal.show('user-modal')"
+        >+</b-button
+      >
       <b-form-input class="search-field" v-model="searchText" size="sm" :placeholder="$t('people.search.placeholder')"></b-form-input>
       <b-table
         :items="users"
         :fields="fields"
         striped
-        responsive="sm"
+        responsive="md"
         class="text-left users-table"
       >
         <template #cell(name)="row">
@@ -65,6 +72,7 @@
         {{ $t("admin.users.loadMore") }}
       </b-button>
     </b-card>
+    <user-modal :createAction="loadUsers" />
   </b-container>
 </template>
 
@@ -75,11 +83,13 @@ import ProfileService from "@/services/profileService";
 import UserService from "@/services/userService";
 import SearchService from "@/services/searchService";
 import { debounce } from "@/services/Utils";
+import UserModal from "@/components/admin/modals/UserModal.vue";
 export default {
   name: "UsersAdministration",
   components: {
     Menu,
     BIconArrowClockwise,
+    UserModal,
   },
   data() {
     return {
@@ -206,6 +216,10 @@ export default {
 
 .load-more-button {
   width: 100%;
+}
+.user-add-button {
+  float: right;
+  margin-top: -3em;
 }
 </style>
 

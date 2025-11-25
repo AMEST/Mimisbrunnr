@@ -16,7 +16,7 @@ var UserService = {
     },
     getUsers: async function (offset) {
         var request = await axios.get(
-            `/api/user?offset=${offset == null? "" : offset}`,
+            `/api/user?offset=${offset == null ? "" : offset}`,
             { validateStatus: false }
         );
         if (request.status == 200)
@@ -30,42 +30,57 @@ var UserService = {
         var request = await axios.post(`/api/user/${email}/promote`, {
             validateStatus: false,
         });
-        if(request.status == 200)
+        if (request.status == 200)
             return true;
         showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
-          "Error when promote user.", "warning");
+            "Error when promote user.", "warning");
         return false;
     },
     demote: async function (email) {
         var request = await axios.post(`/api/user/${email}/demote`, {
             validateStatus: false,
         });
-        if(request.status == 200)
+        if (request.status == 200)
             return true;
         showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
-          "Error when demote user.", "warning");
+            "Error when demote user.", "warning");
         return false;
     },
     enable: async function (email) {
         var request = await axios.post(`/api/user/${email}/enable`, {
             validateStatus: false,
         });
-        if(request.status == 200)
+        if (request.status == 200)
             return true;
         showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
-          "Error when enable user.", "warning");
+            "Error when enable user.", "warning");
         return false;
     },
     disable: async function (email) {
         var request = await axios.post(`/api/user/${email}/disable`, {
             validateStatus: false,
         });
-        if(request.status == 200)
+        if (request.status == 200)
             return true;
         showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
-          "Error when disable user.", "warning");
+            "Error when disable user.", "warning");
         return false;
     },
+    create: async function (email, name, avatarUrl = null) {
+        var request = await axios.post(`/api/user`, {
+                "email": email,
+                "name": name,
+                "avatarUrl": avatarUrl
+            },
+            {
+                validateStatus: false,
+            });
+        if (request.status == 200)
+            return true;
+        showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
+            "Error when creating user.", "warning");
+        return false;
+    }
 }
 export default UserService
 /* eslint-enable */
