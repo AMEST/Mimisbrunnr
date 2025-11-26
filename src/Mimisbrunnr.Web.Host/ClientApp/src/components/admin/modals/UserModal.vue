@@ -11,7 +11,7 @@
                 </b-form-invalid-feedback>
             </b-form-group>
             <b-form-group :label="$t('admin.users.modal.avatarUrl')">
-                <b-form-input v-model="avatarUrl"></b-form-input>
+                <b-form-input v-model="avatarUrl" :state="isAvatarUrlValid"></b-form-input>
             </b-form-group>
         </b-form>
         <template #modal-footer="{ cancel }">
@@ -45,6 +45,9 @@ export default {
                 atIndex < this.email.trim().length - 1 &&
                 this.email.trim().split('@').length === 2
                 && this.email.trim().indexOf(" ") === -1;
+        },
+        isAvatarUrlValid() {
+            return !this.avatarUrl || this.avatarUrl.startsWith("http://") || this.avatarUrl.startsWith("https://");
         }
     },
     methods: {

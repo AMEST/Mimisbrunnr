@@ -32,8 +32,13 @@ public class UserCreateModel : IValidatableObject
     {
         var emailSpan = Email.AsSpan();
         if (emailSpan.Count('@') != 1 || emailSpan.Count(' ') > 0 || emailSpan.StartsWith("@") || emailSpan.EndsWith("@"))
-            return [new ValidationResult("Invalid email format")];
+            yield return new ValidationResult("Invalid email format");
 
-        return [ValidationResult.Success];        
+        var avatarUrlSpan = AvatarUrl.AsSpan();
+        if (!string.IsNullOrEmpty(AvatarUrl) && !avatarUrlSpan.StartsWith("http://") && !avatarUrlSpan.StartsWith("https://"))
+            yield return new ValidationResult("AvatarUrl must be empty or starts with http or https");
+        
+
+       yield return ValidationResult.Success;        
     }
 }
