@@ -191,6 +191,13 @@
                     "promote": "Promote",
                     "demote": "Demote"
                 },
+                "modal": {
+                    "title": "Create user",
+                    "name": "Name",
+                    "email": "Email",
+                    "avatarUrl": "Link to avatar",
+                    "invalidEmail": "Invalid Email format"
+                },
                 "approveModal":{
                     "title": "Confirm the action",
                     "promote": "Are you sure you want to give administrator rights to the user?",
@@ -677,10 +684,17 @@
                     },
                     "expand": "Развернуть",
                     "remove": "Удалить",
-                    "disable": "Выключить",
+                    "disable": "Отключить",
                     "enable": "Включить",
-                    "promote": "Повысить",
-                    "demote": "Понизить"
+                    "promote": "Сделать админом",
+                    "demote": "Убрать из админов"
+                },
+                "modal": {
+                    "title": "Создание пользователя",
+                    "name": "Имя",
+                    "email": "Электронная почта",
+                    "avatarUrl": "Ссылка на аватарку",
+                    "invalidEmail": "Неверный формат почты"
                 },
                 "approveModal":{
                     "title": "Подтвердите действие",
