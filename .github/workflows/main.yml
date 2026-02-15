@@ -108,18 +108,35 @@ jobs:
   publish-webapp-docker:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: Build And Push Mimisbrunnr
-      uses: docker/build-push-action@v1.1.0
-      with:
-        repository: eluki/mimisbrunnr-wiki
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-        target: app
-        tag_with_ref: true
-        push: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
+    -   uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+    -   name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          # list of Docker images to use as base name for tags
+          images: eluki/mimisbrunnr-wiki
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=semver,pattern={{version}}
+            type=raw,value=latest,enable={{is_default_branch}}
+    -   name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_PASSWORD }}
+    -   name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+    -   name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+    -   name: Build and push Mimisbrunnr
+        uses: docker/build-push-action@v6
+        with:
+          target: app
+          push: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
   publish-client-library-nuget:
     if: contains(github.ref, 'tags/v') || github.ref == 'refs/heads/main'
