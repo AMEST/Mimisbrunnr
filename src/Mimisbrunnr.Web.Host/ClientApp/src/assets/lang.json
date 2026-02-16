@@ -285,7 +285,8 @@
                     }
                 },
                 "profile": {
-                    "title": "Profile"
+                    "title": "Profile",
+                    "description": "Profile additional information"
                 },
                 "other": {
                     "title": "Other"
@@ -784,7 +785,8 @@
                     }
                 },
                 "profile": {
-                    "title": "Профиль"
+                    "title": "Профиль",
+                    "description": "Дополнительная информация о профиле"
                 },
                 "other": {
                     "title": "Прочее"

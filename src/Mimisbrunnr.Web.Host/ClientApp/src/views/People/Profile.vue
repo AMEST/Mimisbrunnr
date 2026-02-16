@@ -26,7 +26,7 @@
       </b-col>
       <worked-on />
     </b-row>
-    <settings-modal />
+    <settings-modal :profile="profile" />
   </b-container>
 </template>
 

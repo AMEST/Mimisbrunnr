@@ -1,49 +1,51 @@
 <template>
-  <b-card class="profile-info">
-    <span class="text-muted"> {{ $t("profile.additional.title") }} </span>
-    <b-card-text>
-      <b-input-group-prepend is-text v-on:click="goToWebSite">
-        <b-icon-globe-2 /> &nbsp;
+  <b-tab :title="$t('profile.settings.profile.title')" no-body>
+    <b-card
+      :title="$t('profile.settings.profile.title')"
+      :sub-title="$t('profile.settings.profile.description')"
+    >
+      <b-input-group-prepend class="info-input-block">
+        <b-icon-globe-2 />
         <b-form-input
-          disabled
           v-model="profile.website"
+          v-on:change="save"
           :placeholder="$t('profile.additional.website')"
         ></b-form-input>
       </b-input-group-prepend>
-      <b-input-group-prepend is-text>
-        <b-icon-bag-fill /> &nbsp;
+      <b-input-group-prepend class="info-input-block">
+        <b-icon-bag-fill />
         <b-form-input
-          disabled
           v-model="profile.post"
+          v-on:change="save"
           :placeholder="$t('profile.additional.post')"
         ></b-form-input>
       </b-input-group-prepend>
-      <b-input-group-prepend is-text>
-        <b-icon-diagram-2 /> &nbsp;
+      <b-input-group-prepend class="info-input-block">
+        <b-icon-diagram-2 />
         <b-form-input
-          disabled
           v-model="profile.department"
+          v-on:change="save"
           :placeholder="$t('profile.additional.department')"
         ></b-form-input>
       </b-input-group-prepend>
-      <b-input-group-prepend is-text>
-        <b-icon-building /> &nbsp;
+      <b-input-group-prepend class="info-input-block">
+        <b-icon-building />
         <b-form-input
-          disabled
           v-model="profile.organization"
+          v-on:change="save"
           :placeholder="$t('profile.additional.organization')"
         ></b-form-input>
       </b-input-group-prepend>
-      <b-input-group-prepend is-text>
-        <b-icon-geo-alt /> &nbsp;
+      <b-input-group-prepend class="info-input-block">
+        <b-icon-geo-alt />
         <b-form-input
-          disabled
           v-model="profile.location"
+          v-on:change="save"
           :placeholder="$t('profile.additional.location')"
         ></b-form-input>
       </b-input-group-prepend>
-    </b-card-text>
-  </b-card>
+    </b-card>
+  </b-tab>
 </template>
 
 <script>
@@ -54,10 +56,12 @@ import {
   BIconBuilding,
   BIconGeoAlt,
 } from "bootstrap-vue";
+import { debounce } from "@/services/Utils.js";
+import ProfileService from "@/services/profileService";
+
 export default {
-  name: "AdditionalInfo",
+  name: "AdditionalInfoTab",
   props: {
-    itsMe: Boolean,
     profile: Object,
   },
   components: {
@@ -68,18 +72,21 @@ export default {
     BIconGeoAlt,
   },
   methods: {
-    goToWebSite() {
-      if (
-        this.profile == null ||
-        this.profile.website == null ||
-        (!this.profile.website.startsWith("http://") &&
-          !this.profile.website.startsWith("https://"))
-      ) {
-        return;
-      }
-
-      window.open(this.profile.website, "_blank");
-    }
+    save: debounce(async function () {
+      await ProfileService.updateProfileInfo(this.profile);
+    }, 1000),
   },
 };
 </script>
+
+<style>
+.info-input-block {
+    padding-bottom: 1em;
+}
+
+.info-input-block svg {
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 0.5em;
+}
+</style>
