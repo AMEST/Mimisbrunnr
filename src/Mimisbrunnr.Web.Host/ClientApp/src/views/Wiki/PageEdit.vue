@@ -85,6 +85,7 @@ const VueMarkdown = () =>
 import axios from "axios";
 import { debounce, isImageFile } from "@/services/Utils.js";
 import { formatMarkdownTables, insertMarkdownTableColumn, insertMarkdownTableRow } from "@/services/markdown/tableUtils";
+import { detectAndConvertToMarkdown } from "@/services/markdown/htmlToMarkdown";
 import DraftModal from "@/components/pageEditor/DraftModal.vue";
 import GuideModal from "@/components/pageEditor/GuideModal.vue";
 import PagePreviewModal from "@/components/pageEditor/PagePreviewModal.vue";
@@ -428,33 +429,38 @@ export default {
     paste: async function (codeMirror, pasteEvent) {
         var data = (pasteEvent.clipboardData || window.clipboardData).items;
         var pasted = "";
+        var htmlData = null;
 
         for (var i = 0; i < data.length; i++) {
             if (data[i].type.indexOf("image") !== -1) {
-            var file = data[i].getAsFile();
+                var file = data[i].getAsFile();
 
-            var newFileName = `${new Date().getTime()}_${file.name}`;
-            var formData = new FormData();
-            formData.append("attachment", file, newFileName);
-            await axios({
-                method: "post",
-                url: "/api/attachment/" + this.page.id,
-                data: formData,
-                validateStatus: false,
-            });
-            this.addAttachmentLink({ name: newFileName });
-
-            } else if (data[i].type.indexOf("text/plain") !== -1) {
-                try{
-                    pasted += data[i].getAsString();
-                }catch (e) {
-                    //nothing
-                }
+                var newFileName = `${new Date().getTime()}_${file.name}`;
+                var formData = new FormData();
+                formData.append("attachment", file, newFileName);
+                pasteEvent.preventDefault();
+                await axios({
+                    method: "post",
+                    url: "/api/attachment/" + this.page.id,
+                    data: formData,
+                    validateStatus: false,
+                });
+                this.addAttachmentLink({ name: newFileName });
             }
         }
+        htmlData = (pasteEvent.clipboardData || window.clipboardData).getData("text/html");
+        pasted = (pasteEvent.clipboardData || window.clipboardData).getData("text/plain");
+
+        if (htmlData){
+            var markdownResult = detectAndConvertToMarkdown(pasted, htmlData);
+            if (markdownResult !== null)
+                pasted = markdownResult;
+        }
+        
         if (pasted.length === 0) 
             return;
 
+        pasteEvent.preventDefault();
         var cursor = codeMirror.getCursor();
         codeMirror.setSelection(cursor, cursor);
         codeMirror.replaceSelection(pasted);
