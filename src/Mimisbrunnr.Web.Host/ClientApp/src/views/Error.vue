@@ -19,6 +19,8 @@ export default {
                     return "404 Resource not found";
                 case "unauthorized":
                     return "User not authorized or user hasn't permissions";
+                case "forbidden":
+                    return "User hasn't permissions to view page";
                 default:
                     return "Unknown error";
             }

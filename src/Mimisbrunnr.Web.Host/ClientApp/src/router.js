@@ -55,6 +55,11 @@ export default new Router({
             component: () => import(/* webpackChunkName: "editor" */ './views/Wiki/PageEdit.vue')
         },
         {
+            path: '/space/:key/:pageId/embedded',
+            name: 'embeddedPage',
+            component: () => import(/* webpackChunkName: "space" */ './views/Wiki/EmbeddedPage.vue')
+        },
+        {
             path: '/profile/:email',
             name: 'profile',
             component: () => import(/* webpackChunkName: "profile" */ './views/People/Profile.vue')

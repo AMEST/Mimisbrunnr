@@ -100,8 +100,10 @@ export default {
         if (!(await this.loadSpace())) return;
         if (!(await this.loadPage())) return;
       } catch (error) {
-        if (error == 401 || error == 403)
+        if (error == 401)
           this.$router.push("/error/unauthorized");
+        else if (error == 403)
+          this.$router.push("/error/forbidden");
         else this.$router.push("/error/unknown");
         return;
       }

@@ -43,6 +43,10 @@ public class HandleWikiErrorsAttribute : ExceptionFilterAttribute
                     { StatusCode = 400 };
                 context.ExceptionHandled = true;
                 break;
+            case FileNotFoundException fileNotFoundException:
+                context.Result = new ObjectResult(new { message = fileNotFoundException.Message }) { StatusCode = 404 };
+                context.ExceptionHandled = true;
+                break;
         }
 
         return base.OnExceptionAsync(context);

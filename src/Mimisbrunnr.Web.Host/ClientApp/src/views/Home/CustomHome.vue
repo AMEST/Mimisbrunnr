@@ -16,30 +16,19 @@
       </b-button>
     </div>
     <div class="pt-5 pl-5 pr-5">
-      <vue-markdown
-        :html="this.$store.state.application.info.allowHtml"
-        :source="this.page.content"
-        id="custom-home-page-content"
-      ></vue-markdown>
+      <PageRenderer :page="page" content-id="custom-home-page-content" />
     </div>
   </b-container>
 </template>
 
 <script>
-// eslint-disable-next-line
-import hljs from "highlight.js/lib/common";
-import "highlight.js/styles/github.css";
 import { BIconPencilFill } from "bootstrap-vue";
-import { replaceRelativeLinksToRoute } from "@/services/Utils";
-const VueMarkdown = () =>
-  import(
-    /* webpackChunkName: "vue-markdown-component" */ "@/thirdparty/VueMarkdown"
-  );
 import axios from "axios";
+import PageRenderer from "@/components/PageRenderer.vue";
 export default {
   name: "CustomHome",
   components: {
-    VueMarkdown,
+    PageRenderer,
     BIconPencilFill,
   },
   data() {
@@ -73,8 +62,6 @@ export default {
       return;
     }
     this.page = pageRequest.data;
-    setTimeout(() => hljs.highlightAll(), 100);
-    setTimeout(replaceRelativeLinksToRoute, 250, "custom-home-page-content");
   },
 };
 </script>
