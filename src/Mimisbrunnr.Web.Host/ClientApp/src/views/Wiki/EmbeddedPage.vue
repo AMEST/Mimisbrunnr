@@ -1,64 +1,26 @@
 <template>
   <b-container fluid class="full-size-container text-left embedded-page embedded-mode">
-    <div class="pt-3 pl-5 pr-5">
-      <vue-markdown
-        :toc="true"
-        :html="this.$store.state.application.info.allowHtml"
-        :source="page.content"
-        :postrender="postProcess"
-        id="embedded-page-content"
-      ></vue-markdown>
+    <div class="pt-3">
+      <PageRenderer :page="page" content-id="embedded-page-content" />
     </div>
   </b-container>
 </template>
 
 <script>
-import hljs from "highlight.js/lib/common";
-import "highlight.js/styles/github.css";
-import { replaceRelativeLinksToRoute } from "@/services/Utils";
-const VueMarkdown = () =>
-  import(
-    /* webpackChunkName: "vue-markdown-component" */ "@/thirdparty/VueMarkdown"
-  );
 import axios from "axios";
-import PluginService from "@/services/pluginService";
+import PageRenderer from "@/components/PageRenderer.vue";
 export default {
   name: "EmbeddedPage",
   components: {
-    VueMarkdown,
+    PageRenderer,
   },
   data() {
     return {
       page: { content: "" },
-      anchorScrolled: false,
     };
   },
   methods: {
-    scrollToAnchor() {
-      if (this.anchorScrolled) return;
-      if (!window.location.hash) return;
-      var hash = decodeURI(window.location.hash);
-      if (hash.length == 1) return;
-      const anchorName = hash.substring(1, hash.length);
-      var anchor = document.getElementById(anchorName);
-      if (!anchor) anchor = document.getElementsByName(anchorName)[0];
-      if (!anchor) return;
-      anchor.scrollIntoView();
-      this.anchorScrolled = true;
-    },
-    postProcess(html) {
-      setTimeout(() => hljs.highlightAll(), 100);
-      setTimeout(this.scrollToAnchor, 100);
-      setTimeout(replaceRelativeLinksToRoute, 100, "embedded-page-content");
-      setTimeout(async () => {
-        await PluginService.renderMacroOnPage(this.page.id);
-        this.scrollToAnchor();
-        replaceRelativeLinksToRoute("embedded-page-content");
-      }, 200);
-      return html;
-    },
     async loadPage() {
-      this.anchorScrolled = false;
       var pageRequest = await axios.get(
         `/api/page/${this.$route.params.pageId}`,
         {
@@ -75,6 +37,14 @@ export default {
       }
       this.page = pageRequest.data;
       document.title = this.page.name;
+      setTimeout(() => {
+        try{
+            if(window.parent)
+                window.parent.postMessage({type: "page-loaded"}, '*');
+        }catch{
+            //nothing
+        }
+      }, 200);
     },
   },
   mounted: function () {
@@ -92,3 +62,8 @@ export default {
   },
 };
 </script>
+<style>
+.embedded-page {
+    background-color: white;
+}
+</style>

@@ -16,65 +16,25 @@
       </b-button>
     </div>
     <div class="pt-5 pl-5 pr-5">
-      <vue-markdown
-        :toc="true"
-        :html="this.$store.state.application.info.allowHtml"
-        :source="this.page.content"
-        :postrender="postProcess"
-        id="custom-home-page-content"
-      ></vue-markdown>
+      <PageRenderer :page="page" content-id="custom-home-page-content" />
     </div>
   </b-container>
 </template>
 
 <script>
-// eslint-disable-next-line
-import hljs from "highlight.js/lib/common";
-import "highlight.js/styles/github.css";
 import { BIconPencilFill } from "bootstrap-vue";
-import { replaceRelativeLinksToRoute } from "@/services/Utils";
-const VueMarkdown = () =>
-  import(
-    /* webpackChunkName: "vue-markdown-component" */ "@/thirdparty/VueMarkdown"
-  );
 import axios from "axios";
-import PluginService from "@/services/pluginService";
+import PageRenderer from "@/components/PageRenderer.vue";
 export default {
   name: "CustomHome",
   components: {
-    VueMarkdown,
+    PageRenderer,
     BIconPencilFill,
   },
   data() {
     return {
       page: { content: "" },
-      anchorScrolled: false,
     };
-  },
-  methods: {
-    scrollToAnchor() {
-      if (this.anchorScrolled) return;
-      if (!window.location.hash) return;
-      var hash = decodeURI(window.location.hash);
-      if (hash.length == 1) return;
-      const anchorName = hash.substring(1, hash.length);
-      var anchor = document.getElementById(anchorName);
-      if (!anchor) anchor = document.getElementsByName(anchorName)[0];
-      if (!anchor) return;
-      anchor.scrollIntoView();
-      this.anchorScrolled = true;
-    },
-    postProcess(html) {
-      setTimeout(() => hljs.highlightAll(), 100);
-      setTimeout(this.scrollToAnchor, 100);
-      setTimeout(replaceRelativeLinksToRoute, 100, "custom-home-page-content");
-      setTimeout(async () => {
-        await PluginService.renderMacroOnPage(this.page.id);
-        this.scrollToAnchor();
-        replaceRelativeLinksToRoute("custom-home-page-content");
-      }, 200);
-      return html;
-    },
   },
   mounted: async function () {
     if (!this.$store.state.application.info.customHomepageEnabled) {
