@@ -1,4 +1,4 @@
-FROM alpine/git as version
+FROM alpine/git AS version
 WORKDIR /src
 COPY . /src
 RUN echo $(git describe --tags --always 2>/dev/null |  sed 's/-g[a-z0-9]\{7\}//') > /version ;\
