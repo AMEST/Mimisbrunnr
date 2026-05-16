@@ -461,8 +461,11 @@ export default {
             return;
 
         pasteEvent.preventDefault();
-        var cursor = codeMirror.getCursor();
-        codeMirror.setSelection(cursor, cursor);
+        // set selection on cursor only when empty selected text
+        if (codeMirror.getSelection() === ''){
+            var cursor = codeMirror.getCursor();
+            codeMirror.setSelection(cursor, cursor);
+        }
         codeMirror.replaceSelection(pasted);
     },
     dragAndDrop: async function (codeMirror, dropEvent) {
