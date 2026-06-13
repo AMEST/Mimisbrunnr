@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Mimisbrunnr.Integration.PageTemplates;
 using Mimisbrunnr.Web.Filters;
@@ -7,7 +8,7 @@ namespace Mimisbrunnr.Web.PageTemplates;
 
 [Route("api/[controller]")]
 [ApiController]
-[Microsoft.AspNetCore.Authorization.Authorize]
+[Authorize]
 [HandlePageTemplateErrors]
 public class PageTemplateController : ControllerBase
 {

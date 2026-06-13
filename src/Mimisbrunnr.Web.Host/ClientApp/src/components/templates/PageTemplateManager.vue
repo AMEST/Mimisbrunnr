@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <component :is="adminMode ? 'h3' : 'h5'" :style="adminMode ? 'margin-bottom: unset;' : ''">{{ $t("pageTemplates.title") }}</component>
+      <component v-if="type !== 'Space'" :is="adminMode ? 'h3' : 'h5'" :style="adminMode ? 'margin-bottom: unset;' : ''">{{ $t("pageTemplates.title") }}</component>
       <b-button v-if="!readonly" variant="primary" size="sm" @click="openCreate">
         {{ $t("pageTemplates.create") }}
       </b-button>

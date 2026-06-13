@@ -518,7 +518,8 @@
             "space": "Space",
             "createFromTemplate": "Create from Template",
             "noTemplates": "No templates available",
-            "createPageFromTemplate": "Create page from template"
+            "createPageFromTemplate": "Create page from template",
+            "markdownGuide": "Markdown guide"
         }
     },
     "ru": {
@@ -1041,7 +1042,8 @@
             "space": "Пространства",
             "createFromTemplate": "Создать из шаблона",
             "noTemplates": "Нет доступных шаблонов",
-            "createPageFromTemplate": "Создать страницу из шаблона"
+            "createPageFromTemplate": "Создать страницу из шаблона",
+            "markdownGuide": "Справка по Markdown"
         }
     }
 }

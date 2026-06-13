@@ -25,7 +25,13 @@ namespace Mimisbrunnr.Web.Infrastructure
             parameters.Add(nameof(HtmlEncode), HtmlEncode);
             parameters.Add(nameof(ToLower), ToLower);
             parameters.Add(nameof(ToUpper), ToUpper);
+            parameters.Add(nameof(Uuid), Uuid);
             return await _stubble.RenderAsync(template, parameters);
+        }
+
+        private static string Uuid(string _, Func<string, string> __)
+        {
+            return Guid.NewGuid().ToString("N");
         }
 
         private static string UrlEncode(string str, Func<string, string> render)

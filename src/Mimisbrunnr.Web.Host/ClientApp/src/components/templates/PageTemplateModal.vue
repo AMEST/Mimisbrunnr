@@ -15,21 +15,27 @@
         <b-form-input v-model="form.description" />
       </b-form-group>
       <b-form-group :label="$t('pageTemplates.content')">
-        <b-form-textarea v-model="form.content" rows="12" max-rows="24" required />
+        <div class="d-flex template-group">
+          <b-button variant="link" class="ml-2 guide-btn" @click="showGuide" :title="$t('pageTemplates.markdownGuide')">❔</b-button>
+          <b-form-textarea v-model="form.content" rows="12" max-rows="24" required class="flex-grow-1" />
+        </div>
       </b-form-group>
       <div class="d-flex justify-content-end">
         <b-button variant="secondary" class="mr-2" @click="close">{{ $t('pageEditor.close') }}</b-button>
         <b-button variant="primary" type="submit">{{ isEdit ? $t('space.settings.save') : $t('pageTemplates.create') }}</b-button>
       </div>
     </b-form>
+    <guide-modal modal-id="guide-modal-template" />
   </b-modal>
 </template>
 
 <script>
 import pageTemplateService from "@/services/pageTemplateService";
+import GuideModal from "@/components/pageEditor/GuideModal.vue";
 
 export default {
   name: "PageTemplateModal",
+  components: { GuideModal },
   props: {
     modalId: { type: String, default: "page-template-modal" },
     template: { type: Object, default: null },
@@ -80,6 +86,16 @@ export default {
     close() {
       this.$bvModal.hide(this.modalId);
     },
+    showGuide() {
+      this.$bvModal.show("guide-modal-template");
+    },
   },
 };
 </script>
+<style>
+.template-group {
+    flex-direction: column;
+    align-items: self-end;
+    margin-top: -2em;
+}
+</style>
