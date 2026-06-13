@@ -79,7 +79,7 @@ public interface IPageTemplateManager
 }
 ```
 
-**PageTemplateManager.cs** — имплементация, работающая через `IPageTemplateStore`.
+**PageTemplateManager.cs** — имплементация, работающая напрямую через `IRepository<PageTemplate>` (без промежуточного Store).
 
 ### 3.2. DTO (Integration) — `src/Integration/Mimisbrunnr.Integration/PageTemplates/`
 
@@ -88,6 +88,7 @@ PageTemplateModel.cs
 PageTemplateCreateModel.cs
 PageTemplateUpdateModel.cs
 PageTemplateRenderRequest.cs
+PageTemplateRenderResponse.cs
 ```
 
 ```csharp
@@ -131,6 +132,12 @@ public class PageTemplateRenderRequest
     [Required] public string TemplateId { get; set; }
     [Required] public string SpaceKey { get; set; }  // для вычисления параметров
 }
+
+// PageTemplateRenderResponse.cs
+public class PageTemplateRenderResponse
+{
+    public string Content { get; set; }
+}
 ```
 
 ### 3.3. API Controller — `src/Mimisbrunnr.Web/PageTemplates/`
@@ -142,6 +149,58 @@ PageTemplateService.cs
 HandlePageTemplateErrorsAttribute.cs
 PageTemplateMapper.cs (Mapperly)
 ```
+
+**Архитектурный принцип: контроллер — только точка входа**
+
+Вся бизнес-логика, включая рендеринг шаблонов, должна находиться в сервисе (`PageTemplateService`), а не в контроллере. Контроллер выполняет только:
+1. Проверку прав (через атрибуты или вызов сервиса)
+2. Валидацию контракта (атрибут `[ValidateModel]`)
+3. Получение текущего пользователя (если нужно)
+4. Вызов соответствующего метода `AppService`
+5. Возврат результата (или обработку ошибок через `HandlePageTemplateErrorsAttribute`)
+
+**Архитектурный принцип: контракты API — только типизированные DTO**
+
+Контроллеры должны возвращать строго типизированные DTO из сборки Integration (или локальных Contracts), а не anonymous types (`new { ... }`). Это обеспечивает корректную генерацию схемы в Swagger/OpenAPI. Сервис (`AppService`) должен возвращать готовый внешний контракт, который контроллер отдаёт наружу без дополнительной трансформации:
+
+```csharp
+// Сервис возвращает готовый DTO для API
+public async Task<PageTemplateRenderResponse> Render(string templateId, string spaceKey, UserInfo user)
+{
+    // ... логика ...
+    return new PageTemplateRenderResponse { Content = rendered };
+}
+
+// Контроллер просто оборачивает в Ok()
+public async Task<IActionResult> Render(string id, PageTemplateRenderRequest request)
+{
+    var user = await _userService.GetCurrentUser();
+    var result = await _pageTemplateService.Render(id, request.SpaceKey, user);
+    return Ok(result);  // PageTemplateRenderResponse, НЕ new { content = result.Content }
+}
+```
+
+Запрещено:
+```csharp
+// НЕЛЬЗЯ — anonymous type, Swagger не видит схему
+return Ok(new { content = rendered });
+```
+
+**Пример правильной структуры метода контроллера:**
+
+```csharp
+[HttpPost("{id}/render")]
+[ValidateModel]
+[HandlePageTemplateErrors]
+public async Task<IActionResult> Render(string id, PageTemplateRenderRequest request)
+{
+    var user = await _userService.GetCurrentUser();
+    var result = await _pageTemplateService.Render(id, request.SpaceKey, user);
+    return Ok(result);
+}
+```
+
+Логика формирования параметров рендеринга (даты, данные пользователя, данные пространства) и вызов `ITemplateRenderer` — целиком в `PageTemplateService.Render()`.
 
 **Маршрут:** `[Route("api/[controller]")]` → `/api/pagetemplate`
 
@@ -175,13 +234,13 @@ Update/Delete:
   Space  → admin пространства
 ```
 
-**Рендеринг шаблона (`POST /api/pagetemplate/{id}/render`):**
+**Рендеринг шаблона — логика в `PageTemplateService.Render()`:**
 
 ```csharp
-public async Task<IActionResult> Render(string id, PageTemplateRenderRequest request)
+public async Task<PageTemplateRenderResponse> Render(string templateId, string spaceKey, UserInfo user)
 {
-    var template = await _pageTemplateService.GetById(id, user);
-    var space = await _spaceManager.GetByKey(request.SpaceKey);
+    var template = await _pageTemplateManager.GetById(templateId);
+    var space = await _spaceManager.GetByKey(spaceKey);
 
     var parameters = new Dictionary<string, object>
     {
@@ -196,7 +255,21 @@ public async Task<IActionResult> Render(string id, PageTemplateRenderRequest req
     };
 
     var rendered = await _templateRenderer.Render(template.Content, parameters);
-    return Ok(new { content = rendered });
+    return new PageTemplateRenderResponse { Content = rendered };
+}
+```
+
+**Контроллер вызывает сервис и возвращает готовый DTO:**
+
+```csharp
+[HttpPost("{id}/render")]
+[ValidateModel]
+[HandlePageTemplateErrors]
+public async Task<IActionResult> Render(string id, PageTemplateRenderRequest request)
+{
+    var user = await _userService.GetCurrentUser();
+    var result = await _pageTemplateService.Render(id, request.SpaceKey, user);
+    return Ok(result);  // PageTemplateRenderResponse — схема видна в Swagger
 }
 ```
 
@@ -215,6 +288,20 @@ public async Task<IActionResult> Render(string id, PageTemplateRenderRequest req
 
 EntityMapClass используется по тому же принципу, что и существующие маппинги (см. `PageMap.cs`, `SpaceMap.cs` и др. в `Mimisbrunnr.Storage.MongoDb.Mappings`).
 
+`PageTemplateManager` работает напрямую через существующую абстракцию `IRepository<PageTemplate>`, которая уже умеет CRUD-операции:
+
+```csharp
+public interface IRepository<TEntity> where TEntity : class
+{
+    Task Create(TEntity obj, CancellationToken cancellationToken = default);
+    Task Update(TEntity obj, CancellationToken cancellationToken = default);
+    Task Delete(TEntity obj, CancellationToken cancellationToken = default);
+    IQueryable<TEntity> GetAll();
+}
+```
+
+Поэтому **не нужно** создавать отдельный `IPageTemplateStore` / `PageTemplateStore` — просто инжектим `IRepository<PageTemplate>` в `PageTemplateManager`.
+
 **Новая entity map** `src/Mimisbrunnr.Storage.MongoDb/Mappings/PageTemplateMap.cs`:
 ```csharp
 public class PageTemplateMap : EntityMapClass<PageTemplate>
@@ -226,20 +313,6 @@ public class PageTemplateMap : EntityMapClass<PageTemplate>
     }
 }
 ```
-
-**Новый store interface** `Mimisbrunnr.PageTemplates.Services.IPageTemplateStore`:
-```csharp
-public interface IPageTemplateStore
-{
-    Task<PageTemplate> GetById(string id);
-    IQueryable<PageTemplate> GetAll();
-    Task Create(PageTemplate template);
-    Task Update(PageTemplate template);
-    Task Delete(PageTemplate template);
-}
-```
-
-**Реализация** `Mimisbrunnr.Storage.MongoDb.PageTemplateStore` — через `BaseMongoDbContext` и `IRepository<PageTemplate>`.
 
 **Индексы** — добавить метод `CreatePageTemplateIndexes` в `MongoDbStoreModule` по аналогии с существующими `CreateUserIndexes`, `CreatePageIndexes` и т.д. Метод вызывается в `StartAsync`:
 
@@ -285,10 +358,7 @@ typeof(PageTemplatesModule)
 services.AddSingleton<IPageTemplateService, PageTemplateService>();
 ```
 
-**MongoDbStoreModule.cs** — добавить store:
-```csharp
-services.AddSingleton<IPageTemplateStore, PageTemplateStore>();
-```
+**MongoDbStoreModule.cs** — зарегистрировать `IRepository<PageTemplate>` (если ещё не зарегистрировано автоматически через `AddEntity`):
 
 ### 3.6. Обработка ошибок
 
@@ -484,6 +554,13 @@ PageTemplateManager.vue
   padding-left: 6px;
   padding-right: 6px;
 }
+
+/* Скрываем кнопку на мобильных — места нет, адаптивность сложная */
+@media (max-width: 576px) {
+  .create-from-template-button {
+    display: none !important;
+  }
+}
 ```
 
 **Модалка выбора шаблона** `components/base/CreateFromTemplateModal.vue`:
@@ -634,14 +711,21 @@ async createFromTemplate(template) {
 User clicks [▼] in Header
   → CreateFromTemplateModal opens
   → GET /api/pagetemplate (через pageTemplateService.getAll())
+  → PageTemplateController.GetAll() → PageTemplateService.GetAll()
   → список шаблонов (System + User + Space, если в пространстве)
   → User выбирает шаблон
   → POST /api/pagetemplate/{id}/render { spaceKey }
-     → PageTemplateService.Render()
-       → ITemplateRenderer.Render(template.Content, parameters)
-     ← { content: "..." }
+      → PageTemplateController.Render()
+        → [ValidateModel] → проверка контракта
+        → получение UserInfo
+        → PageTemplateService.Render()
+          → IPageTemplateManager.GetById()
+          → ISpaceManager.GetByKey()
+          → ITemplateRenderer.Render(template.Content, parameters)
+        ← PageTemplateRenderResponse { Content: "..." }
+      ← PageTemplateRenderResponse { Content: "..." }
   → POST /api/page { spaceKey, parentPageId, name, content }
-     → PageService.Create()
+      → PageService.Create()
   → redirect to /space/{key}/{pageId}/edit
 ```
 
@@ -657,22 +741,21 @@ User clicks [▼] in Header
 | 3 | `src/Mimisbrunnr.PageTemplates/Contracts/TemplateType.cs` | создать |
 | 4 | `src/Mimisbrunnr.PageTemplates/Services/IPageTemplateManager.cs` | создать |
 | 5 | `src/Mimisbrunnr.PageTemplates/Services/PageTemplateManager.cs` | создать |
-| 6 | `src/Mimisbrunnr.PageTemplates/Services/IPageTemplateStore.cs` | создать |
-| 7 | `src/Mimisbrunnr.PageTemplates/PageTemplatesModule.cs` | создать |
-| 8 | `src/Integration/Mimisbrunnr.Integration/PageTemplates/PageTemplateModel.cs` | создать |
-| 9 | `src/Integration/Mimisbrunnr.Integration/PageTemplates/PageTemplateCreateModel.cs` | создать |
-| 10 | `src/Integration/Mimisbrunnr.Integration/PageTemplates/PageTemplateUpdateModel.cs` | создать |
-| 11 | `src/Integration/Mimisbrunnr.Integration/PageTemplates/PageTemplateRenderRequest.cs` | создать |
+| 6 | `src/Mimisbrunnr.PageTemplates/PageTemplatesModule.cs` | создать |
+| 7 | `src/Integration/Mimisbrunnr.Integration/PageTemplates/PageTemplateModel.cs` | создать |
+| 8 | `src/Integration/Mimisbrunnr.Integration/PageTemplates/PageTemplateCreateModel.cs` | создать |
+| 9 | `src/Integration/Mimisbrunnr.Integration/PageTemplates/PageTemplateUpdateModel.cs` | создать |
+| 10 | `src/Integration/Mimisbrunnr.Integration/PageTemplates/PageTemplateRenderRequest.cs` | создать |
+| 11 | `src/Integration/Mimisbrunnr.Integration/PageTemplates/PageTemplateRenderResponse.cs` | создать |
 | 12 | `src/Mimisbrunnr.Web/PageTemplates/PageTemplateController.cs` | создать |
 | 13 | `src/Mimisbrunnr.Web/PageTemplates/IPageTemplateService.cs` | создать |
 | 14 | `src/Mimisbrunnr.Web/PageTemplates/PageTemplateService.cs` | создать |
 | 15 | `src/Mimisbrunnr.Web/Filters/HandlePageTemplateErrorsAttribute.cs` | создать |
 | 16 | `src/Mimisbrunnr.Web/Mapping/PageTemplateMapper.cs` | создать |
 | 17 | `src/Mimisbrunnr.Storage.MongoDb/Mappings/PageTemplateMap.cs` | создать |
-| 18 | `src/Mimisbrunnr.Storage.MongoDb/PageTemplateStore.cs` | создать |
-| 19 | `src/Mimisbrunnr.Storage.MongoDb/MongoDbStoreModule.cs` | изменить (добавить entity + store + indexes) |
-| 20 | `src/Mimisbrunnr.Web.Host/StartupModule.cs` | изменить (добавить PageTemplatesModule) |
-| 21 | `src/Mimisbrunnr.Web/WebModule.cs` | изменить (добавить ITemplateService) |
+| 18 | `src/Mimisbrunnr.Storage.MongoDb/MongoDbStoreModule.cs` | изменить (добавить entity + indexes) |
+| 19 | `src/Mimisbrunnr.Web.Host/StartupModule.cs` | изменить (добавить PageTemplatesModule) |
+| 20 | `src/Mimisbrunnr.Web/WebModule.cs` | изменить (добавить ITemplateService) |
 
 ### Frontend (Vue.js):
 | # | Файл | Действие |
@@ -712,13 +795,13 @@ User clicks [▼] in Header
 ```csharp
 public class PageTemplateManagerTests
 {
-    private readonly IPageTemplateStore _store;
+    private readonly IRepository<PageTemplate> _repository;
     private readonly PageTemplateManager _manager;
 
     public PageTemplateManagerTests()
     {
-        _store = A.Fake<IPageTemplateStore>();
-        _manager = new PageTemplateManager(_store);
+        _repository = A.Fake<IRepository<PageTemplate>>();
+        _manager = new PageTemplateManager(_repository);
     }
 
     [Fact]
@@ -741,24 +824,29 @@ public class PageTemplateManagerTests
             result.CreatedBy.Email.Should().Be("user@test.com");
         }
 
-        A.CallTo(() => _store.Create(A<PageTemplate>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _repository.Create(A<PageTemplate>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
     }
 
     [Fact]
-    public async Task GetById_Should_Return_Template_From_Store()
+    public async Task GetById_Should_Return_Template_From_Repository()
     {
-        var expected = new PageTemplate { Id = "123", Name = "Test" };
-        A.CallTo(() => _store.GetById("123")).Returns(expected);
+        var templates = new[]
+        {
+            new PageTemplate { Id = "123", Name = "Test" },
+            new PageTemplate { Id = "456", Name = "Other" },
+        }.AsQueryable();
+        A.CallTo(() => _repository.GetAll()).Returns(templates);
 
         var result = await _manager.GetById("123");
 
-        result.Should().BeSameAs(expected);
+        result.Should().NotBeNull();
+        result.Id.Should().Be("123");
     }
 
     [Fact]
     public async Task GetById_Should_Throw_When_Not_Found()
     {
-        A.CallTo(() => _store.GetById("missing")).Returns((PageTemplate)null!);
+        A.CallTo(() => _repository.GetAll()).Returns(Enumerable.Empty<PageTemplate>().AsQueryable());
 
         await _manager.Invoking(m => m.GetById("missing"))
             .Should().ThrowAsync<PageTemplateNotFoundException>();
@@ -775,7 +863,8 @@ public class PageTemplateManagerTests
             Updated = DateTime.UtcNow.AddDays(-1),
             UpdatedBy = new UserInfo { Email = "old@test.com" }
         };
-        A.CallTo(() => _store.GetById("1")).Returns(existing);
+        var templates = new[] { existing }.AsQueryable();
+        A.CallTo(() => _repository.GetAll()).Returns(templates);
 
         var updateInfo = new UserInfo { Email = "new@test.com" };
         await _manager.Update("1", "New Name", "New content", updateInfo);
@@ -788,22 +877,23 @@ public class PageTemplateManagerTests
             existing.Updated.Should().BeCloseTo(DateTime.UtcNow, precision: TimeSpan.FromSeconds(1));
         }
 
-        A.CallTo(() => _store.Update(existing)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _repository.Update(existing, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
     }
 
     [Fact]
-    public async Task Delete_Should_Remove_From_Store()
+    public async Task Delete_Should_Remove_From_Repository()
     {
         var template = new PageTemplate { Id = "1" };
-        A.CallTo(() => _store.GetById("1")).Returns(template);
+        var templates = new[] { template }.AsQueryable();
+        A.CallTo(() => _repository.GetAll()).Returns(templates);
 
         await _manager.Delete("1");
 
-        A.CallTo(() => _store.Delete(template)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _repository.Delete(template, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
     }
 
     [Fact]
-    public async Task GetAll_Should_Return_From_Store()
+    public async Task GetAll_Should_Return_From_Repository()
     {
         var templates = new[]
         {
@@ -811,7 +901,7 @@ public class PageTemplateManagerTests
             new PageTemplate { Name = "B" }
         }.AsQueryable();
 
-        A.CallTo(() => _store.GetAll()).Returns(templates);
+        A.CallTo(() => _repository.GetAll()).Returns(templates);
 
         var result = _manager.GetAll();
 
@@ -819,367 +909,6 @@ public class PageTemplateManagerTests
     }
 }
 ```
-
-#### 7.2.2. PageTemplateService (Web-слой, `Mimisbrunnr.Web`)
-
-Тесты в `tests/Mimisbrunnr.Web.Tests/PageTemplates/PageTemplateServiceTests.cs`:
-
-```csharp
-public class PageTemplateServiceTests
-{
-    private readonly IPageTemplateManager _manager;
-    private readonly IPermissionService _permissions;
-    private readonly ISpaceManager _spaceManager;
-    private readonly ITemplateRenderer _renderer;
-    private readonly PageTemplateService _service;
-
-    public PageTemplateServiceTests()
-    {
-        _manager = A.Fake<IPageTemplateManager>();
-        _permissions = A.Fake<IPermissionService>();
-        _spaceManager = A.Fake<ISpaceManager>();
-        _renderer = A.Fake<ITemplateRenderer>();
-        _service = new PageTemplateService(_manager, _permissions, _spaceManager, _renderer);
-    }
-
-    // --- GetAll ---
-
-    [Fact]
-    public async Task GetAll_System_Returns_All_System_Templates()
-    {
-        SetupSystemTemplates();
-        var user = User("user@test.com");
-
-        var result = await _service.GetAll(TemplateType.System, null, user);
-
-        result.Should().HaveCount(2);
-    }
-
-    [Fact]
-    public async Task GetAll_User_Returns_Only_Own_Templates()
-    {
-        var user = User("owner@test.com");
-        var all = new[]
-        {
-            Template("1", TemplateType.User, "owner@test.com"),
-            Template("2", TemplateType.User, "other@test.com"),
-        }.AsQueryable();
-        A.CallTo(() => _manager.GetAll()).Returns(all);
-
-        var result = await _service.GetAll(TemplateType.User, null, user);
-
-        result.Should().ContainSingle().Which.Id.Should().Be("1");
-    }
-
-    [Fact]
-    public async Task GetAll_Space_Returns_Only_When_User_Has_View_Permission()
-    {
-        var user = User("user@test.com");
-        var space = new Space { Id = "s1", Key = "space1" };
-        var all = new[]
-        {
-            Template("1", TemplateType.Space, spaceId: "s1"),
-            Template("2", TemplateType.Space, spaceId: "s2"),
-        }.AsQueryable();
-        A.CallTo(() => _manager.GetAll()).Returns(all);
-        A.CallTo(() => _spaceManager.GetById("s1")).Returns(space);
-        A.CallTo(() => _permissions.EnsureViewPermission("space1", user))
-            .DoesNothing(); // has permission
-        A.CallTo(() => _spaceManager.GetById("s2"))
-            .ThrowsAsync(new SpaceNotFoundException());
-
-        var result = await _service.GetAll(TemplateType.Space, "space1", user);
-
-        result.Should().ContainSingle().Which.Id.Should().Be("1");
-    }
-
-    // --- Create ---
-
-    [Fact]
-    public async Task Create_System_By_NonAdmin_Throws()
-    {
-        var user = User("user@test.com", isAdmin: false);
-
-        await _service.Invoking(s => s.Create(
-                new PageTemplateCreateModel { Type = "System", Name = "T", Content = "C" }, user))
-            .Should().ThrowAsync<UserHasNotPermissionException>();
-    }
-
-    [Fact]
-    public async Task Create_System_By_Admin_Succeeds()
-    {
-        var user = User("admin@test.com", isAdmin: true);
-        var model = new PageTemplateCreateModel
-        {
-            Type = "System", Name = "Sys", Content = "# Hello", Description = "A system template"
-        };
-
-        var result = await _service.Create(model, user);
-
-        using (new AssertionScope())
-        {
-            result.Name.Should().Be("Sys");
-            result.Type.Should().Be(TemplateType.System.ToString());
-            result.CreatedBy.Email.Should().Be("admin@test.com");
-        }
-    }
-
-    [Fact]
-    public async Task Create_User_Sets_OwnerEmail()
-    {
-        var user = User("user@test.com");
-        var model = new PageTemplateCreateModel
-        {
-            Type = "User", Name = "My", Content = "# My template"
-        };
-
-        var result = await _service.Create(model, user);
-
-        result.OwnerEmail.Should().Be("user@test.com");
-    }
-
-    [Fact]
-    public async Task Create_Space_By_NonAdmin_Throws()
-    {
-        var user = User("user@test.com");
-        var model = new PageTemplateCreateModel
-        {
-            Type = "Space", Name = "S", Content = "C", SpaceKey = "space1"
-        };
-        SetupSpace("space1");
-        A.CallTo(() => _permissions.EnsureAdminPermission("space1", user))
-            .ThrowsAsync(new UserHasNotPermissionException());
-
-        await _service.Invoking(s => s.Create(model, user))
-            .Should().ThrowAsync<UserHasNotPermissionException>();
-    }
-
-    [Fact]
-    public async Task Create_Space_By_Admin_Succeeds()
-    {
-        var user = User("admin@test.com");
-        var model = new PageTemplateCreateModel
-        {
-            Type = "Space", Name = "S", Content = "C", SpaceKey = "space1"
-        };
-        var space = SetupSpace("space1");
-        A.CallTo(() => _permissions.EnsureAdminPermission("space1", user)).DoesNothing();
-
-        var result = await _service.Create(model, user);
-
-        result.SpaceId.Should().Be(space.Id);
-    }
-
-    // --- Update ---
-
-    [Fact]
-    public async Task Update_System_By_NonAdmin_Throws()
-    {
-        var user = User("user@test.com", isAdmin: false);
-        A.CallTo(() => _manager.GetById("1"))
-            .Returns(Template("1", TemplateType.System));
-
-        await _service.Invoking(s => s.Update("1",
-                new PageTemplateUpdateModel { Name = "N", Content = "C" }, user))
-            .Should().ThrowAsync<UserHasNotPermissionException>();
-    }
-
-    [Fact]
-    public async Task Update_User_By_Owner_Succeeds()
-    {
-        var user = User("owner@test.com");
-        A.CallTo(() => _manager.GetById("1"))
-            .Returns(Template("1", TemplateType.User, ownerEmail: "owner@test.com"));
-
-        await _service.Update("1",
-            new PageTemplateUpdateModel { Name = "New", Content = "New content" }, user);
-
-        A.CallTo(() => _manager.Update("1", "New", "New content", user))
-            .MustHaveHappenedOnceExactly();
-    }
-
-    // --- Delete ---
-
-    [Fact]
-    public async Task Delete_User_By_NonOwner_Throws()
-    {
-        var user = User("other@test.com");
-        A.CallTo(() => _manager.GetById("1"))
-            .Returns(Template("1", TemplateType.User, ownerEmail: "owner@test.com"));
-
-        await _service.Invoking(s => s.Delete("1", user))
-            .Should().ThrowAsync<UserHasNotPermissionException>();
-    }
-
-    [Fact]
-    public async Task Delete_Space_By_SpaceAdmin_Succeeds()
-    {
-        var user = User("spaceadmin@test.com");
-        var space = new Space { Id = "s1", Key = "space1" };
-        A.CallTo(() => _manager.GetById("1"))
-            .Returns(Template("1", TemplateType.Space, spaceId: "s1"));
-        A.CallTo(() => _spaceManager.GetById("s1")).Returns(space);
-        A.CallTo(() => _permissions.EnsureAdminPermission("space1", user)).DoesNothing();
-
-        await _service.Delete("1", user);
-
-        A.CallTo(() => _manager.Delete("1")).MustHaveHappenedOnceExactly();
-    }
-
-    // --- Render ---
-
-    [Fact]
-    public async Task Render_Returns_Rendered_Content_With_All_Parameters()
-    {
-        var user = User("user@test.com");
-        var space = new Space { Id = "s1", Key = "space1", Name = "My Space" };
-        var template = new PageTemplate
-        {
-            Id = "1",
-            Content = "# {{SpaceName}} by {{UserName}}",
-            Type = TemplateType.System
-        };
-
-        A.CallTo(() => _manager.GetById("1")).Returns(template);
-        A.CallTo(() => _spaceManager.GetByKey("space1")).Returns(space);
-        A.CallTo(() => _renderer.Render(template.Content, A<IDictionary<string, object>>._))
-            .ReturnsLazily((string t, IDictionary<string, object> p) =>
-                $"# {p["SpaceName"]} by {p["UserName"]}");
-
-        var result = await _service.Render("1", "space1", user);
-
-        result.Content.Should().Be("# My Space by user@test.com");
-    }
-
-    [Fact]
-    public async Task Render_Should_Pass_Correct_Parameters_To_Renderer()
-    {
-        var user = User("john@test.com");
-        var space = new Space { Id = "s1", Key = "dev", Name = "Development" };
-        var template = new PageTemplate { Id = "1", Content = "{{CurrentDate}}", Type = TemplateType.System };
-
-        A.CallTo(() => _manager.GetById("1")).Returns(template);
-        A.CallTo(() => _spaceManager.GetByKey("dev")).Returns(space);
-
-        await _service.Render("1", "dev", user);
-
-        A.CallTo(() => _renderer.Render(A<string>._, A<IDictionary<string, object>>.That
-                .Matches(d =>
-                    d.ContainsKey("CurrentDate") &&
-                    d.ContainsKey("CurrentTime") &&
-                    d.ContainsKey("CurrentDateTime") &&
-                    d.ContainsKey("SpaceName") && (string)d["SpaceName"] == "Development" &&
-                    d.ContainsKey("SpaceKey") && (string)d["SpaceKey"] == "dev" &&
-                    d.ContainsKey("UserName"))))
-            .MustHaveHappenedOnceExactly();
-    }
-
-    // --- Helper methods ---
-
-    private static UserInfo User(string email, bool isAdmin = false) =>
-        new() { Email = email, Name = email.Split('@')[0] };
-
-    private static PageTemplate Template(string id, TemplateType type,
-        string? ownerEmail = null, string? spaceId = null) =>
-        new()
-        {
-            Id = id,
-            Name = "Template " + id,
-            Content = "# Content",
-            Type = type,
-            OwnerEmail = ownerEmail,
-            SpaceId = spaceId
-        };
-
-    private void SetupSystemTemplates()
-    {
-        var templates = new[]
-        {
-            Template("s1", TemplateType.System),
-            Template("s2", TemplateType.System),
-        }.AsQueryable();
-        A.CallTo(() => _manager.GetAll()).Returns(templates);
-    }
-
-    private Space SetupSpace(string key)
-    {
-        var space = new Space { Id = key + "_id", Key = key, Name = key };
-        A.CallTo(() => _spaceManager.GetByKey(key)).Returns(space);
-        return space;
-    }
-}
-```
-
-#### 7.2.3. PageTemplateController (API, `Mimisbrunnr.Web`)
-
-Тесты в `tests/Mimisbrunnr.Web.Tests/PageTemplates/PageTemplateControllerTests.cs`:
-
-```csharp
-public class PageTemplateControllerTests
-{
-    // Use the project's existing TestBase or controller test helper pattern
-    // проверяет routing, валидацию модели, проброс ошибок сервиса
-
-    [Fact]
-    public async Task GetAll_Should_Call_Service_And_Return_Ok()
-    {
-        // Arrange
-        var service = A.Fake<IPageTemplateService>();
-        var controller = new PageTemplateController(service);
-        var user = new UserInfo { Email = "test@test.com" };
-        controller.SetupControllerContext(user);
-
-        var expected = new[] { new PageTemplateModel { Id = "1" } };
-        A.CallTo(() => service.GetAll(null, null, user)).Returns(expected);
-
-        // Act
-        var result = await controller.GetAll(null, null);
-
-        // Assert
-        result.Should().BeOfType<OkObjectResult>()
-            .Which.Value.Should().BeSameAs(expected);
-    }
-
-    [Fact]
-    public async Task Create_InvalidModel_Returns_BadRequest()
-    {
-        var service = A.Fake<IPageTemplateService>();
-        var controller = new PageTemplateController(service);
-        controller.ModelState.AddModelError("Name", "Required");
-
-        var result = await controller.Create(new PageTemplateCreateModel());
-
-        result.Should().BeOfType<BadRequestObjectResult>();
-    }
-
-    [Fact]
-    public async Task Render_Should_Return_Content()
-    {
-        var service = A.Fake<IPageTemplateService>();
-        var controller = new PageTemplateController(service);
-        var user = new UserInfo { Email = "test@test.com" };
-        controller.SetupControllerContext(user);
-
-        A.CallTo(() => service.Render("1", "space1", user))
-            .Returns(new PageTemplateRenderResult { Content = "# Rendered" });
-
-        var result = await controller.Render("1", new PageTemplateRenderRequest
-        {
-            TemplateId = "1",
-            SpaceKey = "space1"
-        });
-
-        var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
-        okResult.Value.Should().BeEquivalentTo(new { content = "# Rendered" });
-    }
-}
-```
-
-#### 7.2.4. PageTemplateStore (MongoDB, интеграционные)
-
-Опционально — интеграционные тесты с тестовой MongoDB (через `Testcontainers.MongoDb` или in-memory):
-- Создание, чтение, обновление, удаление записей
-- Фильтрация по типу, ownerEmail, spaceId
 
 ### 7.3. Запуск тестов
 
@@ -1206,14 +935,13 @@ dotnet test tests/Mimisbrunnr.Web.Tests/
 | 1.1 | Создать проект `Mimisbrunnr.PageTemplates` | `.csproj` |
 | 1.2 | Определить `TemplateType` enum | `Contracts/TemplateType.cs` |
 | 1.3 | Определить `PageTemplate` entity | `Contracts/PageTemplate.cs` |
-| 1.4 | Определить `IPageTemplateStore` + `IPageTemplateManager` | `Services/` |
-| 1.5 | Реализовать `PageTemplateManager` | `Services/PageTemplateManager.cs` |
+| 1.4 | Определить `IPageTemplateManager` | `Services/` |
+| 1.5 | Реализовать `PageTemplateManager` (через `IRepository<PageTemplate>`) | `Services/PageTemplateManager.cs` |
 | 1.6 | Создать `PageTemplatesModule` | `PageTemplatesModule.cs` |
 | 1.7 | Создать `PageTemplateMap` (MongoDB mapping) | `Mimisbrunnr.Storage.MongoDb/Mappings/` |
-| 1.8 | Создать `PageTemplateStore` (MongoDB) | `Mimisbrunnr.Storage.MongoDb/` |
-| 1.9 | Зарегистрировать entity и store в `MongoDbStoreModule` | `MongoDbStoreModule.cs` |
-| 1.10 | Добавить индексы (Type, OwnerEmail, SpaceId) | `MongoDbStoreModule.cs` |
-| 1.11 | Добавить `PageTemplatesModule` в `StartupModule` | `StartupModule.cs` |
+| 1.8 | Зарегистрировать entity в `MongoDbStoreModule` | `MongoDbStoreModule.cs` |
+| 1.9 | Добавить индексы (Type, OwnerEmail, SpaceId) | `MongoDbStoreModule.cs` |
+| 1.10 | Добавить `PageTemplatesModule` в `StartupModule` | `StartupModule.cs` |
 
 **Проверка:** `dotnet build` успешно собирается.
 
@@ -1235,7 +963,7 @@ dotnet test tests/Mimisbrunnr.Web.Tests/
 
 | Шаг | Действие |
 |-----|----------|
-| 3.1 | Написать тесты `PageTemplateManagerTests` (store mocking) |
+| 3.1 | Написать тесты `PageTemplateManagerTests` (repository mocking) |
 | 3.2 | Написать тесты `PageTemplateServiceTests` (все сценарии прав) |
 | 3.3 | Написать тесты `PageTemplateControllerTests` (routing, validation, errors) |
 | 3.4 | Запустить `dotnet test` — все тесты зелёные |
