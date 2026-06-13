@@ -13,6 +13,7 @@ using Mimisbrunnr.Storage.MongoDb.Migrations;
 using Mimisbrunnr.Favorites.Contracts;
 using MongoDB.Bson.Serialization;
 using Mimisbrunnr.Favorites.Services;
+using Mimisbrunnr.PageTemplates.Contracts;
 
 namespace Mimisbrunnr.Storage.MongoDb;
 
@@ -52,6 +53,7 @@ public class MongoDbStoreModule : RunnableModule
                 .AddEntity<Comment, CommentMap>()
                 .AddEntity<Plugin, PluginMap>()
                 .AddEntity<MacroState, MacroStateMap>()
+                .AddEntity<PageTemplate, PageTemplateMap>()
         );
         BsonClassMap.RegisterClassMap(new FavoriteUserMap());
         BsonClassMap.RegisterClassMap(new FavoriteSpaceMap());
@@ -81,6 +83,7 @@ public class MongoDbStoreModule : RunnableModule
             await CreateFavoriteIndexes(baseMongoContext);
             await CreateCommentIndexes(baseMongoContext);
             await CreatePluginIndexes(baseMongoContext);
+            await CreatePageTemplateIndexes(baseMongoContext);
         }
         catch (Exception e)
         {
@@ -414,5 +417,28 @@ public class MongoDbStoreModule : RunnableModule
             Background = true
         }));
 
+    }
+
+    private static async Task CreatePageTemplateIndexes(IMongoDbContext mongoContext)
+    {
+        var collection = mongoContext.GetCollection<PageTemplate>();
+
+        var typeKeyDefinition = Builders<PageTemplate>.IndexKeys.Ascending(x => x.Type);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<PageTemplate>(typeKeyDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+
+        var ownerEmailKeyDefinition = Builders<PageTemplate>.IndexKeys.Ascending(x => x.OwnerEmail);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<PageTemplate>(ownerEmailKeyDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+
+        var spaceIdKeyDefinition = Builders<PageTemplate>.IndexKeys.Ascending(x => x.SpaceId);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<PageTemplate>(spaceIdKeyDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
     }
 }

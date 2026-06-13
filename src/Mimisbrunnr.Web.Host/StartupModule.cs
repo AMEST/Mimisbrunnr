@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Mimisbrunnr.DataImport;
 using Mimisbrunnr.DataImport.Confluence;
 using Mimisbrunnr.Persistent;
+using Mimisbrunnr.PageTemplates;
 using Mimisbrunnr.Storage.MongoDb;
 using Mimisbrunnr.Web.Host.Configuration;
 using Mimisbrunnr.Web.Host.Services;
@@ -24,6 +25,7 @@ internal class StartupModule : Module
         typeof(AspNetModule), typeof(MongoDbStoreModule), typeof(WebModule),
         typeof(PersistentModule), typeof(MetricsModule),
         typeof(ConfluenceDataImportModule), typeof(WebCacheModule),
+        typeof(PageTemplatesModule),
     ];
 
     public override void Configure(IServiceCollection services)

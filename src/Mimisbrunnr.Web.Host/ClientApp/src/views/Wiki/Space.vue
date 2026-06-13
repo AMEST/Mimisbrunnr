@@ -31,6 +31,7 @@
       :spaceUpdateCallback="init"
       :space="space"
     />
+    <space-page-templates :spaceKey="space.key" v-if="userPermissions && userPermissions.isAdmin" />
     <attachments :page="page" />
     <versions :page="page" :onVersionRestore="loadPage" :userPermissions="userPermissions" />
   </b-container>
@@ -68,6 +69,10 @@ const Permissions = () =>
   import(
     /* webpackChunkName: "space-modals-component" */ "@/components/space/modal/Permissions.vue"
   );
+const SpacePageTemplates = () =>
+  import(
+    /* webpackChunkName: "space-modals-component" */ "@/components/space/modal/PageTemplates.vue"
+  );
 import SpaceService from "@/services/spaceService";
 import PageService from "../../services/pageService";
 export default {
@@ -82,6 +87,7 @@ export default {
     Settings,
     Attachments,
     Versions,
+    SpacePageTemplates,
   },
   data() {
     return {

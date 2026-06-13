@@ -12,30 +12,11 @@ export default {
     data() {
         return {
             menuItems: [
-                {
-                    name: "General",
-                    to: "/admin",
-                    active: false,
-                    disabled: false
-                },
-                {
-                    name: "Users",
-                    to: "/admin/users",
-                    active: false,
-                    disabled: false
-                },
-                {
-                    name: "Groups",
-                    to: "/admin/groups",
-                    active: false,
-                    disabled: false
-                },
-                {
-                    name: "Plugins",
-                    to: "/admin/plugins",
-                    active: false,
-                    disabled: false
-                },
+                { name: "General", to: "/admin", active: false, disabled: false },
+                { name: "Users", to: "/admin/users", active: false, disabled: false },
+                { name: "Groups", to: "/admin/groups", active: false, disabled: false },
+                { name: "Plugins", to: "/admin/plugins", active: false, disabled: false },
+                { name: "Templates", to: "/admin/templates", active: false, disabled: false },
             ]
         }
     },

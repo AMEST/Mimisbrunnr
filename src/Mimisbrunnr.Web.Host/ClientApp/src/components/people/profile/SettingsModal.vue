@@ -9,6 +9,7 @@
 <b-tabs :pills="isVertical" :card="isVertical" :vertical="isVertical">
       <api-tokens/>
       <user-groups/>
+      <page-templates-tab/>
       <additional-info-tab :profile="profile"/>
       <b-tab :title="$t('profile.settings.other.title')" disabled></b-tab>
     </b-tabs>
@@ -18,11 +19,13 @@
 <script>
 import ApiTokens from '@/components/people/profile/settings/ApiTokens.vue';
 import UserGroups from '@/components/people/profile/settings/UserGroups.vue';
+import PageTemplatesTab from '@/components/people/profile/settings/PageTemplatesTab.vue';
 import AdditionalInfoTab from '@/components/people/profile/settings/AdditionalInfoTab.vue';
 export default {
   components: { 
     ApiTokens,
     UserGroups,
+    PageTemplatesTab,
     AdditionalInfoTab
   },
   name: "SettingsModal",

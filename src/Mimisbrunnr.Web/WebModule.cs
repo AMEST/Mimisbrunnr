@@ -14,6 +14,7 @@ using Mimisbrunnr.Web.Search;
 using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Web.User;
 using Mimisbrunnr.Web.Wiki;
+using Mimisbrunnr.Web.PageTemplates;
 using Mimisbrunnr.Wiki;
 using Skidbladnir.Modules;
 
@@ -42,5 +43,6 @@ public class WebModule : Module
         services.AddSingleton<IFavoriteService, FavoriteService>();
         services.AddSingleton<ICommentService, CommentService>();
         services.AddSingleton<IPluginService, PluginService>();
+        services.AddSingleton<IPageTemplateService, PageTemplateService>();
     }
 }

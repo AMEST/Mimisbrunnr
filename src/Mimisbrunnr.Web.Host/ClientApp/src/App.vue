@@ -4,6 +4,7 @@
       <Header />
       <router-view />
       <SpaceCreateModal />
+      <create-from-template-modal />
       <search-bar />
     </div>
     <div v-if="this.loaded && !this.initialized">
@@ -17,6 +18,7 @@ import Header from "@/components/base/Header.vue";
 const Quickstart = () => import(/* webpackChunkName: "quicstart-component" */"@/components/quickstart/Quickstart.vue");
 const SpaceCreateModal = () => import(/* webpackChunkName: "space-create-modal" */"@/components/base/SpaceCreateModal.vue");
 const SearchBar = () => import(/* webpackChunkName: "search-bar-component" */"@/components/search/SearchBar.vue");
+const CreateFromTemplateModal = () => import(/* webpackChunkName: "base-modals" */"@/components/base/CreateFromTemplateModal.vue");
 import axios from "axios";
 import ProfileService from "@/services/profileService";
 export default {
@@ -25,6 +27,7 @@ export default {
     SpaceCreateModal,
     Quickstart,
     SearchBar,
+    CreateFromTemplateModal,
   },
   data: () => ({
     loaded: false,

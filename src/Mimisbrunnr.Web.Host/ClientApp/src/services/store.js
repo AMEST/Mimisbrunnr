@@ -21,6 +21,11 @@ export default new Vuex.Store({
       history: [],
       theme: '',
       version: ''
+    },
+    templates: {
+      system: [],
+      user: [],
+      space: [],
     }
   },
   getters: {},
@@ -62,6 +67,15 @@ export default new Vuex.Store({
     // eslint-disable-next-line
     changeVersion(state, value) {
       state.application.version = value
+    },
+    setSystemTemplates(state, payload) {
+      state.templates.system = payload
+    },
+    setUserTemplates(state, payload) {
+      state.templates.user = payload
+    },
+    setSpaceTemplates(state, payload) {
+      state.templates.space = payload
     }
   },
   actions: {}

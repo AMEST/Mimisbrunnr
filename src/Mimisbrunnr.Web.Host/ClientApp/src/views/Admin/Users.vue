@@ -210,7 +210,7 @@ export default {
 
 @media (min-width: 440px) {
     .admin-user-card .card-body {
-    margin: 2.25rem 2.25rem 2.25rem 2.25rem;
+    margin: 1.25rem 1.25rem 1.25rem 1.25rem;
     }
 }
 
