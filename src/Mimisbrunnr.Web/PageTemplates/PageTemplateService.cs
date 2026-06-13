@@ -58,10 +58,16 @@ internal class PageTemplateService : IPageTemplateService
         {
             if (!string.IsNullOrEmpty(spaceKey))
             {
-                await _permissionService.EnsureEditPermission(spaceKey, user);
-                var space = await _spaceManager.GetByKey(spaceKey);
-                var spaceTemplates = query.Where(x => x.Type == TemplateType.Space && x.SpaceId == space.Id).ToArray();
-                templates.AddRange(spaceTemplates);
+                try {
+                    await _permissionService.EnsureEditPermission(spaceKey, user);
+                    var space = await _spaceManager.GetByKey(spaceKey);
+                    var spaceTemplates = query.Where(x => x.Type == TemplateType.Space && x.SpaceId == space.Id).ToArray();
+                    templates.AddRange(spaceTemplates);
+                }
+                catch (UserHasNotPermissionException)
+                {
+                    //do nothing
+                }
             }
         }
 
@@ -80,25 +86,13 @@ internal class PageTemplateService : IPageTemplateService
         await EnsureCreatePermission(model.Type, model.SpaceKey, user);
 
         var spaceId = default(string);
-        var ownerEmail = default(string);
-
-        switch (model.Type)
+        var ownerEmail = user.Email;
+        if (model.Type == TemplateType.Space)
         {
-            case TemplateType.System:
-                ownerEmail = user.Email;
-                break;
-            case TemplateType.User:
-                ownerEmail = user.Email;
-                break;
-            case TemplateType.Space:
-                var space = await _spaceManager.GetByKey(model.SpaceKey);
-                if (space == null)
-                    throw new SpaceNotFoundException($"Space with key '{model.SpaceKey}' not found");
-                spaceId = space.Id;
-                ownerEmail = user.Email;
-                break;
-            default:
-                throw new InvalidOperationException($"Unknown template type: {model.Type}");
+            var space = await _spaceManager.GetByKey(model.SpaceKey);
+            if (space == null)
+                throw new SpaceNotFoundException($"Space with key '{model.SpaceKey}' not found");
+            spaceId = space.Id;
         }
 
         var template = new PageTemplate

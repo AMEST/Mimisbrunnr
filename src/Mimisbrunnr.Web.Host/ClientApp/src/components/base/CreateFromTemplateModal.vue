@@ -38,7 +38,8 @@ export default {
   methods: {
     async loadTemplates() {
       try {
-        this.templates = await pageTemplateService.getAll();
+        var spaceKey = this.$route.params.key || "";
+        this.templates = await pageTemplateService.getAll("", spaceKey);
       } catch (e) {
         this.templates = [];
       }
