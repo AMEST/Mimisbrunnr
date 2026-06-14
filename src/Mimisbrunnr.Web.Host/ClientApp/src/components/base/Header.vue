@@ -43,6 +43,15 @@
             <b-icon-plus class="create-icon" />
             <span>{{ $t("header.pageCreateButton") }}</span>
           </b-button>
+          <b-button
+            variant="light"
+            class="create-from-template-button"
+            v-if="$store.state.application.profile"
+            v-b-modal.create-from-template-modal
+            size="sm"
+          >
+            <b-icon-chevron-down />
+          </b-button>
         </b-navbar-nav>
         <!-- Right aligned nav items -->
         <b-navbar-nav class="header-right-menu">
@@ -151,6 +160,7 @@ import {
   BIconPlus,
   BIconSearch,
   BIconGear,
+  BIconChevronDown,
 } from "bootstrap-vue";
 import axios from "axios";
 import ProfileService from "@/services/profileService";
@@ -171,6 +181,7 @@ export default {
     BIconPlus,
     BIconSearch,
     BIconGear,
+    BIconChevronDown,
   },
   watch: {
     // eslint-disable-next-line
@@ -251,6 +262,18 @@ export default {
 }
 .create-button span {
   padding-top: 0.5em;
+}
+.create-button + .create-from-template-button {
+  margin-left: 2px;
+  height: 32px;
+  margin-top: 0.2em;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+@media (max-width: 576px) {
+  .create-from-template-button {
+    display: none !important;
+  }
 }
 @media (max-width: 834px) {
   .create-button .create-icon {

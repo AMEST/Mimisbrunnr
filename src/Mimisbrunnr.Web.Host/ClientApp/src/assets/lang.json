@@ -8,6 +8,7 @@
             },
             "people": "People",
             "pageCreateButton": "Create",
+            "pageCreateFromTemplateButton": "Create from template",
             "search": "Search",
             "login": "Log in",
             "lang": "Language",
@@ -253,6 +254,9 @@
                     "ok": "Yes",
                     "cancel": "No"
                 }
+            },
+            "templates": {
+                "title": "Page templates"
             }
         },
         "profile": {
@@ -290,7 +294,8 @@
                 },
                 "other": {
                     "title": "Other"
-                }
+                },
+                "pageTemplates": "My templates"
             },
             "favorites": "Favorites",
             "additional": {
@@ -440,7 +445,8 @@
                 "title": "Space actions",
                 "profile": "Profile",
                 "permissions": "Permissions",
-                "settings": "Settings"
+                "settings": "Settings",
+                "templates": "Page templates"
             },
             "tree": "Page tree",
             "emptyTree": "Empty",
@@ -496,6 +502,24 @@
         "newPage": {
             "defaultTitle": "New page",
             "defaultContent": "_Add your information here_"
+        },
+        "pageTemplates": {
+            "title": "Page Templates",
+            "create": "Create",
+            "edit": "Edit",
+            "delete": "Delete",
+            "deleteConfirm": "Are you sure you want to delete this template?",
+            "name": "Name",
+            "description": "Description",
+            "content": "Content",
+            "source": "Source",
+            "system": "System",
+            "user": "Personal",
+            "space": "Space",
+            "createFromTemplate": "Create from Template",
+            "noTemplates": "No templates available",
+            "createPageFromTemplate": "Create page from template",
+            "markdownGuide": "Markdown guide"
         }
     },
     "ru": {
@@ -507,6 +531,7 @@
             },
             "people": "Пользователи",
             "pageCreateButton": "Создать",
+            "pageCreateFromTemplateButton": "Создать из шаблона",
             "search": "Поиск",
             "login": "Вход",
             "lang": "Язык",
@@ -753,6 +778,9 @@
                     "ok": "Да",
                     "cancel": "Нет"
                 }
+            },
+            "templates": {
+                "title": "Шаблоны страниц"
             }
         },
         "profile": {
@@ -790,7 +818,8 @@
                 },
                 "other": {
                     "title": "Прочее"
-                }
+                },
+                "pageTemplates": "Мои шаблоны"
             },
             "favorites": "Избранное",
             "additional": {
@@ -940,7 +969,8 @@
                 "title": "Действия в пространстве",
                 "profile": "Профиль",
                 "permissions": "Разрешения",
-                "settings": "Настройки"
+                "settings": "Настройки",
+                "templates": "Шаблоны страниц"
             },
             "tree": "Древо страниц",
             "emptyTree": "Пусто",
@@ -996,6 +1026,24 @@
         "newPage": {
             "defaultTitle": "Новая страница",
             "defaultContent": "_Добавьте свою информацию сюда_"
+        },
+        "pageTemplates": {
+            "title": "Шаблоны страниц",
+            "create": "Создать",
+            "edit": "Редактировать",
+            "delete": "Удалить",
+            "deleteConfirm": "Вы уверены, что хотите удалить шаблон?",
+            "name": "Имя",
+            "description": "Описание",
+            "content": "Шаблон",
+            "source": "Тип",
+            "system": "Системный",
+            "user": "Личный",
+            "space": "Пространства",
+            "createFromTemplate": "Создать из шаблона",
+            "noTemplates": "Нет доступных шаблонов",
+            "createPageFromTemplate": "Создать страницу из шаблона",
+            "markdownGuide": "Справка по Markdown"
         }
     }
 }

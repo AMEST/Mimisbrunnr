@@ -93,6 +93,11 @@ export default new Router({
             path: '/admin/plugins',
             name: 'PluginsAdministration',
             component: () => import(/* webpackChunkName: "admin" */ './views/Admin/Plugins.vue')
+        },
+        {
+            path: '/admin/templates',
+            name: 'PageTemplates',
+            component: () => import(/* webpackChunkName: "admin" */ './views/Admin/PageTemplates.vue')
         }
     ]
 })

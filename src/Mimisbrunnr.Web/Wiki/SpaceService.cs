@@ -8,6 +8,7 @@ using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;
 using Mimisbrunnr.Integration.Wiki;
 using Mimisbrunnr.Integration.Group;
+using Mimisbrunnr.PageTemplates.Services;
 
 namespace Mimisbrunnr.Web.Wiki;
 
@@ -19,13 +20,15 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
     private readonly IUserGroupManager _userGroupManager;
     private readonly IApplicationConfigurationManager _applicationConfigurationManager;
     private readonly ILogger<SpaceService> _logger;
+    private readonly IPageTemplateManager _pageTemplateManager;
 
     public SpaceService(IPermissionService permissionService,
         ISpaceManager spaceManager,
         IUserManager userManager,
         IUserGroupManager userGroupManager,
         IApplicationConfigurationManager applicationConfigurationManager,
-        ILogger<SpaceService> logger
+        ILogger<SpaceService> logger,
+        IPageTemplateManager pageTemplateManager
     )
     {
         _permissionService = permissionService;
@@ -34,6 +37,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         _userGroupManager = userGroupManager;
         _applicationConfigurationManager = applicationConfigurationManager;
         _logger = logger;
+        _pageTemplateManager = pageTemplateManager;
     }
 
     public async Task<SpaceModel[]> GetAll(UserInfo requestedBy, int? take = null, int? skip = null)
@@ -222,6 +226,7 @@ internal class SpaceService : ISpaceService, ISpaceDisplayService
         if (space.Status != SpaceStatus.Archived)
             throw new InvalidOperationException("Only archived spaces allowed for removing");
 
+        await _pageTemplateManager.DeleteBySpaceId(space.Id);
         await _spaceManager.Remove(space);
         _logger.LogInformation("User `{User}` remove space `{SpaceKey}`", removedBy.Email, key);
     }

@@ -37,6 +37,8 @@ A wiki system for storing knowledge (Atlassian Confluence alternative).
 │   │
 │   ├── Mimisbrunnr.Persistent/        # File storage (Local/GridFS/WebDAV/S3)
 │   │
+│   ├── Mimisbrunnr.PageTemplates/       # Page templates (entities, manager, contracts)
+│   │
 │   ├── Mimisbrunnr.Favorites/         # Favorites
 │   │
 │   ├── Mimisbrunnr.Json/              # JSON utilities
@@ -63,6 +65,8 @@ A wiki system for storing knowledge (Atlassian Confluence alternative).
 | **Backend API** | `src/Mimisbrunnr.Web/` |
 | **Models/Business Logic** | `src/Mimisbrunnr.Wiki/` |
 | **MongoDB Repositories** | `src/Mimisbrunnr.Storage.MongoDb/` |
+| **Page Templates** | `src/Mimisbrunnr.PageTemplates/`, `src/Mimisbrunnr.Web/PageTemplates/` |
+| **Template Renderer** | `src/Mimisbrunnr.Web.Infrastructure/StubbleTemplateRenderer.cs` |
 | **Entry Point** | `src/Mimisbrunnr.Web.Host/Program.cs` |
 
 ## Frontend Details
@@ -132,3 +136,5 @@ For details: see README.md Configuration section.
 3. **Mapperly**: Mapper generation via Riok.Mapperly (NET 8 source generators)
 4. **Swagger**: API documented via Swashbuckle.AspNetCore
 5. **Prometheus Metrics**: Metrics collection via prometheus-net
+6. **Page Templates**: Three template types (System, User, Space) with Mustache rendering via `ITemplateRenderer`
+7. **Stubble Template Renderer**: Mustache-based engine used for page templates and plugin macros. Built-in helpers: `UrlEncode`, `HtmlEncode`, `ToLower`, `ToUpper`, `Uuid` (generates unique IDs without hyphens). See `docs/stubble-renderer.md` for details.

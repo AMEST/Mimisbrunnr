@@ -39,6 +39,12 @@
         >
           <b-icon-gear-fill/>&nbsp; {{ $t("space.actions.settings") }}
         </b-list-group-item>
+        <b-list-group-item
+          v-b-modal.space-page-templates-modal
+          v-if="userPermissions.isAdmin"
+        >
+          <b-icon-files />&nbsp; {{ $t("space.actions.templates") }}
+        </b-list-group-item>
       </b-list-group>
     </div>
     <div class="mt-3 space-menu-page-tree">
@@ -76,6 +82,7 @@ import {
   BIconPersonFill,
   BIconShieldLockFill,
   BIconGearFill,
+  BIconFiles,
 } from "bootstrap-vue";
 import axios from "axios";
 import { VueTreeList, Tree } from "vue-tree-list";
@@ -87,6 +94,7 @@ export default {
     BIconPersonFill,
     BIconShieldLockFill,
     BIconGearFill,
+    BIconFiles,
   },
   data() {
     return {

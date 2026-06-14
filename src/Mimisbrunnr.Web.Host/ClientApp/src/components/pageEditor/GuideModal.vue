@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="guide-modal" centered size="lg" ok-only lazy title="Guide"> 
+  <b-modal :id="modalId" centered size="lg" ok-only lazy title="Guide"> 
     <vue-markdown :source="this.guide" :toc="true"/>
   </b-modal>
 </template>
@@ -10,6 +10,9 @@ export default {
     name: "GuideModal",
     components: {
         VueMarkdown,
+    },
+    props: {
+        modalId: { type: String, default: "guide-modal" },
     },
     data() {
         return {

@@ -73,6 +73,11 @@ Support for the following features:
   - Favorites
 - Plugins
   - Macros for pages (additional functional for pages)
+- Page Templates
+  - Create and manage reusable page templates (System, User, Space)
+  - Mustache-based templating (via Stubble) with variables for date/time, user info, and space context
+  - Create new pages from templates with rendered content
+  - Template access control: System templates (global admin), User templates (owner only), Space templates (space admin)
 - Administration
   - Change wiki instance title
   - Enabling anonymous access (permission to read public spaces and access to wiki without authentication)
@@ -94,6 +99,7 @@ Support for the following features:
     - Enable
     - Remove (with clean all plugin data)
     - Link to simple plugin editor
+  - Manage page templates (system-wide templates)
 - Hosting
   - Simple scalable
   - Three types of caching (one for single node and two for multiple nodes)

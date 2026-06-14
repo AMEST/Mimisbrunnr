@@ -3,5 +3,8 @@
         "Childs",
         "Mimisbrunnr"
     ],
-    "cSpell.language": "en,ru,ru-RU"
+    "cSpell.language": "en,ru,ru-RU",
+    "dotrush.roslyn.projectOrSolutionFiles": [
+        "Mimisbrunnr.sln"
+    ]
 }

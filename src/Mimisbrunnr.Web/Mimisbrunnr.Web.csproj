@@ -23,6 +23,7 @@
       <ProjectReference Include="..\DataImport\Mimisbrunnr.DataImport\Mimisbrunnr.DataImport.csproj" />
       <ProjectReference Include="..\Mimisbrunnr.Favorites\Mimisbrunnr.Favorites.csproj" />
       <ProjectReference Include="..\Mimisbrunnr.Json\Mimisbrunnr.Json.csproj" />
+      <ProjectReference Include="..\Mimisbrunnr.PageTemplates\Mimisbrunnr.PageTemplates.csproj" />
     </ItemGroup>
 
     <ItemGroup>
