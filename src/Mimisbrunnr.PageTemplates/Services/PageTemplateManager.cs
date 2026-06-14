@@ -35,10 +35,11 @@ public class PageTemplateManager : IPageTemplateManager
         return template;
     }
 
-    public async Task Update(string id, string name, string content, UserInfo updatedBy)
+    public async Task Update(string id, string name, string description, string content, UserInfo updatedBy)
     {
         var template = await GetById(id);
         template.Name = name;
+        template.Description = description;
         template.Content = content;
         template.Updated = DateTime.UtcNow;
         template.UpdatedBy = updatedBy;

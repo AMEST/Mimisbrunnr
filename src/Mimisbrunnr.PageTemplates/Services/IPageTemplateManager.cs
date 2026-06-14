@@ -8,6 +8,6 @@ public interface IPageTemplateManager
     Task<PageTemplate> GetById(string id);
     IQueryable<PageTemplate> GetAll();
     Task<PageTemplate> Create(PageTemplate template);
-    Task Update(string id, string name, string content, UserInfo updatedBy);
+    Task Update(string id, string name, string description, string content, UserInfo updatedBy);
     Task Delete(string id);
 }

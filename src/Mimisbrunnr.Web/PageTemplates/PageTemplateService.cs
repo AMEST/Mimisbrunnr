@@ -114,7 +114,7 @@ internal class PageTemplateService : IPageTemplateService
         var template = await _pageTemplateManager.GetById(id);
         await EnsureModifyPermission(template, user);
 
-        await _pageTemplateManager.Update(id, model.Name, model.Content, user);
+        await _pageTemplateManager.Update(id, model.Name, model.Description, model.Content, user);
     }
 
     public async Task Delete(string id, UserInfo user)
