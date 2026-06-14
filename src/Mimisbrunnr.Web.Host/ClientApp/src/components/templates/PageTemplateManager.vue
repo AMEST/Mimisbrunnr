@@ -75,11 +75,7 @@ export default {
   },
   methods: {
     async loadTemplates() {
-      try {
-        this.templates = await pageTemplateService.getAll(this.type, this.spaceKey);
-      } catch (e) {
-        this.templates = [];
-      }
+      this.templates = await pageTemplateService.getAll(this.type, this.spaceKey);
     },
     openCreate() {
       this.editingTemplate = null;
@@ -90,14 +86,20 @@ export default {
       this.$bvModal.show("page-template-modal-" + this.type);
     },
     async confirmDelete(template) {
-      if (confirm(this.$t("pageTemplates.deleteConfirm"))) {
-        try {
-          await pageTemplateService.delete(template.id);
-          await this.loadTemplates();
-        } catch (e) {
-          alert(e.message || "Error deleting template");
-        }
-      }
+      const approved = await this.$bvModal.msgBoxConfirm(this.$t("pageTemplates.deleteConfirm"), {
+        title: this.$t("pageTemplates.delete"),
+        centered: true,
+        size: "sm",
+        buttonSize: "sm",
+        cancelTitle: this.$t("admin.groups.approveModal.cancel"),
+        okTitle: this.$t("admin.groups.approveModal.ok"),
+        okVariant: "danger",
+        headerClass: "p-2 border-bottom-0",
+        footerClass: "p-2 border-top-0",
+      });
+      if (!approved) return;
+      await pageTemplateService.delete(template.id);
+      await this.loadTemplates();
     },
   },
 };

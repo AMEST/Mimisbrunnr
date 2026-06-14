@@ -1,3 +1,5 @@
+import { showToast } from "@/services/Utils";
+
 async function request(url, options = {}) {
   const res = await fetch(url, {
     headers: { "Content-Type": "application/json" },
@@ -5,7 +7,9 @@ async function request(url, options = {}) {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw { status: res.status, message: err.message, data: err };
+    const msg = err.message || "Request failed";
+    showToast(`Status: ${res.status}. ${msg}`, "Error", "danger");
+    throw { status: res.status, message: msg, data: err };
   }
   if (res.status === 200 && (res.headers.get("content-length") === "0" || res.headers.get("content-type") === null)) {
     return null;
@@ -14,35 +18,63 @@ async function request(url, options = {}) {
 }
 
 export default {
-  getAll(type, spaceKey) {
-    const params = new URLSearchParams();
-    if (type) params.set("type", type);
-    if (spaceKey) params.set("spaceKey", spaceKey);
-    const qs = params.toString();
-    return request("/api/pagetemplate" + (qs ? "?" + qs : ""));
+  async getAll(type, spaceKey) {
+    try {
+      const params = new URLSearchParams();
+      if (type) params.set("type", type);
+      if (spaceKey) params.set("spaceKey", spaceKey);
+      const qs = params.toString();
+      return await request("/api/pagetemplate" + (qs ? "?" + qs : ""));
+    } catch (e) {
+      return [];
+    }
   },
-  getById(id) {
-    return request("/api/pagetemplate/" + id);
+  async getById(id) {
+    try {
+      return await request("/api/pagetemplate/" + id);
+    } catch (e) {
+      return null;
+    }
   },
-  create(model) {
-    return request("/api/pagetemplate", {
-      method: "POST",
-      body: JSON.stringify(model),
-    });
+  async create(model) {
+    try {
+      const result = await request("/api/pagetemplate", {
+        method: "POST",
+        body: JSON.stringify(model),
+      });
+      showToast("Template created", "Success", "success");
+      return result;
+    } catch (e) {
+      return null;
+    }
   },
-  update(id, model) {
-    return request("/api/pagetemplate/" + id, {
-      method: "PUT",
-      body: JSON.stringify(model),
-    });
+  async update(id, model) {
+    try {
+      await request("/api/pagetemplate/" + id, {
+        method: "PUT",
+        body: JSON.stringify(model),
+      });
+      showToast("Template updated", "Success", "success");
+    } catch (e) {
+      return null;
+    }
   },
-  delete(id) {
-    return request("/api/pagetemplate/" + id, { method: "DELETE" });
+  async delete(id) {
+    try {
+      await request("/api/pagetemplate/" + id, { method: "DELETE" });
+      showToast("Template deleted", "Success", "success");
+    } catch (e) {
+      return null;
+    }
   },
-  render(templateId, spaceKey) {
-    return request("/api/pagetemplate/" + templateId + "/render", {
-      method: "POST",
-      body: JSON.stringify({ templateId, spaceKey }),
-    });
+  async render(templateId, spaceKey) {
+    try {
+      return await request("/api/pagetemplate/" + templateId + "/render", {
+        method: "POST",
+        body: JSON.stringify({ templateId, spaceKey }),
+      });
+    } catch (e) {
+      return null;
+    }
   },
 };
