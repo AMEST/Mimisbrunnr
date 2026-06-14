@@ -51,4 +51,13 @@ public class PageTemplateManager : IPageTemplateManager
         var template = await GetById(id);
         await _repository.Delete(template);
     }
+
+    public async Task DeleteBySpaceId(string spaceId)
+    {
+        var templates = _repository.GetAll().Where(x => x.Type == TemplateType.Space && x.SpaceId == spaceId).ToArray();
+        foreach (var template in templates)
+        {
+            await _repository.Delete(template);
+        }
+    }
 }

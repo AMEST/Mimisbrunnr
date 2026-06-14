@@ -133,6 +133,7 @@ internal class PageTemplateService : IPageTemplateService
         var space = await _spaceManager.GetByKey(spaceKey);
         if (space == null)
             throw new SpaceNotFoundException($"Space with key '{spaceKey}' not found");
+        await _permissionService.EnsureViewPermission(spaceKey, user);
 
         var parameters = new Dictionary<string, object>
         {
