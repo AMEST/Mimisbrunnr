@@ -13,6 +13,7 @@ import hljs from "highlight.js/lib/common";
 import "highlight.js/styles/github.css";
 import { replaceRelativeLinksToRoute } from "@/services/Utils";
 import PluginService from "@/services/pluginService";
+import { setupImagePreview } from "@/services/imagePreview";
 
 const VueMarkdown = () =>
   import(
@@ -32,6 +33,10 @@ export default {
     contentId: {
       type: String,
       default: "page-content",
+    },
+    disableImagePreview: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -68,6 +73,9 @@ export default {
         await PluginService.renderMacroOnPage(this.page.id);
         this.scrollToAnchor();
         replaceRelativeLinksToRoute(this.contentId);
+        if (!this.disableImagePreview) {
+          setupImagePreview(document.getElementById(this.contentId || 'page-content'));
+        }
       }, 200);
       return html;
     },
@@ -75,6 +83,8 @@ export default {
   watch: {
     content() {
       this.anchorScrolled = false;
+      var el = document.getElementById(this.contentId || 'page-content');
+      if (el) delete el.dataset.previewInitialized;
     },
   },
 };

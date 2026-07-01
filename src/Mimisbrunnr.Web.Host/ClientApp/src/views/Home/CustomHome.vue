@@ -16,7 +16,7 @@
       </b-button>
     </div>
     <div class="pt-5 pl-5 pr-5">
-      <PageRenderer :page="page" content-id="custom-home-page-content" />
+      <PageRenderer :page="page" content-id="custom-home-page-content" :disable-image-preview="true" />
     </div>
   </b-container>
 </template>
