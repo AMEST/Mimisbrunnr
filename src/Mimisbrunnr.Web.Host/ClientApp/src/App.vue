@@ -6,6 +6,7 @@
       <SpaceCreateModal />
       <create-from-template-modal />
       <search-bar />
+      <preview-overlay />
     </div>
     <div v-if="this.loaded && !this.initialized">
       <Quickstart />
@@ -21,6 +22,7 @@ const SearchBar = () => import(/* webpackChunkName: "search-bar-component" */"@/
 const CreateFromTemplateModal = () => import(/* webpackChunkName: "base-modals" */"@/components/base/CreateFromTemplateModal.vue");
 import axios from "axios";
 import ProfileService from "@/services/profileService";
+import PreviewOverlay from "@/components/PreviewOverlay.vue";
 export default {
   components: {
     Header,
@@ -28,6 +30,7 @@ export default {
     Quickstart,
     SearchBar,
     CreateFromTemplateModal,
+    PreviewOverlay,
   },
   data: () => ({
     loaded: false,
@@ -129,5 +132,11 @@ body {
   background-position: right calc(0.375em + 0.1875rem) center;
   background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
   margin-bottom: 5px;
+}
+[data-preview-initialized] img {
+  cursor: pointer;
+}
+[data-preview-initialized] a img {
+  cursor: inherit;
 }
 </style>
