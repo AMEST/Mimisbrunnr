@@ -133,4 +133,10 @@ body {
   background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
   margin-bottom: 5px;
 }
+[data-preview-initialized] img {
+  cursor: pointer;
+}
+[data-preview-initialized] a img {
+  cursor: inherit;
+}
 </style>

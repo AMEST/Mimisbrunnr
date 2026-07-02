@@ -70,7 +70,11 @@ export default {
       setTimeout(this.scrollToAnchor, 100);
       setTimeout(replaceRelativeLinksToRoute, 100, this.contentId);
       setTimeout(async () => {
-        await PluginService.renderMacroOnPage(this.page.id);
+        try {
+          await PluginService.renderMacroOnPage(this.page.id);
+        } catch (e) {
+          console.warn('Macro render failed', e);
+        }
         this.scrollToAnchor();
         replaceRelativeLinksToRoute(this.contentId);
         if (!this.disableImagePreview) {

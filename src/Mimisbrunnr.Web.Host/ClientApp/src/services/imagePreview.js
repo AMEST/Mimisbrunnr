@@ -9,23 +9,19 @@ export function setupImagePreview(container) {
   if (containerEl.dataset.previewInitialized) return
   containerEl.dataset.previewInitialized = 'true'
 
-  var images = containerEl.querySelectorAll('img')
+  containerEl.addEventListener('click', function (e) {
+    var img = e.target.closest('img')
+    if (!img) return
+    if (img.closest('a')) return
 
-  for (var i = 0; i < images.length; i++) {
-    var img = images[i]
-    if (img.closest('a')) continue
+    var src = img.src
+    if (!src) return
 
-    img.style.cursor = 'pointer'
-    img.addEventListener('click', function () {
-      var src = this.src
-      if (!src) return
+    var name = img.getAttribute('alt') || ''
+    if (!name) {
+      name = decodeURIComponent(src.split('/').pop() || '')
+    }
 
-      var name = this.getAttribute('alt') || ''
-      if (!name) {
-        name = decodeURIComponent(src.split('/').pop() || '')
-      }
-
-      openPreview('image', src, name)
-    })
-  }
+    openPreview('image', src, name)
+  })
 }

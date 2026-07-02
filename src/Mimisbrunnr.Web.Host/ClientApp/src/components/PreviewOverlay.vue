@@ -4,7 +4,7 @@
       <b-icon-x :width="48" :height="48" />
     </button>
     <div class="preview-body" @wheel.prevent="onZoom">
-      <img v-if="type === 'image'" :src="src" class="preview-image" :style="imageStyle" />
+      <img v-if="type === 'image'" :src="src" class="preview-image" :style="imageStyle" @error="onError" />
     </div>
     <div v-if="caption" class="preview-caption">{{ caption }}</div>
   </div>
@@ -62,8 +62,15 @@ export default {
       }
     },
     onZoom(e) {
-      var delta = e.deltaY > 0 ? -0.1 : 0.1
-      this.scale = Math.min(5, Math.max(0.25, this.scale + delta))
+      if (e.deltaY > 0) {
+        this.scale = Math.max(0.25, this.scale - e.deltaY * 0.001)
+      } else {
+        this.scale = Math.min(5, this.scale - e.deltaY * 0.001)
+      }
+    },
+    onError() {
+      this.src = ''
+      this.close()
     }
   }
 }
