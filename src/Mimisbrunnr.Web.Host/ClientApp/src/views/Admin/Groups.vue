@@ -1,5 +1,6 @@
 <template>
-  <b-container>
+  <b-container fluid class="h-100vh admin-content">
+    <b-container>
     <Menu activeMenuItem="Groups" />
     <b-card :title="$t('admin.groups.title')" class="admin-group-card">
       <b-button
@@ -43,6 +44,7 @@
       </b-button>
     </b-card>
     <group-modal :createAction="loadGroups" />
+    </b-container>
   </b-container>
 </template>
 
@@ -126,6 +128,10 @@ export default {
 </script>
 
 <style scoped>
+.admin-content {
+  overflow-y: auto;
+}
+
 .admin-group-card {
   border-top: unset !important;
   border-top-left-radius: unset !important;
