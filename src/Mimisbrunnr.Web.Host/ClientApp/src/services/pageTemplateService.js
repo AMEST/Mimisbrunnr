@@ -24,7 +24,8 @@ export default {
       if (type) params.set("type", type);
       if (spaceKey) params.set("spaceKey", spaceKey);
       const qs = params.toString();
-      return await request("/api/pagetemplate" + (qs ? "?" + qs : ""));
+      const result = await request("/api/pagetemplate" + (qs ? "?" + qs : ""));
+      return Array.isArray(result) ? result : [];
     } catch (e) {
       return [];
     }
