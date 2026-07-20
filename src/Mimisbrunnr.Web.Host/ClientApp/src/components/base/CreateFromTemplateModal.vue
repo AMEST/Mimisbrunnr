@@ -3,9 +3,12 @@
     id="create-from-template-modal"
     :title="$t('pageTemplates.createFromTemplate')"
     centered
-    @show="loadTemplates"
+    @shown="loadTemplates"
   >
-    <b-list-group v-if="templates.length > 0">
+    <div v-if="loading" class="text-center py-3">
+      <b-spinner variant="secondary"></b-spinner>
+    </div>
+    <b-list-group v-else-if="templates.length > 0">
       <b-list-group-item
         v-for="tpl in templates"
         :key="tpl.id"
@@ -32,16 +35,20 @@ export default {
   name: "CreateFromTemplateModal",
   data() {
     return {
+      loading: false,
       templates: [],
     };
   },
   methods: {
     async loadTemplates() {
+      this.loading = true;
       try {
         var spaceKey = this.$route.params.key || "";
         this.templates = await pageTemplateService.getAll("", spaceKey);
       } catch (e) {
         this.templates = [];
+      } finally {
+        this.loading = false;
       }
     },
     async createFromTemplate(template) {
