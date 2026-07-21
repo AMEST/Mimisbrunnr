@@ -101,7 +101,7 @@ export default {
 
 .profile-img-header {
   height: 192px;
-  width: 100vw;
+  width: 100%;
   position: absolute;
   left: 0;
   background: -webkit-linear-gradient(
