@@ -1,31 +1,33 @@
 <template>
-  <b-container v-if="profile">
+  <b-container v-if="profile" fluid class="h-100vh profile-container">
     <b-card overlay img-src="" text-variant="white" class="profile-img-header">
     </b-card>
-    <b-row class="h-100vh profile-content">
-      <b-col sm="5" md="auto"  class="text-left">
-        <b-avatar
-          class="profile-avatar-bg"
-          :text="getInitials()"
-          :src="this.profile.avatarUrl"
-          :style="this.profile.avatarUrl ? 'background-color: #f4f5f7' : ''"
-        ></b-avatar>
-        <div class="profile-title">
-          <h4>{{ this.profile.name }}</h4>
-          <span class="text-muted"> {{ this.profile.email }} </span>
-        </div>
-        <div class="profile-actions" v-if="this.itsMe">
-          <b-button class="profile-actions-button" block variant="light" v-b-modal.profile-settings-modal>{{
-            $t("profile.settings.title")
-          }}</b-button>
-          <b-button class="profile-actions-button" to="/dashboard/favorites" block variant="light">{{
-            $t("profile.favorites")
-          }}</b-button>
-        </div>
-        <additional-info v-if="profile != null" :profile="profile" :itsMe="this.itsMe" />
-      </b-col>
-      <worked-on />
-    </b-row>
+    <b-container class="profile-content">
+      <b-row>
+        <b-col sm="5" md="auto"  class="text-left">
+          <b-avatar
+            class="profile-avatar-bg"
+            :text="getInitials()"
+            :src="this.profile.avatarUrl"
+            :style="this.profile.avatarUrl ? 'background-color: #f4f5f7' : ''"
+          ></b-avatar>
+          <div class="profile-title">
+            <h4>{{ this.profile.name }}</h4>
+            <span class="text-muted"> {{ this.profile.email }} </span>
+          </div>
+          <div class="profile-actions" v-if="this.itsMe">
+            <b-button class="profile-actions-button" block variant="light" v-b-modal.profile-settings-modal>{{
+              $t("profile.settings.title")
+            }}</b-button>
+            <b-button class="profile-actions-button" to="/dashboard/favorites" block variant="light">{{
+              $t("profile.favorites")
+            }}</b-button>
+          </div>
+          <additional-info v-if="profile != null" :profile="profile" :itsMe="this.itsMe" />
+        </b-col>
+        <worked-on />
+      </b-row>
+    </b-container>
     <settings-modal :profile="profile" />
   </b-container>
 </template>
@@ -92,10 +94,14 @@ export default {
 </script>
 
 <style>
+.profile-container {
+  overflow-y: auto;
+  position: relative;
+}
+
 .profile-img-header {
   height: 192px;
-  width: 100vw;
-  max-width: 100%;
+  width: 100%;
   position: absolute;
   left: 0;
   background: -webkit-linear-gradient(
@@ -140,7 +146,7 @@ export default {
 .profile-content {
   position: relative;
   top: 192px;
-  height: calc(100vh - 56px - 192px) !important;
+  height: calc(100% - 192px) !important;
 }
 
 .profile-title {

@@ -1,8 +1,10 @@
 <template>
-  <b-container class="pt-5 text-left">
+  <b-container fluid class="h-100vh pt-5 text-left discovery-content">
+    <b-container>
       <b-form-input class="search-field discovery-search" v-model="searchText" size="lg" :placeholder="$t('people.search.placeholder')"></b-form-input>
       <users :textForSearch="searchText" />
       <!--TODO: Add groups list-->
+    </b-container>
   </b-container>
 </template>
 
@@ -38,6 +40,10 @@ export default {
 </script>
 
 <style>
+.discovery-content {
+  overflow-y: auto;
+}
+
 .discovery-search {
     background-color: transparent !important;
 }

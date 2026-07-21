@@ -1,9 +1,11 @@
 <template>
-  <b-container>
+  <b-container fluid class="h-100vh admin-content">
+    <b-container>
     <Menu activeMenuItem="Templates" />
     <b-card class="admin-templates-card">
       <page-template-manager type="System" admin-mode />
     </b-card>
+    </b-container>
   </b-container>
 </template>
 
@@ -18,6 +20,10 @@ export default {
 </script>
 
 <style scoped>
+.admin-content {
+  overflow-y: auto;
+}
+
 .admin-templates-card {
   border-top: unset !important;
   border-top-left-radius: unset !important;

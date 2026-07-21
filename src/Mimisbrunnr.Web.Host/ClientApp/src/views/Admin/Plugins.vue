@@ -1,5 +1,6 @@
 <template>
-  <b-container>
+  <b-container fluid class="h-100vh admin-content">
+    <b-container>
     <Menu activeMenuItem="Plugins" />
     <b-card class="admin-plugin-card">
       <div class="d-flex justify-content-between align-items-center mb-3">
@@ -89,6 +90,7 @@
     <div align="right">
         <a href="/assets/plugin-editor.html" target="_blank">{{ $t("admin.plugins.openPluginEditor") }}</a>
     </div>
+    </b-container>
   </b-container>
 </template>
 
@@ -218,6 +220,10 @@ export default {
 </script>
 
 <style scoped>
+.admin-content {
+  overflow-y: auto;
+}
+
 .admin-plugin-card {
   border-top: unset !important;
   border-top-left-radius: unset !important;

@@ -1,5 +1,6 @@
 <template>
-  <b-container>
+  <b-container fluid class="h-100vh admin-content">
+    <b-container>
     <Menu activeMenuItem="Users" />
     <b-card :title="$t('admin.users.title')" class="admin-user-card">
       <b-button
@@ -73,6 +74,7 @@
       </b-button>
     </b-card>
     <user-modal :createAction="loadUsers" />
+    </b-container>
   </b-container>
 </template>
 
@@ -193,6 +195,10 @@ export default {
 </script>
 
 <style scoped>
+.admin-content {
+  overflow-y: auto;
+}
+
 .admin-user-card {
   border-top: unset !important;
   border-top-left-radius: unset !important;

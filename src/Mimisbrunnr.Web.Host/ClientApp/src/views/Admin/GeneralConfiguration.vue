@@ -1,5 +1,6 @@
 <template>
-  <b-container>
+  <b-container fluid class="h-100vh admin-content">
+    <b-container>
     <Menu activeMenuItem="General" />
     <b-card :title="$t('admin.general.title')" class="admin-general-card">
       <b-card-text>
@@ -81,6 +82,7 @@
         {{ $t("admin.general.save") }}
       </b-button>
     </b-card>
+    </b-container>
   </b-container>
 </template>
 
@@ -135,6 +137,10 @@ export default {
 </script>
 
 <style scoped>
+.admin-content {
+  overflow-y: auto;
+}
+
 .admin-general-card {
   border-top: unset !important;
   border-top-left-radius: unset !important;
