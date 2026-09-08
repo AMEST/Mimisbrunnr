@@ -30,7 +30,7 @@ public class AccountController : ControllerBase
     public IActionResult Login([FromQuery] string redirectUri = null)
     {
         var redirect = "/";
-        if(!string.IsNullOrEmpty(redirectUri) && redirectUri.StartsWith("/"))
+        if (!string.IsNullOrEmpty(redirectUri) && Url.IsLocalUrl(redirectUri))
             redirect = redirectUri;
 
         var user = User?.ToInfo();

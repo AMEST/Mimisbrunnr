@@ -11,6 +11,10 @@ namespace Mimisbrunnr.Web.Host.Services;
 
 public class ConfluenceDataImportService : IDataImportService
 {
+    private const int MaxArchiveEntries = 10_000;
+    private const long MaxEntryUncompressedSize = 100 * 1024 * 1024;
+    private const long MaxArchiveUncompressedSize = 1024 * 1024 * 1024;
+    private const long MaxCompressionRatio = 100;
     private readonly Converter _markdownConverter;
     private readonly IWikiService _wikiService;
     private readonly ILogger<ConfluenceDataImportService> _logger;
@@ -44,6 +48,7 @@ public class ConfluenceDataImportService : IDataImportService
 
         using (var archive = new ZipArchive(importStream))
         {
+            EnsureArchiveIsWithinLimits(archive);
             _logger.LogDebug("Open zip archive with exported space");
             var entities = await ReadEntitiesFromZip(archive).ConfigureAwait(false);
             var entitiesDocument = XDocument.Parse(entities);
@@ -283,6 +288,27 @@ public class ConfluenceDataImportService : IDataImportService
         }
 
         return null;
+    }
+
+    private static void EnsureArchiveIsWithinLimits(ZipArchive archive)
+    {
+        if (archive.Entries.Count > MaxArchiveEntries)
+            throw new InvalidDataException($"Import archive contains more than {MaxArchiveEntries} entries.");
+
+        long totalUncompressedSize = 0;
+        foreach (var entry in archive.Entries)
+        {
+            if (entry.Length > MaxEntryUncompressedSize)
+                throw new InvalidDataException($"Archive entry '{entry.FullName}' exceeds the allowed size.");
+
+            totalUncompressedSize = checked(totalUncompressedSize + entry.Length);
+            if (totalUncompressedSize > MaxArchiveUncompressedSize)
+                throw new InvalidDataException("Archive exceeds the allowed uncompressed size.");
+
+            if (entry.Length > 0 && entry.CompressedLength > 0
+                && entry.Length / entry.CompressedLength > MaxCompressionRatio)
+                throw new InvalidDataException($"Archive entry '{entry.FullName}' exceeds the allowed compression ratio.");
+        }
     }
 #endregion
 }
