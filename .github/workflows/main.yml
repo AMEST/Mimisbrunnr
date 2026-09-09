@@ -8,6 +8,23 @@ on:
     branches: [ main ]
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      NUGET_XMLDOC_MODE: skip
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0'
+    - name: Run tests
+      run: dotnet test ./tests/Mimisbrunnr.Web.Tests/Mimisbrunnr.Web.Tests.csproj --filter "Category!=Integration"
+
   publish-import-cli-binary:
     if: contains(github.ref, 'tags/v') # works only version tagged
     runs-on: ubuntu-latest
