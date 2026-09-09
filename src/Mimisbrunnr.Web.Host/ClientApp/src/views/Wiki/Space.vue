@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import http from "@/services/http";
 import Menu from "@/components/space/Menu.vue";
 import Page from "@/components/space/Page.vue";
 const DeletePage = () =>
@@ -155,7 +155,7 @@ export default {
       if (pageId == null) pageId = this.space.homePageId;
       if (pageId == null) return;
 
-      var pageRequest = await axios.get("/api/page/" + pageId, {
+      var pageRequest = await http.get("/api/page/" + pageId, {
         validateStatus: false,
       });
       if (

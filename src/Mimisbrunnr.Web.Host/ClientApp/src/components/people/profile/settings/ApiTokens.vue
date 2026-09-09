@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import http from "@/services/http";
 export default {
   name: "ApiTokens",
   data() {
@@ -70,7 +70,7 @@ export default {
   },
   methods: {
     load: async function () {
-      var tokenRequest = await axios.get("/api/account/token");
+      var tokenRequest = await http.get("/api/account/token");
       this.tokens = tokenRequest.data;
     },
     revoke: async function (token) {
@@ -86,7 +86,7 @@ export default {
             footerClass: 'p-2 border-top-0',
       });
       if(!approve) return;
-      await axios.delete(`/api/account/token/${token.id}`);
+      await http.delete(`/api/account/token/${token.id}`);
       await this.load();
     },
     create: async function () {
@@ -101,7 +101,7 @@ export default {
       }
 
       var tokenLifetimeTimeSpan = `${tokenLifetime}.00:00:00`
-      var tokenRequest = await axios.post(`/api/account/token`, {
+      var tokenRequest = await http.post(`/api/account/token`, {
         "lifetime": tokenLifetimeTimeSpan
       });
       this.token = tokenRequest.data.token;

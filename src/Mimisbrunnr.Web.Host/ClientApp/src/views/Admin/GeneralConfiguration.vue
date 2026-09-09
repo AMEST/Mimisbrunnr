@@ -88,7 +88,7 @@
 
 <script>
 import Menu from "@/components/admin/Menu.vue";
-import axios from "axios";
+import http from "@/services/http";
 import ProfileService from "@/services/profileService";
 export default {
   name: "GeneralConfiguration",
@@ -110,7 +110,7 @@ export default {
   }),
   methods: {
     save: async function () {
-      await axios.put("/api/admin/applicationConfiguration", this.info);
+      await http.put("/api/admin/applicationConfiguration", this.info);
       window.location.reload();
     },
   },
@@ -120,7 +120,7 @@ export default {
       this.$router.push("/error/unauthorized");
       return;
     }
-    var spacesRequest = await axios.get("/api/space");
+    var spacesRequest = await http.get("/api/space");
     for (let spaceIndex in spacesRequest.data) {
       if (spacesRequest.data[spaceIndex].type != "Public") continue;
       this.spaces.push({
@@ -128,7 +128,7 @@ export default {
         text: `${spacesRequest.data[spaceIndex].name} (${spacesRequest.data[spaceIndex].key})`,
       });
     }
-    var configurationRequest = await axios.get(
+    var configurationRequest = await http.get(
       "/api/admin/applicationConfiguration"
     );
     this.info = configurationRequest.data;

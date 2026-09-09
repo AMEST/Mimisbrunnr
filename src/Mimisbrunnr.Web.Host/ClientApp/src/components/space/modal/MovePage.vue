@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import http from "@/services/http";
 import SpaceService from '@/services/spaceService';
 import PageService from '@/services/pageService';
 import SearchService from '@/services/searchService';
@@ -63,7 +63,7 @@ export default {
       if(pageId == null) return;
       if(this.selectedPage == null) return;
 
-      var newPageRequest = await axios.post(`/api/page/move/${pageId}/${this.selectedPage.id}?withChilds=${this.withChilds}`);
+      var newPageRequest = await http.post(`/api/page/move/${pageId}/${this.selectedPage.id}?withChilds=${this.withChilds}`);
 
       if (this.actionCallBack !== null && newPageRequest.data.spaceKey == this.$route.params.key)
         this.actionCallBack();

@@ -62,7 +62,7 @@
 
 <script>
 import { BIconTrash } from "bootstrap-vue";
-import axios from "axios";
+import http from "@/services/http";
 export default {
   name: "Attachments",
   data() {
@@ -84,7 +84,7 @@ export default {
     // eslint-disable-next-line
     init: async function (even) {
       if (this.page == null) return;
-      var attachmentRequest = await axios.get(
+      var attachmentRequest = await http.get(
         "/api/attachment/" + this.page.id,
         {
           validateStatus: false,
@@ -113,7 +113,7 @@ export default {
     // eslint-disable-next-line
     deleteAttachment: async function (attachment) {
       console.log("[delete]", attachment);
-      await axios.delete(
+      await http.delete(
         "/api/attachment/" + this.page.id + "/" + attachment.name,
         {
           validateStatus: false,
@@ -126,7 +126,7 @@ export default {
       this.uploadOverlay = true;
       var formData = new FormData();
       formData.append("attachment", this.newAttachment);
-      await axios({
+      await http({
         method: "post",
         url: "/api/attachment/" + this.page.id,
         data: formData,

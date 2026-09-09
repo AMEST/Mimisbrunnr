@@ -3,20 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "export NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve",
-    "build": "export NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build",
-    "lint": "export NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service lint"
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "axios": "^0.26.1",
     "bootstrap": "4.6.1",
     "bootstrap-vue": "2.21.2",
     "codemirror": "^5.65.13",
     "codemirror-spell-checker": "^1.1.2",
-    "core-js": "^2.6.5",
+    "core-js": "^3.37.0",
     "easymde": "^2.18.0",
     "highlight.js": "^11.5.1",
-    "markdown-it": "^13.0.1",
+    "markdown-it": "^14.0.0",
     "markdown-it-abbr": "^1.0.4",
     "markdown-it-collapsible": "^2.0.2",
     "markdown-it-container": "^3.0.0",
@@ -31,8 +30,8 @@
     "markdown-it-task-lists": "^2.1.1",
     "markdown-it-toc-and-anchor": "^4.2.0",
     "marked": "^4.0.13",
-    "turndown": "^7.1.3",
     "register-service-worker": "^1.6.2",
+    "turndown": "^7.1.3",
     "vue": "^2.6.14",
     "vue-i18n": "^8.27.1",
     "vue-router": "^3.0.3",
@@ -42,14 +41,18 @@
     "vuex": "^3.6.2"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.0.5",
-    "@vue/cli-plugin-eslint": "^3.0.5",
-    "@vue/cli-plugin-pwa": "^3.0.5",
-    "@vue/cli-service": "^3.0.5",
-    "babel-eslint": "^10.0.1",
-    "bootstrap-vue": "2.21.2",
-    "eslint": "^5.16.0",
-    "eslint-plugin-vue": "^5.0.0",
-    "vue-template-compiler": "^2.6.10"
+    "@babel/eslint-parser": "^7.24.0",
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "@vue/cli-plugin-eslint": "^5.0.8",
+    "@vue/cli-plugin-pwa": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
+    "eslint": "^8.0.0",
+    "eslint-plugin-vue": "^9.0.0",
+    "path-browserify": "^1.0.1",
+    "vue-template-compiler": "^2.7.14"
+  },
+  "overrides": {
+    "serialize-javascript": "^7.1.0",
+    "qs": "^6.16.0"
   }
 }

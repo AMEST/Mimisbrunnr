@@ -1,9 +1,9 @@
-import axios from "axios";
+import http from "@/services/http";
 import { showToast } from "@/services/Utils";
 /*eslint-disable */
 var GroupService = {
     getGroup: async function (name) {
-        var request = await axios.get(`/api/group/${name}`,
+        var request = await http.get(`/api/group/${name}`,
             { validateStatus: false }
         );
         if (request.status == 200)
@@ -13,7 +13,7 @@ var GroupService = {
         return null;
     },
     getGroups: async function (offset) {
-        var request = await axios.get(`/api/group?offset=${offset == null? "" : offset}`,
+        var request = await http.get(`/api/group?offset=${offset == null? "" : offset}`,
             { validateStatus: false }
         );
         if (request.status == 200)
@@ -23,7 +23,7 @@ var GroupService = {
         return null;
     },
     createGroup: async function (name, description) {
-        var request = await axios.post(`/api/group`,
+        var request = await http.post(`/api/group`,
             {
                 name: name,
                 description: description,
@@ -38,7 +38,7 @@ var GroupService = {
         return false;
     },
     deleteGroup: async function (name) {
-        var request = await axios.delete(`/api/Group/${name}`,
+        var request = await http.delete(`/api/Group/${name}`,
             {
                 validateStatus: false,
             }

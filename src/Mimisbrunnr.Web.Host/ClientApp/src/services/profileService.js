@@ -1,4 +1,4 @@
-import axios from "axios";
+import http from "@/services/http";
 import store from "@/services/store";
 import { showToast } from "@/services/Utils";
 /*eslint-disable */
@@ -15,20 +15,20 @@ var ProfileService = {
         throw new Exception("Internal sever error. Can't get current user")
     },
     getCurrentUserRaw: async function () {
-        return await axios.get("/api/user/current", {
+        return await http.get("/api/user/current", {
             validateStatus: false,
         });
     },
     getOrCreatePersonalSpace: async function (profile) {
         var personalSpaceKey = profile.email.toUpperCase();
-        var getPersonalSpaceRequest = await axios.get(
+        var getPersonalSpaceRequest = await http.get(
             "/api/space/" + personalSpaceKey,
             {
                 validateStatus: false,
             }
         );
         if (getPersonalSpaceRequest.status == 200) return personalSpaceKey;
-        var createPersonalSpaceRequest = await axios.post(
+        var createPersonalSpaceRequest = await http.post(
             "/api/space",
             {
                 key: personalSpaceKey,
@@ -53,7 +53,7 @@ var ProfileService = {
             return;
         }
 
-        var request = await axios.put(`/api/user/${profile.email}`,profile,
+        var request = await http.put(`/api/user/${profile.email}`,profile,
             {
                 validateStatus: false,
             }

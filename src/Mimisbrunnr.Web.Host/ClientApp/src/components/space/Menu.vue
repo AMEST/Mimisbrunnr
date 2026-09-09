@@ -84,7 +84,7 @@ import {
   BIconGearFill,
   BIconFiles,
 } from "bootstrap-vue";
-import axios from "axios";
+import http from "@/services/http";
 import { VueTreeList, Tree } from "vue-tree-list";
 import { getNameInitials } from "@/services/Utils";
 export default {
@@ -113,7 +113,7 @@ export default {
       return getNameInitials(this.space.name);
     },
     loadHomePage: async function () {
-      var homePageRequest = await axios.get(
+      var homePageRequest = await http.get(
         "/api/page/" + this.space.homePageId,
         {
           validateStatus: false,

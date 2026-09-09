@@ -83,7 +83,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import http from "@/services/http";
 export default {
   name: "SpaceCreateModal",
   data() {
@@ -129,7 +129,7 @@ export default {
       alert(JSON.stringify(response.data));
     },
     createSpace: function () {
-      return axios.post("/api/space", this.form, {
+      return http.post("/api/space", this.form, {
         validateStatus: false,
       });
     },
@@ -137,7 +137,7 @@ export default {
       var formData = new FormData();
       formData.append("model", JSON.stringify(this.form));
       formData.append("import", this.importFile);
-      return axios({
+      return http({
         method: "post",
         url: "/api/space/import",
         data: formData,

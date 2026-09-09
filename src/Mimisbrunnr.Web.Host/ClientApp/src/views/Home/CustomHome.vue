@@ -24,7 +24,7 @@
 
 <script>
 import { BIconPencilFill } from "bootstrap-vue";
-import axios from "axios";
+import http from "@/services/http";
 import PageRenderer from "@/components/PageRenderer.vue";
 export default {
   name: "CustomHome",
@@ -45,14 +45,14 @@ export default {
 
     document.title = this.$store.state.application.info.title;
 
-    var customHomeRequest = await axios.get("/api/Customization/homepage", {
+    var customHomeRequest = await http.get("/api/Customization/homepage", {
       validateStatus: false,
     });
     if (customHomeRequest.status != 200) {
       this.$router.push("/dashboard");
       return;
     }
-    var pageRequest = await axios.get(
+    var pageRequest = await http.get(
       `/api/page/${customHomeRequest.data.homepageId}`,
       {
         validateStatus: false,

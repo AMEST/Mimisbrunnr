@@ -20,7 +20,7 @@
 
 <script>
 import PermissionsTable from "@/components/space/modal/permissions/PermissionsTable.vue";
-import axios from 'axios';
+import http from "@/services/http";
 export default {
   name: "Permissions",
   components: {
@@ -36,7 +36,7 @@ export default {
       var spaceKey = this.$route.params.key;
       if (spaceKey == null) return;
 
-      var permissionsRequest = await axios.get("/api/space/"+spaceKey+"/permissions");
+      var permissionsRequest = await http.get("/api/space/"+spaceKey+"/permissions");
       this.permissions = permissionsRequest.data;
     },
     onShow: async function () {

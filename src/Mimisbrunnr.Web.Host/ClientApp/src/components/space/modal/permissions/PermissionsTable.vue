@@ -79,7 +79,7 @@
 
 <script>
 import { BIconDisc, BIconTrash } from "bootstrap-vue";
-import axios from "axios";
+import http from "@/services/http";
 import UserService from "@/services/userService";
 import GroupService from "@/services/groupService";
 import SearchService from "@/services/searchService";
@@ -140,7 +140,7 @@ export default {
       var spaceKey = this.$route.params.key;
       if (spaceKey == null) return;
       if (permission == null) return;
-      var savePermissionRequest = await axios.put(
+      var savePermissionRequest = await http.put(
         `/api/space/${spaceKey}/permissions`,
         permission,
         { validateStatus: false }
@@ -159,7 +159,7 @@ export default {
       var spaceKey = this.$route.params.key;
       if (spaceKey == null) return;
       if (permission == null) return;
-      await axios.delete(`/api/space/${spaceKey}/permissions`, {
+      await http.delete(`/api/space/${spaceKey}/permissions`, {
         data: permission,
       });
       await this.actionCallBack();
@@ -196,7 +196,7 @@ export default {
         }
         permission.user = profileRequest;
       }
-      var addPermissionRequest = await axios.post(
+      var addPermissionRequest = await http.post(
         `/api/space/${spaceKey}/permissions`,
         permission,
         { validateStatus: false }

@@ -1,4 +1,4 @@
-import axios from "axios";
+import http from "@/services/http";
 import { showToast } from "@/services/Utils";
 /*eslint-disable */
 var SpaceService = {
@@ -7,7 +7,7 @@ var SpaceService = {
         if (take){
             url += `?take=${take}&skip=${skip ? skip : 0}`;
         }
-        var spacesRequest = await axios.get(url, {
+        var spacesRequest = await http.get(url, {
             validateStatus: false,
         });
         if (spacesRequest.status == 200) 
@@ -17,7 +17,7 @@ var SpaceService = {
          return [];
     },
     getSpace: async function (spaceKey) {
-        var request = await axios.get(`/api/space/${spaceKey}`, {
+        var request = await http.get(`/api/space/${spaceKey}`, {
             validateStatus: false,
         });
         if (request.status == 200)
@@ -29,7 +29,7 @@ var SpaceService = {
         return null;
     },
     getSpacePermissions: async function (spaceKey) {
-        var request = await axios.get(`/api/space/${spaceKey}/permission`, {
+        var request = await http.get(`/api/space/${spaceKey}/permission`, {
             validateStatus: false,
         });
         if (request.status == 200)

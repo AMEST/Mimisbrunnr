@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import http from "@/services/http";
 import PageRenderer from "@/components/PageRenderer.vue";
 export default {
   name: "EmbeddedPage",
@@ -21,7 +21,7 @@ export default {
   },
   methods: {
     async loadPage() {
-      var pageRequest = await axios.get(
+      var pageRequest = await http.get(
         `/api/page/${this.$route.params.pageId}`,
         {
           validateStatus: false,
