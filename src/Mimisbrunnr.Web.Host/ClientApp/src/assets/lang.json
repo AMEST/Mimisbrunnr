@@ -272,6 +272,9 @@
                     "days": "Days",
                     "create": "Create",
                     "empty": "There are no issued tokens",
+                    "generatedToken": "Your new token",
+                    "copy": "Copy",
+                    "tokenCopied": "Token copied to clipboard",
                     "approveModal":{
                         "title": "Confirm the action",
                         "revoke": "Are you sure you want to revoke the issued API Token?",
@@ -796,6 +799,9 @@
                     "days": "Дней",
                     "create": "Создать",
                     "empty": "Нет ни одного выпущенного токена",
+                    "generatedToken": "Ваш новый токен",
+                    "copy": "Скопировать",
+                    "tokenCopied": "Токен скопирован в буфер обмена",
                     "approveModal":{
                         "title": "Подтвердите действие",
                         "revoke": "Вы действительно хотите отозвать выпущенный API Token?",

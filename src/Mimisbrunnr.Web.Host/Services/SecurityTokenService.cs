@@ -80,6 +80,7 @@ internal class SecurityTokenService : ISecurityTokenService
         var userTokens = await _userTokenRepository
             .GetAll()
             .Where(x => x.UserId == user.Id)
+            .OrderByDescending(x => x.Created)
             .ToArrayAsync();
         return userTokens;
     }
