@@ -43,6 +43,68 @@ public class DraftServiceTests
         A.CallTo(() => _drafts.Remove("page")).MustHaveHappenedOnceExactly();
     }
 
+    [Fact]
+    public async Task Should_UpdateExistingDraft_WhenDraftExists()
+    {
+        var user = new UserInfo { Email = "user@example.test" };
+        ArrangePage(user);
+        var draft = new Draft { OriginalPageId = "page", Name = "Old", Content = "Old content" };
+        A.CallTo(() => _drafts.GetByPageId("page")).Returns(Task.FromResult(draft));
+
+        await _service.Update("page", new DraftUpdateModel { Name = "New", Content = "New content" }, user);
+
+        draft.Name.Should().Be("New");
+        draft.Content.Should().Be("New content");
+        A.CallTo(() => _drafts.Update(draft, user)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _drafts.Create(A<string>._, A<string>._, A<string>._, A<UserInfo>._)).MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_ReturnDraftModel_WhenGettingByPageId()
+    {
+        var user = new UserInfo { Email = "user@example.test" };
+        ArrangePage(user);
+        A.CallTo(() => _drafts.GetByPageId("page")).Returns(Task.FromResult(new Draft { Name = "Title", Content = "Content" }));
+
+        var result = await _service.GetByPageId("page", user);
+
+        result.Name.Should().Be("Title");
+        A.CallTo(() => _permissions.EnsureEditPermission("SPACE", user)).MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task ShouldThrow_PageNotFoundException_WhenDeletingDraftOfMissingPage()
+    {
+        var user = new UserInfo { Email = "user@example.test" };
+        A.CallTo(() => _pages.GetById("missing")).Returns(Task.FromResult<Page>(null));
+
+        await _service.Invoking(x => x.Delete("missing", user))
+            .Should().ThrowAsync<Mimisbrunnr.Integration.Wiki.PageNotFoundException>();
+    }
+
+    [Fact]
+    public async Task ShouldThrow_SpaceNotFoundException_WhenPageHasMissingSpace()
+    {
+        var user = new UserInfo { Email = "user@example.test" };
+        A.CallTo(() => _pages.GetById("page")).Returns(Task.FromResult(new Page { Id = "page", SpaceId = "space" }));
+        A.CallTo(() => _spaces.GetById("space")).Returns(Task.FromResult<Space>(null));
+
+        await _service.Invoking(x => x.Update("page", new DraftUpdateModel(), user))
+            .Should().ThrowAsync<Mimisbrunnr.Integration.Wiki.SpaceNotFoundException>();
+    }
+
+    [Fact]
+    public async Task Should_RequireAnonymousAccess_WhenGettingDraft()
+    {
+        var user = new UserInfo { Email = "user@example.test" };
+        ArrangePage(user);
+        A.CallTo(() => _drafts.GetByPageId("page")).Returns(Task.FromResult(new Draft()));
+
+        await _service.GetByPageId("page", user);
+
+        A.CallTo(() => _permissions.EnsureAnonymousAllowed(user)).MustHaveHappenedOnceExactly();
+    }
+
     private void ArrangePage(UserInfo user)
     {
         A.CallTo(() => _pages.GetById("page")).Returns(Task.FromResult(new Page { Id = "page", SpaceId = "space" }));

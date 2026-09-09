@@ -29,27 +29,27 @@ namespace Mimisbrunnr.Web.Infrastructure
             return await _stubble.RenderAsync(template, parameters);
         }
 
-        private static string Uuid(string _, Func<string, string> __)
+        private static object Uuid(string _, Func<string, string> __)
         {
             return Guid.NewGuid().ToString("N");
         }
 
-        private static string UrlEncode(string str, Func<string, string> render)
+        private static object UrlEncode(string str, Func<string, string> render)
         {
             return HttpUtility.UrlEncode(render(str));
         }
 
-        private static string HtmlEncode(string str, Func<string, string> render)
+        private static object HtmlEncode(string str, Func<string, string> render)
         {
             return HttpUtility.HtmlEncode(render(str));
         }
 
-        private static string ToLower(string str, Func<string, string> render)
+        private static object ToLower(string str, Func<string, string> render)
         {
             return render(str).ToLowerInvariant();
         }
 
-        private static string ToUpper(string str, Func<string, string> render)
+        private static object ToUpper(string str, Func<string, string> render)
         {
             return render(str).ToUpperInvariant();
         }

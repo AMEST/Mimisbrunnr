@@ -59,10 +59,8 @@ internal class SecurityTokenService : ISecurityTokenService
         };
         if (!systemToken)
             await _userTokenRepository.Create(userToken);
-        else
-            userToken.Id = Guid.Empty.ToString();
 
-        var principal = CreatePrincipal(user, userToken.Id, systemToken);
+        var principal = CreatePrincipal(user, userToken.Id ?? Guid.Empty.ToString(), systemToken);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -102,7 +100,7 @@ internal class SecurityTokenService : ISecurityTokenService
             [
                 new(ClaimTypes.NameIdentifier, user.Email),
                 new(ClaimTypes.Email, user.Email),
-                new(ClaimTypes.Name, user.Name),
+                new(ClaimTypes.Name, user.Name ?? user.Email),
                 new(ClaimTypes.Role, user.Role.ToString()),
                 new(TokenIdClaim, tokenId),
                 new(SystemTokenClaim, $"{systemToken}")

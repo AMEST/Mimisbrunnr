@@ -38,4 +38,26 @@ public class CustomizationServiceTests
         result.HomepageId.Should().Be("home");
         A.CallTo(() => _permissions.EnsureAnonymousAllowed(user)).MustHaveHappenedOnceExactly();
     }
+
+    [Fact]
+    public async Task Should_ReturnNull_WhenCustomHomepageIsDisabled()
+    {
+        var user = new UserInfo { Email = "user@example.test" };
+        A.CallTo(() => _configuration.Get()).Returns(Task.FromResult(new ApplicationConfiguration { CustomHomepageEnabled = false }));
+
+        var result = await _service.GetCustomHomepage(user);
+
+        result.Should().BeNull();
+        A.CallTo(() => _spaces.GetByKey(A<string>._, user)).MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_ReturnCustomCss_WhenConfigurationExists()
+    {
+        A.CallTo(() => _configuration.Get()).Returns(Task.FromResult(new ApplicationConfiguration { CustomCss = "body { color: red }" }));
+
+        var result = await _service.GetCustomCss();
+
+        result.Should().Be("body { color: red }");
+    }
 }

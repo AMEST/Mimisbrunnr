@@ -34,4 +34,33 @@ public class QuickstartServiceTests
 
         A.CallTo(() => _configuration.Initialize(A<Mimisbrunnr.Web.Infrastructure.Contracts.ApplicationConfiguration>.That.Matches(x => x.Title == "Wiki" && x.UserAutoCreation), user)).MustHaveHappenedOnceExactly();
     }
+
+    [Fact]
+    public async Task ShouldThrow_InitializeException_WhenInitializingAlreadyInitializedApplication()
+    {
+        var user = new UserInfo { Email = "admin@example.test" };
+        A.CallTo(() => _configuration.IsInitialized()).Returns(Task.FromResult(true));
+
+        await _service.Invoking(x => x.Initialize(new QuickstartModel { Title = "Wiki" }, user))
+            .Should().ThrowAsync<InitializeException>();
+        A.CallTo(() => _configuration.Initialize(A<Mimisbrunnr.Web.Infrastructure.Contracts.ApplicationConfiguration>._, A<Mimisbrunnr.Users.User>._)).MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_ReturnConfiguration_WhenGettingQuickstart()
+    {
+        A.CallTo(() => _configuration.Get()).Returns(Task.FromResult(new Mimisbrunnr.Web.Infrastructure.Contracts.ApplicationConfiguration { Title = "Wiki", UserAutoCreation = true }));
+
+        var result = await _service.Get();
+
+        result.Title.Should().Be("Wiki");
+    }
+
+    [Fact]
+    public async Task Should_ReturnInitializedFlag_WhenCheckingInitialization()
+    {
+        A.CallTo(() => _configuration.IsInitialized()).Returns(Task.FromResult(true));
+
+        (await _service.IsInitialized()).Should().BeTrue();
+    }
 }

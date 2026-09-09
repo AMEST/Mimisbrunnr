@@ -43,6 +43,9 @@ public static partial class UserMapper
 
     public static UserInfo ToInfo(this ClaimsPrincipal principal)
     {
+        if (principal is null)
+            return null;
+
         var user = new UserInfo
         {
             Email = principal.FindFirst(ClaimTypes.Email)?.Value?.ToLower() ??

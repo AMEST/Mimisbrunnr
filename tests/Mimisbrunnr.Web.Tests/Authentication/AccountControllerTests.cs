@@ -10,6 +10,30 @@ namespace Mimisbrunnr.Web.Tests.Authentication;
 public class AccountControllerTests
 {
     [Fact]
+    public async Task Should_ReturnBadRequest_WhenTokenCreationFails()
+    {
+        var service = A.Fake<ITokenService>();
+        A.CallTo(() => service.CreateUserToken(A<TokenCreateRequest>._, null))
+            .Returns(Task.FromResult<TokenCreateResult>(null));
+        var controller = new AccountController(service);
+
+        var result = await controller.CreateToken(new TokenCreateRequest());
+
+        result.Should().BeOfType<BadRequestResult>();
+    }
+
+    [Fact]
+    public async Task Should_ReturnTokens_WhenTokensAreRequested()
+    {
+        var service = A.Fake<ITokenService>();
+        A.CallTo(() => service.GetUserTokens(null)).Returns(Task.FromResult<IEnumerable<TokenModel>>([]));
+
+        var result = await new AccountController(service).GetTokens();
+
+        result.Should().BeOfType<OkObjectResult>();
+    }
+
+    [Fact]
     public void Should_UseRootRedirect_WhenProtocolRelativeRedirectIsProvided()
     {
         var url = A.Fake<IUrlHelper>();

@@ -9,6 +9,30 @@ namespace Mimisbrunnr.Web.Tests.Wiki;
 public class AttachmentControllerTests
 {
     [Fact]
+    public async Task Should_ReturnNotFound_WhenAttachmentContentIsMissing()
+    {
+        var attachments = A.Fake<IAttachmentService>();
+        A.CallTo(() => attachments.GetAttachmentContent("page", "missing.bin", null))
+            .Returns(Task.FromResult<Stream>(null));
+        var controller = new AttachmentController(attachments);
+
+        var result = await controller.GetContent("page", "missing.bin");
+
+        result.Should().BeOfType<NotFoundResult>();
+    }
+
+    [Fact]
+    public async Task Should_ReturnEmptyCollection_WhenPageHasNoAttachments()
+    {
+        var attachments = A.Fake<IAttachmentService>();
+        A.CallTo(() => attachments.GetAttachments("page", null))
+            .Returns(Task.FromResult<Mimisbrunnr.Integration.Wiki.AttachmentModel[]>(null));
+        var result = await new AttachmentController(attachments).GetAll("page");
+
+        result.Should().BeOfType<OkObjectResult>().Which.Value.Should().BeAssignableTo<Mimisbrunnr.Integration.Wiki.AttachmentModel[]>();
+    }
+
+    [Fact]
     public async Task Should_ForceDownloadAndNosniff_WhenGettingHtmlAttachment()
     {
         var attachments = A.Fake<IAttachmentService>();
@@ -41,7 +65,7 @@ public class AttachmentControllerTests
         var result = await controller.GetContent("page", "image.png");
 
         var file = result.Should().BeOfType<FileStreamResult>().Subject;
-        file.FileDownloadName.Should().BeNull();
+        file.FileDownloadName.Should().BeNullOrEmpty();
         file.ContentType.Should().Be("image/png");
     }
 }

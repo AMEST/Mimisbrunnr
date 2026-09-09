@@ -10,12 +10,12 @@ public static class ConfigurationExtensions
 {
     public static StorageType GetFromStorageType(this CliConfiguration configuration)
     {
-        return Enum.Parse<StorageType>(configuration.OptFromStorageType, true);
+        return Enum.Parse<StorageType>(configuration.OptFromStorageType!, true);
     }
 
     public static StorageType GetToStorageType(this CliConfiguration configuration)
     {
-        return Enum.Parse<StorageType>(configuration.OptToStorageType, true);
+        return Enum.Parse<StorageType>(configuration.OptToStorageType!, true);
     }
 
     public static PersistentModuleConfiguration GetPersistentModuleConfiguration(this CliConfiguration configuration, StorageType type)
