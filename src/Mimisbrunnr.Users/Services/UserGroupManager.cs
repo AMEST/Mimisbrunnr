@@ -29,7 +29,7 @@ internal class UserGroupManager : IUserGroupManager
     
     public Task<Group> FindByName(string name)
     {
-        return _groupRepository.GetAll().FirstOrDefaultAsync(x => x.Name == name);
+        return _groupRepository.GetAll().FirstOrDefaultAsync(x => x.Name.ToLower() == name.ToLower());
     }
 
     public async Task<Group> Add(string name, string description, string ownerEmail)

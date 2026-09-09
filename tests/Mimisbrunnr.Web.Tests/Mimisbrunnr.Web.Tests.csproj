@@ -19,5 +19,11 @@
     <ItemGroup>
       <ProjectReference Include="..\..\src\Mimisbrunnr.PageTemplates\Mimisbrunnr.PageTemplates.csproj" />
       <ProjectReference Include="..\..\src\Mimisbrunnr.Web\Mimisbrunnr.Web.csproj" />
+      <ProjectReference Include="..\..\src\Mimisbrunnr.Web.Host\Mimisbrunnr.Web.Host.csproj" />
+      <ProjectReference Include="..\..\src\Mimisbrunnr.Web.Infrastructure\Mimisbrunnr.Web.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Mimisbrunnr.Wiki\Mimisbrunnr.Wiki.csproj" />
+      <ProjectReference Include="..\..\src\Mimisbrunnr.Users\Mimisbrunnr.Users.csproj" />
+      <ProjectReference Include="..\..\src\Mimisbrunnr.Favorites\Mimisbrunnr.Favorites.csproj" />
+      <ProjectReference Include="..\..\src\DataImport\Mimisbrunnr.DataImport.Confluence\Mimisbrunnr.DataImport.Confluence.csproj" />
     </ItemGroup>
 </Project>

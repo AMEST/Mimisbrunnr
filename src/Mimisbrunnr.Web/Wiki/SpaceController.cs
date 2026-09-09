@@ -19,6 +19,7 @@ namespace Mimisbrunnr.Web.Wiki;
 [HandleWikiErrors]
 public class SpaceController : ControllerBase
 {
+    private const long MaxImportSize = 250 * 1024 * 1024;
     private static readonly JsonSerializerOptions DeserializeSettings = new()
     {
             PropertyNameCaseInsensitive = true,
@@ -163,8 +164,8 @@ public class SpaceController : ControllerBase
     [ProducesResponseType(typeof(SpaceModel), 200)]
     [ProducesResponseType(401)]
     [ProducesResponseType(404)]
-    [DisableRequestSizeLimit]
-    [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
+    [RequestSizeLimit(MaxImportSize)]
+    [RequestFormLimits(ValueLengthLimit = 1024 * 1024, MultipartBodyLengthLimit = MaxImportSize)]
     public async Task<IActionResult> Import()
     {
         var createModelForm = HttpContext.Request.Form.FirstOrDefault(x => x.Key.Equals("model", StringComparison.OrdinalIgnoreCase));
@@ -173,8 +174,11 @@ public class SpaceController : ControllerBase
 
         var createModel = JsonSerializer.Deserialize<SpaceCreateModel>(createModelForm.Value.ToString(), DeserializeSettings);
         var importZip = HttpContext.Request.Form.Files.FirstOrDefault(x => x.Name.Equals("import", StringComparison.OrdinalIgnoreCase));
-        if (importZip == null)
+        if (importZip == null || importZip.Length == 0)
             return BadRequest();
+
+        if (importZip.Length > MaxImportSize)
+            return BadRequest($"Import file must not exceed {MaxImportSize / 1024 / 1024} MB.");
 
         var userInfo = User?.ToInfo();
 

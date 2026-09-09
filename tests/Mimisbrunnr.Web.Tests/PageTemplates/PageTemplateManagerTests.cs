@@ -22,7 +22,7 @@ public class PageTemplateManagerTests
     }
 
     [Fact]
-    public async Task Create_Should_Set_CreatedAndUpdated()
+    public async Task Should_SetAuditFields_WhenCreatingTemplate()
     {
         var template = new PageTemplate
         {
@@ -45,7 +45,7 @@ public class PageTemplateManagerTests
     }
 
     [Fact]
-    public async Task GetById_Should_Return_Template_From_Repository()
+    public async Task Should_ReturnTemplate_WhenTemplateExists()
     {
         var templates = new[]
         {
@@ -61,7 +61,7 @@ public class PageTemplateManagerTests
     }
 
     [Fact]
-    public async Task GetById_Should_Throw_When_Not_Found()
+    public async Task ShouldThrow_PageTemplateNotFoundException_WhenTemplateDoesNotExist()
     {
         A.CallTo(() => _repository.GetAll()).Returns(Enumerable.Empty<PageTemplate>().AsQueryable());
 
@@ -70,7 +70,7 @@ public class PageTemplateManagerTests
     }
 
     [Fact]
-    public async Task Update_Should_Set_Updated_And_UpdatedBy()
+    public async Task Should_UpdateAuditFields_WhenUpdatingTemplate()
     {
         var existing = new PageTemplate
         {
@@ -84,7 +84,7 @@ public class PageTemplateManagerTests
         A.CallTo(() => _repository.GetAll()).Returns(templates);
 
         var updateInfo = new UserInfo { Email = "new@test.com" };
-        await _manager.Update("1", "New Name", "New content", updateInfo);
+        await _manager.Update("1", "New Name", "New description", "New content", updateInfo);
 
         using (new AssertionScope())
         {
@@ -98,7 +98,7 @@ public class PageTemplateManagerTests
     }
 
     [Fact]
-    public async Task Delete_Should_Remove_From_Repository()
+    public async Task Should_RemoveTemplate_WhenDeletingTemplate()
     {
         var template = new PageTemplate { Id = "1" };
         var templates = new[] { template }.AsQueryable();
@@ -110,7 +110,7 @@ public class PageTemplateManagerTests
     }
 
     [Fact]
-    public async Task GetAll_Should_Return_From_Repository()
+    public async Task Should_ReturnAllTemplates_WhenGettingTemplates()
     {
         var templates = new[]
         {

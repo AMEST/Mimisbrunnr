@@ -45,14 +45,16 @@ internal class PageService : IPageService
     {
         await _permissionService.EnsureAnonymousAllowed(requestedBy);
 
+        // A tree cache is shared by all users. Authorize before returning a cached value,
+        // otherwise a user without access can read a tree populated by an authorized user.
+        var page = await _pageManager.GetById(pageId) ?? throw new PageNotFoundException();
+        var space = await _spaceManager.GetById(page.SpaceId) ?? throw new SpaceNotFoundException();
+        await _permissionService.EnsureViewPermission(space.Key, requestedBy);
+
         var cachedPageTree = await _distributedCache.GetAsync<PageTreeModel>(GetPageTreeCacheKey(pageId));
         if (cachedPageTree is not null)
             return cachedPageTree;
 
-        var page = await _pageManager.GetById(pageId) ?? throw new PageNotFoundException();
-        var space = await _spaceManager.GetById(page.SpaceId);
-
-        await _permissionService.EnsureViewPermission(space.Key, requestedBy);
         var pageTree = await _pageManager.GetAllChilds(page);
 
         var pageTreeModel = pageTree.ToModel(page, space);

@@ -296,6 +296,11 @@ public class MongoDbStoreModule : RunnableModule
         {
             Background = true
         }));
+        var userTokenCreationDefinition = Builders<UserToken>.IndexKeys.Ascending(x => x.UserId).Descending(x => x.Created);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<UserToken>(userTokenCreationDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
         var revokeTokenDefinition = Builders<UserToken>.IndexKeys.Ascending(x => x.Id).Ascending(x => x.UserId);
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<UserToken>(revokeTokenDefinition, new CreateIndexOptions()
         {

@@ -6,6 +6,9 @@
         <Nullable>disable</Nullable>
         <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     </PropertyGroup>
+    <ItemGroup>
+      <InternalsVisibleTo Include="Mimisbrunnr.Web.Tests" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Skidbladnir.Modules" Version="2.0.0" />

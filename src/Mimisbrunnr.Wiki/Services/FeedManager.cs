@@ -19,12 +19,16 @@ namespace Mimisbrunnr.Wiki.Services
 
         public Task<PageUpdateEvent[]> GetPageUpdates(UserInfo requestedBy, IEnumerable<Space> userSpaces = null, UserInfo updatedBy = null)
         {
-            var query = _pageUpdatesRepository.GetAll().OrderByDescending(x => x.Updated);
             if (requestedBy is null)
-                return query.Where(x => x.SpaceType == SpaceType.Public).Take(15).ToArrayAsync();
+            {
+                var anonymousQuery = _pageUpdatesRepository.GetAll().OrderByDescending(x => x.Updated);
+                return anonymousQuery.Where(x => x.SpaceType == SpaceType.Public).Take(15).ToArrayAsync();
+            }
 
             if (userSpaces is null)
                 throw new ArgumentNullException(nameof(userSpaces));
+
+            var query = _pageUpdatesRepository.GetAll().OrderByDescending(x => x.Updated);
 
             if (updatedBy is null)
             {

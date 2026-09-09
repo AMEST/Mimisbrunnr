@@ -15,6 +15,8 @@ namespace Mimisbrunnr.Web.Wiki;
 [HandleWikiErrors]
 public class AttachmentController : ControllerBase
 {
+    private const long MaxAttachmentSize = 50 * 1024 * 1024;
+
     private readonly IAttachmentService _attachmentService;
 
     public AttachmentController(IAttachmentService attachmentService)
@@ -56,7 +58,12 @@ public class AttachmentController : ControllerBase
         var attachmentContent = await _attachmentService.GetAttachmentContent(pageId, name, User?.ToInfo());
         if (attachmentContent is null)
             return NotFound();
-        return File(attachmentContent, MimeTypes.GetMimeType(name));
+        Response.Headers["X-Content-Type-Options"] = "nosniff";
+
+        if (IsSafeInlineImage(name))
+            return File(attachmentContent, MimeTypes.GetMimeType(name));
+
+        return File(attachmentContent, "application/octet-stream", name);
     }
 
     /// <summary>
@@ -67,14 +74,30 @@ public class AttachmentController : ControllerBase
     [ProducesResponseType(200)]
     [ProducesResponseType(401)]
     [ProducesResponseType(404)]
-    [DisableRequestSizeLimit]
+    [RequestSizeLimit(MaxAttachmentSize)]
     public async Task<IActionResult> Upload([FromRoute] string pageId)
     {
         var uploadedFile = HttpContext.Request.Form.Files.FirstOrDefault();
+        if (uploadedFile is null || uploadedFile.Length == 0)
+            return BadRequest("An attachment file is required.");
+
+        if (uploadedFile.Length > MaxAttachmentSize)
+            return BadRequest($"Attachment must not exceed {MaxAttachmentSize / 1024 / 1024} MB.");
 
         await _attachmentService.Upload(pageId, uploadedFile.OpenReadStream(), uploadedFile.FileName, User?.ToInfo());
 
         return Ok();
+    }
+
+    private static bool IsSafeInlineImage(string name)
+    {
+        var extension = Path.GetExtension(name);
+        return extension.Equals(".png", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".gif", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".webp", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".avif", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

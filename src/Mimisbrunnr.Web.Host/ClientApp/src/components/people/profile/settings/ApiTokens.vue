@@ -5,27 +5,29 @@
       :sub-title="$t('profile.settings.tokens.description')"
     >
       <b-alert v-if="this.tokens.length == 0" show variant="light">{{$t('profile.settings.tokens.empty')}}</b-alert>
-      <b-list-group>
-        <b-list-group-item
-          button
-          v-for="token in this.tokens"
-          :key="token.id"
-          :class="[token.revoked || new Date(token.expired) < new Date() ? 'revoked-token' : '']"
-        >
-          {{ $t("profile.settings.tokens.notBefore") }}
-          {{ new Date(token.created).toLocaleString() }}
-          {{ $t("profile.settings.tokens.notAfter") }}
-          {{ new Date(token.expired).toLocaleString() }}
-          <b-button
-            v-if="!token.revoked && new Date(token.expired) > new Date()"
-            variant="outline-danger"
-            style="float: right"
-            v-on:click="revoke(token)"
+      <div class="api-token-list">
+        <b-list-group>
+          <b-list-group-item
+            button
+            v-for="token in this.tokens"
+            :key="token.id"
+            :class="[token.revoked || new Date(token.expired) < new Date() ? 'revoked-token' : '']"
           >
-            {{ $t("profile.settings.tokens.revoke") }}
-          </b-button>
-        </b-list-group-item>
-      </b-list-group>
+            {{ $t("profile.settings.tokens.notBefore") }}
+            {{ new Date(token.created).toLocaleString() }}
+            {{ $t("profile.settings.tokens.notAfter") }}
+            {{ new Date(token.expired).toLocaleString() }}
+            <b-button
+              v-if="!token.revoked && new Date(token.expired) > new Date()"
+              variant="outline-danger"
+              style="float: right"
+              v-on:click="revoke(token)"
+            >
+              {{ $t("profile.settings.tokens.revoke") }}
+            </b-button>
+          </b-list-group-item>
+        </b-list-group>
+      </div>
       <hr />
       <b-card-sub-title>{{
         $t("profile.settings.tokens.createNewDescription")
@@ -38,7 +40,19 @@
           }}</b-button>
         </b-input-group-append>
       </b-input-group>
-      <b-form-textarea v-if="token" plaintext :value="token"></b-form-textarea>
+      <b-form-group v-if="token" class="mt-3">
+        <label for="generatedToken">{{ $t("profile.settings.tokens.generatedToken") }}</label>
+        <b-form-textarea
+          id="generatedToken"
+          plaintext
+          :value="token"
+          :rows="7"
+          readonly
+        ></b-form-textarea>
+        <b-button class="mt-2" block variant="success" @click="copyToken">{{
+          $t("profile.settings.tokens.copy")
+        }}</b-button>
+      </b-form-group>
     </b-card>
   </b-tab>
 </template>
@@ -93,6 +107,18 @@ export default {
       this.token = tokenRequest.data.token;
       await this.load();
     },
+    copyToken: async function () {
+      try {
+        await navigator.clipboard.writeText(this.token);
+      } catch (e) {
+        return;
+      }
+      this.$bvToast.toast(this.$t("profile.settings.tokens.tokenCopied"), {
+        title: this.$t("profile.settings.tokens.copy"),
+        variant: "success",
+        solid: true,
+      });
+    },
   },
   mounted: function () {
     this.load();
@@ -103,5 +129,10 @@ export default {
 <style>
 .revoked-token {
   text-decoration: line-through !important;
+}
+
+.api-token-list {
+  max-height: 420px;
+  overflow-y: auto;
 }
 </style>

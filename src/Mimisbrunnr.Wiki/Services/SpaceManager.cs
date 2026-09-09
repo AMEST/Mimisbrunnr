@@ -42,7 +42,7 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
         if (permissions.Count > 0)
         {
             var permissionsArray = permissions.ToArray();
-            query = query.Where(g => g.PermissionsFlat.Any(p => permissionsArray.Contains(p)) || g.Type == SpaceType.Public);
+            query = query.Where(g => (g.PermissionsFlat != null && g.PermissionsFlat.Any(p => permissionsArray.Contains(p))) || g.Type == SpaceType.Public);
         }
 
         if (skip.HasValue)

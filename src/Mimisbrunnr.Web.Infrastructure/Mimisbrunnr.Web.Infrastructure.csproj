@@ -5,6 +5,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     </PropertyGroup>
+    <ItemGroup>
+      <InternalsVisibleTo Include="Mimisbrunnr.Web.Tests" />
+    </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Mimisbrunnr.Users\Mimisbrunnr.Users.csproj" />

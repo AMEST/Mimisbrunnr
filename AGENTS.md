@@ -112,6 +112,13 @@ dotnet test               # Tests
 dotnet run --project src/Mimisbrunnr.Web.Host  # Run
 ```
 
+## Testing Conventions
+
+- Tests that require external dependencies, such as a database, RabbitMQ, `Integration.Client`, or other networked infrastructure, must be marked with `[Trait("Category", "Integration")]`.
+- Test files must be named `{ClassUnderTest}Tests.cs`.
+- Test methods must use the pattern `Should{Not|Throw}_{ExpectedOutcome}_When{Scenario}()`.
+- Use FakeItEasy as the preferred mocking framework for new tests and AwesomeAssertions for assertions.
+
 ### Docker
 ```bash
 docker build -t mimisbrunnr-wiki .  # Build image

@@ -14,6 +14,9 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     </PropertyGroup>
+    <ItemGroup>
+      <InternalsVisibleTo Include="Mimisbrunnr.Web.Tests" />
+    </ItemGroup>
 
     <ItemGroup>
         <!-- Don't publish the SPA source files, but do show them in the project files list -->

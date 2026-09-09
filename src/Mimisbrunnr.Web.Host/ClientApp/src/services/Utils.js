@@ -42,7 +42,8 @@ export function isImageFile(name) {
         name.toLowerCase().endsWith(".jpg") ||
         name.toLowerCase().endsWith(".jpeg") ||
         name.toLowerCase().endsWith(".gif") ||
-        name.toLowerCase().endsWith(".svg")
+        name.toLowerCase().endsWith(".webp") ||
+        name.toLowerCase().endsWith(".avif")
     );
 }
 
