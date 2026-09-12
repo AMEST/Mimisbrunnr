@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import http from "@/services/http";
 import SpaceService from '@/services/spaceService';
 import PageService from '@/services/pageService';
 import SearchService from '@/services/searchService';
@@ -65,7 +65,7 @@ export default {
         pageId = space.homePageId;
       }
       if(this.selectedPage == null) return;
-      var newPageRequest = await axios.post("/api/page/copy/" + pageId + '/' + this.selectedPage.id);
+      var newPageRequest = await http.post("/api/page/copy/" + pageId + '/' + this.selectedPage.id);
       if (this.actionCallBack !== null && newPageRequest.data.spaceKey == spaceKey)
         this.actionCallBack();
 

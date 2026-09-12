@@ -97,7 +97,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import http from "@/services/http";
 
 import { showToast, isImageFile, getNameInitials } from "@/services/Utils.js";
 export default {
@@ -135,16 +135,16 @@ export default {
       };
       if (this.space.type != "Personal")
         spaceUpdateModel.public = this.isPublic;
-      await axios.put(`/api/space/${this.space.key}`, spaceUpdateModel);
+      await http.put(`/api/space/${this.space.key}`, spaceUpdateModel);
       if (this.isArchive)
-        await axios.post(`/api/space/${this.space.key}/archive`);
-      else await axios.post(`/api/space/${this.space.key}/unarchive`);
+        await http.post(`/api/space/${this.space.key}/archive`);
+      else await http.post(`/api/space/${this.space.key}/unarchive`);
 
       if (this.spaceUpdateCallback != null) await this.spaceUpdateCallback();
     },
     remove: async function () {
       this.processing = true;
-      await axios.delete(`/api/space/${this.space.key}`);
+      await http.delete(`/api/space/${this.space.key}`);
       this.processing = false;
       this.$router.push("/");
     },
@@ -159,7 +159,7 @@ export default {
       var avatarPath = `/api/attachment/${this.space.homePageId}/${this.newAttachment.name}`;
       var formData = new FormData();
       formData.append("attachment", this.newAttachment);
-      await axios({
+      await http({
         method: "post",
         url: `/api/attachment/${this.space.homePageId}`,
         data: formData,

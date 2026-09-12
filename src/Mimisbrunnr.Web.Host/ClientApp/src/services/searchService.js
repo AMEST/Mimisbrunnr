@@ -1,9 +1,9 @@
-import axios from "axios";
+import http from "@/services/http";
 import { showToast } from "@/services/Utils";
 /*eslint-disable */
 var SearchService = {
     findSpaces: async function (search) {
-        var request = await axios.get(`/api/search/space?search=${search}`, {
+        var request = await http.get(`/api/search/space?search=${search}`, {
             validateStatus: false,
         });
         if (request.status == 200)
@@ -16,7 +16,7 @@ var SearchService = {
         throw new Exception("Internal sever error. Can't find spaces")
     },
     findPages: async function (search) {
-        var request = await axios.get(`/api/search/page?search=${search}`, {
+        var request = await http.get(`/api/search/page?search=${search}`, {
             validateStatus: false,
         });
         if (request.status == 200)
@@ -29,7 +29,7 @@ var SearchService = {
         throw new Exception("Internal sever error. Can't find pages")
     },
     findUsers: async function (search) {
-        var request = await axios.get(`/api/search/user?search=${search}`, {
+        var request = await http.get(`/api/search/user?search=${search}`, {
             validateStatus: false,
         });
         if (request.status == 200)

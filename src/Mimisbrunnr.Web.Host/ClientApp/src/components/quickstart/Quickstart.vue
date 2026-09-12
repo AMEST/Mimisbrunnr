@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import http from "@/services/http";
 export default {
   name: "Quickstart",
   data: () => ({
@@ -56,7 +56,7 @@ export default {
   }),
   methods: {
     init: async function () {
-      await axios.post("/api/quickstart/initialize", this.info);
+      await http.post("/api/quickstart/initialize", this.info);
       window.location.reload();
     },
   },

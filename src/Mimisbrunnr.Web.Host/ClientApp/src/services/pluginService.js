@@ -1,4 +1,4 @@
-import axios from "axios";
+import http from "@/services/http";
 import { showToast } from "@/services/Utils";
 /*eslint-disable */
 var PluginService = {
@@ -7,7 +7,7 @@ var PluginService = {
         if (take){
             url += `?skip=${skip ? skip : 0}&take=${take}`;
         }
-        var request = await axios.get(url, {
+        var request = await http.get(url, {
             validateStatus: false,
         });
         if (request.status == 200) 
@@ -21,7 +21,7 @@ var PluginService = {
         if (take){
             url += `?skip=${skip ? skip : 0}&take=${take}`;
         }
-        var request = await axios.get(url, {
+        var request = await http.get(url, {
             validateStatus: false,
         });
         if (request.status == 200) 
@@ -31,7 +31,7 @@ var PluginService = {
         return [];
     },
     getMacroInfo: async function(macroIdentifier){
-        var request = await axios.get(`/api/plugin/macros/${macroIdentifier}`, {
+        var request = await http.get(`/api/plugin/macros/${macroIdentifier}`, {
             validateStatus: false,
         });
         if (request.status == 200) 
@@ -41,7 +41,7 @@ var PluginService = {
         return null;
     },
     getMacroState: async function(pageId, macroIdOnPage) {
-        var request = await axios.get(`/api/plugin/macros/${pageId}/${macroIdOnPage}/state`, {
+        var request = await http.get(`/api/plugin/macros/${pageId}/${macroIdOnPage}/state`, {
             validateStatus: false,
         });
         if (request.status == 200) 
@@ -59,7 +59,7 @@ var PluginService = {
             params: parameters
         };
         
-        var request = await axios.post('/api/plugin/macros/state', requestBody, {
+        var request = await http.post('/api/plugin/macros/state', requestBody, {
             validateStatus: false,
         });
         if (request.status == 200)
@@ -70,7 +70,7 @@ var PluginService = {
     },
 
     installPlugin: async function(model) {
-        var request = await axios.post("/api/plugin", model, {
+        var request = await http.post("/api/plugin", model, {
             validateStatus: false,
         });
         if (request.status == 200)
@@ -81,7 +81,7 @@ var PluginService = {
     },
 
     unInstallPlugin: async function(pluginIdentifier) {
-        var request = await axios.delete(`/api/plugin/${pluginIdentifier}`, {
+        var request = await http.delete(`/api/plugin/${pluginIdentifier}`, {
             validateStatus: false,
         });
         if (request.status == 200)
@@ -92,7 +92,7 @@ var PluginService = {
     },
 
     disablePlugin: async function(pluginIdentifier) {
-        var request = await axios.post(`/api/plugin/${pluginIdentifier}/disable`, null, {
+        var request = await http.post(`/api/plugin/${pluginIdentifier}/disable`, null, {
             validateStatus: false,
         });
         if (request.status == 200)
@@ -103,7 +103,7 @@ var PluginService = {
     },
 
     enablePlugin: async function(pluginIdentifier) {
-        var request = await axios.post(`/api/plugin/${pluginIdentifier}/enable`, null, {
+        var request = await http.post(`/api/plugin/${pluginIdentifier}/enable`, null, {
             validateStatus: false,
         });
         if (request.status == 200)
@@ -114,7 +114,7 @@ var PluginService = {
     },
 
     render: async function(pageId, macroIdOnPage, userRequest) {
-        var request = await axios.post(`/api/plugin/macros/${pageId}/${macroIdOnPage}/render`, userRequest, {
+        var request = await http.post(`/api/plugin/macros/${pageId}/${macroIdOnPage}/render`, userRequest, {
             validateStatus: false,
         });
         if (request.status == 200)

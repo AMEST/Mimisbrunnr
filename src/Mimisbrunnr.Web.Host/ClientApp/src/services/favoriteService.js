@@ -1,9 +1,9 @@
-import axios from "axios";
+import http from "@/services/http";
 import { showToast } from "@/services/Utils";
 /*eslint-disable */
 var FavoriteService = {
     getAll: async function (count = 15, skip = 0, type = undefined) {
-        var request = await axios.get(`/api/favorites?count=${count}&skip=${skip}`+(type == undefined ? "" : `&type=${type}`),
+        var request = await http.get(`/api/favorites?count=${count}&skip=${skip}`+(type == undefined ? "" : `&type=${type}`),
             { validateStatus: false }
         );
         if (request.status == 200)
@@ -13,7 +13,7 @@ var FavoriteService = {
         return [];
     },
     getUser: async function (userEmail) {
-        var request = await axios.post(`/api/favorites/findOne`,
+        var request = await http.post(`/api/favorites/findOne`,
             {
                 "$type": "FavoriteUserFindModel",
                 "userEmail": userEmail,
@@ -27,7 +27,7 @@ var FavoriteService = {
         return null;
     },
     getSpace: async function (spaceKey) {
-        var request = await axios.post(`/api/favorites/findOne`,
+        var request = await http.post(`/api/favorites/findOne`,
             {
                 "$type": "FavoriteSpaceFindModel",
                 "spaceKey": spaceKey,
@@ -41,7 +41,7 @@ var FavoriteService = {
         return null;
     },
     getPage: async function (pageId) {
-        var request = await axios.post(`/api/favorites/findOne`,
+        var request = await http.post(`/api/favorites/findOne`,
             {
                 "$type": "FavoritePageFindModel",
                 "pageId": pageId,
@@ -55,7 +55,7 @@ var FavoriteService = {
         return null;
     },
     addUser: async function (userEmail) {
-        var request = await axios.post(`/api/favorites`,
+        var request = await http.post(`/api/favorites`,
             {
                 "$type": "FavoriteUserCreateModel",
                 "userEmail": userEmail,
@@ -70,7 +70,7 @@ var FavoriteService = {
         return false;
     },
     addSpace: async function (spaceKey) {
-        var request = await axios.post(`/api/favorites`,
+        var request = await http.post(`/api/favorites`,
             {
                 "$type": "FavoriteSpaceCreateModel",
                 "spaceKey": spaceKey,
@@ -85,7 +85,7 @@ var FavoriteService = {
         return false;
     },
     addPage: async function (pageId) {
-        var request = await axios.post(`/api/favorites`,
+        var request = await http.post(`/api/favorites`,
             {
                 "$type": "FavoritePageCreateModel",
                 "pageId": pageId,
@@ -100,7 +100,7 @@ var FavoriteService = {
         return false;
     },
     existsUser: async function (userEmail) {
-        var request = await axios.post(`/api/favorites/exists`,
+        var request = await http.post(`/api/favorites/exists`,
             {
                 "$type": "FavoriteUserFindModel",
                 "userEmail": userEmail,
@@ -110,7 +110,7 @@ var FavoriteService = {
         return request.status == 200;
     },
     existsSpace: async function (spaceKey) {
-        var request = await axios.post(`/api/favorites/exists`,
+        var request = await http.post(`/api/favorites/exists`,
             {
                 "$type": "FavoriteSpaceFindModel",
                 "spaceKey": spaceKey,
@@ -120,7 +120,7 @@ var FavoriteService = {
         return request.status == 200;
     },
     existsPage: async function (pageId) {
-        var request = await axios.post(`/api/favorites/exists`,
+        var request = await http.post(`/api/favorites/exists`,
             {
                 "$type": "FavoritePageFindModel",
                 "pageId": pageId,
@@ -130,7 +130,7 @@ var FavoriteService = {
         return request.status == 200;
     },
     delete: async function (id) {
-        var request = await axios.delete(`/api/favorites/${id}`,
+        var request = await http.delete(`/api/favorites/${id}`,
             {
                 validateStatus: false,
             }

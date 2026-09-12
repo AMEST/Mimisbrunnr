@@ -1,9 +1,9 @@
-import axios from "axios";
+import http from "@/services/http";
 import { showToast } from "@/services/Utils";
 /*eslint-disable */
 var UserService = {
     getUser: async function (email) {
-        var request = await axios.get(
+        var request = await http.get(
             `/api/user/${email}`,
             { validateStatus: false }
         );
@@ -15,7 +15,7 @@ var UserService = {
         return null;
     },
     getUsers: async function (offset) {
-        var request = await axios.get(
+        var request = await http.get(
             `/api/user?offset=${offset == null ? "" : offset}`,
             { validateStatus: false }
         );
@@ -27,7 +27,7 @@ var UserService = {
         return null;
     },
     promote: async function (email) {
-        var request = await axios.post(`/api/user/${email}/promote`, {
+        var request = await http.post(`/api/user/${email}/promote`, {
             validateStatus: false,
         });
         if (request.status == 200)
@@ -37,7 +37,7 @@ var UserService = {
         return false;
     },
     demote: async function (email) {
-        var request = await axios.post(`/api/user/${email}/demote`, {
+        var request = await http.post(`/api/user/${email}/demote`, {
             validateStatus: false,
         });
         if (request.status == 200)
@@ -47,7 +47,7 @@ var UserService = {
         return false;
     },
     enable: async function (email) {
-        var request = await axios.post(`/api/user/${email}/enable`, {
+        var request = await http.post(`/api/user/${email}/enable`, {
             validateStatus: false,
         });
         if (request.status == 200)
@@ -57,7 +57,7 @@ var UserService = {
         return false;
     },
     disable: async function (email) {
-        var request = await axios.post(`/api/user/${email}/disable`, {
+        var request = await http.post(`/api/user/${email}/disable`, {
             validateStatus: false,
         });
         if (request.status == 200)
@@ -67,7 +67,7 @@ var UserService = {
         return false;
     },
     create: async function (email, name, avatarUrl = null) {
-        var request = await axios.post(`/api/user`, {
+        var request = await http.post(`/api/user`, {
                 "email": email,
                 "name": name,
                 "avatarUrl": avatarUrl

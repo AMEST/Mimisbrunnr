@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import http from "@/services/http";
 export default {
     name: "DeletePage",
     data() {
@@ -26,7 +26,7 @@ export default {
     methods: {
         deletePage: async function(){
             if(this.pageId == null) return;
-            await axios.delete("/api/page/"+this.pageId + '?recursively='+this.recursive.toString());
+            await http.delete("/api/page/"+this.pageId + '?recursively='+this.recursive.toString());
             this.$bvModal.hide("page-delete-modal");
             var spaceKey = this.$route.params.key;
             if(spaceKey == null) return;

@@ -3,7 +3,7 @@ import App from './App.vue'
 import router from './router'
 import store from './services/store'
 import language from './assets/lang.json'
-import axios from 'axios'
+import http from "@/services/http";
 import './registerServiceWorker'
 // Bootstrap
 import { BootstrapVue, BIcon} from 'bootstrap-vue'
@@ -59,7 +59,7 @@ if (homeMenuClosed !== undefined) {
 } else {
     store.commit('changeHomeMenuClose', window.innerWidth <= 860)
 }
-var applicationInfoTask = axios.get('/api/quickstart').then(result => {
+var applicationInfoTask = http.get('/api/quickstart').then(result => {
     if (result.data == null || result.status !== 200) {
         return
     }

@@ -20,7 +20,7 @@ const Quickstart = () => import(/* webpackChunkName: "quicstart-component" */"@/
 const SpaceCreateModal = () => import(/* webpackChunkName: "space-create-modal" */"@/components/base/SpaceCreateModal.vue");
 const SearchBar = () => import(/* webpackChunkName: "search-bar-component" */"@/components/search/SearchBar.vue");
 const CreateFromTemplateModal = () => import(/* webpackChunkName: "base-modals" */"@/components/base/CreateFromTemplateModal.vue");
-import axios from "axios";
+import http from "@/services/http";
 import ProfileService from "@/services/profileService";
 import PreviewOverlay from "@/components/PreviewOverlay.vue";
 export default {
@@ -39,7 +39,7 @@ export default {
   }),
   created: async function () {
     window.addEventListener("resize", this.updateHeaderHeightVar);
-    var initializedRequest = await axios.get("/api/quickstart/initialize");
+    var initializedRequest = await http.get("/api/quickstart/initialize");
     var currentAccount = await ProfileService.getCurrentUser();
     if (
       currentAccount == null &&

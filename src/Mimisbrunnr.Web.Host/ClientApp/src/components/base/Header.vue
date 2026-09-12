@@ -162,7 +162,7 @@ import {
   BIconGear,
   BIconChevronDown,
 } from "bootstrap-vue";
-import axios from "axios";
+import http from "@/services/http";
 import ProfileService from "@/services/profileService";
 import { getInitials } from "@/services/Utils";
 export default {
@@ -212,7 +212,7 @@ export default {
         );
       }
       if (pageId == null) {
-        var spaceHomePageRequest = await axios.get("/api/space/" + spaceKey);
+        var spaceHomePageRequest = await http.get("/api/space/" + spaceKey);
         pageId = spaceHomePageRequest.data.homePageId;
       }
       await this.createPage(spaceKey, pageId);
@@ -224,7 +224,7 @@ export default {
         name: this.$t("newPage.defaultTitle"),
         content: this.$t("newPage.defaultContent"),
       };
-      var createPageRequest = await axios.post("/api/page", newPage, {
+      var createPageRequest = await http.post("/api/page", newPage, {
         validateStatus: false,
       });
       if (createPageRequest.status == 200)

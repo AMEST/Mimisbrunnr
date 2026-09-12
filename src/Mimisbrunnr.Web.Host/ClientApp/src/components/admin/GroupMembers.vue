@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import http from "@/services/http";
 export default {
   name: "GroupMembers",
   props: {
@@ -54,7 +54,7 @@ export default {
   },
   methods: {
     loadMembers: async function () {
-      var memberRequest = await axios.get(`/api/Group/${this.group}/users`, {
+      var memberRequest = await http.get(`/api/Group/${this.group}/users`, {
         validateStatus: false,
       });
       if (memberRequest.status != 200) {
@@ -76,7 +76,7 @@ export default {
       this.loading = false;
     },
     addUserToGroup: async function () {
-      var request = await axios.post(`/api/Group/${this.group}/${this.email}`, {
+      var request = await http.post(`/api/Group/${this.group}/${this.email}`, {
         validateStatus: false,
       });
       this.email = "";
@@ -94,7 +94,7 @@ export default {
       await this.loadMembers();
     },
     removeUserFromGroup: async function () {
-      var request = await axios.delete(
+      var request = await http.delete(
         `/api/Group/${this.group}/${this.email}`,
         {
           validateStatus: false,

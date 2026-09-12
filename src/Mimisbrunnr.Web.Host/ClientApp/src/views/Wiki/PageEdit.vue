@@ -82,7 +82,7 @@ const VueMarkdown = () =>
   import(
     /* webpackChunkName: "vue-markdown-component" */ "@/thirdparty/VueMarkdown"
   );
-import axios from "axios";
+import http from "@/services/http";
 import { debounce, isImageFile } from "@/services/Utils.js";
 import { formatMarkdownTables, insertMarkdownTableColumn, insertMarkdownTableRow } from "@/services/markdown/tableUtils";
 import { detectAndConvertToMarkdown } from "@/services/markdown/htmlToMarkdown";
@@ -439,7 +439,7 @@ export default {
                 var formData = new FormData();
                 formData.append("attachment", file, newFileName);
                 pasteEvent.preventDefault();
-                await axios({
+                await http({
                     method: "post",
                     url: "/api/attachment/" + this.page.id,
                     data: formData,
@@ -489,7 +489,7 @@ export default {
         var newFileName = `${new Date().getTime()}_${droppedFile.name}`;
         var formData = new FormData();
         formData.append("attachment", droppedFile, newFileName);
-        await axios({
+        await http({
           method: "post",
           url: "/api/attachment/" + this.page.id,
           data: formData,

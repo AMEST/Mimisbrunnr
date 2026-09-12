@@ -1,9 +1,9 @@
-import axios from "axios";
+import http from "@/services/http";
 import { showToast } from "@/services/Utils";
 /*eslint-disable */
 var PageService = {
     getPageTree: async function(pageId) {
-        var request = await axios.get(
+        var request = await http.get(
             "/api/page/" + pageId + "/tree",
             {
               validateStatus: false,
@@ -20,7 +20,7 @@ var PageService = {
         return null;
     },
     getPage: async function (pageId) {
-        var request = await axios.get(`/api/page/${pageId}`, {
+        var request = await http.get(`/api/page/${pageId}`, {
             validateStatus: false,
         });
 
@@ -33,7 +33,7 @@ var PageService = {
         throw 401;
     },
     savePage: async function (page) {
-        var request = await axios.put(
+        var request = await http.put(
             `/api/page/${page.id}`,
             page,
             {
@@ -47,7 +47,7 @@ var PageService = {
         return false;
     },
     getDraft: async function (pageId) {
-        var request = await axios.get(`/api/draft/${pageId}`, {
+        var request = await http.get(`/api/draft/${pageId}`, {
             validateStatus: false,
         });
 
@@ -60,7 +60,7 @@ var PageService = {
         throw 401;
     },
     saveDraft: async function (pageId, draft) {
-        var request = await axios.put(`/api/draft/${pageId}`, draft, {
+        var request = await http.put(`/api/draft/${pageId}`, draft, {
             validateStatus: false,
         });
         if (request.status == 200)
@@ -70,7 +70,7 @@ var PageService = {
         return null;
     },
     deleteDraft: async function (pageId) {
-        var request = await axios.delete(`/api/draft/${pageId}`, {
+        var request = await http.delete(`/api/draft/${pageId}`, {
             validateStatus: false,
         });
         if (request.status == 200)
@@ -79,7 +79,7 @@ var PageService = {
             "Error when deleting draft.", "warning");
     },
     getComments: async function (pageId) {
-        var request = await axios.get(`/api/page/${pageId}/comments`,
+        var request = await http.get(`/api/page/${pageId}/comments`,
             { validateStatus: false }
         );
         if (request.status == 200)
@@ -89,7 +89,7 @@ var PageService = {
         return null;
     },
     createComment: async function (pageId, comment) {
-        var request = await axios.post(`/api/page/${pageId}/comments`,
+        var request = await http.post(`/api/page/${pageId}/comments`,
             {
                 "message": comment
             },
@@ -102,7 +102,7 @@ var PageService = {
         return null;
     },
     deleteComment: async function (pageId, commentId) {
-        var request = await axios.delete(`/api/page/${pageId}/comments/${commentId}`,
+        var request = await http.delete(`/api/page/${pageId}/comments/${commentId}`,
             { validateStatus: false }
         );
         if (request.status == 200)
@@ -111,7 +111,7 @@ var PageService = {
             "Error when deleting comment.", "warning");
     },
     getVersions: async function (pageId) {
-        var request = await axios.get(`/api/page/${pageId}/versions`,
+        var request = await http.get(`/api/page/${pageId}/versions`,
             { validateStatus: false }
         );
         if (request.status == 200)
@@ -121,7 +121,7 @@ var PageService = {
         return null;
     },
     restoreVersion: async function (pageId, version) {
-        var request = await axios.put(`/api/page/${pageId}/versions/${version}`,
+        var request = await http.put(`/api/page/${pageId}/versions/${version}`,
             { validateStatus: false }
         );
         if (request.status == 200)
@@ -130,7 +130,7 @@ var PageService = {
             "Error when restore page version.", "warning");
     },
     deleteVersion: async function (pageId, version) {
-        var request = await axios.delete(`/api/page/${pageId}/versions/${version}`,
+        var request = await http.delete(`/api/page/${pageId}/versions/${version}`,
             { validateStatus: false }
         );
         if (request.status == 200)

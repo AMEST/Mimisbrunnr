@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import http from "@/services/http";
 export default {
     name: "Version",
     data() {
@@ -14,7 +14,7 @@ export default {
         }
     },
     mounted: async function(){
-        var versionRequest = await axios.get("/api/version");
+        var versionRequest = await http.get("/api/version");
         if(versionRequest.status == 200)
             this.version = versionRequest.data.version;
     }
