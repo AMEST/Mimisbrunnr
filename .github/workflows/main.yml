@@ -23,7 +23,12 @@ jobs:
       with:
         dotnet-version: '8.0'
     - name: Run tests
-      run: dotnet test ./tests/Mimisbrunnr.Web.Tests/Mimisbrunnr.Web.Tests.csproj --filter "Category!=Integration"
+      run: >
+        dotnet test ./tests/Mimisbrunnr.Web.Tests/Mimisbrunnr.Web.Tests.csproj
+        --filter "Category!=Integration"
+        /p:CollectCoverage=true
+        /p:CoverletOutputFormat=cobertura
+        /p:VSTestUseMSBuildOutput=false
 
   publish-import-cli-binary:
     if: contains(github.ref, 'tags/v') # works only version tagged
