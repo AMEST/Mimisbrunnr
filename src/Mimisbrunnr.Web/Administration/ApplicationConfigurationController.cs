@@ -16,6 +16,10 @@ public class ApplicationConfigurationController : ControllerBase
 {
     private readonly IApplicationConfigurationService _configurationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ApplicationConfigurationController"/> class
+    /// </summary>
+    /// <param name="configurationService">Service for managing the application configuration</param>
     public ApplicationConfigurationController(IApplicationConfigurationService configurationService)
     {
         _configurationService = configurationService;

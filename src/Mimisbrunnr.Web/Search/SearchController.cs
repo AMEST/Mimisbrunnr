@@ -17,6 +17,10 @@ public class SearchController : ControllerBase
 {
     private readonly ISearchService _searchService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SearchController"/> class
+    /// </summary>
+    /// <param name="searchService">Service for searching across entities</param>
     public SearchController(ISearchService searchService)
     {
         _searchService = searchService;

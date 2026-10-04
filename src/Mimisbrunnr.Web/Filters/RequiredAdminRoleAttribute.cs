@@ -6,8 +6,15 @@ using Mimisbrunnr.Web.Mapping;
 
 namespace Mimisbrunnr.Web.Filters;
 
+/// <summary>
+/// Authorization filter that requires the current user to have the admin role
+/// </summary>
 public class RequiredAdminRoleAttribute : Attribute, IAsyncAuthorizationFilter
 {
+    /// <summary>
+    /// Verifies that the current user has the admin role, forbidding access otherwise
+    /// </summary>
+    /// <param name="context">Authorization filter context</param>
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
         var userManager = context.HttpContext.RequestServices.GetService<IUserManager>();

@@ -15,6 +15,10 @@ public class AccountController : ControllerBase
 {
     private readonly ITokenService _tokenService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AccountController"/> class
+    /// </summary>
+    /// <param name="tokenService">Service for managing access tokens</param>
     public AccountController(ITokenService tokenService)
     {
         _tokenService = tokenService;

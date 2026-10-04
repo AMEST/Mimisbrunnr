@@ -7,12 +7,21 @@ using Mimisbrunnr.Wiki.Contracts;
 
 namespace Mimisbrunnr.Web.Administration
 {
+    /// <summary>
+    /// Service for reading and updating the application configuration
+    /// </summary>
     public class ApplicationConfigurationService : IApplicationConfigurationService
     {
         private readonly IApplicationConfigurationManager _configurationManager;
         private readonly ISpaceService _spaceService;
         private readonly ILogger<ApplicationConfigurationService> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApplicationConfigurationService"/> class
+        /// </summary>
+        /// <param name="configurationManager">Manager used to read and persist the configuration</param>
+        /// <param name="spaceService">Service used to validate the custom homepage space</param>
+        /// <param name="logger">Logger instance</param>
         public ApplicationConfigurationService(
             IApplicationConfigurationManager configurationManager,
             ISpaceService spaceService,
@@ -24,12 +33,21 @@ namespace Mimisbrunnr.Web.Administration
             _logger = logger;
         }
 
+        /// <summary>
+        /// Gets the current application configuration
+        /// </summary>
+        /// <returns>The current application configuration model</returns>
         public async Task<ApplicationConfigurationModel> Get()
         {
             var configuration = await _configurationManager.Get();
             return configuration.ToModel();
         }
 
+        /// <summary>
+        /// Updates the application configuration
+        /// </summary>
+        /// <param name="model">The new configuration values</param>
+        /// <param name="updatedBy">User performing the update</param>
         public async Task Update(ApplicationConfigurationModel model, UserInfo updatedBy)
         {
             var configuration = await _configurationManager.Get();

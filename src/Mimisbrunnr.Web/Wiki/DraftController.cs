@@ -16,6 +16,10 @@ public class DraftController : ControllerBase
 {
     private readonly IDraftService _draftService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DraftController"/> class
+    /// </summary>
+    /// <param name="draftService">Service for managing drafts</param>
     public DraftController(IDraftService draftService)
     {
         _draftService = draftService;

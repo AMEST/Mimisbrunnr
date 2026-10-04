@@ -14,6 +14,10 @@ public class QuickstartController : ControllerBase
 {
     private readonly IQuickstartService _quickstartService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="QuickstartController"/> class
+    /// </summary>
+    /// <param name="quickstartService">Service for managing quickstart and initialization</param>
     public QuickstartController(IQuickstartService quickstartService)
     {
         _quickstartService = quickstartService;

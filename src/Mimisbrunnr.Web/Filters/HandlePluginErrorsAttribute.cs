@@ -5,6 +5,9 @@ using Mimisbrunnr.Integration.Wiki;
 
 namespace Mimisbrunnr.Web.Filters;
 
+/// <summary>
+/// Exception filter that converts plugin errors into HTTP responses
+/// </summary>
 public class HandlePluginErrorsAttribute : ExceptionFilterAttribute
 {
     /// <inheritdoc />

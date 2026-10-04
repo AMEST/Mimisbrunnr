@@ -11,16 +11,48 @@ using Mimisbrunnr.Wiki.Contracts;
 
 namespace Mimisbrunnr.Web.Favorites;
 
+/// <summary>
+/// Service for managing user favorites
+/// </summary>
 public interface IFavoriteService
 {
+    /// <summary>
+    /// Adds a new favorite
+    /// </summary>
+    /// <param name="model">Favorite to add</param>
+    /// <param name="user">Owner of the favorite</param>
+    /// <returns>The added favorite</returns>
     Task<FavoriteModel> Add(FavoriteCreateModel model, UserInfo user);
 
+    /// <summary>
+    /// Gets favorites matching the specified filter
+    /// </summary>
+    /// <param name="filter">Filter criteria</param>
+    /// <param name="user">Owner of the favorites</param>
+    /// <returns>Matching favorites</returns>
     Task<FavoriteModel[]> GetFavorites(FavoriteFilterModel filter, UserInfo user);
 
+    /// <summary>
+    /// Gets a single favorite matching the specified criteria
+    /// </summary>
+    /// <param name="filter">Criteria to find the favorite</param>
+    /// <param name="user">Owner of the favorite</param>
+    /// <returns>The found favorite, or null if not found</returns>
     Task<FavoriteModel> GetFavorite(FavoriteFindModel filter, UserInfo user);
 
+    /// <summary>
+    /// Checks whether the specified item is in the user's favorites
+    /// </summary>
+    /// <param name="model">Criteria identifying the favorite</param>
+    /// <param name="user">Owner of the favorites</param>
+    /// <returns>True if the item is in favorites; otherwise false</returns>
     Task<bool> EnsureInFavorites(FavoriteFindModel model, UserInfo user);
 
+    /// <summary>
+    /// Removes a favorite by identifier
+    /// </summary>
+    /// <param name="id">Identifier of the favorite to remove</param>
+    /// <param name="user">Owner of the favorite</param>
     Task Remove(string id, UserInfo user);
 }
 

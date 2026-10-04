@@ -19,6 +19,10 @@ public class AttachmentController : ControllerBase
 
     private readonly IAttachmentService _attachmentService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AttachmentController"/> class
+    /// </summary>
+    /// <param name="attachmentService">Service for managing attachments</param>
     public AttachmentController(IAttachmentService attachmentService)
     {
         _attachmentService = attachmentService;

@@ -20,11 +20,21 @@ using Skidbladnir.Modules;
 
 namespace Mimisbrunnr.Web;
 
+/// <summary>
+/// Module that registers the web layer services
+/// </summary>
 public class WebModule : Module
 {
+    /// <summary>
+    /// Modules that this module depends on
+    /// </summary>
     public override Type[] DependsModules => [ typeof(WebInfrastructureModule), typeof(UsersModule), 
         typeof(WikiModule), typeof(FavoritesModule) ];
 
+    /// <summary>
+    /// Registers the web layer services into the dependency injection container
+    /// </summary>
+    /// <param name="services">Service collection to configure</param>
     public override void Configure(IServiceCollection services)
     {
         services.AddSingleton<IQuickstartService, QuickstartService>();

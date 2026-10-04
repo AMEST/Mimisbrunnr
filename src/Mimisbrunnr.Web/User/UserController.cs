@@ -17,6 +17,10 @@ public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserController"/> class
+    /// </summary>
+    /// <param name="userService">Service for managing users</param>
     public UserController(IUserService userService)
     {
         _userService = userService;

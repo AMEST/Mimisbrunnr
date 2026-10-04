@@ -4,6 +4,9 @@ using Mimisbrunnr.Web.Infrastructure;
 
 namespace Mimisbrunnr.Web.Filters;
 
+/// <summary>
+/// Exception filter that converts customization errors into HTTP responses
+/// </summary>
 public class HandleCustomizationErrorsAttribute : ExceptionFilterAttribute
 {
     /// <inheritdoc />

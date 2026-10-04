@@ -17,6 +17,10 @@ public class CommentController : ControllerBase
 {
     private readonly ICommentService _commentService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CommentController"/> class
+    /// </summary>
+    /// <param name="commentService">Service for managing comments</param>
     public CommentController(ICommentService commentService)
     {
         _commentService = commentService;

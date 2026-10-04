@@ -6,6 +6,9 @@ using Mimisbrunnr.Integration.User;
 
 namespace Mimisbrunnr.Web.Filters;
 
+/// <summary>
+/// Exception filter that converts favorites errors into HTTP responses
+/// </summary>
 public class HandleFavoritesErrorsAttribute : ExceptionFilterAttribute
 {
     /// <inheritdoc />

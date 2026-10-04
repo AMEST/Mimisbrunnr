@@ -29,6 +29,11 @@ public class SpaceController : ControllerBase
     private readonly ISpaceService _spaceService;
     private readonly IDataImportService _spaceImportService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SpaceController"/> class
+    /// </summary>
+    /// <param name="spaceService">Service for managing spaces</param>
+    /// <param name="spaceImportService">Service for importing space data</param>
     public SpaceController(ISpaceService spaceService, IDataImportService spaceImportService)
     {
         _spaceImportService = spaceImportService;

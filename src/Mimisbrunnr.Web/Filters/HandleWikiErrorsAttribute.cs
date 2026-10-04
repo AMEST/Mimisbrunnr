@@ -5,6 +5,9 @@ using Mimisbrunnr.Integration.Wiki;
 
 namespace Mimisbrunnr.Web.Filters;
 
+/// <summary>
+/// Exception filter that converts wiki errors into HTTP responses
+/// </summary>
 public class HandleWikiErrorsAttribute : ExceptionFilterAttribute
 {
     /// <inheritdoc />

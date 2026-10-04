@@ -17,6 +17,10 @@ public class PageController : ControllerBase
 {
     private readonly IPageService _pageService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PageController"/> class
+    /// </summary>
+    /// <param name="pageService">Service for managing pages</param>
     public PageController(IPageService pageService)
     {
         _pageService = pageService;

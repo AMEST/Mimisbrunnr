@@ -19,6 +19,10 @@ public class GroupController : ControllerBase
 {
     private readonly IGroupService _groupService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GroupController"/> class
+    /// </summary>
+    /// <param name="groupService">Service for managing groups</param>
     public GroupController(IGroupService groupService)
     {
         _groupService = groupService;

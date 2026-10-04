@@ -17,6 +17,10 @@ public class FavoritesController : ControllerBase
 {
     private readonly IFavoriteService _favorites;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FavoritesController"/> class
+    /// </summary>
+    /// <param name="favorites">Service for managing user favorites</param>
     public FavoritesController(IFavoriteService favorites)
     {
         _favorites = favorites;

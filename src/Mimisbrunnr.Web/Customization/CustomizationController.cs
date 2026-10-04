@@ -15,6 +15,10 @@ public class CustomizationController: ControllerBase
 {
     private readonly ICustomizationService _customizationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CustomizationController"/> class
+    /// </summary>
+    /// <param name="customizationService">Service for managing UI customization</param>
     public CustomizationController(ICustomizationService customizationService)
     {
         _customizationService = customizationService;

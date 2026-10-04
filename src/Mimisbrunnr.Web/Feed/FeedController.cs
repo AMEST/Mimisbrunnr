@@ -16,6 +16,10 @@ public class FeedController : ControllerBase
 {
     private readonly IFeedService _feedService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FeedController"/> class
+    /// </summary>
+    /// <param name="feedService">Service for retrieving page update feeds</param>
     public FeedController(IFeedService feedService)
     {
         _feedService = feedService;
