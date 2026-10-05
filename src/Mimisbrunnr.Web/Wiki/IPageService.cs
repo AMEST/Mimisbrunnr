@@ -25,6 +25,15 @@ public interface IPageService
     Task<PageVersionsListModel> GetPageVersions(string pageId, UserInfo requestedBy);
 
     /// <summary>
+    /// Get a specific historical version of a page
+    /// </summary>
+    /// <param name="pageId">Page identifier</param>
+    /// <param name="version">Version number</param>
+    /// <param name="requestedBy">User requesting the version</param>
+    /// <returns>The requested historical page version</returns>
+    Task<HistoricalPageModel> GetVersion(string pageId, long version, UserInfo requestedBy);
+
+    /// <summary>
     /// Get the page tree structure starting from the specified page
     /// </summary>
     /// <param name="pageId">Identifier of the root page</param>

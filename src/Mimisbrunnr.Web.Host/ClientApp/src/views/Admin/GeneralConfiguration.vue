@@ -44,6 +44,14 @@
             &nbsp;{{ $t("admin.general.fields.swagger.content") }}
           </b-form-checkbox>
         </b-form-group>
+        <b-form-group
+          :label="$t('admin.general.fields.mcp.label')"
+          :description="$t('admin.general.fields.mcp.description')"
+        >
+          <b-form-checkbox v-model="info.mcpEnabled" switch>
+            &nbsp;{{ $t("admin.general.fields.mcp.content") }}
+          </b-form-checkbox>
+        </b-form-group>
         <br />
         <b-form-group
           :label="$t('admin.general.fields.customCss.label')"
@@ -102,6 +110,7 @@ export default {
       allowHtml: true,
       userAutoCreation: true,
       swaggerEnabled: true,
+      mcpEnabled: false,
       customCss: "",
       customHomepageEnabled: false,
       customHomepageSpaceKey: null,

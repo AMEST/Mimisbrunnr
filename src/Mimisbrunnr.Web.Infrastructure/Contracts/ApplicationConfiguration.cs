@@ -14,6 +14,8 @@ public class ApplicationConfiguration : IHasId<string>
 
     public bool SwaggerEnabled { get; set; }
 
+    public bool McpEnabled { get; set; }
+
     public bool AllowHtml { get; set; }
 
     public string CustomCss { get; set; }

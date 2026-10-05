@@ -42,6 +42,7 @@ public static partial class ApplicationMapper
             AllowAnonymous = model?.AllowAnonymous ?? false,
             AllowHtml = model?.AllowHtml ?? true,
             SwaggerEnabled = model?.SwaggerEnabled ?? false,
+            McpEnabled = model?.McpEnabled ?? false,
             CustomHomepageEnabled = model?.CustomHomepageEnabled ?? false
         };
     }

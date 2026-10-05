@@ -11,6 +11,7 @@ using Mimisbrunnr.Web.Host.Services.CacheDecorators;
 using Mimisbrunnr.Web.Host.Services.Features;
 using Mimisbrunnr.Web.Host.Services.Metrics;
 using Mimisbrunnr.Web.Infrastructure;
+using Mimisbrunnr.Web.Mcp;
 using Mimisbrunnr.Web.Services;
 using Skidbladnir.Caching.Distributed.MongoDB;
 using Skidbladnir.DataProtection.MongoDb;
@@ -25,7 +26,7 @@ internal class StartupModule : Module
         typeof(AspNetModule), typeof(MongoDbStoreModule), typeof(WebModule),
         typeof(PersistentModule), typeof(MetricsModule),
         typeof(ConfluenceDataImportModule), typeof(WebCacheModule),
-        typeof(PageTemplatesModule),
+        typeof(PageTemplatesModule), typeof(McpModule),
     ];
 
     public override void Configure(IServiceCollection services)

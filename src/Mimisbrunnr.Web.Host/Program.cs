@@ -43,6 +43,8 @@ app.UseForwardedHeaders(forwardedHeadersOptions);
 
 app.UseSwaggerFeature();
 
+app.UseMcpFeature();
+
 app.UseSpaStaticFiles();
 
 app.UseRouting();
@@ -56,6 +58,8 @@ app.UseAuthorization();
 app.UseUserValidationMiddleware();
 
 app.MapControllers();
+
+app.MapMcp("/mcp").RequireAuthorization();
 
 if (app.Environment.IsDevelopment())
 {

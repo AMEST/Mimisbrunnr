@@ -43,6 +43,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimisbrunnr.Migration.Persi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimisbrunnr.PageTemplates", "src\Mimisbrunnr.PageTemplates\Mimisbrunnr.PageTemplates.csproj", "{DBF1A34F-BDFE-4C00-8265-AAF6BE865EF2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimisbrunnr.Web.Mcp", "src\Mimisbrunnr.Web.Mcp\Mimisbrunnr.Web.Mcp.csproj", "{5AC31C1C-07FB-429A-8035-B00264A5BD52}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -245,6 +247,18 @@ Global
 		{DBF1A34F-BDFE-4C00-8265-AAF6BE865EF2}.Release|x64.Build.0 = Release|Any CPU
 		{DBF1A34F-BDFE-4C00-8265-AAF6BE865EF2}.Release|x86.ActiveCfg = Release|Any CPU
 		{DBF1A34F-BDFE-4C00-8265-AAF6BE865EF2}.Release|x86.Build.0 = Release|Any CPU
+		{5AC31C1C-07FB-429A-8035-B00264A5BD52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AC31C1C-07FB-429A-8035-B00264A5BD52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AC31C1C-07FB-429A-8035-B00264A5BD52}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5AC31C1C-07FB-429A-8035-B00264A5BD52}.Debug|x64.Build.0 = Debug|Any CPU
+		{5AC31C1C-07FB-429A-8035-B00264A5BD52}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5AC31C1C-07FB-429A-8035-B00264A5BD52}.Debug|x86.Build.0 = Debug|Any CPU
+		{5AC31C1C-07FB-429A-8035-B00264A5BD52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AC31C1C-07FB-429A-8035-B00264A5BD52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AC31C1C-07FB-429A-8035-B00264A5BD52}.Release|x64.ActiveCfg = Release|Any CPU
+		{5AC31C1C-07FB-429A-8035-B00264A5BD52}.Release|x64.Build.0 = Release|Any CPU
+		{5AC31C1C-07FB-429A-8035-B00264A5BD52}.Release|x86.ActiveCfg = Release|Any CPU
+		{5AC31C1C-07FB-429A-8035-B00264A5BD52}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -269,5 +283,6 @@ Global
 		{04570E9A-30E7-4D6C-B395-2831D86AA665} = {7B5B41ED-0FD9-4F24-9BA1-5D1C0D476611}
 		{441CD216-C6A9-467A-957D-94CD0AE8FC0A} = {04570E9A-30E7-4D6C-B395-2831D86AA665}
 		{DBF1A34F-BDFE-4C00-8265-AAF6BE865EF2} = {7B5B41ED-0FD9-4F24-9BA1-5D1C0D476611}
+		{5AC31C1C-07FB-429A-8035-B00264A5BD52} = {7B5B41ED-0FD9-4F24-9BA1-5D1C0D476611}
 	EndGlobalSection
 EndGlobal

@@ -31,6 +31,28 @@ public class FeatureServiceTests
     }
 
     [Fact]
+    public async Task Should_ReturnMcpState_WhenMcpFeatureIsRequested()
+    {
+        var configuration = A.Fake<IApplicationConfigurationManager>();
+        A.CallTo(() => configuration.Get()).Returns(Task.FromResult(new ApplicationConfiguration { McpEnabled = true }));
+
+        var enabled = await new FeatureService(configuration).IsFeatureEnabled("appconfig__mcp");
+
+        enabled.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Should_ReturnFalse_WhenMcpIsDisabled()
+    {
+        var configuration = A.Fake<IApplicationConfigurationManager>();
+        A.CallTo(() => configuration.Get()).Returns(Task.FromResult(new ApplicationConfiguration { McpEnabled = false }));
+
+        var enabled = await new FeatureService(configuration).IsFeatureEnabled("appconfig__mcp");
+
+        enabled.Should().BeFalse();
+    }
+
+    [Fact]
     public async Task Should_ReturnFalse_WhenConfigurationDoesNotExist()
     {
         var configuration = A.Fake<IApplicationConfigurationManager>();

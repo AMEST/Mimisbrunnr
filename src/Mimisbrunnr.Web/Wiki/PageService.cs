@@ -205,6 +205,22 @@ internal class PageService : IPageService
         };
     }
 
+    public async Task<HistoricalPageModel> GetVersion(string pageId, long version, UserInfo requestedBy)
+    {
+        await _permissionService.EnsureAnonymousAllowed(requestedBy);
+
+        var page = await _pageManager.GetById(pageId) ?? throw new PageNotFoundException();
+        var space = await _spaceManager.GetById(page.SpaceId);
+
+        await _permissionService.EnsureViewPermission(space.Key, requestedBy);
+
+        var historicalPage = await _pageManager.GetVersionByPageId(pageId, version);
+        if (historicalPage is null)
+            throw new PageVersionNotFoundException();
+
+        return historicalPage.ToModel();
+    }
+
     public async Task<PageModel> RestoreVersion(string pageId, long version, UserInfo restoredBy)
     {
         await _permissionService.EnsureAnonymousAllowed(restoredBy);

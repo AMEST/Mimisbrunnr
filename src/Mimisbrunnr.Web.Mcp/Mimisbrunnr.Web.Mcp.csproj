@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Mimisbrunnr.Web\Mimisbrunnr.Web.csproj" />
+        <ProjectReference Include="..\Integration\Mimisbrunnr.Integration\Mimisbrunnr.Integration.csproj" />
+        <ProjectReference Include="..\Mimisbrunnr.Json\Mimisbrunnr.Json.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="ModelContextProtocol.AspNetCore" Version="2.2.0" />
+        <PackageReference Include="Skidbladnir.Modules" Version="2.0.0" />
+    </ItemGroup>
+
+</Project>

@@ -33,6 +33,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\src\Mimisbrunnr.PageTemplates\Mimisbrunnr.PageTemplates.csproj" />
       <ProjectReference Include="..\..\src\Mimisbrunnr.Web\Mimisbrunnr.Web.csproj" />
+      <ProjectReference Include="..\..\src\Mimisbrunnr.Web.Mcp\Mimisbrunnr.Web.Mcp.csproj" />
       <ProjectReference Include="..\..\src\Mimisbrunnr.Web.Host\Mimisbrunnr.Web.Host.csproj" />
       <ProjectReference Include="..\..\src\Mimisbrunnr.Web.Infrastructure\Mimisbrunnr.Web.Infrastructure.csproj" />
       <ProjectReference Include="..\..\src\Mimisbrunnr.Wiki\Mimisbrunnr.Wiki.csproj" />
