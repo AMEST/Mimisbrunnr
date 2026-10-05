@@ -177,6 +177,12 @@ export default {
         previewRender: this.previewRender,
       },
       renderedMarkdown: "<br/>",
+      imageSizePresets: {
+        small: { width: "25%", height: "" },
+        medium: { width: "50%", height: "" },
+        large: { width: "100%", height: "" },
+        original: { width: "", height: "" }
+      },
       hoveredMacro: {
         id: null,
         name: null,
@@ -200,6 +206,7 @@ export default {
         return;
       }
       this.hideMacroButtons();
+      this.hideImageButtons();
       await this.loadPage();
       await this.loadDraft();
       if (this.draft != null) {
@@ -278,6 +285,7 @@ export default {
           // eslint-disable-next-line
           self.simplemde.codemirror.on("change", (cm, ev) => self.saveDraft());
           self.simplemde.codemirror.on("mousedown", self.handleMacroHover);
+          self.simplemde.codemirror.on("mousedown", self.handleImageHover);
           window.cm = this.simplemde.codemirror;
         },
         1000,
@@ -329,6 +337,148 @@ export default {
         document.body.removeChild(this.currentMacroButtons);
         this.currentMacroButtons = null;
       }
+    },
+    findImageMarkupAt: function(cm, pos) {
+      const line = cm.getLine(pos.line);
+      const imageRegex = /!\[[^\]]*\]\([^)]*\)/g;
+      let match;
+      while ((match = imageRegex.exec(line)) !== null) {
+        if (pos.ch >= match.index && pos.ch <= match.index + match[0].length) {
+          return {
+            markup: match[0],
+            start: match.index,
+            end: match.index + match[0].length,
+          };
+        }
+      }
+      return null;
+    },
+    parseImageMarkup: function(markup) {
+      const match = /^!\[([^\]]*)\]\(([^)]*)\)$/.exec(markup);
+      if (!match) return null;
+
+      const inner = match[2];
+      const sizeMatch = /\s+=([0-9%]*)x([0-9%]*)\s*$/.exec(inner);
+      let width = "";
+      let height = "";
+      let base = inner;
+      if (sizeMatch) {
+        width = sizeMatch[1];
+        height = sizeMatch[2];
+        base = inner.slice(0, sizeMatch.index);
+      }
+      return { alt: match[1], base: base.trimEnd(), width, height };
+    },
+    buildImageMarkup: function(parsed, width, height) {
+      const size = width || height ? ` =${width}x${height}` : "";
+      return `![${parsed.alt}](${parsed.base}${size})`;
+    },
+    handleImageHover: function(cm, event) {
+      const pos = cm.coordsChar({ left: event.clientX, top: event.clientY });
+      const image = this.findImageMarkupAt(cm, pos);
+      if (image) {
+        this.showImageButtons(cm, pos, image);
+      } else {
+        this.hideImageButtons();
+      }
+    },
+    showImageButtons: function(cm, pos, image) {
+      this.hideImageButtons();
+      const parsed = this.parseImageMarkup(image.markup);
+      if (!parsed) return;
+
+      const container = document.createElement("div");
+      container.className = "image-buttons";
+
+      const custom = document.createElement("div");
+      custom.className = "image-buttons-custom";
+
+      const widthInput = document.createElement("input");
+      widthInput.type = "text";
+      widthInput.className = "image-size-input";
+      widthInput.placeholder = this.$t("pageEditor.imageMenu.width");
+      widthInput.value = parsed.width;
+
+      const separator = document.createElement("span");
+      separator.innerText = "×";
+
+      const heightInput = document.createElement("input");
+      heightInput.type = "text";
+      heightInput.className = "image-size-input";
+      heightInput.placeholder = this.$t("pageEditor.imageMenu.height");
+      heightInput.value = parsed.height;
+
+      const applyBtn = document.createElement("button");
+      applyBtn.innerText = this.$t("pageEditor.imageMenu.apply");
+      applyBtn.onclick = () =>
+        this.setImageSize(pos, widthInput.value.trim(), heightInput.value.trim());
+
+      const applyOnEnter = (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          applyBtn.click();
+        }
+      };
+      widthInput.addEventListener("keydown", applyOnEnter);
+      heightInput.addEventListener("keydown", applyOnEnter);
+
+      custom.appendChild(widthInput);
+      custom.appendChild(separator);
+      custom.appendChild(heightInput);
+      custom.appendChild(applyBtn);
+
+      const presets = document.createElement("div");
+      presets.className = "image-buttons-presets";
+      const presetDefs = [
+        ["small", this.$t("pageEditor.imageMenu.small")],
+        ["medium", this.$t("pageEditor.imageMenu.medium")],
+        ["large", this.$t("pageEditor.imageMenu.large")],
+        ["original", this.$t("pageEditor.imageMenu.original")],
+      ];
+      for (const [key, label] of presetDefs) {
+        const preset = this.imageSizePresets[key];
+        const btn = document.createElement("button");
+        btn.innerText = label;
+        btn.onclick = () => this.setImageSize(pos, preset.width, preset.height);
+        presets.appendChild(btn);
+      }
+
+      container.appendChild(custom);
+      container.appendChild(presets);
+
+      const coords = cm.charCoords(pos);
+      container.style.position = "absolute";
+      container.style.left = `${coords.left}px`;
+      container.style.top = `${coords.bottom}px`;
+
+      document.body.appendChild(container);
+      this.currentImageButtons = container;
+    },
+    hideImageButtons: function() {
+      if (this.currentImageButtons) {
+        document.body.removeChild(this.currentImageButtons);
+        this.currentImageButtons = null;
+      }
+    },
+    setImageSize: function(pos, width, height) {
+      const cm = this.simplemde.codemirror;
+      const image = this.findImageMarkupAt(cm, pos);
+      if (!image) {
+        this.hideImageButtons();
+        return;
+      }
+      const parsed = this.parseImageMarkup(image.markup);
+      if (!parsed) {
+        this.hideImageButtons();
+        return;
+      }
+      const newMarkup = this.buildImageMarkup(parsed, width, height);
+      cm.replaceRange(
+        newMarkup,
+        { line: pos.line, ch: image.start },
+        { line: pos.line, ch: image.end }
+      );
+      this.hideImageButtons();
     },
     deleteMacro: function(pos) {
       const lineText = this.simplemde.codemirror.getLine(pos.line);
@@ -585,6 +735,7 @@ export default {
   },
   destroyed: function() {
     this.hideMacroButtons();
+    this.hideImageButtons();
   },
   watch: {
     // eslint-disable-next-line
@@ -704,6 +855,43 @@ export default {
 }
 
 .macro-buttons button:hover {
+    background: #e0e0e0;
+}
+
+.image-buttons {
+    position: absolute;
+    background: white;
+    border: 1px solid #ddd;
+    padding: 4px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.image-buttons-custom,
+.image-buttons-presets {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.image-buttons input.image-size-input {
+    width: 70px;
+    padding: 2px 4px;
+    border: 1px solid #ccc;
+    font-size: 12px;
+}
+
+.image-buttons button {
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 2px 6px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.image-buttons button:hover {
     background: #e0e0e0;
 }
 .editor-preview-side p:has(+ .mm-macro-block){

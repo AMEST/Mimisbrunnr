@@ -379,6 +379,15 @@
                 "edit": "Edit",
                 "delete": "Delete"
             },
+            "imageMenu": {
+                "width": "Width",
+                "height": "Height",
+                "apply": "Apply",
+                "small": "Small",
+                "medium": "Medium",
+                "large": "Large",
+                "original": "Original"
+            },
             "macroEditor":{
                 "title": "Macro params editor",
                 "error": "Macro editing error",
@@ -915,6 +924,15 @@
             "macroMenu": {
                 "edit": "Изменить",
                 "delete": "Удалить"
+            },
+            "imageMenu": {
+                "width": "Ширина",
+                "height": "Высота",
+                "apply": "ОК",
+                "small": "Маленький",
+                "medium": "Средний",
+                "large": "Большой",
+                "original": "Оригинальный"
             },
             "macroEditor":{
                 "title": "Редактор параметров макроса",
