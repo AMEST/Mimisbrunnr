@@ -65,6 +65,39 @@ public class SpaceToolsTests
             .MustNotHaveHappened();
     }
 
+    [Theory]
+    [InlineData("999")]
+    [InlineData("-1")]
+    [InlineData("Private, Public")]
+    public async Task ShouldThrow_InvalidArgument_WhenCreateSpaceTypeIsUndefined(string type)
+    {
+        var spaces = A.Fake<ISpaceService>();
+        var context = McpTestFactory.CreateContext();
+        var tools = new SpaceTools(spaces, context, McpTestFactory.CreateExecutor(context));
+
+        var exception = await Assert.ThrowsAsync<McpException>(() => tools.CreateSpace("TEAM", "Name", type));
+
+        exception.Message.Should().StartWith("invalid_argument:");
+        A.CallTo(() => spaces.Create(A<SpaceCreateModel>._, A<Mimisbrunnr.Wiki.Contracts.UserInfo>._))
+            .MustNotHaveHappened();
+    }
+
+    [Theory]
+    [InlineData("Personal", SpaceTypeModel.Personal)]
+    [InlineData("private", SpaceTypeModel.Private)]
+    [InlineData("PUBLIC", SpaceTypeModel.Public)]
+    public async Task Should_CreateSpace_WhenTypeIsDefined(string type, SpaceTypeModel expected)
+    {
+        var spaces = A.Fake<ISpaceService>();
+        var context = McpTestFactory.CreateContext();
+        var tools = new SpaceTools(spaces, context, McpTestFactory.CreateExecutor(context));
+
+        await tools.CreateSpace("TEAM", "Name", type);
+
+        A.CallTo(() => spaces.Create(A<SpaceCreateModel>.That.Matches(m => m.Type == expected), A<Mimisbrunnr.Wiki.Contracts.UserInfo>._))
+            .MustHaveHappenedOnceExactly();
+    }
+
     [Fact]
     public async Task Should_UpdatePermission_WhenPermissionAlreadyExists()
     {

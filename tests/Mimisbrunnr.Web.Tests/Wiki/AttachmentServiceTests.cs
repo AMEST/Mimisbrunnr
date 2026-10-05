@@ -46,6 +46,43 @@ public class AttachmentServiceTests
     }
 
     [Fact]
+    public async Task Should_PassSizeLimitAfterAuthorization_WhenGettingBoundedAttachmentContent()
+    {
+        var page = new Page { Id = "page", SpaceId = "space" };
+        var space = new Space { Id = "space", Key = "SPACE" };
+        var user = new UserInfo { Email = "user@example.test" };
+        using var content = new MemoryStream([1, 2, 3]);
+        A.CallTo(() => _pages.GetById(page.Id)).Returns(page);
+        A.CallTo(() => _spaces.GetById(space.Id)).Returns(space);
+        A.CallTo(() => _attachments.GetAttachmentContent(page, "file.png", 4)).Returns(content);
+
+        var result = await _service.GetAttachmentContent(page.Id, "file.png", user, 4);
+
+        result.Should().BeSameAs(content);
+        A.CallTo(() => _permissions.EnsureAnonymousAllowed(user)).MustHaveHappenedOnceExactly()
+            .Then(A.CallTo(() => _permissions.EnsureViewPermission(space.Key, user)).MustHaveHappenedOnceExactly())
+            .Then(A.CallTo(() => _attachments.GetAttachmentContent(page, "file.png", 4)).MustHaveHappenedOnceExactly());
+        A.CallTo(() => _attachments.GetAttachmentContent(A<Page>._, A<string>._)).MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task ShouldNot_DownloadAttachment_WhenBoundedDownloadIsForbidden()
+    {
+        var page = new Page { Id = "page", SpaceId = "space" };
+        var space = new Space { Id = "space", Key = "SPACE" };
+        var user = new UserInfo { Email = "user@example.test" };
+        A.CallTo(() => _pages.GetById(page.Id)).Returns(page);
+        A.CallTo(() => _spaces.GetById(space.Id)).Returns(space);
+        A.CallTo(() => _permissions.EnsureViewPermission(space.Key, user))
+            .Throws(new Mimisbrunnr.Web.Infrastructure.UserHasNotPermissionException());
+
+        await _service.Invoking(x => x.GetAttachmentContent(page.Id, "file.png", user, 4))
+            .Should().ThrowAsync<Mimisbrunnr.Web.Infrastructure.UserHasNotPermissionException>();
+
+        A.CallTo(() => _attachments.GetAttachmentContent(A<Page>._, A<string>._, A<long>._)).MustNotHaveHappened();
+    }
+
+    [Fact]
     public async Task Should_ReturnAttachments_WhenGettingAttachments()
     {
         var page = new Page { Id = "page", SpaceId = "space" };

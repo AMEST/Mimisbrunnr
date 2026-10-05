@@ -38,7 +38,13 @@ internal class AttachmentService : IAttachmentService
         return attachments?.Select(x => x.ToModel()).ToArray();
     }
 
-    public async Task<Stream> GetAttachmentContent(string pageId, string name, UserInfo requestedBy)
+    public Task<Stream> GetAttachmentContent(string pageId, string name, UserInfo requestedBy)
+        => GetAttachmentContentCore(pageId, name, requestedBy, null);
+
+    public Task<Stream> GetAttachmentContent(string pageId, string name, UserInfo requestedBy, long maxBytes)
+        => GetAttachmentContentCore(pageId, name, requestedBy, maxBytes);
+
+    private async Task<Stream> GetAttachmentContentCore(string pageId, string name, UserInfo requestedBy, long? maxBytes)
     {
         await _permissionService.EnsureAnonymousAllowed(requestedBy);
         var page = await _pageManager.GetById(pageId);
@@ -51,7 +57,9 @@ internal class AttachmentService : IAttachmentService
 
         await _permissionService.EnsureViewPermission(space.Key, requestedBy);
 
-        return await _attachmentManager.GetAttachmentContent(page, name);
+        return maxBytes.HasValue
+            ? await _attachmentManager.GetAttachmentContent(page, name, maxBytes.Value)
+            : await _attachmentManager.GetAttachmentContent(page, name);
     }
 
     public async Task Remove(string pageId, string name, UserInfo removedBy)

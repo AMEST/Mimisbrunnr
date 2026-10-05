@@ -11,12 +11,7 @@ public class McpServerConfiguration
     public string ServerName { get; set; } = "Mimisbrunnr Wiki";
 
     /// <summary>
-    /// Server version reported to MCP clients.
-    /// </summary>
-    public string ServerVersion { get; set; } = "1.0.0";
-
-    /// <summary>
-    /// Maximum size (in bytes) of an attachment uploaded through the MCP tool.
+    /// Maximum size (in bytes) of an attachment uploaded or downloaded through MCP tools.
     /// MCP messages carry base64 content, so this is intentionally lower than the REST limit.
     /// </summary>
     public long MaxAttachmentBytes { get; set; } = 10 * 1024 * 1024;

@@ -1,8 +1,10 @@
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mimisbrunnr.Json;
 using Mimisbrunnr.Web.Mcp.Internal;
 using Skidbladnir.Modules;
+using Module = Skidbladnir.Modules.Module;
 
 namespace Mimisbrunnr.Web.Mcp;
 
@@ -19,6 +21,10 @@ public class McpModule : Module
         var options = Configuration.AppConfiguration.GetSection("Mcp").Get<McpServerConfiguration>()
                       ?? new McpServerConfiguration();
 
+        var version = Assembly.GetEntryAssembly()?
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+            .InformationalVersion;
+
         services.AddSingleton(options);
         services.AddTransient<ToolContext>();
         services.AddTransient<ToolExecutor>();
@@ -28,7 +34,7 @@ public class McpModule : Module
                 o.ServerInfo = new()
                 {
                     Name = options.ServerName,
-                    Version = options.ServerVersion
+                    Version = version
                 };
             })
             .WithHttpTransport()

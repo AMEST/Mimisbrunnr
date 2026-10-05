@@ -89,6 +89,62 @@ public class AttachmentManagerTests
     }
 
     [Fact]
+    public async Task ShouldThrow_AttachmentTooLargeWithoutDownloading_WhenStorageSizeExceedsLimit()
+    {
+        var repository = A.Fake<IRepository<Attachment>>();
+        var attachment = new Attachment { PageId = "page", Name = "file.txt", Path = "attachments/x" };
+        A.CallTo(() => repository.GetAll()).Returns(new[] { attachment }.AsQueryable());
+        var storage = A.Fake<IStorage>();
+        A.CallTo(() => storage.GetFileAsync(attachment.Path))
+            .Returns(new Skidbladnir.Storage.Abstractions.FileInfo(attachment.Path, 5, DateTime.UtcNow));
+        var manager = new AttachmentManager(repository, storage);
+
+        await manager.Invoking(x => x.GetAttachmentContent(new Page { Id = "page" }, "file.txt", 4))
+            .Should().ThrowAsync<AttachmentTooLargeException>();
+
+        A.CallTo(() => storage.DownloadFileAsync(A<string>._)).MustNotHaveHappened();
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(3)]
+    [InlineData(4)]
+    public async Task Should_DownloadAttachment_WhenStorageSizeDoesNotExceedLimit(int size)
+    {
+        var repository = A.Fake<IRepository<Attachment>>();
+        var attachment = new Attachment { PageId = "page", Name = "file.txt", Path = "attachments/x" };
+        A.CallTo(() => repository.GetAll()).Returns(new[] { attachment }.AsQueryable());
+        var storage = A.Fake<IStorage>();
+        var info = new Skidbladnir.Storage.Abstractions.FileInfo(attachment.Path, size, DateTime.UtcNow);
+        using var content = new MemoryStream(new byte[size]);
+        A.CallTo(() => storage.GetFileAsync(attachment.Path)).Returns(info);
+        A.CallTo(() => storage.DownloadFileAsync(attachment.Path)).Returns(new DownloadResult(info, content));
+        var manager = new AttachmentManager(repository, storage);
+
+        var result = await manager.GetAttachmentContent(new Page { Id = "page" }, "file.txt", 4);
+
+        result.Should().BeSameAs(content);
+        A.CallTo(() => storage.GetFileAsync(attachment.Path)).MustHaveHappenedOnceExactly()
+            .Then(A.CallTo(() => storage.DownloadFileAsync(attachment.Path)).MustHaveHappenedOnceExactly());
+    }
+
+    [Fact]
+    public async Task Should_ReturnNullWithoutDownloading_WhenStorageMetadataIsMissing()
+    {
+        var repository = A.Fake<IRepository<Attachment>>();
+        var attachment = new Attachment { PageId = "page", Name = "file.txt", Path = "attachments/x" };
+        A.CallTo(() => repository.GetAll()).Returns(new[] { attachment }.AsQueryable());
+        var storage = A.Fake<IStorage>();
+        A.CallTo(() => storage.GetFileAsync(attachment.Path)).Returns((Skidbladnir.Storage.Abstractions.FileInfo)null);
+        var manager = new AttachmentManager(repository, storage);
+
+        var result = await manager.GetAttachmentContent(new Page { Id = "page" }, "file.txt", 4);
+
+        result.Should().BeNull();
+        A.CallTo(() => storage.DownloadFileAsync(A<string>._)).MustNotHaveHappened();
+    }
+
+    [Fact]
     public async Task Should_DeleteFileAndAttachment_WhenRemovingByName()
     {
         var repository = A.Fake<IRepository<Attachment>>();

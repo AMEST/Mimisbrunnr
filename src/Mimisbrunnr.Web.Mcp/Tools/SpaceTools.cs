@@ -124,7 +124,7 @@ public sealed class SpaceTools
 
     private static SpaceTypeModel ParseSpaceType(string type)
     {
-        if (Enum.TryParse<SpaceTypeModel>(type, ignoreCase: true, out var result))
+        if (Enum.TryParse<SpaceTypeModel>(type, ignoreCase: true, out var result) && Enum.IsDefined(result))
             return result;
 
         throw new McpException(

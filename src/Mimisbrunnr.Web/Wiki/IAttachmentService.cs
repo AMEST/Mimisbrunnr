@@ -26,6 +26,16 @@ public interface IAttachmentService
     Task<Stream> GetAttachmentContent(string pageId, string name, UserInfo requestedBy);
 
     /// <summary>
+    /// Get attachment content after checking its size in storage, before downloading it.
+    /// </summary>
+    /// <param name="pageId">Page identifier</param>
+    /// <param name="name">Attachment name</param>
+    /// <param name="requestedBy">User requesting the attachment content</param>
+    /// <param name="maxBytes">Maximum permitted file size in bytes</param>
+    /// <returns>Stream with the attachment content</returns>
+    Task<Stream> GetAttachmentContent(string pageId, string name, UserInfo requestedBy, long maxBytes);
+
+    /// <summary>
     /// Upload an attachment to a page
     /// </summary>
     /// <param name="pageId">Page identifier</param>

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using Microsoft.AspNetCore.StaticFiles;
+using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Web.Mcp.Internal;
 using Mimisbrunnr.Web.Wiki;
 using ModelContextProtocol;
@@ -49,12 +50,23 @@ public sealed class AttachmentTools
         [Description("Attachment file name.")] string name)
         => _executor.Execute("get_attachment", async () =>
         {
-            await using var stream = await _attachments.GetAttachmentContent(pageId, name, _context.GetUser());
+            await using var stream = await _attachments.GetAttachmentContent(
+                pageId, name, _context.GetUser(), _configuration.MaxAttachmentBytes);
             if (stream is null)
                 throw new McpException("attachment_not_found: Attachment not found.");
 
+            if (stream.CanSeek && stream.Length - stream.Position > _configuration.MaxAttachmentBytes)
+                throw new AttachmentTooLargeException(_configuration.MaxAttachmentBytes);
+
             using var memoryStream = new MemoryStream();
-            await stream.CopyToAsync(memoryStream);
+            var buffer = new byte[81920];
+            int bytesRead;
+            while ((bytesRead = await stream.ReadAsync(buffer)) != 0)
+            {
+                if (memoryStream.Length + bytesRead > _configuration.MaxAttachmentBytes)
+                    throw new AttachmentTooLargeException(_configuration.MaxAttachmentBytes);
+                await memoryStream.WriteAsync(buffer.AsMemory(0, bytesRead));
+            }
 
             if (!ContentTypeProvider.TryGetContentType(name, out var contentType))
                 contentType = "application/octet-stream";
