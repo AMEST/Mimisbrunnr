@@ -527,6 +527,8 @@
         },
         "pageTemplates": {
             "title": "Page Templates",
+            "pluginSource": "Plugin: {name}",
+            "pluginReadOnly": "Managed by plugin updates",
             "create": "Create",
             "edit": "Edit",
             "delete": "Delete",
@@ -1073,6 +1075,8 @@
         },
         "pageTemplates": {
             "title": "Шаблоны страниц",
+            "pluginSource": "Плагин: {name}",
+            "pluginReadOnly": "Изменяется через обновление плагина",
             "create": "Создать",
             "edit": "Редактировать",
             "delete": "Удалить",

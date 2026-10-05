@@ -10,7 +10,7 @@
     label { display: block; margin: 10px 0 5px; }
     input, textarea { width: 100%; padding: 8px; }
     textarea { height: 100px; }
-    .macro { border: 1px solid #ccc; padding: 15px; margin: 10px 0; }
+    .macro, .page-template { border: 1px solid #ccc; padding: 15px; margin: 10px 0; }
     .buttons { margin-top: 20px; }
     button { padding: 8px 15px; margin-right: 10px; }
   </style>
@@ -39,6 +39,13 @@
     <button onclick="addMacro()">Add Macro</button>
   </div>
 
+  <div class="section">
+    <h2>Global Page Templates</h2>
+    <p>Templates are available to all users while the plugin is enabled. Change the plugin version to install updates.</p>
+    <div id="pageTemplatesContainer"></div>
+    <button onclick="addPageTemplate()">Add Page Template</button>
+  </div>
+
   <div class="buttons">
     <button onclick="loadPlugin()">Load Plugin</button>
     <button onclick="savePlugin()">Save Plugin</button>
@@ -50,8 +57,33 @@
       PluginIdentifier: "",
       Name: "",
       Version: "",
-      Macros: []
+      Macros: [],
+      PageTemplates: []
     };
+
+    function addPageTemplate(template = {}) {
+      const container = document.getElementById('pageTemplatesContainer');
+      const templateDiv = document.createElement('div');
+      templateDiv.className = 'page-template';
+      templateDiv.innerHTML = `
+        <h3>Page Template</h3>
+        <label>Template Identifier (unique within this plugin):</label>
+        <input type="text" class="templateIdentifier" maxlength="255">
+        <label>Name:</label>
+        <input type="text" class="templateName" maxlength="255">
+        <label>Description:</label>
+        <textarea class="templateDescription" maxlength="1024"></textarea>
+        <label>Content (Markdown / Mustache):</label>
+        <textarea class="templateContent" style="height: 240px;"></textarea>
+        <button type="button" class="remove-template">Delete Page Template</button>
+      `;
+      templateDiv.querySelector('.templateIdentifier').value = template.TemplateIdentifier || '';
+      templateDiv.querySelector('.templateName').value = template.Name || '';
+      templateDiv.querySelector('.templateDescription').value = template.Description || '';
+      templateDiv.querySelector('.templateContent').value = template.Content || '';
+      templateDiv.querySelector('.remove-template').addEventListener('click', () => templateDiv.remove());
+      container.appendChild(templateDiv);
+    }
 
     function addMacro() {
       const container = document.getElementById('macrosContainer');
@@ -175,7 +207,7 @@
 
       // Validate macros
       const macroIdentifiers = new Set();
-      for (const macro of currentPlugin.Macros) {
+      for (const macro of (currentPlugin.Macros || [])) {
         if (!macro.MacroIdentifier || !macro.Name) {
           alert('Please fill all required macro fields');
           return false;
@@ -198,6 +230,22 @@
         }
       }
 
+      const templateIdentifiers = new Set();
+      for (const template of currentPlugin.PageTemplates) {
+        if (!template.TemplateIdentifier.trim() || !template.Name.trim() || !template.Content.trim()) {
+          alert('Please fill all required page template fields: identifier, name and content');
+          return false;
+        }
+        if (template.TemplateIdentifier.length > 255 || template.Name.length > 255 || template.Description.length > 1024) {
+          alert('Page template identifier/name must be at most 255 characters; description at most 1024');
+          return false;
+        }
+        if (templateIdentifiers.has(template.TemplateIdentifier)) {
+          alert(`Duplicate TemplateIdentifier: ${template.TemplateIdentifier}`);
+          return false;
+        }
+        templateIdentifiers.add(template.TemplateIdentifier);
+      }
       return true;
     }
 
@@ -229,7 +277,9 @@
       const container = document.getElementById('macrosContainer');
       container.innerHTML = '';
       
-      currentPlugin.Macros.forEach(macro => {
+      document.getElementById('pageTemplatesContainer').innerHTML = '';
+      (currentPlugin.PageTemplates || []).forEach(template => addPageTemplate(template));
+      (currentPlugin.Macros || []).forEach(macro => {
         addMacro();
         const lastMacro = container.lastElementChild;
         lastMacro.querySelector('.macroIdentifier').value = macro.MacroIdentifier;
@@ -262,6 +312,12 @@
       currentPlugin.Name = document.getElementById('pluginName').value;
       currentPlugin.Version = document.getElementById('pluginVersion').value;
 
+      currentPlugin.PageTemplates = Array.from(document.querySelectorAll('.page-template')).map(template => ({
+        TemplateIdentifier: template.querySelector('.templateIdentifier').value,
+        Name: template.querySelector('.templateName').value,
+        Description: template.querySelector('.templateDescription').value,
+        Content: template.querySelector('.templateContent').value
+      }));
       currentPlugin.Macros = [];
       const macros = document.querySelectorAll('.macro');
       macros.forEach(macro => {
