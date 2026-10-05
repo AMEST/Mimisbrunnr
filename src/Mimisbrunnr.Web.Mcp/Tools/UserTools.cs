@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Mimisbrunnr.Integration.User;
 using Mimisbrunnr.Web.Mcp.Internal;
 using Mimisbrunnr.Web.User;
 using ModelContextProtocol.Server;
@@ -21,6 +22,18 @@ public sealed class UserTools
         _context = context;
         _executor = executor;
     }
+
+    [McpServerTool(Name = "get_current_user", ReadOnly = true, Idempotent = true)]
+    [Description("Returns the current authenticated user's email, display name, avatar URL, admin status and whether the account is enabled.")]
+    public Task<string> GetCurrentUser()
+        => _executor.Execute("get_current_user", async () =>
+        {
+            var user = await _users.GetCurrent(_context.GetUser());
+            if (user is null)
+                throw new UserNotFoundException();
+
+            return ToolJson.Serialize(user);
+        });
 
     [McpServerTool(Name = "list_users", ReadOnly = true, Idempotent = true)]
     [Description("Returns the list of wiki users.")]
