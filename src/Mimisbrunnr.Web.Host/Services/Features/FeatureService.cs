@@ -36,6 +36,8 @@ internal class FeatureService : IFeatureService
         {
             case $"{ApplicationFeaturePrefix}_swagger":
                 return configuration.SwaggerEnabled;
+            case $"{ApplicationFeaturePrefix}_mcp":
+                return configuration.McpEnabled;
             default:
                 throw new ArgumentOutOfRangeException($"Unknown application feature {name}");
         }

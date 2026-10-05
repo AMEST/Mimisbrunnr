@@ -15,6 +15,7 @@ public class ApplicationConfigurationMap : EntityMapClass<ApplicationConfigurati
             .SetIgnoreIfDefault(false)
             .SetDefaultValue(true);
         MapProperty(x => x.SwaggerEnabled).SetIgnoreIfDefault(false);
+        MapProperty(x => x.McpEnabled).SetIgnoreIfDefault(false);
         MapProperty(x => x.AllowHtml)
             .SetIgnoreIfDefault(false)
             .SetDefaultValue(true);

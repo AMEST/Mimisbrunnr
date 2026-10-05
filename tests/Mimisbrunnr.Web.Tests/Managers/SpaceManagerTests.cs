@@ -250,6 +250,71 @@ public class SpaceManagerTests
         A.CallTo(() => repository.Update(space, A<CancellationToken>._)).MustHaveHappenedTwiceExactly();
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ShouldThrow_InvalidOperationWithoutChangingPermissions_WhenRemovingStoredPersonalAdmin(bool useGroup)
+    {
+        var repository = A.Fake<IRepository<Space>>();
+        var owner = new Permission
+        {
+            User = useGroup ? null : new UserInfo { Email = "owner@test.com" },
+            Group = useGroup ? new GroupInfo { Name = "Owners" } : null,
+            IsAdmin = true,
+            CanView = true
+        };
+        var space = new Space { Type = SpaceType.Personal, Permissions = [owner] };
+        space.UpdatePermissions();
+        var request = new Permission
+        {
+            User = useGroup ? null : new UserInfo { Email = "OWNER@TEST.COM" },
+            Group = useGroup ? new GroupInfo { Name = "OWNERS" } : null,
+            IsAdmin = false
+        };
+        var manager = new SpaceManager(repository, A.Fake<IPageManager>());
+
+        await manager.Invoking(x => x.RemovePermission(space, request))
+            .Should().ThrowAsync<InvalidOperationException>();
+
+        space.Permissions.Should().ContainSingle().Which.Should().BeSameAs(owner);
+        A.CallTo(() => repository.Update(A<Space>._, A<CancellationToken>._)).MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task ShouldThrow_InvalidOperationWithoutChangingPermissions_WhenDemotingPersonalOwner()
+    {
+        var repository = A.Fake<IRepository<Space>>();
+        var owner = new Permission { User = new UserInfo { Email = "owner@test.com" }, IsAdmin = true };
+        var space = new Space { Type = SpaceType.Personal, Permissions = [owner] };
+        var manager = new SpaceManager(repository, A.Fake<IPageManager>());
+
+        await manager.Invoking(x => x.UpdatePermission(space,
+                new Permission { User = new UserInfo { Email = "owner@test.com" }, CanView = true }))
+            .Should().ThrowAsync<InvalidOperationException>();
+
+        space.Permissions.Should().ContainSingle().Which.Should().BeSameAs(owner);
+        A.CallTo(() => repository.Update(A<Space>._, A<CancellationToken>._)).MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_RemoveNonAdminPermission_WhenPersonalSpaceHasOwner()
+    {
+        var repository = A.Fake<IRepository<Space>>();
+        var owner = new Permission { User = new UserInfo { Email = "owner@test.com" }, IsAdmin = true };
+        var visitor = new UserInfo { Email = "visitor@test.com" };
+        var space = new Space
+        {
+            Type = SpaceType.Personal,
+            Permissions = [owner, new Permission { User = visitor, CanView = true }]
+        };
+        var manager = new SpaceManager(repository, A.Fake<IPageManager>());
+
+        await manager.RemovePermission(space, new Permission { User = visitor });
+
+        space.Permissions.Should().ContainSingle().Which.Should().BeSameAs(owner);
+        A.CallTo(() => repository.Update(space, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+    }
+
     [Fact]
     public async Task Should_SetStatusArchived_WhenArchivingSpace()
     {

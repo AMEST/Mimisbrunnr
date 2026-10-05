@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using Mimisbrunnr.Integration.Favorites;
 
 namespace Mimisbrunnr.Json;
@@ -8,7 +9,10 @@ public static class JsonSerializerOptionsFactory
 {
     static JsonSerializerOptionsFactory()
     {
-        Default = new JsonSerializerOptions();
+        Default = new JsonSerializerOptions
+        {
+            TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+        };
         Default.ApplyDefaults();
     }
 

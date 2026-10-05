@@ -151,7 +151,10 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
         if (permission.Group != null && permission.User != null)
             throw new InvalidOperationException("Only one permission targer allowed. User or Group");
 
-        if (space.Type == SpaceType.Personal && permission.IsAdmin)
+        if (space.Type == SpaceType.Personal && (permission.IsAdmin || space.Permissions.Any(x =>
+                x.IsAdmin && (permission.User != null
+                    ? x.User != null && x.User.Equals(permission.User)
+                    : x.Group != null && x.Group.Equals(permission.Group)))))
             throw new InvalidOperationException("Cannot remove administrators from personal space");
 
         var newPermissions = space.Permissions.Where(x =>

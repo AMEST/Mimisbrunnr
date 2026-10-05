@@ -27,6 +27,11 @@ public class QuickstartModel
     public bool SwaggerEnabled {get; set;}
 
     /// <summary>
+    /// Whether the MCP (Model Context Protocol) server for agents is enabled
+    /// </summary>
+    public bool McpEnabled {get; set;}
+
+    /// <summary>
     /// Whether raw HTML is allowed in page content
     /// </summary>
     [Required]

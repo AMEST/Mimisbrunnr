@@ -99,6 +99,11 @@
                     "label": "Application swagger",
                     "description": "Enable swagger for view application api",
                     "content": "Enable swagger"
+                },
+                "mcp": {
+                    "label": "MCP server for agents",
+                    "description": "Enable the MCP (Model Context Protocol) server for AI agents. Agents authorize with a personal access token.",
+                    "content": "Enable MCP"
                 }
             }
         },
@@ -130,6 +135,11 @@
                         "label": "Application swagger",
                         "description": "Enable swagger for view application api",
                         "content": "Enable swagger"
+                    },
+                    "mcp": {
+                        "label": "MCP server for agents",
+                        "description": "Enable the MCP (Model Context Protocol) server for AI agents. Agents authorize with a personal access token.",
+                        "content": "Enable MCP"
                     },
                     "customCss": {
                         "label": "Custom css",
@@ -625,6 +635,11 @@
                     "label": "Swagger документация",
                     "description": "Включить swagger для просмотра api приложения",
                     "content": "Включить swagger"
+                },
+                "mcp": {
+                    "label": "MCP-сервер для агентов",
+                    "description": "Включить MCP (Model Context Protocol) сервер для AI-агентов. Агенты авторизуются персональным токеном доступа.",
+                    "content": "Включить MCP"
                 }
             }
         },
@@ -656,6 +671,11 @@
                         "label": "Swagger документация",
                         "description": "Включить swagger для просмотра api приложения",
                         "content": "Включить swagger"
+                    },
+                    "mcp": {
+                        "label": "MCP-сервер для агентов",
+                        "description": "Включить MCP (Model Context Protocol) сервер для AI-агентов. Агенты авторизуются персональным токеном доступа.",
+                        "content": "Включить MCP"
                     },
                     "customCss": {
                         "label": "Пользовательский CSS",

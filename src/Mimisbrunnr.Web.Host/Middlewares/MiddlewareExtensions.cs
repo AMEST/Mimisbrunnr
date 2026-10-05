@@ -24,6 +24,13 @@ internal static class MiddlewareExtensions
         );
     }
 
+    public static IApplicationBuilder UseMcpFeature(this IApplicationBuilder builder)
+    {
+        return builder.UseWhen(
+            context => context.Request.Path.StartsWithSegments("/mcp"),
+            branch => branch.UseFeatureMiddleware($"{FeatureService.ApplicationFeaturePrefix}_mcp"));
+    }
+
     public static IApplicationBuilder UseUserValidationMiddleware(this IApplicationBuilder builder)
     {
         return builder.UseMiddleware<ValidateUserStateMiddleware>()

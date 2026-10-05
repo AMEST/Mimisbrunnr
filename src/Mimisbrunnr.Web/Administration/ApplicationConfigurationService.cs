@@ -56,6 +56,7 @@ namespace Mimisbrunnr.Web.Administration
             configuration.UserAutoCreation = model.UserAutoCreation;
             configuration.AllowHtml = model.AllowHtml;
             configuration.SwaggerEnabled = model.SwaggerEnabled;
+            configuration.McpEnabled = model.McpEnabled;
             configuration.CustomCss = model.CustomCss;
             configuration.CustomHomepageEnabled = model.CustomHomepageEnabled;
             configuration.CustomHomepageSpaceKey = model.CustomHomepageEnabled ? model.CustomHomepageSpaceKey : null;

@@ -24,11 +24,27 @@ internal class AttachmentManager : IAttachmentManager
         return _attachmentRepository.GetAll().Where(x => x.PageId == page.Id).ToArrayAsync();
     }
 
-    public async Task<Stream> GetAttachmentContent(Page page, string name)
+    public Task<Stream> GetAttachmentContent(Page page, string name)
+        => GetAttachmentContentCore(page, name, null);
+
+    public Task<Stream> GetAttachmentContent(Page page, string name, long maxBytes)
+        => GetAttachmentContentCore(page, name, maxBytes);
+
+    private async Task<Stream> GetAttachmentContentCore(Page page, string name, long? maxBytes)
     {
         var attachment = await _attachmentRepository.GetAll().FirstOrDefaultAsync(x => x.PageId == page.Id && x.Name == name);
         if (attachment is null)
             return null;
+
+        if (maxBytes.HasValue)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(maxBytes.Value);
+            var info = await _fileStorage.GetFileAsync(attachment.Path);
+            if (info is null)
+                return null;
+            if (info.Size > maxBytes.Value)
+                throw new AttachmentTooLargeException(maxBytes.Value);
+        }
 
         var downloadResult = await _fileStorage.DownloadFileAsync(attachment.Path);
         if (downloadResult is null)

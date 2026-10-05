@@ -52,6 +52,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Mimisbrunnr.Storage.MongoDb\Mimisbrunnr.Storage.MongoDb.csproj" />
         <ProjectReference Include="..\Mimisbrunnr.Web\Mimisbrunnr.Web.csproj" />
+        <ProjectReference Include="..\Mimisbrunnr.Web.Mcp\Mimisbrunnr.Web.Mcp.csproj" />
         <ProjectReference Include="..\Mimisbrunnr.Persistent\Mimisbrunnr.Persistent.csproj" />
         <ProjectReference Include="..\DataImport\Mimisbrunnr.DataImport.Confluence\Mimisbrunnr.DataImport.Confluence.csproj" />
     </ItemGroup>
