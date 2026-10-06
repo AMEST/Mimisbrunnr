@@ -155,7 +155,7 @@ var PluginService = {
                 };
 
                 const result = await this.render(pageId, macroId, userRequest);
-                if (result && result.html) {
+                if (result && result.html && div.isConnected) {
                     div.innerHTML = result.html;
                 }
             } catch (error) {
@@ -166,6 +166,8 @@ var PluginService = {
 
         // executing script inside macros (after all macros are rendered)
         macroDivs.forEach(div => {
+            if (!div.isConnected)
+                return;
             const directScript = Array.from(div.children).find(child => child.tagName === 'SCRIPT');
             if (directScript) {
                 try {

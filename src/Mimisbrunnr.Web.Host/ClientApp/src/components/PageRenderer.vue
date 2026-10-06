@@ -71,7 +71,7 @@ export default {
       setTimeout(replaceRelativeLinksToRoute, 100, this.contentId);
       setTimeout(async () => {
         try {
-          await PluginService.renderMacroOnPage(this.page.id);
+          await PluginService.renderMacroOnPage(this.page.id, this.contentId);
         } catch (e) {
           console.warn('Macro render failed', e);
         }
