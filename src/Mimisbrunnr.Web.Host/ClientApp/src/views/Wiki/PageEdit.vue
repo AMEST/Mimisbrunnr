@@ -76,8 +76,6 @@
 </template>
 
 <script>
-import Vue from "vue";
-import { BIconArrowsAngleExpand } from "bootstrap-vue";
 import Attachments from "@/components/space/modal/Attachments.vue";
 import VueSimplemde from "@/thirdparty/VueSimpleMde.vue";
 const VueMarkdown = () =>
@@ -88,6 +86,7 @@ import http from "@/services/http";
 import { debounce, isImageFile } from "@/services/Utils.js";
 import { formatMarkdownTables, insertMarkdownTableColumn, insertMarkdownTableRow } from "@/services/markdown/tableUtils";
 import { detectAndConvertToMarkdown } from "@/services/markdown/htmlToMarkdown";
+import { createImageSizeMenu } from "@/services/editor/editor-image-plugin";
 import DraftModal from "@/components/pageEditor/DraftModal.vue";
 import GuideModal from "@/components/pageEditor/GuideModal.vue";
 import PagePreviewModal from "@/components/pageEditor/PagePreviewModal.vue";
@@ -179,12 +178,6 @@ export default {
         previewRender: this.previewRender,
       },
       renderedMarkdown: "<br/>",
-      imageSizePresets: {
-        small: { width: "25%", height: "" },
-        medium: { width: "50%", height: "" },
-        large: { width: "100%", height: "" },
-        original: { width: "", height: "" }
-      },
       hoveredMacro: {
         id: null,
         name: null,
@@ -208,7 +201,7 @@ export default {
         return;
       }
       this.hideMacroButtons();
-      this.hideImageButtons();
+      this.imageSizeMenu.hide();
       await this.loadPage();
       await this.loadDraft();
       if (this.draft != null) {
@@ -287,7 +280,10 @@ export default {
           // eslint-disable-next-line
           self.simplemde.codemirror.on("change", (cm, ev) => self.saveDraft());
           self.simplemde.codemirror.on("mousedown", self.handleMacroHover);
-          self.simplemde.codemirror.on("mousedown", self.handleImageHover);
+          self.simplemde.codemirror.on(
+            "mousedown",
+            self.imageSizeMenu.handleHover
+          );
           window.cm = this.simplemde.codemirror;
         },
         1000,
@@ -339,171 +335,6 @@ export default {
         document.body.removeChild(this.currentMacroButtons);
         this.currentMacroButtons = null;
       }
-    },
-    findImageMarkupAt: function(cm, pos) {
-      const line = cm.getLine(pos.line);
-      const imageRegex = /!\[[^\]]*\]\([^)]*\)/g;
-      let match;
-      while ((match = imageRegex.exec(line)) !== null) {
-        if (pos.ch >= match.index && pos.ch <= match.index + match[0].length) {
-          return {
-            markup: match[0],
-            start: match.index,
-            end: match.index + match[0].length,
-          };
-        }
-      }
-      return null;
-    },
-    parseImageMarkup: function(markup) {
-      const match = /^!\[([^\]]*)\]\(([^)]*)\)$/.exec(markup);
-      if (!match) return null;
-
-      const inner = match[2];
-      const sizeMatch = /\s+=([0-9%]*)x([0-9%]*)\s*$/.exec(inner);
-      let width = "";
-      let height = "";
-      let base = inner;
-      if (sizeMatch) {
-        width = sizeMatch[1];
-        height = sizeMatch[2];
-        base = inner.slice(0, sizeMatch.index);
-      }
-      return { alt: match[1], base: base.trimEnd(), width, height };
-    },
-    buildImageMarkup: function(parsed, width, height) {
-      const size = width || height ? ` =${width}x${height}` : "";
-      return `![${parsed.alt}](${parsed.base}${size})`;
-    },
-    handleImageHover: function(cm, event) {
-      const pos = cm.coordsChar({ left: event.clientX, top: event.clientY });
-      const image = this.findImageMarkupAt(cm, pos);
-      if (image) {
-        this.showImageButtons(cm, pos, image);
-      } else {
-        this.hideImageButtons();
-      }
-    },
-    showImageButtons: function(cm, pos, image) {
-      this.hideImageButtons();
-      const parsed = this.parseImageMarkup(image.markup);
-      if (!parsed) return;
-
-      const container = document.createElement("div");
-      container.className = "image-buttons";
-
-      const widthInput = document.createElement("input");
-      widthInput.type = "text";
-      widthInput.className = "image-size-input";
-      widthInput.placeholder = this.$t("pageEditor.imageMenu.width");
-      widthInput.value = parsed.width;
-
-      const separator = document.createElement("span");
-      separator.innerText = "×";
-
-      const heightInput = document.createElement("input");
-      heightInput.type = "text";
-      heightInput.className = "image-size-input";
-      heightInput.placeholder = this.$t("pageEditor.imageMenu.height");
-      heightInput.value = parsed.height;
-
-      const applyBtn = document.createElement("button");
-      applyBtn.innerText = this.$t("pageEditor.imageMenu.apply");
-      applyBtn.title = this.$t("pageEditor.imageMenu.apply");
-      applyBtn.onclick = () =>
-        this.setImageSize(pos, widthInput.value.trim(), heightInput.value.trim());
-
-      const applyOnEnter = (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          applyBtn.click();
-        }
-      };
-      widthInput.addEventListener("keydown", applyOnEnter);
-      heightInput.addEventListener("keydown", applyOnEnter);
-
-      container.appendChild(widthInput);
-      container.appendChild(separator);
-      container.appendChild(heightInput);
-      container.appendChild(applyBtn);
-
-      this.currentImageIconVms = [];
-      const presetDefs = [
-        ["small", this.$t("pageEditor.imageMenu.small"), 12],
-        ["medium", this.$t("pageEditor.imageMenu.medium"), 16],
-        ["large", this.$t("pageEditor.imageMenu.large"), 20],
-      ];
-      for (const [key, label, iconSize] of presetDefs) {
-        const preset = this.imageSizePresets[key];
-        const btn = document.createElement("button");
-        btn.title = label;
-        btn.setAttribute("aria-label", label);
-        const icon = this.createImageSizeIcon(iconSize);
-        btn.appendChild(icon.el);
-        this.currentImageIconVms.push(icon.vm);
-        btn.onclick = () => this.setImageSize(pos, preset.width, preset.height);
-        container.appendChild(btn);
-      }
-
-      const originalBtn = document.createElement("button");
-      originalBtn.innerText = this.$t("pageEditor.imageMenu.original");
-      originalBtn.title = this.$t("pageEditor.imageMenu.original");
-      originalBtn.onclick = () =>
-        this.setImageSize(
-          pos,
-          this.imageSizePresets.original.width,
-          this.imageSizePresets.original.height
-        );
-      container.appendChild(originalBtn);
-
-      const coords = cm.charCoords(pos);
-      container.style.position = "absolute";
-      container.style.left = `${coords.left}px`;
-      container.style.top = `${coords.bottom}px`;
-
-      document.body.appendChild(container);
-      this.currentImageButtons = container;
-    },
-    createImageSizeIcon: function(size) {
-      const vm = new Vue({
-        render: (h) => h(BIconArrowsAngleExpand),
-      }).$mount();
-      const el = vm.$el;
-      el.setAttribute("width", size);
-      el.setAttribute("height", size);
-      el.style.width = `${size}px`;
-      el.style.height = `${size}px`;
-      return { el, vm };
-    },
-    hideImageButtons: function() {
-      if (this.currentImageIconVms) {
-        for (const vm of this.currentImageIconVms) vm.$destroy();
-        this.currentImageIconVms = null;
-      }
-      if (this.currentImageButtons) {
-        document.body.removeChild(this.currentImageButtons);
-        this.currentImageButtons = null;
-      }
-    },
-    setImageSize: function(pos, width, height) {
-      const cm = this.simplemde.codemirror;
-      const image = this.findImageMarkupAt(cm, pos);
-      if (!image) {
-        this.hideImageButtons();
-        return;
-      }
-      const parsed = this.parseImageMarkup(image.markup);
-      if (!parsed) {
-        this.hideImageButtons();
-        return;
-      }
-      const newMarkup = this.buildImageMarkup(parsed, width, height);
-      cm.replaceRange(
-        newMarkup,
-        { line: pos.line, ch: image.start },
-        { line: pos.line, ch: image.end }
-      );
-      this.hideImageButtons();
     },
     deleteMacro: function(pos) {
       const lineText = this.simplemde.codemirror.getLine(pos.line);
@@ -755,12 +586,17 @@ export default {
       setTimeout(() => PluginService.renderMacroOnPage(this.page.id, "page-preview-modal"), 300);
     }
   },
+  created: function () {
+    this.imageSizeMenu = createImageSizeMenu({
+      t: (key) => this.$t(key),
+    });
+  },
   mounted: function () {
     this.init();
   },
   destroyed: function() {
     this.hideMacroButtons();
-    this.hideImageButtons();
+    this.imageSizeMenu.hide();
   },
   watch: {
     // eslint-disable-next-line
@@ -883,47 +719,6 @@ export default {
     background: #e0e0e0;
 }
 
-.image-buttons {
-    position: absolute;
-    background: white;
-    border: 1px solid #ddd;
-    padding: 4px;
-    z-index: 1000;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 4px;
-    white-space: nowrap;
-}
-
-.image-buttons input.image-size-input {
-    width: 60px;
-    height: 28px;
-    padding: 0 4px;
-    border: 1px solid #ccc;
-    font-size: 12px;
-    box-sizing: border-box;
-}
-
-.image-buttons button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 28px;
-    padding: 0 6px;
-    background: #f0f0f0;
-    border: 1px solid #ccc;
-    cursor: pointer;
-    font-size: 12px;
-    line-height: 1;
-    color: #212121;
-    box-sizing: border-box;
-}
-
-.image-buttons button:hover {
-    background: #e0e0e0;
-}
 .editor-preview-side p:has(+ .mm-macro-block){
     display: inline;
 }
