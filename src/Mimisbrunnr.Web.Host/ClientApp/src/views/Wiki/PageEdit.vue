@@ -76,6 +76,8 @@
 </template>
 
 <script>
+import Vue from "vue";
+import { BIconArrowsAngleExpand } from "bootstrap-vue";
 import Attachments from "@/components/space/modal/Attachments.vue";
 import VueSimplemde from "@/thirdparty/VueSimpleMde.vue";
 const VueMarkdown = () =>
@@ -390,9 +392,6 @@ export default {
       const container = document.createElement("div");
       container.className = "image-buttons";
 
-      const custom = document.createElement("div");
-      custom.className = "image-buttons-custom";
-
       const widthInput = document.createElement("input");
       widthInput.type = "text";
       widthInput.className = "image-size-input";
@@ -410,6 +409,7 @@ export default {
 
       const applyBtn = document.createElement("button");
       applyBtn.innerText = this.$t("pageEditor.imageMenu.apply");
+      applyBtn.title = this.$t("pageEditor.imageMenu.apply");
       applyBtn.onclick = () =>
         this.setImageSize(pos, widthInput.value.trim(), heightInput.value.trim());
 
@@ -422,29 +422,39 @@ export default {
       widthInput.addEventListener("keydown", applyOnEnter);
       heightInput.addEventListener("keydown", applyOnEnter);
 
-      custom.appendChild(widthInput);
-      custom.appendChild(separator);
-      custom.appendChild(heightInput);
-      custom.appendChild(applyBtn);
+      container.appendChild(widthInput);
+      container.appendChild(separator);
+      container.appendChild(heightInput);
+      container.appendChild(applyBtn);
 
-      const presets = document.createElement("div");
-      presets.className = "image-buttons-presets";
+      this.currentImageIconVms = [];
       const presetDefs = [
-        ["small", this.$t("pageEditor.imageMenu.small")],
-        ["medium", this.$t("pageEditor.imageMenu.medium")],
-        ["large", this.$t("pageEditor.imageMenu.large")],
-        ["original", this.$t("pageEditor.imageMenu.original")],
+        ["small", this.$t("pageEditor.imageMenu.small"), 12],
+        ["medium", this.$t("pageEditor.imageMenu.medium"), 16],
+        ["large", this.$t("pageEditor.imageMenu.large"), 20],
       ];
-      for (const [key, label] of presetDefs) {
+      for (const [key, label, iconSize] of presetDefs) {
         const preset = this.imageSizePresets[key];
         const btn = document.createElement("button");
-        btn.innerText = label;
+        btn.title = label;
+        btn.setAttribute("aria-label", label);
+        const icon = this.createImageSizeIcon(iconSize);
+        btn.appendChild(icon.el);
+        this.currentImageIconVms.push(icon.vm);
         btn.onclick = () => this.setImageSize(pos, preset.width, preset.height);
-        presets.appendChild(btn);
+        container.appendChild(btn);
       }
 
-      container.appendChild(custom);
-      container.appendChild(presets);
+      const originalBtn = document.createElement("button");
+      originalBtn.innerText = this.$t("pageEditor.imageMenu.original");
+      originalBtn.title = this.$t("pageEditor.imageMenu.original");
+      originalBtn.onclick = () =>
+        this.setImageSize(
+          pos,
+          this.imageSizePresets.original.width,
+          this.imageSizePresets.original.height
+        );
+      container.appendChild(originalBtn);
 
       const coords = cm.charCoords(pos);
       container.style.position = "absolute";
@@ -454,7 +464,22 @@ export default {
       document.body.appendChild(container);
       this.currentImageButtons = container;
     },
+    createImageSizeIcon: function(size) {
+      const vm = new Vue({
+        render: (h) => h(BIconArrowsAngleExpand),
+      }).$mount();
+      const el = vm.$el;
+      el.setAttribute("width", size);
+      el.setAttribute("height", size);
+      el.style.width = `${size}px`;
+      el.style.height = `${size}px`;
+      return { el, vm };
+    },
     hideImageButtons: function() {
+      if (this.currentImageIconVms) {
+        for (const vm of this.currentImageIconVms) vm.$destroy();
+        this.currentImageIconVms = null;
+      }
       if (this.currentImageButtons) {
         document.body.removeChild(this.currentImageButtons);
         this.currentImageButtons = null;
@@ -865,30 +890,35 @@ export default {
     padding: 4px;
     z-index: 1000;
     display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.image-buttons-custom,
-.image-buttons-presets {
-    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
     align-items: center;
     gap: 4px;
+    white-space: nowrap;
 }
 
 .image-buttons input.image-size-input {
-    width: 70px;
-    padding: 2px 4px;
+    width: 60px;
+    height: 28px;
+    padding: 0 4px;
     border: 1px solid #ccc;
     font-size: 12px;
+    box-sizing: border-box;
 }
 
 .image-buttons button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 28px;
+    padding: 0 6px;
     background: #f0f0f0;
     border: 1px solid #ccc;
-    padding: 2px 6px;
     cursor: pointer;
     font-size: 12px;
+    line-height: 1;
+    color: #212121;
+    box-sizing: border-box;
 }
 
 .image-buttons button:hover {
