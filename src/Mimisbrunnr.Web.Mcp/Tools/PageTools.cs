@@ -33,6 +33,16 @@ public sealed class PageTools
             return ToolJson.Serialize(page);
         });
 
+    [McpServerTool(Name = "get_page_tree", ReadOnly = true, Idempotent = true)]
+    [Description("Returns the page tree starting from the given page: the page itself and all of its descendant pages. Use the space home page id to get the full page tree of a space.")]
+    public Task<string> GetPageTree(
+        [Description("Identifier of the root page of the tree.")] string pageId)
+        => _executor.Execute("get_page_tree", async () =>
+        {
+            var tree = await _pages.GetPageTreeByPageId(pageId, _context.GetUser());
+            return ToolJson.Serialize(tree);
+        });
+
     [McpServerTool(Name = "update_page")]
     [Description("Updates a page's name and content. Call get_page first to avoid losing the current content. Requires space edit permission.")]
     public Task<string> UpdatePage(

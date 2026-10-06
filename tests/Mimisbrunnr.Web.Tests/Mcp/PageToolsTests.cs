@@ -25,6 +25,38 @@ public class PageToolsTests
     }
 
     [Fact]
+    public async Task Should_ReturnPageTree_WhenGetPageTreeInvoked()
+    {
+        var pages = A.Fake<IPageService>();
+        A.CallTo(() => pages.GetPageTreeByPageId("page-1", A<Mimisbrunnr.Wiki.Contracts.UserInfo>._))
+            .Returns(Task.FromResult(new PageTreeModel
+            {
+                Page = new PageModel { Id = "page-1", Name = "Home" },
+                Childs = [new PageTreeModel { Page = new PageModel { Id = "page-2", Name = "Child" } }]
+            }));
+        var tools = new PageTools(pages, McpTestFactory.CreateContext(), McpTestFactory.CreateExecutor());
+
+        var json = await tools.GetPageTree("page-1");
+
+        using var document = JsonDocument.Parse(json);
+        document.RootElement.GetProperty("page").GetProperty("name").GetString().Should().Be("Home");
+        document.RootElement.GetProperty("childs")[0].GetProperty("page").GetProperty("name").GetString().Should().Be("Child");
+    }
+
+    [Fact]
+    public async Task Should_MapPageNotFound_WhenGetPageTreeInvoked()
+    {
+        var pages = A.Fake<IPageService>();
+        A.CallTo(() => pages.GetPageTreeByPageId("missing", A<Mimisbrunnr.Wiki.Contracts.UserInfo>._))
+            .Throws(new PageNotFoundException());
+        var tools = new PageTools(pages, McpTestFactory.CreateContext(), McpTestFactory.CreateExecutor());
+
+        var exception = await Assert.ThrowsAsync<McpException>(() => tools.GetPageTree("missing"));
+
+        exception.Message.Should().StartWith("page_not_found");
+    }
+
+    [Fact]
     public async Task Should_MapPageNotFound_WhenGetPageInvoked()
     {
         var pages = A.Fake<IPageService>();
