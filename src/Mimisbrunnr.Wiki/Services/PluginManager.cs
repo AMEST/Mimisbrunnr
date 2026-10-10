@@ -124,6 +124,18 @@ internal class PluginManager : IPluginManager
 
     public async Task InstallPlugin(Plugin plugin, UserInfo userInfo)
     {
+        plugin.PageTemplates ??= [];
+        var identifiers = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var template in plugin.PageTemplates)
+        {
+            if (template is null || string.IsNullOrWhiteSpace(template.TemplateIdentifier)
+                || template.TemplateIdentifier.Length > 255 || string.IsNullOrWhiteSpace(template.Name)
+                || template.Name.Length > 255 || string.IsNullOrWhiteSpace(template.Content)
+                || template.Description?.Length > 1024)
+                throw new InvalidOperationException("Page templates require an identifier, name and content within the allowed lengths");
+            if (!identifiers.Add(template.TemplateIdentifier))
+                throw new InvalidOperationException($"Duplicate TemplateIdentifier: {template.TemplateIdentifier}");
+        }
         using var _ = _logger.BeginScope("Installing plugin `{pluginIdentifier}` by user {userEmail}", plugin.PluginIdentifier, userInfo.Email);
         var pluginInDatabase = await _pluginRepository.GetAll().FirstOrDefaultAsync(x => x.PluginIdentifier == plugin.PluginIdentifier);
         if (pluginInDatabase is not null && pluginInDatabase.Version == plugin.Version)
@@ -145,6 +157,8 @@ internal class PluginManager : IPluginManager
         pluginInDatabase.Installation = DateTime.UtcNow;
         pluginInDatabase.Version = plugin.Version;
         pluginInDatabase.Macros = plugin.Macros;
+        pluginInDatabase.PageTemplates = plugin.PageTemplates;
+        pluginInDatabase.Name = plugin.Name;
         await _pluginRepository.Update(pluginInDatabase);
         _logger.LogInformation("Plugin `{pluginName}` with version {version} updated successful", plugin.Name, plugin.Version);
     }

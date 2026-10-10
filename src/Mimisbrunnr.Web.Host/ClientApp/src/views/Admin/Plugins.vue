@@ -45,6 +45,7 @@
             <p><strong>{{ $t('admin.plugins.details.installedAt') }}:</strong> {{ formatDate(row.item.installation) }}</p>
             
             <PluginMacrosesInfo :macroses="row.item.macros || []" />
+            <PluginPageTemplatesInfo :templates="row.item.pageTemplates || []" />
             
             <div class="text-right mt-3">
               <b-button
@@ -98,6 +99,7 @@
 import { BIconArrowClockwise } from "bootstrap-vue";
 import Menu from "@/components/admin/Menu.vue";
 import PluginService from "@/services/pluginService";
+import PluginPageTemplatesInfo from "@/components/admin/PluginPageTemplatesInfo.vue";
 import PluginMacrosesInfo from "@/components/admin/PluginMacrosesInfo.vue";
 import InstallPluginModal from "@/components/admin/modals/InstallPluginModal.vue";
 
@@ -107,6 +109,7 @@ export default {
     Menu,
     BIconArrowClockwise,
     PluginMacrosesInfo,
+    PluginPageTemplatesInfo,
     InstallPluginModal
   },
   data() {

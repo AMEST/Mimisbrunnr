@@ -1,3 +1,4 @@
+using System.Text;
 using Mimisbrunnr.Integration.PageTemplates;
 using Mimisbrunnr.Integration.Wiki;
 using Mimisbrunnr.PageTemplates.Contracts;
@@ -18,19 +19,23 @@ internal class PageTemplateService : IPageTemplateService
     private readonly IPermissionService _permissionService;
     private readonly IUserManager _userManager;
     private readonly ITemplateRenderer _templateRenderer;
+    private readonly IPluginManager _pluginManager;
+    private const string PluginTemplatePrefix = "plugin.";
 
     public PageTemplateService(
         IPageTemplateManager pageTemplateManager,
         ISpaceManager spaceManager,
         IPermissionService permissionService,
         IUserManager userManager,
-        ITemplateRenderer templateRenderer)
+        ITemplateRenderer templateRenderer,
+        IPluginManager pluginManager)
     {
         _pageTemplateManager = pageTemplateManager;
         _spaceManager = spaceManager;
         _permissionService = permissionService;
         _userManager = userManager;
         _templateRenderer = templateRenderer;
+        _pluginManager = pluginManager;
     }
 
     public async Task<PageTemplateModel[]> GetAll(string type, string spaceKey, UserInfo user)
@@ -71,11 +76,21 @@ internal class PageTemplateService : IPageTemplateService
             }
         }
 
-        return templates.Select(x => x.ToModel()).ToArray();
+        var models = templates.Select(x => x.ToModel()).ToList();
+        if (string.IsNullOrEmpty(type) || type == TemplateType.System)
+        {
+            var plugins = await _pluginManager.GetPlugins();
+            models.AddRange(plugins.Where(x => !x.Disabled)
+                .SelectMany(plugin => (plugin.PageTemplates ?? [])
+                    .Select(template => ToPluginTemplateModel(plugin, template))));
+        }
+        return models.ToArray();
     }
 
     public async Task<PageTemplateModel> GetById(string id, UserInfo user)
     {
+        if (id.StartsWith(PluginTemplatePrefix, StringComparison.Ordinal))
+            return await GetPluginTemplate(id);
         var template = await _pageTemplateManager.GetById(id);
         await EnsureReadPermission(template, user);
         return template.ToModel();
@@ -111,6 +126,7 @@ internal class PageTemplateService : IPageTemplateService
 
     public async Task Update(string id, PageTemplateUpdateModel model, UserInfo user)
     {
+        EnsureStandaloneTemplate(id);
         var template = await _pageTemplateManager.GetById(id);
         await EnsureModifyPermission(template, user);
 
@@ -119,6 +135,7 @@ internal class PageTemplateService : IPageTemplateService
 
     public async Task Delete(string id, UserInfo user)
     {
+        EnsureStandaloneTemplate(id);
         var template = await _pageTemplateManager.GetById(id);
         await EnsureModifyPermission(template, user);
 
@@ -127,8 +144,7 @@ internal class PageTemplateService : IPageTemplateService
 
     public async Task<PageTemplateRenderResponse> Render(string templateId, string spaceKey, UserInfo user)
     {
-        var template = await _pageTemplateManager.GetById(templateId);
-        await EnsureReadPermission(template, user);
+        var template = await GetById(templateId, user);
 
         var space = await _spaceManager.GetByKey(spaceKey);
         if (space == null)
@@ -149,6 +165,55 @@ internal class PageTemplateService : IPageTemplateService
 
         var rendered = await _templateRenderer.Render(template.Content, parameters);
         return new PageTemplateRenderResponse { Content = rendered };
+    }
+
+    private static string PluginTemplateId(string pluginIdentifier, string templateIdentifier)
+        => PluginTemplatePrefix + Convert.ToHexString(Encoding.UTF8.GetBytes(pluginIdentifier))
+            + "." + Convert.ToHexString(Encoding.UTF8.GetBytes(templateIdentifier));
+
+    private static PageTemplateModel ToPluginTemplateModel(Mimisbrunnr.Wiki.Contracts.Plugin plugin, PluginPageTemplate template)
+        => new()
+        {
+            Id = PluginTemplateId(plugin.PluginIdentifier, template.TemplateIdentifier),
+            Name = template.Name,
+            Description = template.Description,
+            Content = template.Content,
+            Type = TemplateType.System,
+            PluginIdentifier = plugin.PluginIdentifier,
+            PluginName = plugin.Name,
+            IsReadOnly = true,
+            Created = plugin.Installation,
+            Updated = plugin.Installation,
+            CreatedBy = plugin.InstalledBy?.ToModel(),
+            UpdatedBy = plugin.InstalledBy?.ToModel()
+        };
+
+    private async Task<PageTemplateModel> GetPluginTemplate(string id)
+    {
+        var parts = id[PluginTemplatePrefix.Length..].Split('.');
+        if (parts.Length != 2)
+            throw new PageTemplateNotFoundException($"Page template with id '{id}' not found");
+        string pluginIdentifier;
+        try
+        {
+            pluginIdentifier = Encoding.UTF8.GetString(Convert.FromHexString(parts[0]));
+        }
+        catch (FormatException)
+        {
+            throw new PageTemplateNotFoundException($"Page template with id '{id}' not found");
+        }
+        var plugin = await _pluginManager.GetPlugin(pluginIdentifier);
+        var template = plugin is null || plugin.Disabled ? null : (plugin.PageTemplates ?? [])
+            .FirstOrDefault(x => PluginTemplateId(plugin.PluginIdentifier, x.TemplateIdentifier) == id);
+        if (template is null)
+            throw new PageTemplateNotFoundException($"Page template with id '{id}' not found");
+        return ToPluginTemplateModel(plugin, template);
+    }
+
+    private static void EnsureStandaloneTemplate(string id)
+    {
+        if (id.StartsWith(PluginTemplatePrefix, StringComparison.Ordinal))
+            throw new UserHasNotPermissionException("Plugin page templates can only be changed by updating the plugin");
     }
 
     private async Task EnsureCreatePermission(string type, string spaceKey, UserInfo user)
