@@ -315,6 +315,7 @@ export default {
       editBtn.onclick = () => this.editMacro(pos, macroContent);
       
       const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'macro-delete';
       deleteBtn.innerText = this.$t("pageEditor.macroMenu.delete");
       deleteBtn.onclick = () => this.deleteMacro(pos, macroContent);
       
@@ -322,7 +323,6 @@ export default {
       buttons.appendChild(deleteBtn);
       
       const coords = cm.charCoords(pos);
-      buttons.style.position = 'absolute';
       buttons.style.left = `${coords.left}px`;
       buttons.style.top = `${coords.bottom}px`;
       
@@ -596,7 +596,7 @@ export default {
   },
   destroyed: function() {
     this.hideMacroButtons();
-    this.imageSizeMenu.hide();
+    this.imageSizeMenu.destroy();
   },
   watch: {
     // eslint-disable-next-line
@@ -695,28 +695,6 @@ export default {
 .editor-preview .mm-macro-block:before{
     content: "\00a7 Macro";
     padding-left: 10px
-}
-
-.macro-buttons {
-    position: absolute;
-    background: white;
-    border: 1px solid #ddd;
-    padding: 4px;
-    z-index: 1000;
-    display: flex;
-    gap: 4px;
-}
-
-.macro-buttons button {
-    background: #f0f0f0;
-    border: 1px solid #ccc;
-    padding: 2px 6px;
-    cursor: pointer;
-    font-size: 12px;
-}
-
-.macro-buttons button:hover {
-    background: #e0e0e0;
 }
 
 .editor-preview-side p:has(+ .mm-macro-block){

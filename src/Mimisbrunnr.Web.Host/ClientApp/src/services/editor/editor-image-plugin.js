@@ -1,6 +1,6 @@
 import Vue from "vue";
 import { BIconArrowsAngleExpand } from "bootstrap-vue";
-import "./editor-image-plugin.css";
+import "./editor-float-menu.css";
 
 export const DEFAULT_IMAGE_SIZE_PRESETS = {
   small: { width: "25%", height: "" },
@@ -15,13 +15,19 @@ const PRESET_ICON_SIZES = {
   large: 20,
 };
 
-const IMAGE_MARKUP_REGEX = /!\[[^\]]*\]\([^)]*\)/g;
+const IMAGE_MARKUP_REGEX = /!\[[^\]]*\]\([^)]*\)/;
 const IMAGE_MARKUP_FULL_REGEX = /^!\[([^\]]*)\]\(([^)]*)\)$/;
 const IMAGE_SIZE_REGEX = /\s+=([0-9%]*)x([0-9%]*)\s*$/;
+const IMAGE_SIZE_VALUE_REGEX = /^[0-9]+%?$/;
+
+function isValidSizeValue(value) {
+  const normalized = String(value == null ? "" : value).trim();
+  return normalized === "" || IMAGE_SIZE_VALUE_REGEX.test(normalized);
+}
 
 export function findImageMarkupAt(cm, pos) {
   const line = cm.getLine(pos.line);
-  const regex = new RegExp(IMAGE_MARKUP_REGEX);
+  const regex = new RegExp(IMAGE_MARKUP_REGEX.source, "g");
   let match;
   while ((match = regex.exec(line)) !== null) {
     if (pos.ch >= match.index && pos.ch <= match.index + match[0].length) {
@@ -62,7 +68,23 @@ export function createImageSizeMenu(options = {}) {
   const presets = options.presets || DEFAULT_IMAGE_SIZE_PRESETS;
 
   let currentButtons = null;
+  let currentCm = null;
   let iconVms = [];
+
+  function onDocumentMouseDown(event) {
+    if (!currentButtons) return;
+    const target = event.target;
+    if (currentButtons.contains(target)) return;
+    if (currentCm && currentCm.getWrapperElement().contains(target)) return;
+    hide();
+  }
+
+  function onDocumentKeyDown(event) {
+    if (event.key === "Escape") hide();
+  }
+
+  document.addEventListener("mousedown", onDocumentMouseDown);
+  document.addEventListener("keydown", onDocumentKeyDown);
 
   function createIcon(size) {
     const vm = new Vue({
@@ -121,6 +143,7 @@ export function createImageSizeMenu(options = {}) {
     widthInput.value = parsed.width;
 
     const separator = document.createElement("span");
+    separator.className = "image-size-separator";
     separator.innerText = "×";
 
     const heightInput = document.createElement("input");
@@ -130,15 +153,26 @@ export function createImageSizeMenu(options = {}) {
     heightInput.value = parsed.height;
 
     const applyBtn = document.createElement("button");
+    applyBtn.className = "image-size-apply";
     applyBtn.innerText = t("pageEditor.imageMenu.apply");
     applyBtn.title = t("pageEditor.imageMenu.apply");
-    applyBtn.onclick = () =>
-      setSize(cm, pos, widthInput.value.trim(), heightInput.value.trim());
+
+    const applySize = () => {
+      const width = widthInput.value.trim();
+      const height = heightInput.value.trim();
+      const validWidth = isValidSizeValue(width);
+      const validHeight = isValidSizeValue(height);
+      widthInput.classList.toggle("is-invalid", !validWidth);
+      heightInput.classList.toggle("is-invalid", !validHeight);
+      if (!validWidth || !validHeight) return;
+      setSize(cm, pos, width, height);
+    };
+    applyBtn.onclick = applySize;
 
     const applyOnEnter = (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
-        applyBtn.click();
+        applySize();
       }
     };
     widthInput.addEventListener("keydown", applyOnEnter);
@@ -170,12 +204,12 @@ export function createImageSizeMenu(options = {}) {
     container.appendChild(originalBtn);
 
     const coords = cm.charCoords(pos);
-    container.style.position = "absolute";
     container.style.left = `${coords.left}px`;
     container.style.top = `${coords.bottom}px`;
 
     document.body.appendChild(container);
     currentButtons = container;
+    currentCm = cm;
   }
 
   function handleHover(cm, event) {
@@ -188,5 +222,12 @@ export function createImageSizeMenu(options = {}) {
     }
   }
 
-  return { handleHover, hide };
+  function destroy() {
+    hide();
+    currentCm = null;
+    document.removeEventListener("mousedown", onDocumentMouseDown);
+    document.removeEventListener("keydown", onDocumentKeyDown);
+  }
+
+  return { handleHover, hide, destroy };
 }
