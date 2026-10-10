@@ -86,6 +86,7 @@ import http from "@/services/http";
 import { debounce, isImageFile } from "@/services/Utils.js";
 import { formatMarkdownTables, insertMarkdownTableColumn, insertMarkdownTableRow } from "@/services/markdown/tableUtils";
 import { detectAndConvertToMarkdown } from "@/services/markdown/htmlToMarkdown";
+import { createImageSizeMenu } from "@/services/editor/editor-image-plugin";
 import DraftModal from "@/components/pageEditor/DraftModal.vue";
 import GuideModal from "@/components/pageEditor/GuideModal.vue";
 import PagePreviewModal from "@/components/pageEditor/PagePreviewModal.vue";
@@ -200,6 +201,7 @@ export default {
         return;
       }
       this.hideMacroButtons();
+      this.imageSizeMenu.hide();
       await this.loadPage();
       await this.loadDraft();
       if (this.draft != null) {
@@ -278,6 +280,10 @@ export default {
           // eslint-disable-next-line
           self.simplemde.codemirror.on("change", (cm, ev) => self.saveDraft());
           self.simplemde.codemirror.on("mousedown", self.handleMacroHover);
+          self.simplemde.codemirror.on(
+            "mousedown",
+            self.imageSizeMenu.handleHover
+          );
           window.cm = this.simplemde.codemirror;
         },
         1000,
@@ -309,6 +315,7 @@ export default {
       editBtn.onclick = () => this.editMacro(pos, macroContent);
       
       const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'macro-delete';
       deleteBtn.innerText = this.$t("pageEditor.macroMenu.delete");
       deleteBtn.onclick = () => this.deleteMacro(pos, macroContent);
       
@@ -316,7 +323,6 @@ export default {
       buttons.appendChild(deleteBtn);
       
       const coords = cm.charCoords(pos);
-      buttons.style.position = 'absolute';
       buttons.style.left = `${coords.left}px`;
       buttons.style.top = `${coords.bottom}px`;
       
@@ -580,11 +586,17 @@ export default {
       setTimeout(() => PluginService.renderMacroOnPage(this.page.id, "page-preview-modal"), 300);
     }
   },
+  created: function () {
+    this.imageSizeMenu = createImageSizeMenu({
+      t: (key) => this.$t(key),
+    });
+  },
   mounted: function () {
     this.init();
   },
   destroyed: function() {
     this.hideMacroButtons();
+    this.imageSizeMenu.destroy();
   },
   watch: {
     // eslint-disable-next-line
@@ -685,27 +697,6 @@ export default {
     padding-left: 10px
 }
 
-.macro-buttons {
-    position: absolute;
-    background: white;
-    border: 1px solid #ddd;
-    padding: 4px;
-    z-index: 1000;
-    display: flex;
-    gap: 4px;
-}
-
-.macro-buttons button {
-    background: #f0f0f0;
-    border: 1px solid #ccc;
-    padding: 2px 6px;
-    cursor: pointer;
-    font-size: 12px;
-}
-
-.macro-buttons button:hover {
-    background: #e0e0e0;
-}
 .editor-preview-side p:has(+ .mm-macro-block){
     display: inline;
 }
