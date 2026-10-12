@@ -45,6 +45,8 @@ app.UseSwaggerFeature();
 
 app.UseMcpFeature();
 
+app.UseSpaBrandingMiddleware();
+
 app.UseSpaStaticFiles();
 
 app.UseRouting();
