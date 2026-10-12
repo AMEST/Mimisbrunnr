@@ -31,6 +31,11 @@ internal static class MiddlewareExtensions
             branch => branch.UseFeatureMiddleware($"{FeatureService.ApplicationFeaturePrefix}_mcp"));
     }
 
+    public static IApplicationBuilder UseSpaBrandingMiddleware(this IApplicationBuilder builder)
+    {
+        return builder.UseMiddleware<SpaBrandingMiddleware>();
+    }
+
     public static IApplicationBuilder UseUserValidationMiddleware(this IApplicationBuilder builder)
     {
         return builder.UseMiddleware<ValidateUserStateMiddleware>()
