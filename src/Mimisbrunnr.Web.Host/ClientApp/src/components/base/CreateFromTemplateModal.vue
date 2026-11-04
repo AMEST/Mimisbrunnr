@@ -16,7 +16,7 @@
         @click="createFromTemplate(tpl)"
       >
         <strong>{{ tpl.name }}</strong>
-        <small class="text-muted"> — {{ tpl.type }}</small>
+        <small class="text-muted"> — {{ tpl.pluginName ? $t("pageTemplates.pluginSource", { name: tpl.pluginName }) : tpl.type }}</small>
         <br />
         <small v-if="tpl.description">{{ tpl.description }}</small>
       </b-list-group-item>

@@ -12,6 +12,15 @@ public class PageTemplateModel
     /// </summary>
     public string Id { get; set; }
 
+    /// <summary>Identifier of the source plugin, or null for standalone templates.</summary>
+    public string PluginIdentifier { get; set; }
+
+    /// <summary>Display name of the source plugin.</summary>
+    public string PluginName { get; set; }
+
+    /// <summary>Whether the template can only be changed through its plugin package.</summary>
+    public bool IsReadOnly { get; set; }
+
     /// <summary>
     /// Template name
     /// </summary>

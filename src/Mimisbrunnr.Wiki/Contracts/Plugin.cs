@@ -11,5 +11,6 @@ public class Plugin : IHasId<string>
     public UserInfo InstalledBy { get; internal set; }
     public DateTime Installation { get; internal set; }
     public bool Disabled { get; internal set; }
+    public PluginPageTemplate[] PageTemplates { get; set; } = [];
     public Macro[] Macros { get; set; } = [];
 }

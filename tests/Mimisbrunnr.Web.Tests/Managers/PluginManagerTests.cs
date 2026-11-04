@@ -315,4 +315,47 @@ public class PluginManagerTests
         A.CallTo(() => states.Delete(other, A<CancellationToken>._)).MustNotHaveHappened();
         A.CallTo(() => repository.Delete(plugin, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
     }
+
+    [Fact]
+    public async Task Should_ReplacePageTemplatesAndPreserveDisabledState_WhenUpdatingPlugin()
+    {
+        var repository = A.Fake<IRepository<Mimisbrunnr.Wiki.Contracts.Plugin>>();
+        var existing = new Mimisbrunnr.Wiki.Contracts.Plugin { PluginIdentifier = "plugin", Version = "1", Disabled = true,
+            PageTemplates = [new PluginPageTemplate { TemplateIdentifier = "old" }] };
+        A.CallTo(() => repository.GetAll()).Returns(new[] { existing }.AsQueryable());
+        var manager = new PluginManager(repository, A.Fake<IRepository<MacroState>>(), NullLogger<PluginManager>.Instance);
+        var template = new PluginPageTemplate { TemplateIdentifier = "new", Name = "New", Content = "Markdown" };
+
+        await manager.InstallPlugin(new Mimisbrunnr.Wiki.Contracts.Plugin { PluginIdentifier = "plugin", Name = "New name", Version = "2", PageTemplates = [template] }, new UserInfo());
+
+        existing.PageTemplates.Should().ContainSingle().Which.Should().BeSameAs(template);
+        existing.Name.Should().Be("New name");
+        existing.Disabled.Should().BeTrue();
+        await manager.InstallPlugin(new Mimisbrunnr.Wiki.Contracts.Plugin { PluginIdentifier = "plugin", Version = "3" }, new UserInfo());
+        existing.PageTemplates.Should().BeEmpty();
+    }
+
+    [Theory]
+    [InlineData(null, "Name", "Content")]
+    [InlineData("id", " ", "Content")]
+    [InlineData("id", "Name", " ")]
+    public async Task ShouldThrow_InvalidOperationException_WhenPluginPageTemplateIsInvalid(string identifier, string name, string content)
+    {
+        var repository = A.Fake<IRepository<Mimisbrunnr.Wiki.Contracts.Plugin>>();
+        var manager = new PluginManager(repository, A.Fake<IRepository<MacroState>>(), NullLogger<PluginManager>.Instance);
+        var plugin = new Mimisbrunnr.Wiki.Contracts.Plugin { PageTemplates = [new PluginPageTemplate { TemplateIdentifier = identifier, Name = name, Content = content }] };
+        await manager.Invoking(x => x.InstallPlugin(plugin, new UserInfo())).Should().ThrowAsync<InvalidOperationException>();
+        A.CallTo(() => repository.Create(A<Mimisbrunnr.Wiki.Contracts.Plugin>._, A<CancellationToken>._)).MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task ShouldThrow_InvalidOperationException_WhenPluginPageTemplateIdentifiersAreDuplicated()
+    {
+        var repository = A.Fake<IRepository<Mimisbrunnr.Wiki.Contracts.Plugin>>();
+        var manager = new PluginManager(repository, A.Fake<IRepository<MacroState>>(), NullLogger<PluginManager>.Instance);
+        var template = new PluginPageTemplate { TemplateIdentifier = "same", Name = "Name", Content = "Content" };
+        await manager.Invoking(x => x.InstallPlugin(new Mimisbrunnr.Wiki.Contracts.Plugin { PageTemplates = [template, template] }, new UserInfo()))
+            .Should().ThrowAsync<InvalidOperationException>().WithMessage("*Duplicate TemplateIdentifier*");
+        A.CallTo(() => repository.Create(A<Mimisbrunnr.Wiki.Contracts.Plugin>._, A<CancellationToken>._)).MustNotHaveHappened();
+    }
 }

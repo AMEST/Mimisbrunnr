@@ -3,6 +3,14 @@
   "PluginIdentifier": "mimisbrunnr.plugin.example",
   "Name": "Example Plugin",
   "Version": "1.0.0-c",
+  "PageTemplates": [
+    {
+      "TemplateIdentifier": "meeting-notes",
+      "Name": "Meeting notes",
+      "Description": "A global template for meeting notes",
+      "Content": "# Meeting notes\n\nDate: {{CurrentDate}}\nAuthor: {{UserName}}\nSpace: {{SpaceName}}\n\n## Agenda\n\n## Decisions\n\n## Action items\n"
+    }
+  ],
   "Macros": [
     {
       "MacroIdentifier": "mimisbrunnr.plugin.example.macro.hello",

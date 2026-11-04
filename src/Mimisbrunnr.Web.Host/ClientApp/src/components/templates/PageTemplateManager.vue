@@ -19,12 +19,13 @@
         <b-tr v-for="tpl in templates" :key="tpl.id">
           <b-td>{{ tpl.name }}</b-td>
           <b-td>{{ tpl.description || "" }}</b-td>
-          <b-td>{{ typeLabel }}</b-td>
+          <b-td>{{ tpl.pluginName ? $t("pageTemplates.pluginSource", { name: tpl.pluginName }) : typeLabel }}</b-td>
           <b-td v-if="!readonly">
-            <b-button variant="outline-primary" size="sm" class="mr-1" @click="openEdit(tpl)">
+            <small v-if="tpl.isReadOnly" class="text-muted">{{ $t("pageTemplates.pluginReadOnly") }}</small>
+            <b-button v-if="!tpl.isReadOnly" variant="outline-primary" size="sm" class="mr-1" @click="openEdit(tpl)">
               {{ $t("pageTemplates.edit") }}
             </b-button>
-            <b-button variant="outline-danger" size="sm" @click="confirmDelete(tpl)">
+            <b-button v-if="!tpl.isReadOnly" variant="outline-danger" size="sm" @click="confirmDelete(tpl)">
               {{ $t("pageTemplates.delete") }}
             </b-button>
           </b-td>

@@ -18,6 +18,10 @@ public class HandlePluginErrorsAttribute : ExceptionFilterAttribute
             case ArgumentOutOfRangeException notFoundEx:
                 context.Result = new NotFoundObjectResult(new { message = notFoundEx.Message });
                 break;
+            case InvalidOperationException invalidOperationException:
+                context.Result = new BadRequestObjectResult(new { message = invalidOperationException.Message });
+                context.ExceptionHandled = true;
+                break;
             case PluginNotFoundException pluginNotFoundEx:
                 context.Result = new ObjectResult(new { message = pluginNotFoundEx.Message }) { StatusCode = 404 };
                 context.ExceptionHandled = true;

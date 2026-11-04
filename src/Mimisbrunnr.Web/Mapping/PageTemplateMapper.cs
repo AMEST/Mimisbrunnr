@@ -15,5 +15,8 @@ public static partial class PageTemplateMapper
     /// </summary>
     /// <param name="template">Page template entity to map</param>
     /// <returns>The mapped page template model</returns>
+    [MapperIgnoreTarget(nameof(PageTemplateModel.PluginIdentifier))]
+    [MapperIgnoreTarget(nameof(PageTemplateModel.PluginName))]
+    [MapperIgnoreTarget(nameof(PageTemplateModel.IsReadOnly))]
     public static partial PageTemplateModel ToModel(this PageTemplate template);
 }

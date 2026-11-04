@@ -45,4 +45,6 @@ public class PluginModel
     /// Collection of macros provided by this plugin.
     /// </summary>
     public MacroModel[] Macros { get; set; } = [];
+    /// <summary>Global page templates provided by this plugin.</summary>
+    public PluginPageTemplateModel[] PageTemplates { get; set; } = [];
 }
