@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.SpaServices;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Net.Http.Headers;
 using Mimisbrunnr.Persistent;
 using Mimisbrunnr.Storage.MongoDb;
 using Mimisbrunnr.Web.Host;
@@ -45,7 +47,27 @@ app.UseSwaggerFeature();
 
 app.UseMcpFeature();
 
-app.UseSpaStaticFiles();
+// The service worker script and the HTML shell must never be cached aggressively:
+// otherwise the browser keeps running the previous worker and serves a stale
+// index.html that references assets deleted by the next deployment.
+static void DisableCaching(StaticFileResponseContext context)
+{
+    var fileName = context.File.Name;
+    if (fileName.Equals("service-worker.js", StringComparison.OrdinalIgnoreCase) ||
+        fileName.Equals("index.html", StringComparison.OrdinalIgnoreCase) ||
+        fileName.Equals("asset-recovery.js", StringComparison.OrdinalIgnoreCase))
+    {
+        var headers = context.Context.Response.Headers;
+        headers[HeaderNames.CacheControl] = "no-cache, no-store, must-revalidate";
+        headers[HeaderNames.Pragma] = "no-cache";
+        headers[HeaderNames.Expires] = "0";
+    }
+}
+
+app.UseSpaStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = DisableCaching
+});
 
 app.UseRouting();
 
@@ -72,9 +94,17 @@ if (app.Environment.IsDevelopment())
     );
 }
 
+if (!app.Environment.IsDevelopment())
+    app.UseMiddleware<SpaAssetFallbackMiddleware>();
+
 app.UseSpa(spa =>
 {
     spa.Options.SourcePath = "ClientApp";
+    // The SPA fallback serves index.html for deep links - keep it uncached too.
+    spa.Options.DefaultPageStaticFileOptions = new StaticFileOptions
+    {
+        OnPrepareResponse = DisableCaching
+    };
 });
 
 app.Run();
