@@ -4,7 +4,7 @@ import router from './router'
 import store from './services/store'
 import language from './assets/lang.json'
 import http from "@/services/http";
-import './registerServiceWorker'
+import registerServiceWorker from './registerServiceWorker'
 // Bootstrap
 import { BootstrapVue, BIcon} from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
@@ -90,6 +90,8 @@ window.addEventListener('dragover', function (e) {
 window.addEventListener('drop', function (e) {
     e.preventDefault()
 }, false)
+
+registerServiceWorker(router)
 
 // eslint-disable-next-line
 Promise.all([applicationInfoTask]).then(result => {

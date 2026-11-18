@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "test:pwa": "node --test tests/ServiceWorkerTests.cjs tests/ServiceWorkerUpdatesTests.cjs"
   },
   "dependencies": {
     "bootstrap": "4.6.1",
@@ -49,7 +50,10 @@
     "eslint": "^8.0.0",
     "eslint-plugin-vue": "^9.0.0",
     "path-browserify": "^1.0.1",
-    "vue-template-compiler": "^2.7.14"
+    "vue-template-compiler": "^2.7.14",
+    "workbox-precaching": "^6.6.0",
+    "workbox-routing": "^6.6.0",
+    "workbox-webpack-plugin": "^6.6.0"
   },
   "overrides": {
     "serialize-javascript": "^7.1.0",
