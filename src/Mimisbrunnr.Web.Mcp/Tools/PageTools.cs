@@ -1,24 +1,27 @@
 using System.ComponentModel;
 using Mimisbrunnr.Integration.Wiki;
 using Mimisbrunnr.Web.Mcp.Internal;
+using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Web.Wiki;
 using ModelContextProtocol.Server;
 
 namespace Mimisbrunnr.Web.Mcp.Tools;
 
 /// <summary>
-/// MCP tools for reading and editing wiki pages, including version history.
+/// MCP tools for reading, creating and editing wiki pages, including version history.
 /// </summary>
 [McpServerToolType]
 public sealed class PageTools
 {
     private readonly IPageService _pages;
+    private readonly IPermissionService _permissions;
     private readonly ToolContext _context;
     private readonly ToolExecutor _executor;
 
-    public PageTools(IPageService pages, ToolContext context, ToolExecutor executor)
+    public PageTools(IPageService pages, IPermissionService permissions, ToolContext context, ToolExecutor executor)
     {
         _pages = pages;
+        _permissions = permissions;
         _context = context;
         _executor = executor;
     }
@@ -41,6 +44,30 @@ public sealed class PageTools
         {
             var tree = await _pages.GetPageTreeByPageId(pageId, _context.GetUser());
             return ToolJson.Serialize(tree);
+        });
+
+    [McpServerTool(Name = "create_page", Destructive = false)]
+    [Description("Creates and returns a new wiki page under a parent page in the specified space. Requires space view and edit permissions.")]
+    public Task<string> CreatePage(
+        [Description("Space key where the page will be created.")] string spaceKey,
+        [Description("Identifier of the parent page in the same space. Use the space home page id for a top-level page.")] string parentPageId,
+        [Description("Page name.")] string name,
+        [Description("Optional page content (Markdown). Defaults to empty content.")] string content = "")
+        => _executor.Execute("create_page", async () =>
+        {
+            var model = new PageCreateModel
+            {
+                SpaceKey = spaceKey,
+                ParentPageId = parentPageId,
+                Name = name,
+                Content = content
+            };
+            ToolValidation.EnsureValid(model);
+
+            var user = _context.GetUser();
+            await _permissions.EnsureViewPermission(spaceKey, user);
+            var page = await _pages.Create(model, user);
+            return ToolJson.Serialize(page);
         });
 
     [McpServerTool(Name = "update_page")]

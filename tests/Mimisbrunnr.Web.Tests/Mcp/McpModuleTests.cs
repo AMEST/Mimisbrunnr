@@ -23,5 +23,11 @@ public class McpModuleTests
         tools.Select(tool => tool.ProtocolTool.Name).Should().Contain("get_page");
         tools.Select(tool => tool.ProtocolTool.Name).Should().Contain("get_current_user");
         tools.Select(tool => tool.ProtocolTool.Name).Should().Contain(["search_pages", "search_spaces", "search_users"]);
+
+        var createPage = tools.Should().ContainSingle(tool => tool.ProtocolTool.Name == "create_page").Which.ProtocolTool;
+        createPage.InputSchema.GetProperty("required").EnumerateArray().Select(parameter => parameter.GetString())
+            .Should().BeEquivalentTo(["spaceKey", "parentPageId", "name"]);
+        createPage.InputSchema.GetProperty("properties").GetProperty("content").GetProperty("default").GetString()
+            .Should().BeEmpty();
     }
 }
