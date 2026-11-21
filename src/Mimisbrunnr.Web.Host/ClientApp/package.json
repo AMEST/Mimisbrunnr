@@ -6,6 +6,8 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
+    "demo": "node ../../../docs/demo/server.js",
+    "demo:quickstart": "node ../../../docs/demo/server.js --quickstart --port 4322",
     "test:pwa": "node --test tests/ServiceWorkerTests.cjs tests/ServiceWorkerUpdatesTests.cjs"
   },
   "dependencies": {
