@@ -10,11 +10,14 @@ using Mimisbrunnr.Web.PageTemplates;
 using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;
+using Skidbladnir.Repository.Abstractions;
 
 namespace Mimisbrunnr.Web.Tests.PageTemplates;
 
 public class PageTemplateServiceTests
 {
+    public PageTemplateServiceTests() => QueryableAsyncExtensions.EnableFallback();
+
     [Fact]
     public async Task ShouldThrow_UserHasNotPermissionException_WhenUserReadsAnotherUsersTemplate()
     {
