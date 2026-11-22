@@ -8,6 +8,8 @@ namespace Mimisbrunnr.Web.Tests.Managers;
 
 public class DraftManagerTests
 {
+    public DraftManagerTests() => QueryableAsyncExtensions.EnableFallback();
+
     [Fact]
     public async Task Should_CreateDraftWithContent_WhenCreatingDraft()
     {
