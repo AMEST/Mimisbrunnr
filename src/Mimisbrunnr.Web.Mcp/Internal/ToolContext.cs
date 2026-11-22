@@ -33,4 +33,6 @@ public sealed class ToolContext
     /// Returns the current user or <c>null</c> when the request is not authenticated.
     /// </summary>
     public UserInfo TryGetUser() => _httpContextAccessor.HttpContext?.User?.ToInfo();
+
+    internal PathString PathBase => _httpContextAccessor.HttpContext?.Request.PathBase ?? PathString.Empty;
 }

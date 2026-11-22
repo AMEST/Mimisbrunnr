@@ -156,17 +156,30 @@ public class AttachmentToolsTests
     }
 
     [Fact]
-    public async Task Should_UploadAttachment_WhenContentIsValid()
+    public async Task Should_ReturnMarkdownLink_WhenBase64AttachmentIsUploaded()
     {
         var attachments = A.Fake<IAttachmentService>();
+        var user = McpTestFactory.ExpectedUser();
+        const string name = "a [1]#.bin";
+        const string pageId = "page-1";
+        byte[] bytes = [0, 128, 255, 42];
+        A.CallTo(() => attachments.Upload(pageId, A<Stream>._, name, user))
+            .Invokes((string _, Stream stream, string _, UserInfo _) =>
+            {
+                using var uploaded = new MemoryStream();
+                stream.CopyTo(uploaded);
+                uploaded.ToArray().Should().Equal(bytes);
+            });
         var tools = new AttachmentTools(attachments, new McpServerConfiguration(),
             McpTestFactory.CreateContext(), McpTestFactory.CreateExecutor());
-        var content = Convert.ToBase64String(Encoding.UTF8.GetBytes("data"));
 
-        var result = await tools.UploadAttachment("page-1", "a.bin", content);
+        var result = await tools.UploadAttachment(pageId, name, Convert.ToBase64String(bytes));
 
-        result.Should().Contain("ok");
-        A.CallTo(() => attachments.Upload("page-1", A<Stream>._, "a.bin", A<Mimisbrunnr.Wiki.Contracts.UserInfo>._))
-            .MustHaveHappenedOnceExactly();
+        using var document = JsonDocument.Parse(result);
+        var attachment = document.RootElement;
+        attachment.GetProperty("ok").GetBoolean().Should().BeTrue();
+        attachment.GetProperty("url").GetString().Should().Be("/api/attachment/page-1/a%20%5B1%5D%23.bin");
+        attachment.GetProperty("markdown").GetString().Should().Be(@"[a \[1\]#.bin](/api/attachment/page-1/a%20%5B1%5D%23.bin)");
+        A.CallTo(() => attachments.Upload(pageId, A<Stream>._, name, user)).MustHaveHappenedOnceExactly();
     }
 }

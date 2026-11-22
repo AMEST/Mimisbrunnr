@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.StaticFiles;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Web.Mcp.Internal;
@@ -81,15 +82,18 @@ public sealed class AttachmentTools
         });
 
     [McpServerTool(Name = "upload_attachment")]
-    [Description("Uploads an attachment to a page. Content must be base64 encoded. Requires space edit permission.")]
+    [Description("Uploads a file to a page and returns its URL and Markdown link. Use get_page and update_page to insert the link. Uploading the same file name replaces the existing attachment. Requires space edit permission.")]
     public Task<string> UploadAttachment(
         [Description("Page identifier.")] string pageId,
-        [Description("Attachment file name.")] string name,
-        [Description("Base64 encoded file content.")] string content)
+        [Description("Attachment file name, including its extension.")] string name,
+        [Description("Base64 encoding of the entire file.")] string content)
         => _executor.Execute("upload_attachment", async () =>
         {
+            ToolValidation.EnsureNotEmpty(pageId, nameof(pageId));
             ToolValidation.EnsureNotEmpty(name, nameof(name));
             ToolValidation.EnsureNotEmpty(content, nameof(content));
+            if (name is "." or ".." || name.Any(c => c is '/' or '\\' || char.IsControl(c)))
+                throw new McpException("invalid_argument: name must be a single attachment file name.");
 
             byte[] bytes;
             try
@@ -102,12 +106,14 @@ public sealed class AttachmentTools
             }
 
             if (bytes.LongLength > _configuration.MaxAttachmentBytes)
-                throw new McpException(
-                    $"attachment_too_large: Attachment exceeds the {_configuration.MaxAttachmentBytes} bytes MCP limit.");
+                throw new AttachmentTooLargeException(_configuration.MaxAttachmentBytes);
 
+            var user = _context.GetUser();
+            var url = $"{_context.PathBase.ToUriComponent()}/api/attachment/{Uri.EscapeDataString(pageId)}/{Uri.EscapeDataString(name)}";
+            var escapedName = Regex.Replace(name, """[!*&<>\[\]`_|]""", @"\$0");
             using var stream = new MemoryStream(bytes);
-            await _attachments.Upload(pageId, stream, name, _context.GetUser());
-            return ToolJson.Ok();
+            await _attachments.Upload(pageId, stream, name, user);
+            return ToolJson.Serialize(new { ok = true, pageId, name, url, markdown = $"[{escapedName}]({url})" });
         });
 
     [McpServerTool(Name = "delete_attachment", Destructive = true, Idempotent = true)]
