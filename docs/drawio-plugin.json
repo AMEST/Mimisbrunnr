@@ -2,7 +2,7 @@
   "Id": "7f6c0b2e-6a5d-4d9f-9c2b-1e8f0a3d5b71",
   "PluginIdentifier": "mm.plugin.drawio",
   "Name": "Draw.io diagrams",
-  "Version": "0.1.0",
+  "Version": "0.1.1",
   "PageTemplates": [],
   "Macros": [
     {
@@ -10,10 +10,32 @@
       "Name": "Draw.io diagram",
       "Description": "Editable draw.io diagram stored as page attachments: <name>.drawio.xml (source) and <name>.drawio.png (preview). Set the identifier in macro settings.",
       "Icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0Ij4KICA8cmVjdCB4PSI0IiB5PSIxMCIgd2lkdGg9IjIyIiBoZWlnaHQ9IjE0IiByeD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMjMxZjIwIiBzdHJva2Utd2lkdGg9IjMiLz4KICA8cmVjdCB4PSIzOCIgeT0iNDAiIHdpZHRoPSIyMiIgaGVpZ2h0PSIxNCIgcng9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzIzMWYyMCIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgPHBhdGggZD0iTTE1IDI0djEyYzAgNSA4IDQgOCA0aDE1IiBmaWxsPSJub25lIiBzdHJva2U9IiMyMzFmMjAiIHN0cm9rZS13aWR0aD0iMyIvPgo8L3N2Zz4=",
-      "Params": [
-        "name",
-        "width",
-        "height"
+      "ParamDefinitions": [
+        {
+          "Name": "name",
+          "Type": "text",
+          "Label": "Diagram name",
+          "Help": "Latin letters, digits, _ or -, up to 64 characters. Used for name.drawio.xml and name.drawio.png attachments.",
+          "Pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "Required": true,
+          "DefaultValue": "diagram"
+        },
+        {
+          "Name": "width",
+          "Type": "text",
+          "Label": "Maximum width",
+          "Help": "CSS size such as 100%, 400px, 20em or auto.",
+          "Pattern": "^(\\d+(px|em|rem|vh|vw|%)?|auto)$",
+          "DefaultValue": "100%"
+        },
+        {
+          "Name": "height",
+          "Type": "text",
+          "Label": "Maximum height",
+          "Help": "CSS size such as 400px, 50vh, 20rem or auto.",
+          "Pattern": "^(\\d+(px|em|rem|vh|vw|%)?|auto)$",
+          "DefaultValue": "400px"
+        }
       ],
       "DefaultValues": {
         "name": "diagram",

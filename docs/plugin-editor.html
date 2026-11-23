@@ -13,6 +13,9 @@
     .macro, .page-template { border: 1px solid #ccc; padding: 15px; margin: 10px 0; }
     .buttons { margin-top: 20px; }
     button { padding: 8px 15px; margin-right: 10px; }
+    .obsolete { color: #8a4b00; background: #fff4e5; border-left: 4px solid #e8a33d; padding: 8px 10px; margin: 12px 0; }
+    .hint { color: #495057; background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px 12px; margin: 12px 0; }
+    .hint pre { white-space: pre-wrap; font-size: 12px; }
   </style>
 </head>
 <body>
@@ -32,6 +35,32 @@
     <label>Version:</label>
     <input type="text" id="pluginVersion">
   </div>
+
+  <details class="hint">
+    <summary>ParamDefinitions, SharedCode and plugin API</summary>
+    <p><strong>ParamDefinitions</strong> is a JSON array of field descriptions. It replaces the obsolete <code>Params</code> list and drives labels, types, validation, groups and default values in the macro parameters dialog.</p>
+    <p>Supported types: <code>text</code>, <code>textarea</code>, <code>code</code>, <code>json</code>, <code>number</code>, <code>boolean</code>, <code>select</code>, <code>date</code>, <code>attachment</code>, <code>secret</code>. Select fields require <code>Options</code>.</p>
+    <p>Definition fields: <code>Name</code>, <code>Type</code>, <code>Label</code>, <code>Help</code>, <code>Rows</code>, <code>Pattern</code>, <code>Required</code>, <code>Advanced</code>, <code>Group</code>, <code>Options</code>, <code>DefaultValue</code>.</p>
+    <pre>[
+  {
+    "Name": "title",
+    "Type": "text",
+    "Label": "Title",
+    "Help": "Shown above the content",
+    "Required": true,
+    "DefaultValue": "Untitled"
+  },
+  {
+    "Name": "mode",
+    "Type": "select",
+    "Label": "Mode",
+    "Options": ["view", "edit"],
+    "DefaultValue": "view"
+  }
+]</pre>
+    <p><strong>SharedCode</strong> is JavaScript shared by the parameters dialog and the rendered macro. It runs before inline scripts and can expose helpers through <code>MimisbrunnrPluginApi.helpers</code>.</p>
+    <p>Macro scripts receive <code>MimisbrunnrPluginApi</code> with <code>getParams()</code>, <code>getParam(name)</code>, <code>setParam(name, value)</code>, <code>save()</code>, <code>showToast(message, type)</code>, <code>openAttachmentPicker(callback)</code>, <code>openEditor(url)</code>, <code>getContext()</code> and <code>onParamsChanged(handler)</code>.</p>
+  </details>
 
   <div class="section">
     <h2>Macros</h2>
@@ -105,11 +134,20 @@
         <input type="file" class="macroIconFile" accept="image/*">
         <img class="macroIconPreview" style="width: 32px; height: 32px; margin-top: 5px; display: none;">
         
-        <label>Params (comma separated):</label>
+        <div class="obsolete">
+          <strong>Obsolete:</strong> Params is kept only for legacy plugins. Use <code>ParamDefinitions</code> below for new plugins; it defines fields, validation and defaults in one place.
+        </div>
+        <label>Params (obsolete, comma separated):</label>
         <input type="text" class="macroParams">
         
-        <label>Default params (param1=value1&amp;&amp;param2=value2):</label>
+        <label>ParamDefinitions (recommended, JSON array):</label>
+        <textarea class="macroParamDefinitions" style="height: 180px;" placeholder='[{"Name":"name","Type":"text","Label":"Name","Required":true}]'></textarea>
+        
+        <label>Default params (legacy, param1=value1&amp;&amp;param2=value2):</label>
         <input type="text" class="macroDefaultParams">
+        
+        <label>SharedCode (JavaScript shared by the parameters dialog and rendered macro):</label>
+        <textarea class="macroSharedCode" style="height: 160px;" placeholder="MimisbrunnrPluginApi.helpers = { ... };"></textarea>
         
         <label>Template:</label>
         <textarea class="macroTemplate"></textarea>
@@ -206,6 +244,7 @@
       }
 
       // Validate macros
+      const allowedTypes = new Set(['text', 'textarea', 'code', 'json', 'number', 'boolean', 'select', 'date', 'attachment', 'secret']);
       const macroIdentifiers = new Set();
       for (const macro of (currentPlugin.Macros || [])) {
         if (!macro.MacroIdentifier || !macro.Name) {
@@ -228,10 +267,42 @@
           alert('Macro must have either Template or RenderUrl');
           return false;
         }
+
+        if (!Array.isArray(macro.ParamDefinitions)) {
+          alert(`Macro ${macro.MacroIdentifier}: ParamDefinitions must be a JSON array`);
+          return false;
+        }
+
+        const paramNames = new Set();
+        for (const definition of macro.ParamDefinitions) {
+          if (!definition || !definition.Name || !definition.Name.trim()) {
+            alert(`Macro ${macro.MacroIdentifier}: every ParamDefinition needs a Name`);
+            return false;
+          }
+          if (/['"<|=&]/.test(definition.Name)) {
+            alert(`Macro ${macro.MacroIdentifier}: invalid characters in param name ${definition.Name}`);
+            return false;
+          }
+          if (paramNames.has(definition.Name)) {
+            alert(`Macro ${macro.MacroIdentifier}: duplicate param name ${definition.Name}`);
+            return false;
+          }
+          paramNames.add(definition.Name);
+
+          const type = (definition.Type || 'text').toLowerCase();
+          if (!allowedTypes.has(type)) {
+            alert(`Macro ${macro.MacroIdentifier}: unsupported type ${type} for ${definition.Name}`);
+            return false;
+          }
+          if (type === 'select' && (!Array.isArray(definition.Options) || !definition.Options.length)) {
+            alert(`Macro ${macro.MacroIdentifier}: select param ${definition.Name} requires Options`);
+            return false;
+          }
+        }
       }
 
       const templateIdentifiers = new Set();
-      for (const template of currentPlugin.PageTemplates) {
+      for (const template of (currentPlugin.PageTemplates || [])) {
         if (!template.TemplateIdentifier.trim() || !template.Name.trim() || !template.Content.trim()) {
           alert('Please fill all required page template fields: identifier, name and content');
           return false;
@@ -250,7 +321,11 @@
     }
 
     function savePlugin() {
-      collectFormData();
+      const collectError = collectFormData();
+      if (collectError) {
+        alert(collectError);
+        return;
+      }
       
       if (!validatePlugin()) {
         return;
@@ -293,6 +368,10 @@
           iconPreview.style.display = 'block';
         }
         lastMacro.querySelector('.macroParams').value = macro.Params?.join(', ') || '';
+        lastMacro.querySelector('.macroParamDefinitions').value = macro.ParamDefinitions
+          ? JSON.stringify(macro.ParamDefinitions, null, 2)
+          : '';
+        lastMacro.querySelector('.macroSharedCode').value = macro.SharedCode || '';
         lastMacro.querySelector('.macroDefaultParams').value = macro.DefaultValues 
           ? Object.entries(macro.DefaultValues)
               .map(([key, value]) => `${key}=${value}`)
@@ -318,9 +397,19 @@
         Description: template.querySelector('.templateDescription').value,
         Content: template.querySelector('.templateContent').value
       }));
+      let collectError = null;
       currentPlugin.Macros = [];
       const macros = document.querySelectorAll('.macro');
       macros.forEach(macro => {
+        let paramDefinitions = [];
+        const definitionsText = macro.querySelector('.macroParamDefinitions').value.trim();
+        if (definitionsText) {
+          try {
+            paramDefinitions = JSON.parse(definitionsText);
+          } catch (error) {
+            collectError = `Invalid ParamDefinitions JSON for macro ${macro.querySelector('.macroIdentifier').value}: ${error.message}`;
+          }
+        }
         const macroData = {
           MacroIdentifier: macro.querySelector('.macroIdentifier').value,
           Name: macro.querySelector('.macroName').value,
@@ -330,6 +419,7 @@
             .split(',')
             .map(p => p.trim())
             .filter(p => p),
+          ParamDefinitions: paramDefinitions,
           DefaultValues: macro.querySelector('.macroDefaultParams').value
             .split('&&')
             .reduce((acc, pair) => {
@@ -338,6 +428,7 @@
               return acc;
             }, {}),
           CustomParamsEditor: macro.querySelector('.macroCustomParamsEditor').value,
+          SharedCode: macro.querySelector('.macroSharedCode').value,
           Template: macro.querySelector('.macroTemplate').value,
           RenderUrl: macro.querySelector('.macroRenderUrl').value,
           SendUserToken: macro.querySelector('.macroSendUserToken').checked,
@@ -345,6 +436,7 @@
         };
         currentPlugin.Macros.push(macroData);
       });
+      return collectError;
     }
   </script>
 </body>
