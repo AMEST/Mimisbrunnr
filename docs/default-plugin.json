@@ -2,7 +2,7 @@
   "Id": "550e8400-e25b-41d4-a716-446653440000",
   "PluginIdentifier": "mm.plugin.default",
   "Name": "Default Mimisbrunnr Plugin",
-  "Version": "1.1.0",
+  "Version": "1.1.1",
   "Macros": [
     {
       "MacroIdentifier": "mm.plugin.default.anchor",
