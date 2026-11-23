@@ -7,7 +7,7 @@
       @shown="onShow"
       @hide="onHide"
     >
-      <b-form v-if="hasParams && currentParams" @submit.prevent="() => {}">
+      <b-form v-if="currentParams && (hasParams || customEditorHtml)" @submit.prevent="() => {}">
         <b-form-checkbox v-if="hasAdvanced" v-model="showAdvanced" class="mb-3">
           Show advanced parameters
         </b-form-checkbox>
@@ -25,7 +25,10 @@
             :description="param.help"
           >
             <b-input-group v-if="param.type === 'attachment'">
-              <b-form-input v-model="currentParams[param.name]"></b-form-input>
+              <b-form-input
+                :value="currentParams[param.name]"
+                @update="pluginApi.setParam(param.name, $event)"
+              ></b-form-input>
               <b-input-group-append>
                 <b-button variant="outline-secondary" @click="pickAttachmentFor(param.name)">
                   Select
@@ -34,43 +37,46 @@
             </b-input-group>
             <b-form-select
               v-else-if="param.type === 'select'"
-              v-model="currentParams[param.name]"
+              :value="currentParams[param.name]"
+              @input="pluginApi.setParam(param.name, $event)"
               :options="param.options"
             ></b-form-select>
             <b-form-checkbox
               v-else-if="param.type === 'boolean'"
-              v-model="currentParams[param.name]"
+              :checked="currentParams[param.name]"
+              value="true"
+              unchecked-value="false"
+              @input="pluginApi.setParam(param.name, $event)"
             ></b-form-checkbox>
             <b-form-input
               v-else-if="param.type === 'number'"
               type="number"
-              v-model="currentParams[param.name]"
+              :value="currentParams[param.name]"
+              @update="pluginApi.setParam(param.name, $event)"
             ></b-form-input>
             <b-form-input
               v-else-if="param.type === 'date'"
               type="date"
-              v-model="currentParams[param.name]"
-            ></b-form-input>
-            <b-form-input
-              v-else-if="param.type === 'secret'"
-              type="password"
-              v-model="currentParams[param.name]"
+              :value="currentParams[param.name]"
+              @update="pluginApi.setParam(param.name, $event)"
             ></b-form-input>
             <b-form-textarea
               v-else-if="param.type === 'textarea' || param.type === 'code' || param.type === 'json'"
-              v-model="currentParams[param.name]"
+              :value="currentParams[param.name]"
+              @update="pluginApi.setParam(param.name, $event)"
               :rows="param.rows || 3"
               :class="param.type === 'code' ? 'code-input' : 'textarea-input'"
             ></b-form-textarea>
             <b-form-input
               v-else
-              v-model="currentParams[param.name]"
+              :value="currentParams[param.name]"
+              @update="pluginApi.setParam(param.name, $event)"
             ></b-form-input>
           </b-form-group>
         </template>
-        <b-form-input v-model="pageId" id="macro-pageid-input" hidden></b-form-input>
-        <b-form-input v-model="macroIdentifier" id="macro-identifier-input" hidden></b-form-input>
-        <b-form-input v-model="macroIdOnPage" id="macro-identifier-on-page-input" hidden></b-form-input>
+        <b-form-input :value="pageId" id="macro-pageid-input" hidden></b-form-input>
+        <b-form-input :value="macroIdentifier" id="macro-identifier-input" hidden></b-form-input>
+        <b-form-input :value="macroIdOnPage" id="macro-identifier-on-page-input" hidden></b-form-input>
         <div
           v-if="macroDefinition && customEditorHtml"
           ref="customEditor"
@@ -85,6 +91,7 @@
         <b-button
           variant="primary"
           @click="saveParams"
+          :disabled="saving"
           v-if="hasParams || (macroDefinition && macroDefinition.customParamsEditor)"
         >
           {{ $t('pageEditor.macroEditor.save') }}
@@ -128,7 +135,7 @@
 import http from '@/services/http';
 import PluginService from '@/services/pluginService';
 import { showToast } from '@/services/Utils';
-import { getPluginApi, setPluginApiContext, clearPluginApiContext } from '@/services/pluginApi';
+import { setPluginApiContext, clearPluginApiContext } from '@/services/pluginApi';
 import { runScriptElements } from '@/services/scriptRunner';
 
 export default {
@@ -156,7 +163,9 @@ export default {
       macroDefinition: null,
       currentParams: null,
       showAdvanced: false,
-      apiContext: null,
+      pluginApi: null,
+      loadGeneration: 0,
+      saving: false,
       attachmentPickerItems: [],
       attachmentPickerLoading: false,
       attachmentPickerResolver: null
@@ -215,82 +224,64 @@ export default {
       return shared ? '<script>' + shared + '<' + '/script>' + custom : custom;
     }
   },
+  beforeDestroy() {
+    this.resetEditor();
+  },
   methods: {
     async onShow() {
+      const generation = ++this.loadGeneration;
+      const { pageId, macroIdOnPage, macroIdentifier, parameters } = this;
       this.showAdvanced = false;
-      await this.loadMacroDefinition();
-      await this.loadCurrentParams();
-      this.applyDefaults();
-      this.registerApiContext();
-      this.$forceUpdate();
+      const [macroDefinition, macroState] = await Promise.all([
+        PluginService.getMacroInfo(macroIdentifier).catch(error => {
+          console.error('Failed to load macro definition:', error);
+          return null;
+        }),
+        PluginService.getMacroState(pageId, macroIdOnPage).catch(error => {
+          console.error('Failed to load macro state:', error);
+          return null;
+        })
+      ]);
+      if (generation !== this.loadGeneration || !macroDefinition) return;
+      if (macroDefinition.storeParamsInDatabase && !macroState) return;
+
+      const schemaDefaults = Object.fromEntries((macroDefinition.paramDefinitions || [])
+        .filter(definition => definition && definition.name && definition.defaultValue != null)
+        .map(definition => [definition.name, definition.defaultValue]));
+      this.macroDefinition = macroDefinition;
+      this.currentParams = {
+        ...macroDefinition.defaultValues,
+        ...schemaDefaults,
+        ...parameters,
+        ...macroState?.params
+      };
+      const api = setPluginApiContext({
+        pageId,
+        macroId: macroIdOnPage,
+        macroIdentifier,
+        mode: 'edit',
+        getParams: () => this.currentParams,
+        setParam: (name, value) => this.$set(this.currentParams, name, value),
+        save: () => this.saveParams(),
+        openAttachmentPicker: () => this.openAttachmentPicker()
+      });
+      this.pluginApi = api;
       this.$nextTick(() => {
-        runScriptElements(this.$refs.customEditor, getPluginApi());
+        if (this.pluginApi === api) runScriptElements(this.$refs.customEditor, api);
       });
     },
     onHide() {
-      clearPluginApiContext(this.apiContext);
-      this.apiContext = null;
-      if (this.attachmentPickerResolver) {
-        this.attachmentPickerResolver(null);
-        this.attachmentPickerResolver = null;
-      }
-      this.macroDefinition = null;
-      this.currentParams = null;
+      this.resetEditor();
       this.$emit('close');
     },
-    async loadMacroDefinition() {
-      try {
-        this.macroDefinition = await PluginService.getMacroInfo(this.macroIdentifier);
-      } catch (error) {
-        console.error('Failed to load macro definition:', error);
-        this.macroDefinition = null;
-      }
-    },
-    async loadCurrentParams() {
-      try {
-        const macroState = await PluginService.getMacroState(
-          this.pageId,
-          this.macroIdOnPage
-        );
-        this.currentParams = { ...this.parameters, ...(macroState && macroState.params ? macroState.params : {}) };
-      } catch (error) {
-        console.error('Failed to load macro state:', error);
-        this.currentParams = { ...this.parameters };
-      }
-    },
-    applyDefaults() {
-      if (!this.macroDefinition || !this.currentParams) return;
-      const definitions = this.macroDefinition.paramDefinitions || [];
-      const defaultValues = this.macroDefinition.defaultValues || {};
-      for (const param of this.paramList) {
-        const value = this.currentParams[param.name];
-        if (value !== undefined && value !== null && value !== '') continue;
-        const definition = definitions.find(item => item && item.name === param.name);
-        const defaultValue = definition && definition.defaultValue !== undefined
-          ? definition.defaultValue
-          : defaultValues[param.name];
-        if (defaultValue !== undefined && defaultValue !== null && defaultValue !== '') {
-          this.$set(this.currentParams, param.name, defaultValue);
-        }
-      }
-    },
-    registerApiContext() {
-      this.apiContext = {
-        pageId: this.pageId,
-        macroId: this.macroIdOnPage,
-        macroIdentifier: this.macroIdentifier,
-        mode: 'edit',
-        getParams: () => ({ ...this.currentParams }),
-        setParam: (name, value) => {
-          if (this.currentParams && name) {
-            this.$set(this.currentParams, name, value);
-            this.$forceUpdate();
-          }
-        },
-        save: () => this.saveParams(),
-        openAttachmentPicker: () => this.openAttachmentPicker()
-      };
-      setPluginApiContext(this.apiContext);
+    resetEditor() {
+      ++this.loadGeneration;
+      clearPluginApiContext(this.pluginApi);
+      this.pluginApi = null;
+      this.onPickerHidden();
+      this.macroDefinition = null;
+      this.currentParams = null;
+      this.saving = false;
     },
     isGroupHeader(index) {
       if (!this.visibleParams[index] || !this.visibleParams[index].group) return false;
@@ -322,29 +313,36 @@ export default {
       return null;
     },
     async saveParams() {
-      if (!this.currentParams) return false;
+      if (!this.currentParams || this.saving) return false;
       const validationError = this.validateParams();
       if (validationError) {
         showToast(validationError, 'Invalid macro parameters', 'warning');
         return false;
       }
+      const api = this.pluginApi;
+      this.saving = true;
       try {
+        const parameters = Object.fromEntries(Object.entries(this.currentParams)
+          .map(([name, value]) => [name, String(value ?? '')]));
         if (this.macroDefinition.storeParamsInDatabase) {
-          await PluginService.saveMacroState(
+          const saved = await PluginService.saveMacroState(
             this.pageId,
             this.macroDefinition.macroIdentifier,
             this.macroIdOnPage,
-            this.currentParams
+            parameters
           );
+          if (!saved) return false;
         } else {
-          this.$emit('save', this.macroContent, this.currentParams, this.macroIdOnPage, this.macroIdentifier);
+          this.$emit('save', this.macroContent, parameters, this.macroIdOnPage, this.macroIdentifier);
         }
-        this.$bvModal.hide('macro-param-edit-modal');
+        if (this.pluginApi === api) this.$bvModal.hide('macro-param-edit-modal');
         return true;
       } catch (error) {
         console.error('Failed to save macro params:', error);
         showToast('Failed to save macro parameters', 'Error', 'warning');
         return false;
+      } finally {
+        if (this.pluginApi === api) this.saving = false;
       }
     },
     openAttachmentPicker() {
@@ -386,10 +384,9 @@ export default {
       this.attachmentPickerResolver = null;
     },
     async pickAttachmentFor(name) {
-      const value = await this.openAttachmentPicker();
-      if (value && this.currentParams) {
-        this.$set(this.currentParams, name, value);
-      }
+      const api = this.pluginApi;
+      const value = await api.openAttachmentPicker();
+      if (value !== null) api.setParam(name, value);
     }
   }
 };

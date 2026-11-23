@@ -364,8 +364,10 @@ export default {
         const [, name, id, parameters] = match;
         if(!name || !id) return;
 
-        const paramsDict = {};
-        parameters.split('|').map(x => x.split("=")).forEach(x => paramsDict[x[0]] = decodeURIComponent(x[1]))
+        const paramsDict = Object.fromEntries(parameters.split('|')
+          .map(pair => pair.split('='))
+          .filter(([key, value]) => key && value !== undefined)
+          .map(([key, value]) => [key, decodeURIComponent(value)]));
 
         this.hoveredMacro.id = id;
         this.hoveredMacro.name = name;
@@ -414,8 +416,7 @@ export default {
       const paramNames = definitions.length > 0
         ? definitions.filter(x => x && x.name).map(x => x.name)
         : (macroInfo.params || []);
-      let params = macroInfo.storeParamsInDatabase ? '' : paramNames.map(x => `${x}=`).join("|");
-      const macroContent = `{{macro:name=${macroInfo.macroIdentifier}|id=mid-${new Date().getTime()}|${params}}}`;
+      const macroContent = `{{macro:name=${macroInfo.macroIdentifier}|id=mid-${new Date().getTime()}|}}`;
       const cursor = this.simplemde.codemirror.getCursor();
       this.simplemde.codemirror.setSelection(cursor, cursor);
       this.simplemde.codemirror.replaceSelection(macroContent);

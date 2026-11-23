@@ -64,11 +64,11 @@ var PluginService = {
         var request = await http.post('/api/plugin/macros/state', requestBody, {
             validateStatus: false,
         });
-        if (request.status == 200)
-            return request.data;
+        if (request.status >= 200 && request.status < 300)
+            return true;
         showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
          "Error when saving macro state", "warning");
-        return null;
+        return false;
     },
 
     installPlugin: async function(model) {
@@ -152,15 +152,13 @@ var PluginService = {
                         params[key] = decodeURIComponent(value);
                 });
 
-                 const userRequest = {
-                     MacroIdentifier: macroName,
-                     Params: params
-                 };
-                 macroContexts.set(div, { macroId, macroName, params });
-
-                 const result = await this.render(pageId, macroId, userRequest);
-                if (result && result.html && div.isConnected) {
-                    div.innerHTML = result.html;
+                const result = await this.render(pageId, macroId, {
+                    MacroIdentifier: macroName,
+                    Params: params
+                });
+                if (result && div.isConnected) {
+                    div.innerHTML = result.html ?? '';
+                    macroContexts.set(div, { macroId, macroName, params: result.params ?? params });
                 }
             } catch (error) {
                 console.error('Error rendering macro:', error);
@@ -170,21 +168,17 @@ var PluginService = {
 
         // executing shared and inline scripts inside macros (after all macros are rendered)
         macroDivs.forEach(div => {
-            if (!div.isConnected)
+            const context = macroContexts.get(div);
+            if (!context || !div.isConnected)
                 return;
-            const context = macroContexts.get(div) || {
-                macroId: div.id.replace('macro_', ''),
-                macroName: div.getAttribute('aria-name'),
-                params: {}
-            };
             const api = createPluginApi({
                 pageId,
                 macroId: context.macroId,
                 macroIdentifier: context.macroName,
                 mode: 'render',
-                getParams: () => ({ ...context.params }),
+                getParams: () => context.params,
                 setParam: (name, value) => {
-                    if (name) context.params[name] = value;
+                    context.params = { ...context.params, [name]: value };
                 }
             });
             runScriptElements(div, api);

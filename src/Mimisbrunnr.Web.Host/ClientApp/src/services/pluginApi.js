@@ -1,18 +1,7 @@
 import { showToast } from "@/services/Utils";
 
-let currentContext = null;
-let apiInstance = null;
-const subscribers = new Set();
-
-function notifyParamsChanged() {
-    for (const handler of subscribers) {
-        try {
-            handler();
-        } catch (error) {
-            console.error("Plugin API params listener failed:", error);
-        }
-    }
-}
+let activeApi = null;
+const inactiveApi = createPluginApi();
 
 function normalizeUrl(url) {
     if (typeof url !== "string") return null;
@@ -23,6 +12,7 @@ function normalizeUrl(url) {
 }
 
 export function createPluginApi(contextResolver = null) {
+    const subscribers = new Set();
     const getContextObject = () => (typeof contextResolver === "function" ? contextResolver() : contextResolver);
     const getParams = () => {
         const context = getContextObject();
@@ -45,8 +35,16 @@ export function createPluginApi(contextResolver = null) {
         setParam: (name, value) => {
             const context = getContextObject();
             if (!context || !context.setParam || !name) return false;
+            const params = getParams();
+            if (Object.prototype.hasOwnProperty.call(params, name) && params[name] === value) return true;
             context.setParam(name, value);
-            notifyParamsChanged();
+            for (const handler of subscribers) {
+                try {
+                    handler();
+                } catch (error) {
+                    console.error("Plugin API params listener failed:", error);
+                }
+            }
             return true;
         },
         save: () => {
@@ -54,11 +52,13 @@ export function createPluginApi(contextResolver = null) {
             return context && context.save ? context.save() : Promise.resolve(false);
         },
         showToast: (message, title = "", variant = "info") => showToast(message, title, variant),
-        openAttachmentPicker: () => {
+        openAttachmentPicker: async (callback) => {
             const context = getContextObject();
-            return context && context.openAttachmentPicker
-                ? context.openAttachmentPicker()
-                : Promise.resolve(null);
+            const attachment = context && context.openAttachmentPicker
+                ? await context.openAttachmentPicker()
+                : null;
+            if (typeof callback === "function") callback(attachment);
+            return attachment;
         },
         openEditor: (options = {}) => {
             const context = getContextObject();
@@ -71,7 +71,7 @@ export function createPluginApi(contextResolver = null) {
         },
         getContext,
         onParamsChanged: (handler) => {
-            if (typeof handler !== "function") return () => {};
+            if (typeof handler !== "function" || !getContextObject()) return () => {};
             subscribers.add(handler);
             return () => subscribers.delete(handler);
         }
@@ -79,28 +79,23 @@ export function createPluginApi(contextResolver = null) {
 }
 
 export function getPluginApi() {
-    return apiInstance || createPluginApi(() => currentContext);
+    return activeApi || inactiveApi;
 }
 
 export function installPluginApi() {
-    if (window.MimisbrunnrPluginApi) {
-        apiInstance = window.MimisbrunnrPluginApi;
-        return;
-    }
-    apiInstance = createPluginApi(() => currentContext);
+    if (window.MimisbrunnrPluginApi) return;
     Object.defineProperty(window, "MimisbrunnrPluginApi", {
         configurable: true,
-        value: apiInstance
+        get: getPluginApi
     });
 }
 
 export function setPluginApiContext(context) {
-    currentContext = context;
-    notifyParamsChanged();
+    const api = createPluginApi(() => activeApi === api ? context : null);
+    activeApi = api;
+    return api;
 }
 
-export function clearPluginApiContext(context) {
-    if (currentContext !== context) return;
-    currentContext = null;
-    notifyParamsChanged();
+export function clearPluginApiContext(api) {
+    if (activeApi === api) activeApi = null;
 }

@@ -6,11 +6,13 @@ namespace Mimisbrunnr.Web.Tests.Plugin;
 
 public class MacroModelTests
 {
-    [Fact]
-    public void Should_Throw_ValidationError_WhenParamDefinitionTypeIsUnsupported()
+    [Theory]
+    [InlineData("bogus")]
+    [InlineData("secret")]
+    public void Should_Throw_ValidationError_WhenParamDefinitionTypeIsUnsupported(string type)
     {
         var model = CreateValidMacro();
-        model.ParamDefinitions = [new MacroParamDefinitionModel { Name = "name", Type = "bogus" }];
+        model.ParamDefinitions = [new MacroParamDefinitionModel { Name = "name", Type = type }];
 
         Validate(model).Should().Contain(x => x.ErrorMessage.Contains("Unsupported param types"));
     }

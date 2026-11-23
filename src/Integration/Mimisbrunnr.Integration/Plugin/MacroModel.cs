@@ -86,7 +86,7 @@ public class MacroModel : IValidatableObject
                 yield return new ValidationResult("Any param definition name is empty or contains restricted symbols", [nameof(ParamDefinitions)]);
             if (ParamDefinitions.Where(x => x is not null).Select(x => x.Name).Distinct().Count() != ParamDefinitions.Count(x => x is not null))
                 yield return new ValidationResult("Param definition names must be unique", [nameof(ParamDefinitions)]);
-            string[] allowedTypes = ["text", "textarea", "code", "json", "number", "boolean", "select", "date", "attachment", "secret"];
+            string[] allowedTypes = ["text", "textarea", "code", "json", "number", "boolean", "select", "date", "attachment"];
             var invalidTypes = ParamDefinitions
                 .Where(x => x is not null && !string.IsNullOrWhiteSpace(x.Type) && !allowedTypes.Contains(x.Type.ToLowerInvariant()))
                 .Select(x => x.Type)

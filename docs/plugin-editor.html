@@ -39,7 +39,7 @@
   <details class="hint">
     <summary>ParamDefinitions, SharedCode and plugin API</summary>
     <p><strong>ParamDefinitions</strong> is a JSON array of field descriptions. It replaces the obsolete <code>Params</code> list and drives labels, types, validation, groups and default values in the macro parameters dialog.</p>
-    <p>Supported types: <code>text</code>, <code>textarea</code>, <code>code</code>, <code>json</code>, <code>number</code>, <code>boolean</code>, <code>select</code>, <code>date</code>, <code>attachment</code>, <code>secret</code>. Select fields require <code>Options</code>.</p>
+    <p>Supported types: <code>text</code>, <code>textarea</code>, <code>code</code>, <code>json</code>, <code>number</code>, <code>boolean</code>, <code>select</code>, <code>date</code> and <code>attachment</code>. Select fields require <code>Options</code>. Stored or inline values take precedence over <code>DefaultValue</code>, followed by legacy <code>DefaultValues</code>.</p>
     <p>Definition fields: <code>Name</code>, <code>Type</code>, <code>Label</code>, <code>Help</code>, <code>Rows</code>, <code>Pattern</code>, <code>Required</code>, <code>Advanced</code>, <code>Group</code>, <code>Options</code>, <code>DefaultValue</code>.</p>
     <pre>[
   {
@@ -59,7 +59,8 @@
   }
 ]</pre>
     <p><strong>SharedCode</strong> is JavaScript shared by the parameters dialog and the rendered macro. It runs before inline scripts and can expose helpers through <code>MimisbrunnrPluginApi.helpers</code>.</p>
-    <p>Macro scripts receive <code>MimisbrunnrPluginApi</code> with <code>getParams()</code>, <code>getParam(name)</code>, <code>setParam(name, value)</code>, <code>save()</code>, <code>showToast(message, type)</code>, <code>openAttachmentPicker(callback)</code>, <code>openEditor(url)</code>, <code>getContext()</code> and <code>onParamsChanged(handler)</code>.</p>
+    <p>Macro scripts receive <code>MimisbrunnrPluginApi</code> with <code>getParams()</code>, <code>getParam(name)</code>, <code>setParam(name, value)</code>, <code>save()</code>, <code>showToast(message, title, variant)</code>, <code>openAttachmentPicker(callback)</code>, <code>openEditor(url)</code>, <code>getContext()</code> and <code>onParamsChanged(handler)</code>.</p>
+    <p><code>openAttachmentPicker(callback)</code> returns a Promise with the selected file name or <code>null</code> on cancel. The optional callback receives the same result. <code>onParamsChanged(handler)</code> listens for changes to the current macro and returns an unsubscribe function.</p>
   </details>
 
   <div class="section">
@@ -244,7 +245,7 @@
       }
 
       // Validate macros
-      const allowedTypes = new Set(['text', 'textarea', 'code', 'json', 'number', 'boolean', 'select', 'date', 'attachment', 'secret']);
+      const allowedTypes = new Set(['text', 'textarea', 'code', 'json', 'number', 'boolean', 'select', 'date', 'attachment']);
       const macroIdentifiers = new Set();
       for (const macro of (currentPlugin.Macros || [])) {
         if (!macro.MacroIdentifier || !macro.Name) {

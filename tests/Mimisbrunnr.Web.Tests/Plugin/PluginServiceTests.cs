@@ -209,18 +209,51 @@ public class PluginServiceTests
         var user = new UserInfo { Email = "user@example.test", Name = "User" };
         A.CallTo(() => pages.GetById("page")).Returns(Task.FromResult(new Page { Id = "page", SpaceId = "space", Name = "PageName" }));
         A.CallTo(() => spaces.GetById("space")).Returns(Task.FromResult(new Space { Id = "space", Key = "SPACE", Name = "SpaceName" }));
-        A.CallTo(() => plugins.GetMacroState("page", "m-id")).Returns(Task.FromResult(new MacroState { MacroIdentifier = "m1", Params = new Dictionary<string, string> { { "StateKey", "StateValue" } } }));
-        A.CallTo(() => plugins.GetMacro("m1")).Returns(Task.FromResult(new Macro { MacroIdentifier = "m1", Template = "{{PageName}}", DefaultValues = new Dictionary<string, string> { { "DefKey", "DefValue" } } }));
+        A.CallTo(() => plugins.GetMacroState("page", "m-id")).Returns(Task.FromResult(new MacroState
+        {
+            MacroIdentifier = "m1",
+            Params = new Dictionary<string, string> { ["StateKey"] = "StateValue" }
+        }));
+        A.CallTo(() => plugins.GetMacro("m1")).Returns(Task.FromResult(new Macro
+        {
+            MacroIdentifier = "m1",
+            Template = "{{PageName}}",
+            DefaultValues = new Dictionary<string, string> { ["DefKey"] = "DefValue", ["Mode"] = "legacy" },
+            ParamDefinitions =
+            [
+                new MacroParamDefinition { Name = "Mode", DefaultValue = "view" },
+                new MacroParamDefinition { Name = "Caption", DefaultValue = "Untitled" },
+                new MacroParamDefinition { Name = "StateKey", DefaultValue = "default" },
+                new MacroParamDefinition { Name = "DefKey" }
+            ]
+        }));
         A.CallTo(() => plugins.GetPluginByMacroIdentifier("m1")).Returns(Task.FromResult(new Mimisbrunnr.Wiki.Contracts.Plugin { PluginIdentifier = "p1" }));
         A.CallTo(() => users.GetByEmail(user.Email)).Returns(Task.FromResult(new Mimisbrunnr.Users.User { Email = user.Email, Role = UserRole.Employee }));
         A.CallTo(() => renderer.Render(A<string>._, A<IDictionary<string, object>>._)).Returns("rendered");
         var service = BuildService(A.Fake<IPermissionService>(), plugins, pages, spaces, users, renderer, A.Fake<ISecurityTokenService>());
 
-        var result = await service.Render("page", "m-id", new MacroRenderUserRequest { Params = new Dictionary<string, string> { { "UserKey", "UserValue" } } }, user);
+        var request = new MacroRenderUserRequest
+        {
+            Params = new Dictionary<string, string>
+            {
+                ["UserKey"] = "UserValue",
+                ["StateKey"] = "inline",
+                ["Caption"] = ""
+            }
+        };
+        var result = await service.Render("page", "m-id", request, user);
 
         result.Html.Should().Be("rendered");
+        result.Params.Should().BeEquivalentTo(new Dictionary<string, string>
+        {
+            ["UserKey"] = "UserValue",
+            ["StateKey"] = "StateValue",
+            ["Caption"] = "",
+            ["Mode"] = "view",
+            ["DefKey"] = "DefValue"
+        });
         A.CallTo(() => renderer.Render("{{PageName}}", A<IDictionary<string, object>>.That.Matches(d =>
-            d.ContainsKey("UserKey") && d.ContainsKey("StateKey") && d.ContainsKey("DefKey") &&
+            result.Params.All(param => d.ContainsKey(param.Key) && d[param.Key].Equals(param.Value)) &&
             d.ContainsKey("MacroIdOnPage") && d["MacroIdOnPage"].Equals("m-id") &&
             d.ContainsKey("PageId") && d.ContainsKey("SpaceKey") && d["SpaceKey"].Equals("SPACE") &&
             d.ContainsKey("UserEmail") && d["UserEmail"].Equals(user.Email) &&
