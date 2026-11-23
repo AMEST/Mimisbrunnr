@@ -4,6 +4,7 @@ import router from './router'
 import store from './services/store'
 import language from './assets/lang.json'
 import http from "@/services/http";
+import { installPluginApi } from "@/services/pluginApi";
 import registerServiceWorker from './registerServiceWorker'
 // Bootstrap
 import { BootstrapVue, BIcon} from 'bootstrap-vue'
@@ -31,6 +32,8 @@ Vue.use(BootstrapVue)
 Vue.component('b-icon', BIcon)
 
 Vue.config.productionTip = false
+
+installPluginApi()
 
 // Load bootstrap theme
 let link = document.createElement('link');

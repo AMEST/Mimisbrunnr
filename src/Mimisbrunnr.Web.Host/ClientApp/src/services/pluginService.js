@@ -1,5 +1,7 @@
 import http from "@/services/http";
 import { showToast } from "@/services/Utils";
+import { createPluginApi } from "@/services/pluginApi";
+import { runScriptElements } from "@/services/scriptRunner";
 /*eslint-disable */
 var PluginService = {
     getPlugins: async function(skip = null, take = null){
@@ -133,6 +135,7 @@ var PluginService = {
             searchRoot = element;
         }
         const macroDivs = searchRoot.querySelectorAll('div[aria-type="macros"]');
+        const macroContexts = new Map();
         
         // Process all macros in parallel
         await Promise.all(Array.from(macroDivs).map(async (div) => {
@@ -149,12 +152,13 @@ var PluginService = {
                         params[key] = decodeURIComponent(value);
                 });
 
-                const userRequest = {
-                    MacroIdentifier: macroName,
-                    Params: params
-                };
+                 const userRequest = {
+                     MacroIdentifier: macroName,
+                     Params: params
+                 };
+                 macroContexts.set(div, { macroId, macroName, params });
 
-                const result = await this.render(pageId, macroId, userRequest);
+                 const result = await this.render(pageId, macroId, userRequest);
                 if (result && result.html && div.isConnected) {
                     div.innerHTML = result.html;
                 }
@@ -164,18 +168,26 @@ var PluginService = {
             }
         }));
 
-        // executing script inside macros (after all macros are rendered)
+        // executing shared and inline scripts inside macros (after all macros are rendered)
         macroDivs.forEach(div => {
             if (!div.isConnected)
                 return;
-            const directScript = Array.from(div.children).find(child => child.tagName === 'SCRIPT');
-            if (directScript) {
-                try {
-                    new Function(directScript.textContent)();
-                } catch (e) {
-                    console.error('Error macro script executing:', e);
+            const context = macroContexts.get(div) || {
+                macroId: div.id.replace('macro_', ''),
+                macroName: div.getAttribute('aria-name'),
+                params: {}
+            };
+            const api = createPluginApi({
+                pageId,
+                macroId: context.macroId,
+                macroIdentifier: context.macroName,
+                mode: 'render',
+                getParams: () => ({ ...context.params }),
+                setParam: (name, value) => {
+                    if (name) context.params[name] = value;
                 }
-            }
+            });
+            runScriptElements(div, api);
         });
     }
 }

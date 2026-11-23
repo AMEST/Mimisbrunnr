@@ -229,6 +229,31 @@ public class PluginServiceTests
     }
 
     [Fact]
+    public async Task Should_InjectSharedCode_WhenRenderingMacro()
+    {
+        var plugins = A.Fake<IPluginManager>();
+        var pages = A.Fake<IPageManager>();
+        var spaces = A.Fake<ISpaceManager>();
+        var renderer = A.Fake<ITemplateRenderer>();
+        A.CallTo(() => pages.GetById("page")).Returns(Task.FromResult(new Page { Id = "page", SpaceId = "space", Name = "PageName" }));
+        A.CallTo(() => spaces.GetById("space")).Returns(Task.FromResult(new Space { Id = "space", Key = "SPACE", Name = "SpaceName" }));
+        A.CallTo(() => plugins.GetMacroState("page", "m-id")).Returns(Task.FromResult(new MacroState { MacroIdentifier = "m1" }));
+        A.CallTo(() => plugins.GetMacro("m1")).Returns(Task.FromResult(new Macro
+        {
+            MacroIdentifier = "m1",
+            Template = "rendered",
+            SharedCode = "MimisbrunnrPluginApi.helpers = {};"
+        }));
+        A.CallTo(() => plugins.GetPluginByMacroIdentifier("m1")).Returns(Task.FromResult(new Mimisbrunnr.Wiki.Contracts.Plugin { PluginIdentifier = "p1" }));
+        A.CallTo(() => renderer.Render(A<string>._, A<IDictionary<string, object>>._)).Returns("rendered");
+        var service = BuildService(A.Fake<IPermissionService>(), plugins, pages, spaces, A.Fake<IUserManager>(), renderer, A.Fake<ISecurityTokenService>());
+
+        var result = await service.Render("page", "m-id", new MacroRenderUserRequest(), null);
+
+        result.Html.Should().Be("<script>MimisbrunnrPluginApi.helpers = {};</script>\nrendered");
+    }
+
+    [Fact]
     public async Task Should_NotLookupUser_WhenRenderingForAnonymous()
     {
         var plugins = A.Fake<IPluginManager>();

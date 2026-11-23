@@ -184,6 +184,9 @@ public class PluginService : IPluginService
         foreach (var (key, value) in macro.DefaultValues)
             if (!userRequest.Params.ContainsKey(key))
                 userRequest.Params.Add(key, value);
+        foreach (var definition in macro.ParamDefinitions ?? [])
+            if (!string.IsNullOrEmpty(definition?.DefaultValue) && !string.IsNullOrEmpty(definition.Name) && !userRequest.Params.ContainsKey(definition.Name))
+                userRequest.Params.Add(definition.Name, definition.DefaultValue);
 
         var user = userInfo is not null
             ? await _userManager.GetByEmail(userInfo.Email)
@@ -199,13 +202,21 @@ public class PluginService : IPluginService
         userRequest.Params.Add("UserRole", user?.Role.ToString() ?? string.Empty);
 
         if (!string.IsNullOrEmpty(macro.RenderUrl))
-            return await RenderRemoteMacro(plugin, macro, page, space, user, userRequest.Params);
+            return WithSharedCode(await RenderRemoteMacro(plugin, macro, page, space, user, userRequest.Params), macro.SharedCode);
 
         var renderResult = await _templateRenderer.Render(macro.Template, userRequest.Params.ToDictionary(x => x.Key, x => x.Value as object));
-        return new MacroRenderResponse()
+        return WithSharedCode(new MacroRenderResponse()
         {
             Html = renderResult
-        };
+        }, macro.SharedCode);
+    }
+
+    private static MacroRenderResponse WithSharedCode(MacroRenderResponse response, string sharedCode)
+    {
+        if (response is null || string.IsNullOrEmpty(sharedCode))
+            return response;
+        response.Html = $"<script>{sharedCode}</script>\n{response.Html}";
+        return response;
     }
 
     /// <summary>

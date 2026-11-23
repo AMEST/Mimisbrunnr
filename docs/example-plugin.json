@@ -67,9 +67,37 @@
         "title",
         "text"
       ],
-      "DefaultValues": {},
-      "CustomParamsEditor": "",
-      "Template": "<div class=\"warning\">\n{{#title}}<h4>{{#HtmlEncode}}{{#ToUpper}}{{title}}{{/ToUpper}}{{/HtmlEncode}}</h4>{{/title}}\n<span style=\"white-space: pre-wrap;\">{{text}}</span>\n</div> ",
+      "ParamDefinitions": [
+        {
+          "Name": "title",
+          "Type": "text",
+          "Label": "Title",
+          "Required": true,
+          "DefaultValue": "Warning"
+        },
+        {
+          "Name": "text",
+          "Type": "textarea",
+          "Label": "Message",
+          "Rows": 5,
+          "Required": true
+        },
+        {
+          "Name": "style",
+          "Type": "select",
+          "Label": "Style",
+          "Options": ["warning", "info", "danger"],
+          "DefaultValue": "warning",
+          "Advanced": true
+        }
+      ],
+      "DefaultValues": {
+        "title": "Warning",
+        "style": "warning"
+      },
+      "SharedCode": "MimisbrunnrPluginApi.helpers = MimisbrunnrPluginApi.helpers || {};\nMimisbrunnrPluginApi.helpers.setTitle = function () { MimisbrunnrPluginApi.setParam('title', 'Updated by shared code'); MimisbrunnrPluginApi.showToast('Title updated', 'Shared code', 'success'); };\nMimisbrunnrPluginApi.helpers.markRendered = function () { console.log('Warning macro rendered'); };",
+      "CustomParamsEditor": "<button class=\"btn btn-outline-primary\" onclick=\"MimisbrunnrPluginApi.helpers.setTitle();\">Set title via shared code</button>",
+      "Template": "<div class=\"warning {{style}}\">\n{{#title}}<h4>{{#HtmlEncode}}{{#ToUpper}}{{title}}{{/ToUpper}}{{/HtmlEncode}}</h4>{{/title}}\n<span style=\"white-space: pre-wrap;\">{{text}}</span>\n</div>\n<script>MimisbrunnrPluginApi.helpers.markRendered && MimisbrunnrPluginApi.helpers.markRendered();</script>",
       "RenderUrl": "",
       "SendUserToken": false,
       "StoreParamsInDatabase": false
