@@ -7,11 +7,13 @@ public class Macro
     public string Description { get; set; }
     public string Icon { get; set; }
     public string[] Params { get; set; }
+    public MacroParamDefinition[] ParamDefinitions { get; set; } = [];
     public IDictionary<string, string> DefaultValues { get; set; } = new Dictionary<string, string>();
     public string RenderUrl { get; set; }
     public string Template { get; set; }
     public bool SendUserToken { get; set; }
     public bool StoreParamsInDatabase { get; set; }
     public string CustomParamsEditor { get; set; }
+    public string SharedCode { get; set; }
     public bool Disabled { get; internal set; }
 }

@@ -364,8 +364,10 @@ export default {
         const [, name, id, parameters] = match;
         if(!name || !id) return;
 
-        const paramsDict = {};
-        parameters.split('|').map(x => x.split("=")).forEach(x => paramsDict[x[0]] = decodeURIComponent(x[1]))
+        const paramsDict = Object.fromEntries(parameters.split('|')
+          .map(pair => pair.split('='))
+          .filter(([key, value]) => key && value !== undefined)
+          .map(([key, value]) => [key, decodeURIComponent(value)]));
 
         this.hoveredMacro.id = id;
         this.hoveredMacro.name = name;
@@ -410,12 +412,15 @@ export default {
       this.$refs.markdownEditor.simplemde.value(this.page.content);
     },
     insertMacro(macroInfo){
-      let params = macroInfo.storeParamsInDatabase ? '' : macroInfo.params.map(x => `${x}=`).join("|");
-      const macroContent = `{{macro:name=${macroInfo.macroIdentifier}|id=mid-${new Date().getTime()}|${params}}}`;
+      const definitions = macroInfo.paramDefinitions || [];
+      const paramNames = definitions.length > 0
+        ? definitions.filter(x => x && x.name).map(x => x.name)
+        : (macroInfo.params || []);
+      const macroContent = `{{macro:name=${macroInfo.macroIdentifier}|id=mid-${new Date().getTime()}|}}`;
       const cursor = this.simplemde.codemirror.getCursor();
       this.simplemde.codemirror.setSelection(cursor, cursor);
       this.simplemde.codemirror.replaceSelection(macroContent);
-      if (macroInfo.params && macroInfo.params.length > 0)
+      if (paramNames.length > 0)
         this.editMacro(cursor, macroContent);
       setTimeout(() => this.simplemde.codemirror.setCursor({ ch: cursor.ch, line: cursor.line }), 250);
     },

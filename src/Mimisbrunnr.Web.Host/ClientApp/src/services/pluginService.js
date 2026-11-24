@@ -1,5 +1,7 @@
 import http from "@/services/http";
 import { showToast } from "@/services/Utils";
+import { createPluginApi } from "@/services/pluginApi";
+import { runScriptElements } from "@/services/scriptRunner";
 /*eslint-disable */
 var PluginService = {
     getPlugins: async function(skip = null, take = null){
@@ -62,11 +64,11 @@ var PluginService = {
         var request = await http.post('/api/plugin/macros/state', requestBody, {
             validateStatus: false,
         });
-        if (request.status == 200)
-            return request.data;
+        if (request.status >= 200 && request.status < 300)
+            return true;
         showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
          "Error when saving macro state", "warning");
-        return null;
+        return false;
     },
 
     installPlugin: async function(model) {
@@ -133,6 +135,7 @@ var PluginService = {
             searchRoot = element;
         }
         const macroDivs = searchRoot.querySelectorAll('div[aria-type="macros"]');
+        const macroContexts = new Map();
         
         // Process all macros in parallel
         await Promise.all(Array.from(macroDivs).map(async (div) => {
@@ -149,14 +152,13 @@ var PluginService = {
                         params[key] = decodeURIComponent(value);
                 });
 
-                const userRequest = {
+                const result = await this.render(pageId, macroId, {
                     MacroIdentifier: macroName,
                     Params: params
-                };
-
-                const result = await this.render(pageId, macroId, userRequest);
-                if (result && result.html && div.isConnected) {
-                    div.innerHTML = result.html;
+                });
+                if (result && div.isConnected) {
+                    div.innerHTML = result.html ?? '';
+                    macroContexts.set(div, { macroId, macroName, params: result.params ?? params });
                 }
             } catch (error) {
                 console.error('Error rendering macro:', error);
@@ -164,18 +166,22 @@ var PluginService = {
             }
         }));
 
-        // executing script inside macros (after all macros are rendered)
+        // executing shared and inline scripts inside macros (after all macros are rendered)
         macroDivs.forEach(div => {
-            if (!div.isConnected)
+            const context = macroContexts.get(div);
+            if (!context || !div.isConnected)
                 return;
-            const directScript = Array.from(div.children).find(child => child.tagName === 'SCRIPT');
-            if (directScript) {
-                try {
-                    new Function(directScript.textContent)();
-                } catch (e) {
-                    console.error('Error macro script executing:', e);
+            const api = createPluginApi({
+                pageId,
+                macroId: context.macroId,
+                macroIdentifier: context.macroName,
+                mode: 'render',
+                getParams: () => context.params,
+                setParam: (name, value) => {
+                    context.params = { ...context.params, [name]: value };
                 }
-            }
+            });
+            runScriptElements(div, api);
         });
     }
 }

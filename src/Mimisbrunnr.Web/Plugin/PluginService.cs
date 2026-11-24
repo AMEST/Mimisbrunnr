@@ -178,34 +178,49 @@ public class PluginService : IPluginService
         var plugin = await _pluginManager.GetPluginByMacroIdentifier(macro.MacroIdentifier);
         if(plugin.Disabled)
             throw new MacroNotFoundException($"Macro {state.MacroIdentifier ?? userRequest.MacroIdentifier} not found");
-        foreach (var (key, value) in state.Params)
-                if (!userRequest.Params.TryAdd(key, value))
-                    userRequest.Params[key] = value;
-        foreach (var (key, value) in macro.DefaultValues)
-            if (!userRequest.Params.ContainsKey(key))
-                userRequest.Params.Add(key, value);
+        var parameters = userRequest.Params is null
+            ? new Dictionary<string, string>()
+            : new Dictionary<string, string>(userRequest.Params);
+        if (state.Params is not null)
+            foreach (var (key, value) in state.Params)
+                parameters[key] = value;
+        foreach (var definition in macro.ParamDefinitions ?? [])
+            if (definition?.DefaultValue is not null && !string.IsNullOrEmpty(definition.Name))
+                parameters.TryAdd(definition.Name, definition.DefaultValue);
+        var browserParameters = userInfo is null ? new Dictionary<string, string>(parameters) : parameters;
+        if (macro.DefaultValues is not null)
+            foreach (var (key, value) in macro.DefaultValues)
+                parameters.TryAdd(key, value);
 
         var user = userInfo is not null
             ? await _userManager.GetByEmail(userInfo.Email)
             : null;
 
-        userRequest.Params.Add("MacroIdOnPage", macroIdOnPage);
-        userRequest.Params.Add("PageId", page.Id);
-        userRequest.Params.Add("PageName", page.Name);
-        userRequest.Params.Add("SpaceKey", space.Key);
-        userRequest.Params.Add("SpaceName", space.Name);
-        userRequest.Params.Add("UserEmail", userInfo?.Email ?? string.Empty);
-        userRequest.Params.Add("UserName", userInfo?.Name ?? string.Empty);
-        userRequest.Params.Add("UserRole", user?.Role.ToString() ?? string.Empty);
-
-        if (!string.IsNullOrEmpty(macro.RenderUrl))
-            return await RenderRemoteMacro(plugin, macro, page, space, user, userRequest.Params);
-
-        var renderResult = await _templateRenderer.Render(macro.Template, userRequest.Params.ToDictionary(x => x.Key, x => x.Value as object));
-        return new MacroRenderResponse()
+        var renderParameters = new Dictionary<string, string>(parameters)
         {
-            Html = renderResult
+            ["MacroIdOnPage"] = macroIdOnPage,
+            ["PageId"] = page.Id,
+            ["PageName"] = page.Name,
+            ["SpaceKey"] = space.Key,
+            ["SpaceName"] = space.Name,
+            ["UserEmail"] = userInfo?.Email ?? string.Empty,
+            ["UserName"] = userInfo?.Name ?? string.Empty,
+            ["UserRole"] = user?.Role.ToString() ?? string.Empty
         };
+
+        var response = !string.IsNullOrEmpty(macro.RenderUrl)
+            ? await RenderRemoteMacro(plugin, macro, page, space, user, renderParameters)
+            : new MacroRenderResponse
+            {
+                Html = await _templateRenderer.Render(macro.Template, renderParameters.ToDictionary(x => x.Key, x => (object)x.Value))
+            };
+        if (response is null)
+            return null;
+
+        response.Params = browserParameters;
+        if (!string.IsNullOrEmpty(macro.SharedCode))
+            response.Html = $"<script>{macro.SharedCode}</script>\n{response.Html}";
+        return response;
     }
 
     /// <summary>
