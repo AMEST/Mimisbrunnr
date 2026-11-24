@@ -187,6 +187,7 @@ public class PluginService : IPluginService
         foreach (var definition in macro.ParamDefinitions ?? [])
             if (definition?.DefaultValue is not null && !string.IsNullOrEmpty(definition.Name))
                 parameters.TryAdd(definition.Name, definition.DefaultValue);
+        var browserParameters = userInfo is null ? new Dictionary<string, string>(parameters) : parameters;
         if (macro.DefaultValues is not null)
             foreach (var (key, value) in macro.DefaultValues)
                 parameters.TryAdd(key, value);
@@ -216,7 +217,7 @@ public class PluginService : IPluginService
         if (response is null)
             return null;
 
-        response.Params = parameters;
+        response.Params = browserParameters;
         if (!string.IsNullOrEmpty(macro.SharedCode))
             response.Html = $"<script>{macro.SharedCode}</script>\n{response.Html}";
         return response;

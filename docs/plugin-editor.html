@@ -60,6 +60,7 @@
 ]</pre>
     <p><strong>SharedCode</strong> is JavaScript shared by the parameters dialog and the rendered macro. It runs before inline scripts and can expose helpers through <code>MimisbrunnrPluginApi.helpers</code>.</p>
     <p>Macro scripts receive <code>MimisbrunnrPluginApi</code> with <code>getParams()</code>, <code>getParam(name)</code>, <code>setParam(name, value)</code>, <code>save()</code>, <code>showToast(message, title, variant)</code>, <code>openAttachmentPicker(callback)</code>, <code>openEditor(url)</code>, <code>getContext()</code> and <code>onParamsChanged(handler)</code>.</p>
+    <p>For anonymous readers, macro scripts receive inline parameters, saved parameters and defaults declared with <code>DefaultValue</code>. The server also applies legacy <code>DefaultValues</code> when rendering.</p>
     <p><code>openAttachmentPicker(callback)</code> returns a Promise with the selected file name or <code>null</code> on cancel. The optional callback receives the same result. <code>onParamsChanged(handler)</code> listens for changes to the current macro and returns an unsubscribe function.</p>
   </details>
 
