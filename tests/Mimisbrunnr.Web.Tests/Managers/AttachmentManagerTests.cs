@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using FakeItEasy;
 using FluentAssertions;
 using Mimisbrunnr.Wiki.Contracts;
@@ -173,8 +174,9 @@ public class AttachmentManagerTests
 
         A.CallTo(() => storage.DeleteAsync("attachments/1")).MustHaveHappenedOnceExactly();
         A.CallTo(() => storage.DeleteAsync("attachments/2")).MustHaveHappenedOnceExactly();
-        A.CallTo(() => repository.Delete(attachment1, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => repository.Delete(attachment2, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        // Attachments of the page are removed with a single delete request.
+        A.CallTo(() => repository.DeleteAll(A<Expression<Func<Attachment, bool>>>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => repository.Delete(A<Attachment>._, A<CancellationToken>._)).MustNotHaveHappened();
     }
 
     [Fact]

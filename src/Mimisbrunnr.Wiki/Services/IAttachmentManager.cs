@@ -18,4 +18,9 @@ public interface IAttachmentManager
     Task Remove(Page page, string name);
 
     Task RemoveAll(Page page);
+
+    /// <summary>
+    /// Removes attachments of several pages with a single database request
+    /// </summary>
+    Task RemoveAllForPages(string[] pageIds);
 }

@@ -54,6 +54,13 @@ internal class PluginManager : IPluginManager
         await _macroStateRepository.DeleteAll(x => x.PageId == pageId);
     }
 
+    public Task DeleteAllStateInPages(string[] pageIds)
+    {
+        if (pageIds is null || pageIds.Length == 0)
+            return Task.CompletedTask;
+        return _macroStateRepository.DeleteAll(x => pageIds.Contains(x.PageId));
+    }
+
     public async Task DeleteState(string pageId, string macroUniqueId)
     {
         var state = await _macroStateRepository.GetAll()
@@ -167,9 +174,8 @@ internal class PluginManager : IPluginManager
     {
         using var _ = _logger.BeginScope("Uninstalling plugin `{pluginIdentifier}` by user {userEmail}", plugin.PluginIdentifier, userInfo.Email);
         var macroIdentifiers = plugin.Macros.Select(x => x.MacroIdentifier).ToArray();
-        var states = await _macroStateRepository.GetAll().Where(x => macroIdentifiers.Contains(x.MacroIdentifier)).ToArrayAsync();
-        foreach (var state in states)
-            await _macroStateRepository.Delete(state);
+        if (macroIdentifiers.Length > 0)
+            await _macroStateRepository.DeleteAll(x => macroIdentifiers.Contains(x.MacroIdentifier));
 
         await _pluginRepository.Delete(plugin);
         _logger.LogInformation("Plugin `{pluginName}` with version {version} successful uninstalled with deleting all macro states", plugin.Name, plugin.Version);

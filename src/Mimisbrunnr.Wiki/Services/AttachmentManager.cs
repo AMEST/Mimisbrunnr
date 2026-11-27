@@ -5,23 +5,29 @@ using Skidbladnir.Storage.Abstractions;
 
 namespace Mimisbrunnr.Wiki.Services;
 
-internal class AttachmentManager : IAttachmentManager
+internal class AttachmentManager : IAttachmentManager, IDisposable
 {
+    private static readonly TimeSpan LockIdleTimeout = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan LockCleanupInterval = TimeSpan.FromMinutes(5);
+
     private readonly IRepository<Attachment> _attachmentRepository;
     private readonly IStorage _fileStorage;
-    //TODO: Timer for clear _lock store
-    private readonly ConcurrentDictionary<string, SemaphoreSlim> _locks = new();
-
+    private readonly ConcurrentDictionary<string, UploadLock> _locks = new();
+    private readonly Timer _lockCleanupTimer;
 
     public AttachmentManager(IRepository<Attachment> attachmentRepository, IStorage fileStorage)
     {
         _attachmentRepository = attachmentRepository;
         _fileStorage = fileStorage;
+        _lockCleanupTimer = new Timer(_ => CleanupLocks(), null, LockCleanupInterval, LockCleanupInterval);
     }
 
     public Task<Attachment[]> GetAttachments(Page page)
     {
-        return _attachmentRepository.GetAll().Where(x => x.PageId == page.Id).ToArrayAsync();
+        return _attachmentRepository.GetAll()
+            .Where(x => x.PageId == page.Id)
+            .OrderBy(x => x.Name)
+            .ToArrayAsync();
     }
 
     public Task<Stream> GetAttachmentContent(Page page, string name)
@@ -62,14 +68,21 @@ internal class AttachmentManager : IAttachmentManager
         await Remove(attachment);
     }
 
-    public async Task RemoveAll(Page page)
+    public Task RemoveAll(Page page) => RemoveAllForPages([page.Id]);
+
+    public async Task RemoveAllForPages(string[] pageIds)
     {
-        var attachments = await GetAttachments(page);
-        var attachmentRemoveTasks = new List<Task>();
-        foreach (var attachment in attachments)
-            attachmentRemoveTasks.Add(Remove(attachment));
-            
-        await Task.WhenAll(attachmentRemoveTasks);
+        if (pageIds is null || pageIds.Length == 0)
+            return;
+
+        var attachments = await _attachmentRepository.GetAll()
+            .Where(x => pageIds.Contains(x.PageId))
+            .ToArrayAsync();
+        if (attachments.Length == 0)
+            return;
+
+        await Task.WhenAll(attachments.Select(DeleteFile));
+        await _attachmentRepository.DeleteAll(x => pageIds.Contains(x.PageId));
     }
 
     public async Task Upload(Page page, Stream content, string name, UserInfo uploadedBy)
@@ -88,12 +101,16 @@ internal class AttachmentManager : IAttachmentManager
             Path = $"attachments/{Guid.NewGuid()}.bin"
         };
 
-        var mLock = _locks.GetOrAdd($"{page.Id}-{name}", _ => new SemaphoreSlim(1, 1));
+        var mLock = _locks.GetOrAdd($"{page.Id}-{name}", _ => new UploadLock());
+        Interlocked.Exchange(ref mLock.LastUsedTicks, DateTime.UtcNow.Ticks);
         try
         {
-            await mLock.WaitAsync();
-            if (await _attachmentRepository.GetAll().AnyAsync(x => x.PageId == page.Id && x.Name == name))
-                await Remove(page, name);
+            await mLock.Semaphore.WaitAsync();
+
+            var existing = await _attachmentRepository.GetAll()
+                .FirstOrDefaultAsync(x => x.PageId == page.Id && x.Name == name);
+            if (existing is not null)
+                await Remove(existing);
 
             await _fileStorage.UploadFileAsync(content, attachment.Path);
 
@@ -101,19 +118,56 @@ internal class AttachmentManager : IAttachmentManager
         }
         finally
         {
-            mLock.Release();
+            mLock.Semaphore.Release();
         }
     }
 
     private async Task Remove(Attachment attachment)
+    {
+        await DeleteFile(attachment);
+        await _attachmentRepository.Delete(attachment);
+    }
+
+    private async Task DeleteFile(Attachment attachment)
     {
         try
         {
             await _fileStorage.DeleteAsync(attachment.Path);
         }
         catch (FileNotFoundException) { }
-
-        await _attachmentRepository.Delete(attachment);
     }
 
+    private void CleanupLocks()
+    {
+        try
+        {
+            var threshold = DateTime.UtcNow - LockIdleTimeout;
+            foreach (var pair in _locks)
+            {
+                if (pair.Value.Semaphore.CurrentCount != 1)
+                    continue;
+
+                var lastUsed = new DateTime(Interlocked.Read(ref pair.Value.LastUsedTicks), DateTimeKind.Utc);
+                if (lastUsed > threshold)
+                    continue;
+
+                ((ICollection<KeyValuePair<string, UploadLock>>)_locks).Remove(pair);
+            }
+        }
+        catch (Exception)
+        {
+            // Never let the background cleanup take the process down; the next tick will try again.
+        }
+    }
+
+    public void Dispose()
+    {
+        _lockCleanupTimer.Dispose();
+    }
+
+    private sealed class UploadLock
+    {
+        public readonly SemaphoreSlim Semaphore = new(1, 1);
+        public long LastUsedTicks = DateTime.UtcNow.Ticks;
+    }
 }

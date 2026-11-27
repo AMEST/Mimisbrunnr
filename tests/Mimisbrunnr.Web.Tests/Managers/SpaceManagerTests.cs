@@ -1,6 +1,7 @@
 using FakeItEasy;
 using FluentAssertions;
 using Mimisbrunnr.Wiki.Contracts;
+using Mimisbrunnr.Wiki.Repositories;
 using Mimisbrunnr.Wiki.Services;
 using Skidbladnir.Repository.Abstractions;
 
@@ -13,7 +14,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_FindSpaceCaseInsensitively_WhenGettingByKey()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         var space = new Space { Key = "DOCS" };
         A.CallTo(() => repository.GetAll()).Returns(new[] { space }.AsQueryable());
 
@@ -25,7 +26,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_ReturnPublicAndPermittedSpaces_WhenFilteringByUser()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         var publicSpace = new Space { Key = "PUBLIC", Type = SpaceType.Public, Permissions = [] };
         var privateSpace = new Space { Key = "PRIVATE", Type = SpaceType.Private, Permissions = [new Permission { User = new UserInfo { Email = "USER@EXAMPLE.TEST" } }] };
         var hiddenSpace = new Space { Key = "HIDDEN", Type = SpaceType.Private, Permissions = [] };
@@ -43,7 +44,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task ShouldThrow_InvalidOperationException_WhenAddingPermissionWithUserAndGroup()
     {
-        var manager = new SpaceManager(A.Fake<IRepository<Space>>(), A.Fake<IPageManager>());
+        var manager = new SpaceManager(A.Fake<ISpaceRepository>(), A.Fake<IPageManager>());
         var space = new Space { Permissions = [] };
 
         await manager.Invoking(x => x.AddPermission(space, new Permission { User = new UserInfo(), Group = new GroupInfo() }))
@@ -53,7 +54,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_ReturnOnlyPublicSpaces_WhenGettingPublicSpaces()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         A.CallTo(() => repository.GetAll()).Returns(new[] { new Space { Key = "PUBLIC", Type = SpaceType.Public }, new Space { Key = "PRIVATE", Type = SpaceType.Private } }.AsQueryable());
 
         var spaces = await new SpaceManager(repository, A.Fake<IPageManager>()).GetPublicSpaces();
@@ -64,7 +65,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_ApplySkipAndTake_WhenGettingAll()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         A.CallTo(() => repository.GetAll()).Returns(new[]
         {
             new Space { Key = "A" }, new Space { Key = "B" }, new Space { Key = "C" }
@@ -78,7 +79,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_ReturnGroupPermittedSpaces_WhenFilteringByGroups()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         var devSpace = new Space { Key = "DEV", Type = SpaceType.Private, Permissions = [new Permission { Group = new GroupInfo { Name = "DEV" } }] };
         var lockedSpace = new Space { Key = "LOCKED", Type = SpaceType.Private, Permissions = [] };
         var publicSpace = new Space { Key = "PUB", Type = SpaceType.Public, Permissions = [] };
@@ -95,7 +96,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_ReturnNull_WhenGettingByUnknownKey()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         A.CallTo(() => repository.GetAll()).Returns(Array.Empty<Space>().AsQueryable());
 
         var result = await new SpaceManager(repository, A.Fake<IPageManager>()).GetByKey("UNKNOWN");
@@ -106,7 +107,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_ReturnSpace_WhenGettingById()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         var space = new Space { Id = "s1", Key = "DOCS" };
         A.CallTo(() => repository.GetAll()).Returns(new[] { space }.AsQueryable());
 
@@ -118,7 +119,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_ReturnOnlyRequestedSpaces_WhenGettingByIds()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         A.CallTo(() => repository.GetAll()).Returns(new[] { new Space { Id = "s1" }, new Space { Id = "s2" }, new Space { Id = "s3" } }.AsQueryable());
 
         var result = await new SpaceManager(repository, A.Fake<IPageManager>()).GetByIds("s1", "s3");
@@ -129,7 +130,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_ReturnEmpty_WhenGettingByIdsWithoutArguments()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
 
         var result = await new SpaceManager(repository, A.Fake<IPageManager>()).GetByIds();
 
@@ -140,7 +141,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_ReturnPersonalSpaceWithEmailKey_WhenFindingPersonalSpace()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         var personal = new Space { Key = "USER@TEST.COM", Type = SpaceType.Personal };
         A.CallTo(() => repository.GetAll()).Returns(new[] { personal }.AsQueryable());
 
@@ -152,7 +153,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_ReturnMatchingSpaces_WhenFindingByName()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         A.CallTo(() => repository.GetAll()).Returns(new[] { new Space { Name = "Dev Team" }, new Space { Name = "Sales" } }.AsQueryable());
 
         var result = await new SpaceManager(repository, A.Fake<IPageManager>()).FindByName("Team");
@@ -163,7 +164,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_CreateSpaceWithHomePageAndAdminPermission()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         var pages = A.Fake<IPageManager>();
         var owner = new UserInfo { Email = "owner@test.com" };
         var homePage = new Page { Id = "home1" };
@@ -182,7 +183,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_AddUserPermission_WhenAddingValidPermission()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         var space = new Space { Type = SpaceType.Private, Permissions = [] };
         var permission = new Permission { User = new UserInfo { Email = "u@test.com" }, CanView = true };
         A.CallTo(() => repository.GetAll()).Returns(new[] { space }.AsQueryable());
@@ -198,7 +199,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task ShouldThrow_InvalidOperationException_WhenAddingAdminToPersonalSpace()
     {
-        var manager = new SpaceManager(A.Fake<IRepository<Space>>(), A.Fake<IPageManager>());
+        var manager = new SpaceManager(A.Fake<ISpaceRepository>(), A.Fake<IPageManager>());
         var space = new Space
         {
             Type = SpaceType.Personal,
@@ -212,7 +213,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_RemoveUserPermission_WhenRemovingValidPermission()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         var user = new UserInfo { Email = "u@test.com" };
         var space = new Space { Type = SpaceType.Private, Permissions = [new Permission { User = user, CanView = true }] };
         space.UpdatePermissions();
@@ -229,7 +230,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task ShouldThrow_InvalidOperationException_WhenRemovingAdminFromPersonalSpace()
     {
-        var manager = new SpaceManager(A.Fake<IRepository<Space>>(), A.Fake<IPageManager>());
+        var manager = new SpaceManager(A.Fake<ISpaceRepository>(), A.Fake<IPageManager>());
         var space = new Space { Type = SpaceType.Personal, Permissions = [] };
 
         await manager.Invoking(x => x.RemovePermission(space, new Permission { User = new UserInfo { Email = "x@test.com" }, IsAdmin = true }))
@@ -239,7 +240,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_UpdatePermission_ByRemovingAndAdding()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         var user = new UserInfo { Email = "u@test.com" };
         var space = new Space { Type = SpaceType.Private, Permissions = [new Permission { User = user, CanView = false }] };
         A.CallTo(() => repository.GetAll()).Returns(new[] { space }.AsQueryable());
@@ -255,7 +256,7 @@ public class SpaceManagerTests
     [InlineData(true)]
     public async Task ShouldThrow_InvalidOperationWithoutChangingPermissions_WhenRemovingStoredPersonalAdmin(bool useGroup)
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         var owner = new Permission
         {
             User = useGroup ? null : new UserInfo { Email = "owner@test.com" },
@@ -283,7 +284,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task ShouldThrow_InvalidOperationWithoutChangingPermissions_WhenDemotingPersonalOwner()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         var owner = new Permission { User = new UserInfo { Email = "owner@test.com" }, IsAdmin = true };
         var space = new Space { Type = SpaceType.Personal, Permissions = [owner] };
         var manager = new SpaceManager(repository, A.Fake<IPageManager>());
@@ -299,7 +300,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_RemoveNonAdminPermission_WhenPersonalSpaceHasOwner()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         var owner = new Permission { User = new UserInfo { Email = "owner@test.com" }, IsAdmin = true };
         var visitor = new UserInfo { Email = "visitor@test.com" };
         var space = new Space
@@ -318,7 +319,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_SetStatusArchived_WhenArchivingSpace()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         var space = new Space { Status = SpaceStatus.Actual, Permissions = [] };
 
         await new SpaceManager(repository, A.Fake<IPageManager>()).Archive(space);
@@ -330,7 +331,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_SetStatusActual_WhenUnArchivingSpace()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         var space = new Space { Status = SpaceStatus.Archived, Permissions = [] };
 
         await new SpaceManager(repository, A.Fake<IPageManager>()).UnArchive(space);
@@ -342,7 +343,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_RemoveHomePageAndSpace_WhenRemovingSpace()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         var pages = A.Fake<IPageManager>();
         var space = new Space { Id = "s1", HomePageId = "home1" };
         var homePage = new Page { Id = "home1" };
@@ -358,7 +359,7 @@ public class SpaceManagerTests
     [Fact]
     public async Task Should_SearchByNameAndDescriptionCaseInsensitively()
     {
-        var repository = A.Fake<IRepository<Space>>();
+        var repository = A.Fake<ISpaceRepository>();
         A.CallTo(() => repository.GetAll()).Returns(new[]
         {
             new Space { Name = "Knowledge Base", Description = "All docs" },

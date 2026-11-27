@@ -175,9 +175,7 @@ public class PageServiceTests
 
         await service.Update("page", new Mimisbrunnr.Integration.Wiki.PageUpdateModel { Name = "New", Content = "New content" }, user);
 
-        page.Name.Should().Be("New");
-        page.Content.Should().Be("New content");
-        A.CallTo(() => pages.Update(page, user)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => pages.Update(page, "New", "New content", user)).MustHaveHappenedOnceExactly();
         A.CallTo(() => feed.AddPageUpdate(space, page, user)).MustHaveHappenedOnceExactly();
         A.CallTo(() => cache.RemoveAsync("page_tree_home", A<CancellationToken>._)).MustHaveHappenedOnceExactly();
     }

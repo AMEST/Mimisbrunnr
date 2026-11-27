@@ -9,11 +9,14 @@ using MongoDB.Driver;
 using Skidbladnir.Modules;
 using Skidbladnir.Repository.MongoDB;
 using Mimisbrunnr.Wiki.Services;
+using Mimisbrunnr.Wiki.Repositories;
 using Mimisbrunnr.Storage.MongoDb.Migrations;
+using Mimisbrunnr.Storage.MongoDb.Repositories;
 using Mimisbrunnr.Favorites.Contracts;
 using MongoDB.Bson.Serialization;
 using Mimisbrunnr.Favorites.Services;
 using Mimisbrunnr.PageTemplates.Contracts;
+using Skidbladnir.Repository.Abstractions;
 
 namespace Mimisbrunnr.Storage.MongoDb;
 
@@ -61,7 +64,16 @@ public class MongoDbStoreModule : RunnableModule
 
         services
             .AddSingleton<IPageSearcher, PageSearcher>()
-            .AddSingleton<IFavoriteStore, FavoriteStore>();
+            .AddSingleton<IFavoriteStore, FavoriteStore>()
+            .AddSingleton<IPageRepository, PageRepository>()
+            .AddSingleton<ISpaceRepository, SpaceRepository>()
+            .AddSingleton<IHistoricalPageRepository, HistoricalPageRepository>();
+
+        // Managers depend on IRepository<T>; resolve the extended implementations so both contracts use the same instance.
+        services
+            .AddSingleton<IRepository<Page>>(provider => provider.GetRequiredService<IPageRepository>())
+            .AddSingleton<IRepository<Space>>(provider => provider.GetRequiredService<ISpaceRepository>())
+            .AddSingleton<IRepository<HistoricalPage>>(provider => provider.GetRequiredService<IHistoricalPageRepository>());
     }
 
     public override async Task StartAsync(IServiceProvider provider, CancellationToken cancellationToken)
@@ -75,7 +87,7 @@ public class MongoDbStoreModule : RunnableModule
             await CreateUserGroupIndexes(baseMongoContext);
             await CreateSpaceIndexes(baseMongoContext);
             await CreatePageIndexes(baseMongoContext);
-            await CreatePageHistoryIndexes(baseMongoContext);
+            await CreatePageHistoryIndexes(baseMongoContext, logger);
             await CreatePageDraftIndexes(baseMongoContext);
             await CreatePageUpdatesIndexes(baseMongoContext);
             await CreateAttachmentIndexes(baseMongoContext);
@@ -174,6 +186,12 @@ public class MongoDbStoreModule : RunnableModule
         {
             Background = true
         }));
+
+        var groupPermissionSearch = Builders<Space>.IndexKeys.Ascending("Permissions.Group.Name");
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Space>(groupPermissionSearch, new CreateIndexOptions()
+        {
+            Background = true
+        }));
     }
 
     private static async Task CreatePageIndexes(IMongoDbContext mongoContext)
@@ -204,7 +222,7 @@ public class MongoDbStoreModule : RunnableModule
     }
 
 
-    private async Task CreatePageHistoryIndexes(BaseMongoDbContext mongoContext)
+    private async Task CreatePageHistoryIndexes(BaseMongoDbContext mongoContext, ILogger logger)
     {
         var collection = mongoContext.GetCollection<HistoricalPage>();
         var pageIdDefinition = Builders<HistoricalPage>.IndexKeys.Ascending(x => x.PageId);
@@ -212,11 +230,38 @@ public class MongoDbStoreModule : RunnableModule
         {
             Background = true
         }));
-        var pageIdAndVersionDefinition = Builders<HistoricalPage>.IndexKeys.Ascending(x => x.PageId).Ascending(x => x.Version);
-        await collection.Indexes.CreateOneAsync(new CreateIndexModel<HistoricalPage>(pageIdAndVersionDefinition, new CreateIndexOptions()
+
+        // Versions must be unique, otherwise two concurrent saves produce two documents with the same version number.
+        // The previously created non-unique index has to be dropped first: MongoDB does not allow an equivalent key pattern.
+        try
         {
-            Background = true
-        }));
+            await collection.Indexes.DropOneAsync("PageId_1_Version_1");
+        }
+        catch (MongoCommandException)
+        {
+            // index was not created yet
+        }
+
+        var pageIdAndVersionDefinition = Builders<HistoricalPage>.IndexKeys.Ascending(x => x.PageId).Ascending(x => x.Version);
+        try
+        {
+            await collection.Indexes.CreateOneAsync(new CreateIndexModel<HistoricalPage>(pageIdAndVersionDefinition, new CreateIndexOptions()
+            {
+                Background = true,
+                Unique = true,
+                Name = "PageId_Version_unique"
+            }));
+        }
+        catch (MongoCommandException e)
+        {
+            // Existing installations may already contain duplicates produced by the old non-atomic update.
+            logger?.LogWarning(e, "Can't create unique page history index (duplicate versions already stored). Falling back to a non-unique index");
+            await collection.Indexes.CreateOneAsync(new CreateIndexModel<HistoricalPage>(pageIdAndVersionDefinition, new CreateIndexOptions()
+            {
+                Background = true,
+                Name = "PageId_Version"
+            }));
+        }
     }
 
 
@@ -389,6 +434,11 @@ public class MongoDbStoreModule : RunnableModule
         var collection = mongoContext.GetCollection<Comment>();
         var pageIdKeyDefinition = Builders<Comment>.IndexKeys.Ascending(x => x.PageId);
         await collection.Indexes.CreateOneAsync(new CreateIndexModel<Comment>(pageIdKeyDefinition, new CreateIndexOptions()
+        {
+            Background = true
+        }));
+        var pageIdAndCreatedKeyDefinition = Builders<Comment>.IndexKeys.Ascending(x => x.PageId).Ascending(x => x.Created);
+        await collection.Indexes.CreateOneAsync(new CreateIndexModel<Comment>(pageIdAndCreatedKeyDefinition, new CreateIndexOptions()
         {
             Background = true
         }));

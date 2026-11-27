@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Infrastructure.Contracts;
 
@@ -19,9 +20,10 @@ public interface ISecurityTokenService
     Task<string> GenerateAccessToken(User user, TimeSpan? tokenLifeTime = null, bool systemToken = false);
 
     /// <summary>
-    ///     Ensure token not revoked by user and is exists in database
+    ///     Ensure token of the already authenticated principal is not revoked.
+    ///     The result is cached, so revocation takes effect with a short delay.
     /// </summary>
-    Task<bool> EnsureTokenNotRevoked(string token);
+    Task<bool> EnsureTokenNotRevoked(ClaimsPrincipal principal);
 
     /// <summary>
     ///     Revoke user token by token id

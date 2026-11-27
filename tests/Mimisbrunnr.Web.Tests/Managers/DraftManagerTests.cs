@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using FakeItEasy;
 using FluentAssertions;
 using Mimisbrunnr.Wiki.Contracts;
@@ -14,6 +15,7 @@ public class DraftManagerTests
     public async Task Should_CreateDraftWithContent_WhenCreatingDraft()
     {
         var repository = A.Fake<IRepository<Draft>>();
+        A.CallTo(() => repository.GetAll()).Returns(Array.Empty<Draft>().AsQueryable());
         var user = new UserInfo { Email = "user@example.test" };
 
         var draft = await new DraftManager(repository).Create("page", "Title", "Content", user);
@@ -76,12 +78,12 @@ public class DraftManagerTests
     public async Task Should_DeleteDraft_WhenRemovingByPageId()
     {
         var repository = A.Fake<IRepository<Draft>>();
-        var draft = new Draft { OriginalPageId = "page" };
-        A.CallTo(() => repository.GetAll()).Returns(new[] { draft }.AsQueryable());
 
         await new DraftManager(repository).Remove("page");
 
-        A.CallTo(() => repository.Delete(draft, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        // The draft is removed with a single request instead of a read followed by a delete.
+        A.CallTo(() => repository.DeleteAll(A<Expression<Func<Draft, bool>>>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => repository.Delete(A<Draft>._, A<CancellationToken>._)).MustNotHaveHappened();
     }
 
     [Fact]

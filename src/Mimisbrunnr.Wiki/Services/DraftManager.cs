@@ -14,15 +14,32 @@ internal class DraftManager : IDraftManager
 
     public async Task<Draft> Create(string pageId, string name, string content, UserInfo updatedBy)
     {
-        var draft = new Draft(){
-            OriginalPageId = pageId,
-            Name = name,
-            Content = content,
-            Updated = DateTime.UtcNow,
-            UpdatedBy = updatedBy
-        };
-        await _draftRepository.Create(draft);
-        return draft;
+        // A page has a single draft (unique index on OriginalPageId), so creation is an upsert.
+        for (var attempt = 0; ; attempt++)
+        {
+            var existing = await GetByPageId(pageId);
+            if (existing is not null)
+                return await Apply(existing, name, content, updatedBy);
+
+            var draft = new Draft()
+            {
+                OriginalPageId = pageId,
+                Name = name,
+                Content = content,
+                Updated = DateTime.UtcNow,
+                UpdatedBy = updatedBy
+            };
+
+            try
+            {
+                await _draftRepository.Create(draft);
+                return draft;
+            }
+            catch (Exception) when (attempt == 0)
+            {
+                // Another request created the draft between the read and the insert - retry as an update.
+            }
+        }
     }
 
     public Task<Draft> GetByPageId(string pageId)
@@ -35,13 +52,16 @@ internal class DraftManager : IDraftManager
         return _draftRepository.Delete(draft);
     }
 
-    public async Task Remove(string pageId)
+    public Task Remove(string pageId)
     {
-        var draft = await GetByPageId(pageId);
-        if(draft is null)
-            return;
+        return _draftRepository.DeleteAll(x => x.OriginalPageId == pageId);
+    }
 
-        await _draftRepository.Delete(draft);
+    public Task RemoveForPages(string[] pageIds)
+    {
+        if (pageIds is null || pageIds.Length == 0)
+            return Task.CompletedTask;
+        return _draftRepository.DeleteAll(x => pageIds.Contains(x.OriginalPageId));
     }
 
     public Task Update(Draft draft, UserInfo updatedBy)
@@ -49,5 +69,15 @@ internal class DraftManager : IDraftManager
         draft.UpdatedBy = updatedBy;
         draft.Updated = DateTime.UtcNow;
         return _draftRepository.Update(draft);
+    }
+
+    private async Task<Draft> Apply(Draft draft, string name, string content, UserInfo updatedBy)
+    {
+        draft.Name = name;
+        draft.Content = content;
+        draft.Updated = DateTime.UtcNow;
+        draft.UpdatedBy = updatedBy;
+        await _draftRepository.Update(draft);
+        return draft;
     }
 }

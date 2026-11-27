@@ -157,11 +157,12 @@ public class UserGroupManagerTests
             new UserGroup { GroupId = "g1", UserId = "u1" },
             new UserGroup { GroupId = "g1", UserId = "u2" }
         }.AsQueryable());
-        A.CallTo(() => userManager.GetById("u1")).Returns(user1);
-        A.CallTo(() => userManager.GetById("u2")).Returns((Mimisbrunnr.Users.User)null);
+        A.CallTo(() => userManager.GetByIds(A<string[]>._)).Returns(Task.FromResult(new[] { user1 }));
 
         var result = await new UserGroupManager(groups, memberships, userManager).GetUsersInGroup(new Mimisbrunnr.Users.Group { Id = "g1" });
 
         result.Should().ContainSingle().Which.Should().BeSameAs(user1);
+        // Members of the group are resolved with a single request instead of one per member.
+        A.CallTo(() => userManager.GetById(A<string>._)).MustNotHaveHappened();
     }
 }

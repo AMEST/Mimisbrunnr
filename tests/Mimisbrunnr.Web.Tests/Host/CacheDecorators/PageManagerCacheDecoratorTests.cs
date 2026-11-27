@@ -43,19 +43,19 @@ public class PageManagerCacheDecoratorTests
     }
 
     [Fact]
-    public async Task Should_ReturnCachedPages_WhenSpacePagesExistInCache()
+    public async Task Should_DelegateGetAllOnSpace_WithoutCaching()
     {
         var inner = A.Fake<IPageManager>();
         var cache = new FakeDistributedCache();
         var pages = new[] { new Page { Id = "p1" }, new Page { Id = "p2" } };
-        await cache.SetAsync("page_manager_cache_all_s1", pages, new DistributedCacheEntryOptions());
         var space = new Space { Id = "s1" };
+        A.CallTo(() => inner.GetAllOnSpace(space)).Returns(Task.FromResult(pages));
         var decorator = new PageManagerCacheDecorator(inner, cache);
 
         var result = await decorator.GetAllOnSpace(space);
 
         result.Should().BeEquivalentTo(pages);
-        A.CallTo(() => inner.GetAllOnSpace(space)).MustNotHaveHappened();
+        A.CallTo(() => inner.GetAllOnSpace(space)).MustHaveHappenedOnceExactly();
     }
 
     [Fact]
@@ -65,12 +65,11 @@ public class PageManagerCacheDecoratorTests
         var cache = new FakeDistributedCache();
         var page = new Page { Id = "p1", SpaceId = "s1" };
         await cache.SetAsync("page_manager_cache_id_p1", page, new DistributedCacheEntryOptions());
-        await cache.SetAsync("page_manager_cache_all_s1", new[] { page }, new DistributedCacheEntryOptions());
         var decorator = new PageManagerCacheDecorator(inner, cache);
 
-        await decorator.Update(page, new UserInfo { Email = "a@b.c" });
+        await decorator.Update(page, "New", "New content", new UserInfo { Email = "a@b.c" });
 
-        A.CallTo(() => inner.Update(page, A<UserInfo>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => inner.Update(page, "New", "New content", A<UserInfo>._)).MustHaveHappenedOnceExactly();
         var cached = await cache.GetAsync<Page>("page_manager_cache_id_p1");
         cached.Should().BeNull();
     }

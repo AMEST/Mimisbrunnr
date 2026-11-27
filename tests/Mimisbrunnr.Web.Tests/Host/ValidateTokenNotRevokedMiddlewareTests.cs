@@ -14,7 +14,7 @@ public class ValidateTokenNotRevokedMiddlewareTests
         var nextCalled = false;
         var middleware = new ValidateTokenNotRevokedMiddleware(_ => { nextCalled = true; return Task.CompletedTask; });
         var tokenService = A.Fake<ISecurityTokenService>();
-        A.CallTo(() => tokenService.EnsureTokenNotRevoked("token")).Returns(Task.FromResult(false));
+        A.CallTo(() => tokenService.EnsureTokenNotRevoked(A<System.Security.Claims.ClaimsPrincipal>._)).Returns(Task.FromResult(false));
         var context = new DefaultHttpContext();
         context.Request.Headers.Authorization = "Bearer token";
 

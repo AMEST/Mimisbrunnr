@@ -74,7 +74,12 @@ internal class SpaceManagerCacheDecorator : ISpaceManager
 
     public Task<Space[]> GetByIds(params string[] ids)
     {
-        return _inner.GetByIds(ids);
+        return GetMany(ids, GetSpaceCacheKeyById, missing => _inner.GetByIds(missing));
+    }
+
+    public Task<Space[]> GetByKeys(params string[] keys)
+    {
+        return GetMany(keys, GetSpaceCacheKey, missing => _inner.GetByKeys(missing));
     }
 
     public async Task<Space> GetByKey(string key)
@@ -100,6 +105,13 @@ internal class SpaceManagerCacheDecorator : ISpaceManager
         await DeleteSpaceFromCache(space);
     }
 
+    public async Task<Space[]> RemoveGroupPermissions(string groupName)
+    {
+        var affectedSpaces = await _inner.RemoveGroupPermissions(groupName);
+        await Task.WhenAll(affectedSpaces.Select(DeleteSpaceFromCache));
+        return affectedSpaces;
+    }
+
     public async Task UnArchive(Space space)
     {
         await _inner.UnArchive(space);
@@ -114,25 +126,46 @@ internal class SpaceManagerCacheDecorator : ISpaceManager
 
     public async Task UpdatePermission(Space space, Permission permission)
     {
-        await DeleteSpaceFromCache(space);
         await _inner.UpdatePermission(space, permission);
         await DeleteSpaceFromCache(space);
     }
 
-
-    private async Task AddSpaceToCache(Space space)
+    private async Task<Space[]> GetMany(string[] keys, Func<string, string> cacheKeyFactory, Func<string[], Task<Space[]>> loader)
     {
-        if (space is null) return;
-        await _cache.SetAsync(key: GetSpaceCacheKey(space.Key), entry: space, options: new DistributedCacheEntryOptions()
+        var distinctKeys = (keys ?? []).Where(x => !string.IsNullOrEmpty(x)).Distinct(StringComparer.Ordinal).ToArray();
+        if (distinctKeys.Length == 0)
+            return [];
+
+        var cachedSpaces = await Task.WhenAll(distinctKeys.Select(key => _cache.GetAsync<Space>(cacheKeyFactory(key))));
+        var result = new List<Space>(distinctKeys.Length);
+        var missingKeys = new List<string>();
+
+        for (var i = 0; i < distinctKeys.Length; i++)
         {
-            AbsoluteExpirationRelativeToNow = _maxCacheTime,
-            SlidingExpiration = _slidingCacheTime
-        });
-        await _cache.SetAsync(key: GetSpaceCacheKeyById(space.Id), entry: space, options: new DistributedCacheEntryOptions()
+            if (cachedSpaces[i] is not null)
+                result.Add(cachedSpaces[i]);
+            else
+                missingKeys.Add(distinctKeys[i]);
+        }
+
+        if (missingKeys.Count > 0)
         {
-            AbsoluteExpirationRelativeToNow = _maxCacheTime,
-            SlidingExpiration = _slidingCacheTime
-        });
+            var loaded = await loader([.. missingKeys]);
+            await Task.WhenAll(loaded.Select(AddSpaceToCache));
+            result.AddRange(loaded);
+        }
+
+        return [.. result];
+    }
+
+    private Task AddSpaceToCache(Space space)
+    {
+        if (space is null)
+            return Task.CompletedTask;
+
+        return Task.WhenAll(
+            _cache.SetAsync(key: GetSpaceCacheKey(space.Key), entry: space, options: CacheOptions()),
+            _cache.SetAsync(key: GetSpaceCacheKeyById(space.Id), entry: space, options: CacheOptions()));
     }
 
     private async Task DeleteSpaceFromCache(Space space)
@@ -141,6 +174,12 @@ internal class SpaceManagerCacheDecorator : ISpaceManager
         await _cache.RemoveAsync(GetSpaceCacheKey(space.Key));
         await _cache.RemoveAsync(GetSpaceCacheKeyById(space.Id));
     }
+
+    private DistributedCacheEntryOptions CacheOptions() => new()
+    {
+        AbsoluteExpirationRelativeToNow = _maxCacheTime,
+        SlidingExpiration = _slidingCacheTime
+    };
 
     private static string GetSpaceCacheKey(string spaceKey) => $"space_cache_key_{spaceKey}";
 

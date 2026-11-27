@@ -301,18 +301,14 @@ public class PluginManagerTests
     {
         var repository = A.Fake<IRepository<Mimisbrunnr.Wiki.Contracts.Plugin>>();
         var states = A.Fake<IRepository<MacroState>>();
-        var state1 = new MacroState { MacroIdentifier = "m1" };
-        var state2 = new MacroState { MacroIdentifier = "m2" };
-        var other = new MacroState { MacroIdentifier = "other" };
-        A.CallTo(() => states.GetAll()).Returns(new[] { state1, state2, other }.AsQueryable());
         var manager = new PluginManager(repository, states, NullLogger<PluginManager>.Instance);
         var plugin = new Mimisbrunnr.Wiki.Contracts.Plugin { Macros = [new Macro { MacroIdentifier = "m1" }, new Macro { MacroIdentifier = "m2" }] };
 
         await manager.UnInstall(plugin, new UserInfo { Email = "x@test.com" });
 
-        A.CallTo(() => states.Delete(state1, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => states.Delete(state2, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => states.Delete(other, A<CancellationToken>._)).MustNotHaveHappened();
+        // Macro states of the plugin are removed with a single request.
+        A.CallTo(() => states.DeleteAll(A<Expression<Func<MacroState, bool>>>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => states.Delete(A<MacroState>._, A<CancellationToken>._)).MustNotHaveHappened();
         A.CallTo(() => repository.Delete(plugin, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
     }
 

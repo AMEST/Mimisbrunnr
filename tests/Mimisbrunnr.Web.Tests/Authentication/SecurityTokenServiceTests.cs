@@ -1,11 +1,13 @@
 using FakeItEasy;
 using FluentAssertions;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Security.Claims;
 using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Host.Configuration;
 using Mimisbrunnr.Web.Host.Services;
 using Mimisbrunnr.Web.Infrastructure.Contracts;
+using Mimisbrunnr.Web.Tests.Host.CacheDecorators;
 using Skidbladnir.Repository.Abstractions;
 
 namespace Mimisbrunnr.Web.Tests.Authentication;
@@ -14,13 +16,16 @@ public class SecurityTokenServiceTests
 {
     private static BearerTokenConfiguration Configuration() => new() { SymmetricKey = "01234567890123456789012345678901" };
 
+    private static SecurityTokenService CreateService(IRepository<UserToken> repository, IDistributedCache cache = null)
+        => new(Configuration(), repository, cache ?? new FakeDistributedCache(), NullLogger<SecurityTokenService>.Instance);
+
     public SecurityTokenServiceTests() => QueryableAsyncExtensions.EnableFallback();
 
     [Fact]
     public async Task Should_CreatePersistentToken_WhenGeneratingUserToken()
     {
         var repository = A.Fake<IRepository<UserToken>>();
-        var service = new SecurityTokenService(Configuration(), repository, NullLogger<SecurityTokenService>.Instance);
+        var service = CreateService(repository);
         var user = new Mimisbrunnr.Users.User { Id = "user", Email = "user@example.test", Name = "User" };
 
         var token = await service.GenerateAccessToken(user, TimeSpan.FromMinutes(5));
@@ -33,7 +38,7 @@ public class SecurityTokenServiceTests
     public async Task Should_NotPersistToken_WhenGeneratingSystemToken()
     {
         var repository = A.Fake<IRepository<UserToken>>();
-        var service = new SecurityTokenService(Configuration(), repository, NullLogger<SecurityTokenService>.Instance);
+        var service = CreateService(repository);
         var user = new Mimisbrunnr.Users.User { Id = "user", Email = "user@example.test" };
 
         await service.GenerateAccessToken(user, systemToken: true);
@@ -52,7 +57,7 @@ public class SecurityTokenServiceTests
                 persisted = token;
                 token.Id.Should().BeNull();
             });
-        var service = new SecurityTokenService(Configuration(), repository, NullLogger<SecurityTokenService>.Instance);
+        var service = CreateService(repository);
         var user = new Mimisbrunnr.Users.User { Id = "user", Email = "user@example.test" };
 
         await service.GenerateAccessToken(user, TimeSpan.FromMinutes(5));
@@ -67,7 +72,7 @@ public class SecurityTokenServiceTests
         var repository = A.Fake<IRepository<UserToken>>();
         A.CallTo(() => repository.Create(A<UserToken>._, A<CancellationToken>._))
             .Invokes((UserToken token, CancellationToken _) => token.Id = "repo-assigned-id");
-        var service = new SecurityTokenService(Configuration(), repository, NullLogger<SecurityTokenService>.Instance);
+        var service = CreateService(repository);
         var user = new Mimisbrunnr.Users.User { Id = "user", Email = "user@example.test" };
 
         var token = await service.GenerateAccessToken(user, TimeSpan.FromMinutes(5));
@@ -77,11 +82,12 @@ public class SecurityTokenServiceTests
     }
 
     [Fact]
-    public async Task Should_ReturnFalse_WhenTokenIsInvalid()
+    public async Task Should_ReturnFalse_WhenPrincipalIsNotAuthenticated()
     {
-        var service = new SecurityTokenService(Configuration(), A.Fake<IRepository<UserToken>>(), NullLogger<SecurityTokenService>.Instance);
+        var service = CreateService(A.Fake<IRepository<UserToken>>());
+        var principal = new ClaimsPrincipal(new ClaimsIdentity());
 
-        var result = await service.EnsureTokenNotRevoked("not-a-jwt");
+        var result = await service.EnsureTokenNotRevoked(principal);
 
         result.Should().BeFalse();
     }
@@ -91,12 +97,29 @@ public class SecurityTokenServiceTests
     {
         var repository = A.Fake<IRepository<UserToken>>();
         A.CallTo(() => repository.GetAll()).Returns(Array.Empty<UserToken>().AsQueryable());
-        var service = new SecurityTokenService(Configuration(), repository, NullLogger<SecurityTokenService>.Instance);
+        var service = CreateService(repository);
         var user = new Mimisbrunnr.Users.User { Id = "user", Email = "user@example.test" };
         var token = await service.GenerateAccessToken(user, TimeSpan.FromMinutes(5));
 
-        var result = await service.EnsureTokenNotRevoked(token);
+        var result = await service.EnsureTokenNotRevoked(service.GetPrincipal(token));
 
         result.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Should_NotQueryRepository_WhenRevocationStateIsCached()
+    {
+        var repository = A.Fake<IRepository<UserToken>>();
+        A.CallTo(() => repository.GetAll()).Returns(Array.Empty<UserToken>().AsQueryable());
+        var cache = new FakeDistributedCache();
+        var service = CreateService(repository, cache);
+        var user = new Mimisbrunnr.Users.User { Id = "user", Email = "user@example.test" };
+        var token = await service.GenerateAccessToken(user, TimeSpan.FromMinutes(5));
+        var principal = service.GetPrincipal(token);
+
+        await service.EnsureTokenNotRevoked(principal);
+        await service.EnsureTokenNotRevoked(principal);
+
+        A.CallTo(() => repository.GetAll()).MustHaveHappenedOnceExactly();
     }
 }

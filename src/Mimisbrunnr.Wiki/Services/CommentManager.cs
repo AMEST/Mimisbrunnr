@@ -33,7 +33,10 @@ internal class CommentManager : ICommentManager
 
     public async Task<Comment[]> GetComments(Page page)
     {
-        return await _repository.GetAll().Where(x => x.PageId == page.Id).ToArrayAsync();
+        return await _repository.GetAll()
+            .Where(x => x.PageId == page.Id)
+            .OrderBy(x => x.Created)
+            .ToArrayAsync();
     }
 
     public Task Remove(Comment comment)
@@ -41,8 +44,15 @@ internal class CommentManager : ICommentManager
         return _repository.Delete(comment);
     }
 
-    public async Task RemoveAll(Page page)
+    public Task RemoveAll(Page page)
     {
-        await _repository.DeleteAll( x => x.PageId == page.Id);
+        return _repository.DeleteAll(x => x.PageId == page.Id);
+    }
+
+    public Task RemoveAllForPages(string[] pageIds)
+    {
+        if (pageIds is null || pageIds.Length == 0)
+            return Task.CompletedTask;
+        return _repository.DeleteAll(x => pageIds.Contains(x.PageId));
     }
 }

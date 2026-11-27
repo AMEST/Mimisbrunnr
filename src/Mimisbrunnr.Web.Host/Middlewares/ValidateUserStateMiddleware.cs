@@ -51,15 +51,17 @@ internal class ValidateUserStateMiddleware
 
     private static async Task SyncUser(IUserManager userManager, Users.User user, UserInfo userInfo)
     {
-        if (user.AvatarUrl == userInfo.AvatarUrl
-            && user.Name != userInfo.Name)
+        var nameChanged = !string.IsNullOrEmpty(userInfo.Name) && user.Name != userInfo.Name;
+        var avatarChanged = !string.IsNullOrEmpty(userInfo.AvatarUrl) && user.AvatarUrl != userInfo.AvatarUrl;
+        // Nothing to sync: do not write the user document on every request.
+        if (!nameChanged && !avatarChanged)
             return;
 
-        if(!string.IsNullOrEmpty(userInfo.AvatarUrl))
-            user.AvatarUrl = userInfo.AvatarUrl;
-        if(!string.IsNullOrEmpty(userInfo.Name))
+        if (nameChanged)
             user.Name = userInfo.Name;
-            
+        if (avatarChanged)
+            user.AvatarUrl = userInfo.AvatarUrl;
+
         await userManager.UpdateUserInfo(user);
     }
 }

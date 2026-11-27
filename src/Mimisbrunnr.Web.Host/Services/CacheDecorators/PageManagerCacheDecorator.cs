@@ -42,15 +42,9 @@ internal class PageManagerCacheDecorator : IPageManager
         return _inner.GetAllChilds(page, lightContract);
     }
 
-    public async Task<Page[]> GetAllOnSpace(Space space)
+    public Task<Page[]> GetAllOnSpace(Space space)
     {
-        var cached = await _cache.GetAsync<Page[]>(GetSpacePagesCacheName(space.Id));
-        if (cached is not null)
-            return cached;
-
-        cached = await _inner.GetAllOnSpace(space);
-        await StoreInCache(cached, space);
-        return cached;
+        return _inner.GetAllOnSpace(space);
     }
 
     public async Task<Page> GetById(string id)
@@ -63,10 +57,40 @@ internal class PageManagerCacheDecorator : IPageManager
         return cached;
     }
 
+    public async Task<Page[]> GetByIds(params string[] ids)
+    {
+        if (ids is null || ids.Length == 0)
+            return [];
+
+        var distinctIds = ids.Where(x => !string.IsNullOrEmpty(x)).Distinct(StringComparer.Ordinal).ToArray();
+        if (distinctIds.Length == 0)
+            return [];
+
+        var cachedPages = await Task.WhenAll(distinctIds.Select(id => _cache.GetAsync<Page>(GetPageCacheName(id))));
+        var result = new List<Page>(distinctIds.Length);
+        var missingIds = new List<string>();
+
+        for (var i = 0; i < distinctIds.Length; i++)
+        {
+            if (cachedPages[i] is not null)
+                result.Add(cachedPages[i]);
+            else
+                missingIds.Add(distinctIds[i]);
+        }
+
+        if (missingIds.Count > 0)
+        {
+            var loaded = await _inner.GetByIds([.. missingIds]);
+            await Task.WhenAll(loaded.Select(StoreInCache));
+            result.AddRange(loaded);
+        }
+
+        return [.. result];
+    }
+
     public async Task<Page> Move(Page source, Page destinationParentPage, bool withChilds = true)
     {
         var copiedPage = await _inner.Move(source, destinationParentPage, withChilds);
-        await ClearCache(source);
         await ClearCache(copiedPage);
         return copiedPage;
     }
@@ -77,9 +101,9 @@ internal class PageManagerCacheDecorator : IPageManager
         await ClearCache(page);
     }
 
-    public async Task Update(Page page, UserInfo updatedBy)
+    public async Task Update(Page page, string name, string content, UserInfo updatedBy)
     {
-        await _inner.Update(page, updatedBy);
+        await _inner.Update(page, name, content, updatedBy);
         await ClearCache(page);
     }
 
@@ -116,25 +140,12 @@ internal class PageManagerCacheDecorator : IPageManager
             });
     }
 
-    private Task StoreInCache(Page[] pages, Space space)
-    {
-        if (space is null)
-            return Task.CompletedTask;
-        return _cache.SetAsync(key: GetSpacePagesCacheName(space.Id), entry: pages, options: new DistributedCacheEntryOptions()
-        {
-            AbsoluteExpirationRelativeToNow = _maxCacheTime,
-            SlidingExpiration = _slidingCacheTime
-        });
-    }
-
     private async Task ClearCache(Page page)
     {
         if (page is null)
             return;
         await _cache.RemoveAsync(GetPageCacheName(page.Id));
-        await _cache.RemoveAsync(GetSpacePagesCacheName(page.SpaceId));
     }
 
     private static string GetPageCacheName(string id) => $"page_manager_cache_id_{id}";
-    private static string GetSpacePagesCacheName(string spaceId) => $"page_manager_cache_all_{spaceId}";
 }

@@ -13,4 +13,9 @@ public interface ICommentManager
     Task Remove(Comment comment);
 
     Task RemoveAll(Page page);
+
+    /// <summary>
+    /// Removes comments of several pages with a single database request
+    /// </summary>
+    Task RemoveAllForPages(string[] pageIds);
 }
