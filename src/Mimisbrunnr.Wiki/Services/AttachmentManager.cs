@@ -1,25 +1,19 @@
-using System.Collections.Concurrent;
 using Mimisbrunnr.Wiki.Contracts;
 using Skidbladnir.Repository.Abstractions;
 using Skidbladnir.Storage.Abstractions;
 
 namespace Mimisbrunnr.Wiki.Services;
 
-internal class AttachmentManager : IAttachmentManager, IDisposable
+internal class AttachmentManager : IAttachmentManager
 {
-    private static readonly TimeSpan LockIdleTimeout = TimeSpan.FromMinutes(5);
-    private static readonly TimeSpan LockCleanupInterval = TimeSpan.FromMinutes(5);
-
     private readonly IRepository<Attachment> _attachmentRepository;
     private readonly IStorage _fileStorage;
-    private readonly ConcurrentDictionary<string, UploadLock> _locks = new();
-    private readonly Timer _lockCleanupTimer;
+    private readonly Dictionary<(string PageId, string Name), UploadLock> _locks = new();
 
     public AttachmentManager(IRepository<Attachment> attachmentRepository, IStorage fileStorage)
     {
         _attachmentRepository = attachmentRepository;
         _fileStorage = fileStorage;
-        _lockCleanupTimer = new Timer(_ => CleanupLocks(), null, LockCleanupInterval, LockCleanupInterval);
     }
 
     public Task<Attachment[]> GetAttachments(Page page)
@@ -101,12 +95,23 @@ internal class AttachmentManager : IAttachmentManager, IDisposable
             Path = $"attachments/{Guid.NewGuid()}.bin"
         };
 
-        var mLock = _locks.GetOrAdd($"{page.Id}-{name}", _ => new UploadLock());
-        Interlocked.Exchange(ref mLock.LastUsedTicks, DateTime.UtcNow.Ticks);
+        var key = (page.Id, name);
+        UploadLock uploadLock;
+        lock (_locks)
+        {
+            if (!_locks.TryGetValue(key, out uploadLock))
+            {
+                uploadLock = new UploadLock();
+                _locks.Add(key, uploadLock);
+            }
+
+            // Count each waiter before it can use the semaphore.
+            uploadLock.Users++;
+        }
+
+        await uploadLock.Semaphore.WaitAsync();
         try
         {
-            await mLock.Semaphore.WaitAsync();
-
             var existing = await _attachmentRepository.GetAll()
                 .FirstOrDefaultAsync(x => x.PageId == page.Id && x.Name == name);
             if (existing is not null)
@@ -118,7 +123,15 @@ internal class AttachmentManager : IAttachmentManager, IDisposable
         }
         finally
         {
-            mLock.Semaphore.Release();
+            uploadLock.Semaphore.Release();
+            lock (_locks)
+            {
+                if (--uploadLock.Users == 0)
+                {
+                    _locks.Remove(key);
+                    uploadLock.Semaphore.Dispose();
+                }
+            }
         }
     }
 
@@ -137,37 +150,9 @@ internal class AttachmentManager : IAttachmentManager, IDisposable
         catch (FileNotFoundException) { }
     }
 
-    private void CleanupLocks()
-    {
-        try
-        {
-            var threshold = DateTime.UtcNow - LockIdleTimeout;
-            foreach (var pair in _locks)
-            {
-                if (pair.Value.Semaphore.CurrentCount != 1)
-                    continue;
-
-                var lastUsed = new DateTime(Interlocked.Read(ref pair.Value.LastUsedTicks), DateTimeKind.Utc);
-                if (lastUsed > threshold)
-                    continue;
-
-                ((ICollection<KeyValuePair<string, UploadLock>>)_locks).Remove(pair);
-            }
-        }
-        catch (Exception)
-        {
-            // Never let the background cleanup take the process down; the next tick will try again.
-        }
-    }
-
-    public void Dispose()
-    {
-        _lockCleanupTimer.Dispose();
-    }
-
     private sealed class UploadLock
     {
         public readonly SemaphoreSlim Semaphore = new(1, 1);
-        public long LastUsedTicks = DateTime.UtcNow.Ticks;
+        public int Users;
     }
 }

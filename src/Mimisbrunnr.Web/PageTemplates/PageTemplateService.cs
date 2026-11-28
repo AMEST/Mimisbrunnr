@@ -45,14 +45,6 @@ internal class PageTemplateService : IPageTemplateService
         var includeUser = string.IsNullOrEmpty(type) || type == TemplateType.User;
         var includeSpace = string.IsNullOrEmpty(type) || type == TemplateType.Space;
 
-        var requestedTypes = new List<string>(3);
-        if (includeSystem) requestedTypes.Add(TemplateType.System);
-        if (includeUser) requestedTypes.Add(TemplateType.User);
-        if (includeSpace) requestedTypes.Add(TemplateType.Space);
-        if (requestedTypes.Count == 0)
-            return [];
-        var typesFilter = requestedTypes.ToArray();
-
         string spaceId = null;
         if (includeSpace && !string.IsNullOrEmpty(spaceKey))
         {
@@ -67,17 +59,17 @@ internal class PageTemplateService : IPageTemplateService
             }
         }
 
-        var ownerEmail = user?.Email;
+        var ownerEmail = includeUser ? user?.Email : null;
+        if (!includeSystem && ownerEmail is null && spaceId is null)
+            return [];
 
-        // One request for every requested template type; the per-type split is done in memory.
         var templates = await _pageTemplateManager.GetAll()
-            .Where(x => typesFilter.Contains(x.Type))
+            .Where(x => (includeSystem && x.Type == TemplateType.System)
+                        || (ownerEmail != null && x.Type == TemplateType.User && x.OwnerEmail == ownerEmail)
+                        || (spaceId != null && x.Type == TemplateType.Space && x.SpaceId == spaceId))
             .ToArrayAsync();
 
         var models = templates
-            .Where(x => x.Type == TemplateType.System
-                        || (x.Type == TemplateType.User && ownerEmail != null && x.OwnerEmail == ownerEmail)
-                        || (x.Type == TemplateType.Space && spaceId != null && x.SpaceId == spaceId))
             .Select(x => x.ToModel())
             .ToList();
 

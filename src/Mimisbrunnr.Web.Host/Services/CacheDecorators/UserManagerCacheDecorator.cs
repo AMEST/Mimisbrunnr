@@ -174,11 +174,11 @@ internal class UserManagerCacheDecorator : IUserManager
         SlidingExpiration = _slidingCacheTime
     };
 
-    private static string GetUserCacheKeyEmail(string email) => $"user_cache_email_{email.ToLower()}";
+    private static string GetUserCacheKeyEmail(string email) => $"user_cache_v2_email_{email.ToLower()}";
 
-    private static string GetUserCacheKeyId(string id) => $"user_cache_id_{id.ToLower()}";
+    private static string GetUserCacheKeyId(string id) => $"user_cache_v2_id_{id.ToLower()}";
 
-    private static string GetUserCacheKeyEmailMissing(string email) => $"user_cache_email_missing_{email.ToLower()}";
+    private static string GetUserCacheKeyEmailMissing(string email) => $"user_cache_v2_missing_email_{email.ToLower()}";
 
-    private static string GetUserCacheKeyIdMissing(string id) => $"user_cache_id_missing_{id.ToLower()}";
+    private static string GetUserCacheKeyIdMissing(string id) => $"user_cache_v2_missing_id_{id.ToLower()}";
 }

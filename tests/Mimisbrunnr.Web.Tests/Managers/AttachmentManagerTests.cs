@@ -213,4 +213,44 @@ public class AttachmentManagerTests
         A.CallTo(() => repository.Create(A<Attachment>.That.Matches(x => x.PageId == "page" && x.Name == "file.txt"), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }
+
+    [Fact]
+    public async Task Should_KeepWaitingUploadSerialized_WhenPreviousUploadFails()
+    {
+        var repository = A.Fake<IRepository<Attachment>>();
+        A.CallTo(() => repository.GetAll()).Returns(Array.Empty<Attachment>().AsQueryable());
+        var storage = A.Fake<IStorage>();
+        var manager = new AttachmentManager(repository, storage);
+        var page = new Page { Id = "page-a" };
+        var user = new UserInfo { Email = "user@example.test" };
+        using var firstContent = new MemoryStream();
+        using var waitingContent = new MemoryStream();
+        using var otherContent = new MemoryStream();
+        var firstUploadStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var firstUpload = new TaskCompletionSource<Skidbladnir.Storage.Abstractions.FileInfo>(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        A.CallTo(() => storage.UploadFileAsync(firstContent, A<string>._))
+            .Invokes(() => firstUploadStarted.SetResult())
+            .Returns(firstUpload.Task);
+
+        var first = manager.Upload(page, firstContent, "file.txt", user);
+        Task waiting;
+        try
+        {
+            await firstUploadStarted.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            waiting = manager.Upload(page, waitingContent, "file.txt", user);
+            var other = manager.Upload(new Page { Id = "page" }, otherContent, "a-file.txt", user);
+            await other.WaitAsync(TimeSpan.FromSeconds(5));
+            A.CallTo(() => storage.UploadFileAsync(waitingContent, A<string>._)).MustNotHaveHappened();
+        }
+        finally
+        {
+            firstUpload.SetException(new IOException("Upload failed"));
+        }
+
+        Func<Task> finishFirst = () => first;
+        await finishFirst.Should().ThrowAsync<IOException>();
+        await waiting.WaitAsync(TimeSpan.FromSeconds(5));
+        A.CallTo(() => storage.UploadFileAsync(waitingContent, A<string>._)).MustHaveHappenedOnceExactly();
+    }
 }

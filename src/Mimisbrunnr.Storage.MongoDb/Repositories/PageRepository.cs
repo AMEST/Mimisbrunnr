@@ -49,9 +49,13 @@ public class PageRepository : MongoRepository<Page, BaseMongoDbContext>, IPageRe
     {
         ArgumentNullException.ThrowIfNull(page);
 
-        var filter = Builders<Page>.Filter.Eq(x => x.Id, page.Id)
-                     & Builders<Page>.Filter.Eq(x => x.Version, expectedVersion);
+        var filters = Builders<Page>.Filter;
+        var versionFilter = filters.Eq(x => x.Version, expectedVersion);
+        // Older documents without Version are read as version zero.
+        if (expectedVersion == 0)
+            versionFilter |= filters.Exists(x => x.Version, false);
 
+        var filter = filters.Eq(x => x.Id, page.Id) & versionFilter;
         var result = await Entities.ReplaceOneAsync(filter, page);
         if (result.MatchedCount == 0)
             throw new PageConcurrencyException(page.Id);

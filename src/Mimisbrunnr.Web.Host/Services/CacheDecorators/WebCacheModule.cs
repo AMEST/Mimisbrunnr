@@ -11,6 +11,5 @@ internal class WebCacheModule : Module
         services.Decorate<IPageManager, PageManagerCacheDecorator>();
         services.Decorate<ISpaceManager, SpaceManagerCacheDecorator>();
         services.Decorate<IUserManager, UserManagerCacheDecorator>();
-        services.Decorate<IUserGroupManager, UserGroupManagerCacheDecorator>();
     }
 }
