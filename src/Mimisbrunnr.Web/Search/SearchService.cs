@@ -39,23 +39,44 @@ internal class SearchService : ISearchService
 
     public async Task<IEnumerable<PageModel>> SearchPages(string text, UserInfo searchBy)
     {
+        var result = await SearchPages(text, searchBy, 100, 0);
+        return result.Pages;
+    }
+
+    public async Task<PageSearchResult> SearchPages(string text, UserInfo searchBy, int limit, int offset)
+    {
         await _permissionService.EnsureAnonymousAllowed(searchBy);
 
-        var pages = await _pageSearcher.Search(text);
-        if (pages.Length == 0)
-            return [];
-
-        var user = await _userManager.GetByEmail(searchBy?.Email);  
-        if (user?.Role == UserRole.Admin)
+        var user = await _userManager.GetByEmail(searchBy?.Email);
+        Dictionary<string, string> spaceKeysById = null;
+        if (user?.Role != UserRole.Admin)
         {
-            var spaceIds = pages.Select(x => x.SpaceId).Distinct().ToArray();
-            var spaces = await _spaceManager.GetByIds(spaceIds);
-            var foundedSpaceIds = spaces.Select(x => x.Id).ToArray();
-            return pages.Where(x => foundedSpaceIds.Contains(x.SpaceId)).Select(x => x.ToModel(spaces.FirstOrDefault(s => s.Id == x.SpaceId)?.Key));
-        } 
-        var userSpaces = await _spaceDisplayService.FindUserVisibleSpaces(searchBy);
-        var userSpacesId = userSpaces.Select(x => x.Id).ToArray();
-        return pages.Where(x => userSpacesId.Contains(x.SpaceId)).Select(x => x.ToModel(userSpaces.First(s => s.Id == x.SpaceId).Key));
+            var spaces = await _spaceDisplayService.FindUserVisibleSpaces(searchBy);
+            spaceKeysById = spaces.ToDictionary(x => x.Id, x => x.Key, StringComparer.Ordinal);
+            if (spaceKeysById.Count == 0)
+                return new PageSearchResult([], null);
+        }
+
+        // Fetch one extra match to detect the next page without counting every match.
+        var foundPages = await _pageSearcher.Search(text, spaceKeysById?.Keys.ToArray(), limit + 1, offset);
+        if (foundPages.Length == 0)
+            return new PageSearchResult([], null);
+
+        var page = foundPages.Take(limit).ToArray();
+        var nextOffset = foundPages.Length > limit ? offset + limit : (int?)null;
+        if (spaceKeysById is null)
+        {
+            var spaces = await _spaceManager.GetByIds(page.Select(x => x.SpaceId).Distinct().ToArray());
+            spaceKeysById = spaces
+                .Where(x => !string.IsNullOrEmpty(x.Id))
+                .ToDictionary(x => x.Id, x => x.Key, StringComparer.Ordinal);
+        }
+
+        var results = page
+            .Where(x => x.SpaceId is not null && spaceKeysById.ContainsKey(x.SpaceId))
+            .Select(x => x.ToModel(spaceKeysById[x.SpaceId]))
+            .ToArray();
+        return new PageSearchResult(results, nextOffset);
     }
 
     public async Task<IEnumerable<SpaceModel>> SearchSpaces(string text, UserInfo searchBy)
@@ -69,8 +90,10 @@ internal class SearchService : ISearchService
         if (user?.Role == UserRole.Admin)
             return spaces.Select(x => x.ToModel());
 
-        var userSpaces = (await _spaceDisplayService.FindUserVisibleSpaces(searchBy)).Select(x => x.Id);
-        return spaces.Where(x => userSpaces.Contains(x.Id)).Select(x => x.ToModel());
+        var userSpacesId = (await _spaceDisplayService.FindUserVisibleSpaces(searchBy))
+            .Select(x => x.Id)
+            .ToHashSet(StringComparer.Ordinal);
+        return spaces.Where(x => userSpacesId.Contains(x.Id)).Select(x => x.ToModel());
     }
 
     public async Task<IEnumerable<UserModel>> SearchUsers(string text, UserInfo searchBy)

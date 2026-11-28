@@ -19,6 +19,8 @@ public interface ISpaceManager
 
     Task<Space[]> GetByIds(params string[] ids);
 
+    Task<Space[]> GetByKeys(params string[] keys);
+
     Task<Space> GetByKey(string key);
 
     Task<Space> FindPersonalSpace(UserInfo user);
@@ -34,6 +36,12 @@ public interface ISpaceManager
     Task UpdatePermission(Space space, Permission permission);
 
     Task RemovePermission(Space space, Permission permission);
+
+    /// <summary>
+    /// Removes the permissions of the group from every space in a single request
+    /// </summary>
+    /// <returns>Spaces that were affected</returns>
+    Task<Space[]> RemoveGroupPermissions(string groupName);
 
     Task Archive(Space space);
 

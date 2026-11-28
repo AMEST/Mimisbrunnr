@@ -8,6 +8,10 @@ public interface IUserManager
 
     Task<User> GetById(string id);
 
+    Task<User[]> GetByIds(params string[] ids);
+
+    Task<User[]> GetByEmails(params string[] emails);
+
     Task<User> Add(string email, string name, string avatarUrl, UserRole role);
 
     Task Disable(User user);

@@ -94,10 +94,8 @@ internal class PageService : IPageService
         if (space.Status == SpaceStatus.Archived)
             throw new InvalidOperationException("Can't update page because space archived");
 
-        page.Name = updateModel.Name;
-        page.Content = updateModel.Content;
-
-        await _pageManager.Update(page, updatedBy);
+        // PageManager applies the changes itself: it needs the previous state for the history snapshot.
+        await _pageManager.Update(page, updateModel.Name, updateModel.Content, updatedBy);
         await _feedManager.AddPageUpdate(space, page, updatedBy);
         await _distributedCache.RemoveAsync(GetPageTreeCacheKey(space.HomePageId));
     }
@@ -186,7 +184,8 @@ internal class PageService : IPageService
     }
 
 
-    public async Task<PageVersionsListModel> GetPageVersions(string pageId, UserInfo requestedBy)
+    public async Task<PageVersionsListModel> GetPageVersions(string pageId, UserInfo requestedBy,
+        bool includeContent = true, long? contentVersion = null)
     {
         await _permissionService.EnsureAnonymousAllowed(requestedBy);
 
@@ -195,7 +194,7 @@ internal class PageService : IPageService
 
         await _permissionService.EnsureViewPermission(space.Key, requestedBy);
 
-        var versions = await _pageManager.GetAllVersions(page);
+        var versions = await _pageManager.GetAllVersions(page, includeContent, contentVersion);
         return new PageVersionsListModel()
         {
             Versions = versions.Select(x => x.ToModel()).ToArray(),

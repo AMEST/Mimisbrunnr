@@ -1,14 +1,15 @@
 ﻿using Mimisbrunnr.Wiki.Contracts;
+using Mimisbrunnr.Wiki.Repositories;
 using Skidbladnir.Repository.Abstractions;
 
 namespace Mimisbrunnr.Wiki.Services;
 
 internal class SpaceManager : ISpaceManager, ISpaceSearcher
 {
-    private readonly IRepository<Space> _spaceRepository;
+    private readonly ISpaceRepository _spaceRepository;
     private readonly IPageManager _pageManager;
 
-    public SpaceManager(IRepository<Space> spaceRepository, IPageManager pageManager)
+    public SpaceManager(ISpaceRepository spaceRepository, IPageManager pageManager)
     {
         _spaceRepository = spaceRepository;
         _pageManager = pageManager;
@@ -73,9 +74,23 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
 
     public Task<Space[]> GetByIds(params string[] ids)
     {
-        if (ids.Length == 0)
+        var distinctIds = (ids ?? []).Where(id => !string.IsNullOrEmpty(id)).Distinct(StringComparer.Ordinal).ToArray();
+        if (distinctIds.Length == 0)
             return Task.FromResult<Space[]>([]);
-        return _spaceRepository.GetAll().Where(x => ids.Contains(x.Id)).ToArrayAsync();
+        return _spaceRepository.GetAll().Where(x => distinctIds.Contains(x.Id)).ToArrayAsync();
+    }
+
+    public Task<Space[]> GetByKeys(params string[] keys)
+    {
+        // Space keys are stored upper-cased (see GetByKey), so the lookup has to be case-insensitive as well.
+        var normalized = (keys ?? [])
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Select(x => x.ToUpper())
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        if (normalized.Length == 0)
+            return Task.FromResult<Space[]>([]);
+        return _spaceRepository.GetAll().Where(x => normalized.Contains(x.Key)).ToArrayAsync();
     }
 
     public async Task<Space> GetByKey(string key)
@@ -184,6 +199,12 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
         await _pageManager.Remove(spaceHomePage, true);
 
         await _spaceRepository.Delete(space);
+    }
+
+    public Task<Space[]> RemoveGroupPermissions(string groupName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(groupName);
+        return _spaceRepository.RemoveGroupPermissions(groupName);
     }
 
     public async Task<Space[]> Search(string text)

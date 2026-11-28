@@ -16,4 +16,9 @@ public interface IPluginManager
     Task<MacroState> CreateOrUpdateState(MacroState macroState);
     Task DeleteState(string pageId, string macroUniqueId);
     Task DeleteAllStateInPage(string pageId);
+
+    /// <summary>
+    /// Removes macro states of several pages with a single database request
+    /// </summary>
+    Task DeleteAllStateInPages(string[] pageIds);
 }

@@ -110,8 +110,12 @@ var PageService = {
         showToast(`status:${request.status}.${JSON.stringify(request.data)}`,
             "Error when deleting comment.", "warning");
     },
-    getVersions: async function (pageId) {
-        var request = await http.get(`/api/page/${pageId}/versions`,
+    getVersions: async function (pageId, { includeContent = true, contentVersion } = {}) {
+        const params = new URLSearchParams();
+        if (!includeContent) params.set("includeContent", "false");
+        if (contentVersion != null) params.set("contentVersion", contentVersion);
+        const query = params.toString();
+        var request = await http.get(`/api/page/${pageId}/versions${query ? "?" + query : ""}`,
             { validateStatus: false }
         );
         if (request.status == 200)

@@ -82,28 +82,28 @@ internal class UserGroupManager : IUserGroupManager
 
     public async Task<Group[]> GetUserGroups(User user)
     {
-        var groups = new List<Group>();
-        var userInGroups = await _userGroupsRepository.GetAll().Where(x => x.UserId == user.Id).ToArrayAsync();
-        foreach (var userInGroup in userInGroups)
-        {
-            var group = await _groupRepository.GetAll().FirstOrDefaultAsync(x => x.Id == userInGroup.GroupId);
-            if(group != null)
-                groups.Add(group);
-        }
+        if (user is null)
+            return [];
 
-        return [.. groups];
+        var groupIds = await _userGroupsRepository.GetAll()
+            .Where(x => x.UserId == user.Id)
+            .Select(x => x.GroupId)
+            .ToArrayAsync();
+        if (groupIds.Length == 0)
+            return [];
+
+        return await _groupRepository.GetAll().Where(x => groupIds.Contains(x.Id)).ToArrayAsync();
     }
 
     public async Task<User[]> GetUsersInGroup(Group group)
     {
-        var usersInGroups = await _userGroupsRepository.GetAll().Where(x => x.GroupId == group.Id).ToArrayAsync();
-        var users = new List<User>();
-        foreach( var userGroup in usersInGroups)
-        {
-            var user = await _userManager.GetById(userGroup.UserId);
-            if(user is not null)
-                users.Add(user);
-        }
-        return [.. users];
+        var userIds = await _userGroupsRepository.GetAll()
+            .Where(x => x.GroupId == group.Id)
+            .Select(x => x.UserId)
+            .ToArrayAsync();
+        if (userIds.Length == 0)
+            return [];
+
+        return await _userManager.GetByIds(userIds);
     }
 }

@@ -65,12 +65,14 @@ public class PageControllerTests
     public async Task Should_ReturnVersions_WhenGettingVersions()
     {
         var service = A.Fake<IPageService>();
-        A.CallTo(() => service.GetPageVersions("page", A<Mimisbrunnr.Wiki.Contracts.UserInfo>._))
+        A.CallTo(() => service.GetPageVersions("page", A<Mimisbrunnr.Wiki.Contracts.UserInfo>._, true, null))
             .Returns(Task.FromResult(new PageVersionsListModel()));
 
         var result = await new PageController(service).GetVersions("page");
 
         result.Should().BeOfType<OkObjectResult>();
+        A.CallTo(() => service.GetPageVersions("page", A<Mimisbrunnr.Wiki.Contracts.UserInfo>._, true, null))
+            .MustHaveHappenedOnceExactly();
     }
 
     [Fact]

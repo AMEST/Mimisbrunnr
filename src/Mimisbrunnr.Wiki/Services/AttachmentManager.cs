@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using Mimisbrunnr.Wiki.Contracts;
 using Skidbladnir.Repository.Abstractions;
 using Skidbladnir.Storage.Abstractions;
@@ -9,9 +8,7 @@ internal class AttachmentManager : IAttachmentManager
 {
     private readonly IRepository<Attachment> _attachmentRepository;
     private readonly IStorage _fileStorage;
-    //TODO: Timer for clear _lock store
-    private readonly ConcurrentDictionary<string, SemaphoreSlim> _locks = new();
-
+    private readonly Dictionary<(string PageId, string Name), UploadLock> _locks = new();
 
     public AttachmentManager(IRepository<Attachment> attachmentRepository, IStorage fileStorage)
     {
@@ -21,7 +18,10 @@ internal class AttachmentManager : IAttachmentManager
 
     public Task<Attachment[]> GetAttachments(Page page)
     {
-        return _attachmentRepository.GetAll().Where(x => x.PageId == page.Id).ToArrayAsync();
+        return _attachmentRepository.GetAll()
+            .Where(x => x.PageId == page.Id)
+            .OrderBy(x => x.Name)
+            .ToArrayAsync();
     }
 
     public Task<Stream> GetAttachmentContent(Page page, string name)
@@ -62,14 +62,33 @@ internal class AttachmentManager : IAttachmentManager
         await Remove(attachment);
     }
 
-    public async Task RemoveAll(Page page)
+    public Task RemoveAll(Page page) => RemoveAllForPages([page.Id]);
+
+    public async Task RemoveAllForPages(string[] pageIds)
     {
-        var attachments = await GetAttachments(page);
-        var attachmentRemoveTasks = new List<Task>();
-        foreach (var attachment in attachments)
-            attachmentRemoveTasks.Add(Remove(attachment));
-            
-        await Task.WhenAll(attachmentRemoveTasks);
+        if (pageIds is null || pageIds.Length == 0)
+            return;
+
+        var attachments = await _attachmentRepository.GetAll()
+            .Where(x => pageIds.Contains(x.PageId))
+            .ToArrayAsync();
+        if (attachments.Length == 0)
+            return;
+
+        var deletions = attachments.Select(x => (x.Id, FileDeletion: DeleteFile(x))).ToArray();
+        try
+        {
+            await Task.WhenAll(deletions.Select(x => x.FileDeletion));
+        }
+        finally
+        {
+            // Keep metadata for failed deletions so the caller can retry those files.
+            var deletedIds = deletions.Where(x => x.FileDeletion.IsCompletedSuccessfully)
+                .Select(x => x.Id)
+                .ToArray();
+            if (deletedIds.Length > 0)
+                await _attachmentRepository.DeleteAll(x => deletedIds.Contains(x.Id));
+        }
     }
 
     public async Task Upload(Page page, Stream content, string name, UserInfo uploadedBy)
@@ -88,12 +107,27 @@ internal class AttachmentManager : IAttachmentManager
             Path = $"attachments/{Guid.NewGuid()}.bin"
         };
 
-        var mLock = _locks.GetOrAdd($"{page.Id}-{name}", _ => new SemaphoreSlim(1, 1));
+        var key = (page.Id, name);
+        UploadLock uploadLock;
+        lock (_locks)
+        {
+            if (!_locks.TryGetValue(key, out uploadLock))
+            {
+                uploadLock = new UploadLock();
+                _locks.Add(key, uploadLock);
+            }
+
+            // Count each waiter before it can use the semaphore.
+            uploadLock.Users++;
+        }
+
+        await uploadLock.Semaphore.WaitAsync();
         try
         {
-            await mLock.WaitAsync();
-            if (await _attachmentRepository.GetAll().AnyAsync(x => x.PageId == page.Id && x.Name == name))
-                await Remove(page, name);
+            var existing = await _attachmentRepository.GetAll()
+                .FirstOrDefaultAsync(x => x.PageId == page.Id && x.Name == name);
+            if (existing is not null)
+                await Remove(existing);
 
             await _fileStorage.UploadFileAsync(content, attachment.Path);
 
@@ -101,19 +135,36 @@ internal class AttachmentManager : IAttachmentManager
         }
         finally
         {
-            mLock.Release();
+            uploadLock.Semaphore.Release();
+            lock (_locks)
+            {
+                if (--uploadLock.Users == 0)
+                {
+                    _locks.Remove(key);
+                    uploadLock.Semaphore.Dispose();
+                }
+            }
         }
     }
 
     private async Task Remove(Attachment attachment)
+    {
+        await DeleteFile(attachment);
+        await _attachmentRepository.Delete(attachment);
+    }
+
+    private async Task DeleteFile(Attachment attachment)
     {
         try
         {
             await _fileStorage.DeleteAsync(attachment.Path);
         }
         catch (FileNotFoundException) { }
-
-        await _attachmentRepository.Delete(attachment);
     }
 
+    private sealed class UploadLock
+    {
+        public readonly SemaphoreSlim Semaphore = new(1, 1);
+        public int Users;
+    }
 }

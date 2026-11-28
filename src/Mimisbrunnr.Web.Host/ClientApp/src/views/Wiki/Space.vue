@@ -184,14 +184,19 @@ export default {
       return true;
     },
     loadHistoryVersion: async function (originalPage) {
-      var versionsResult = await PageService.getVersions(originalPage.id);
+      var version = parseInt(this.$route.params.versionId);
+      var validVersion = Number.isSafeInteger(version);
+      var versionsResult = await PageService.getVersions(originalPage.id, {
+        includeContent: validVersion,
+        contentVersion: validVersion ? version : undefined,
+      });
       if (!versionsResult || !versionsResult.versions){ 
         this.page = originalPage;
         return;
       }
       this.pageVersions = versionsResult.versions;
       var selectedVersion = this.pageVersions.find(
-        (x) => x.version == parseInt(this.$route.params.versionId)
+        (x) => x.version === version
       );
       if (!selectedVersion) {
         this.pageVersions = [];

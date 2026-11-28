@@ -9,6 +9,7 @@ using Mimisbrunnr.Web.Mapping;
 using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;
+using Skidbladnir.Repository.Abstractions;
 
 namespace Mimisbrunnr.Web.PageTemplates;
 
@@ -40,44 +41,39 @@ internal class PageTemplateService : IPageTemplateService
 
     public async Task<PageTemplateModel[]> GetAll(string type, string spaceKey, UserInfo user)
     {
-        var query = _pageTemplateManager.GetAll();
+        var includeSystem = string.IsNullOrEmpty(type) || type == TemplateType.System;
+        var includeUser = string.IsNullOrEmpty(type) || type == TemplateType.User;
+        var includeSpace = string.IsNullOrEmpty(type) || type == TemplateType.Space;
 
-        var templates = new List<PageTemplate>();
-
-        if (string.IsNullOrEmpty(type) || type == TemplateType.System)
+        string spaceId = null;
+        if (includeSpace && !string.IsNullOrEmpty(spaceKey))
         {
-            var systemTemplates = query.Where(x => x.Type == TemplateType.System).ToArray();
-            templates.AddRange(systemTemplates);
-        }
-
-        if (string.IsNullOrEmpty(type) || type == TemplateType.User)
-        {
-            if (user != null)
+            try {
+                await _permissionService.EnsureEditPermission(spaceKey, user);
+                var space = await _spaceManager.GetByKey(spaceKey);
+                spaceId = space?.Id;
+            }
+            catch (UserHasNotPermissionException)
             {
-                var userTemplates = query.Where(x => x.Type == TemplateType.User && x.OwnerEmail == user.Email).ToArray();
-                templates.AddRange(userTemplates);
+                //do nothing
             }
         }
 
-        if (string.IsNullOrEmpty(type) || type == TemplateType.Space)
-        {
-            if (!string.IsNullOrEmpty(spaceKey))
-            {
-                try {
-                    await _permissionService.EnsureEditPermission(spaceKey, user);
-                    var space = await _spaceManager.GetByKey(spaceKey);
-                    var spaceTemplates = query.Where(x => x.Type == TemplateType.Space && x.SpaceId == space.Id).ToArray();
-                    templates.AddRange(spaceTemplates);
-                }
-                catch (UserHasNotPermissionException)
-                {
-                    //do nothing
-                }
-            }
-        }
+        var ownerEmail = includeUser ? user?.Email : null;
+        if (!includeSystem && ownerEmail is null && spaceId is null)
+            return [];
 
-        var models = templates.Select(x => x.ToModel()).ToList();
-        if (string.IsNullOrEmpty(type) || type == TemplateType.System)
+        var templates = await _pageTemplateManager.GetAll()
+            .Where(x => (includeSystem && x.Type == TemplateType.System)
+                        || (ownerEmail != null && x.Type == TemplateType.User && x.OwnerEmail == ownerEmail)
+                        || (spaceId != null && x.Type == TemplateType.Space && x.SpaceId == spaceId))
+            .ToArrayAsync();
+
+        var models = templates
+            .Select(x => x.ToModel())
+            .ToList();
+
+        if (includeSystem)
         {
             var plugins = await _pluginManager.GetPlugins();
             models.AddRange(plugins.Where(x => !x.Disabled)

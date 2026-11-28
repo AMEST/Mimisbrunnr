@@ -8,15 +8,25 @@ using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.PageTemplates;
 using Mimisbrunnr.Web.Services;
+using Mimisbrunnr.Web.Tests.Infrastructure;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;
+using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using Skidbladnir.Repository.Abstractions;
 
 namespace Mimisbrunnr.Web.Tests.PageTemplates;
 
+[Collection(nameof(MongoDbTestDatabase))]
 public class PageTemplateServiceTests
 {
-    public PageTemplateServiceTests() => QueryableAsyncExtensions.EnableFallback();
+    private readonly MongoDbTestDatabase _database;
+
+    public PageTemplateServiceTests(MongoDbTestDatabase database)
+    {
+        _database = database;
+        QueryableAsyncExtensions.EnableFallback();
+    }
 
     [Fact]
     public async Task ShouldThrow_UserHasNotPermissionException_WhenUserReadsAnotherUsersTemplate()
@@ -100,6 +110,34 @@ public class PageTemplateServiceTests
         var result = await service.GetAll(TemplateType.Space, "KEY", user);
 
         result.Should().BeEmpty();
+        A.CallTo(() => manager.GetAll()).MustNotHaveHappened();
+    }
+
+    [MongoDbFact]
+    [Trait("Category", "Integration")]
+    public async Task Should_ApplyOwnerAndSpaceFiltersInMongoDb_WhenListingAllTemplateTypes()
+    {
+        var templates = _database.Database.GetCollection<PageTemplate>("PageTemplates");
+        var user = new UserInfo { Email = "owner@example.test" };
+        await templates.InsertManyAsync([
+            new PageTemplate { Id = "system", Type = TemplateType.System },
+            new PageTemplate { Id = "mine", Type = TemplateType.User, OwnerEmail = user.Email },
+            new PageTemplate { Id = "another-user", Type = TemplateType.User, OwnerEmail = "other@example.test" },
+            new PageTemplate { Id = "current-space", Type = TemplateType.Space, SpaceId = "current" },
+            new PageTemplate { Id = "another-space", Type = TemplateType.Space, SpaceId = "other" }
+        ]);
+        var manager = A.Fake<IPageTemplateManager>();
+        A.CallTo(() => manager.GetAll()).Returns(templates.AsQueryable());
+        var spaces = A.Fake<ISpaceManager>();
+        A.CallTo(() => spaces.GetByKey("CURRENT")).Returns(new Space { Id = "current", Key = "CURRENT" });
+        var service = new PageTemplateService(manager, spaces, A.Fake<IPermissionService>(), A.Fake<IUserManager>(), A.Fake<ITemplateRenderer>(), A.Fake<IPluginManager>());
+
+        var result = await service.GetAll(null, "CURRENT", user);
+
+        result.Select(x => x.Id).Should().BeEquivalentTo("system", "mine", "current-space");
+        var query = _database.Aggregations.Should().ContainSingle(x => x.Collection == "PageTemplates").Which;
+        query.Pipeline.Should().Contain("$match").And.Contain("OwnerEmail").And.Contain(user.Email)
+            .And.Contain("SpaceId").And.Contain("current");
     }
 
     [Fact]

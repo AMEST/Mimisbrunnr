@@ -5,7 +5,6 @@ using Mimisbrunnr.Integration.User;
 using Mimisbrunnr.Integration.Group;
 using Mimisbrunnr.Wiki.Contracts;
 using Mimisbrunnr.Wiki.Services;
-
 namespace Mimisbrunnr.Web.Group;
 
 internal class GroupService : IGroupService
@@ -81,14 +80,8 @@ internal class GroupService : IGroupService
         var deletedByUser = await _userManager.GetByEmail(removedBy.Email);
         if (!group.OwnerEmails.Contains(removedBy.Email) && deletedByUser.Role != UserRole.Admin ) throw new UserHasNotPermissionException();
 
-        var removeGroupPermissionTasks = new List<Task>();
-        var spaces = await _spaceManager.GetAll();
-        foreach (var space in spaces)
-            if (space.Permissions.Any(x => x.Group?.Name == name))
-                removeGroupPermissionTasks.Add(_spaceManager.RemovePermission(space, new Permission() { Group = new GroupInfo() { Name = name } }));
-
-        await Task.WhenAll(removeGroupPermissionTasks);
-
+        // One bulk update instead of loading every space and rewriting each matching document.
+        await _spaceManager.RemoveGroupPermissions(group.Name);
         await _userGroupManager.Remove(group);
     }
 

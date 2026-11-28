@@ -134,14 +134,14 @@ public class GroupServiceTests
         var service = new GroupService(users, groups, spaces);
         var group = new Mimisbrunnr.Users.Group { Name = "team", OwnerEmails = ["owner@example.test"] };
         var removedBy = new UserInfo { Email = "owner@example.test" };
-        var space = new Space { Permissions = [new Permission { Group = new GroupInfo { Name = "team" } }] };
         A.CallTo(() => groups.FindByName("team")).Returns(Task.FromResult(group));
         A.CallTo(() => users.GetByEmail(removedBy.Email)).Returns(Task.FromResult(new Mimisbrunnr.Users.User { Role = UserRole.Admin }));
-        A.CallTo(() => spaces.GetAll(null, null)).Returns(Task.FromResult(new[] { space }));
 
         await service.Remove("team", removedBy);
 
-        A.CallTo(() => spaces.RemovePermission(space, A<Permission>.That.Matches(x => x.Group.Name == "team"))).MustHaveHappenedOnceExactly();
+        // One bulk permission cleanup per group instead of loading every space.
+        A.CallTo(() => spaces.RemoveGroupPermissions("team")).MustHaveHappenedOnceExactly();
+        A.CallTo(() => spaces.GetAll(A<int?>._, A<int?>._)).MustNotHaveHappened();
         A.CallTo(() => groups.Remove(group)).MustHaveHappenedOnceExactly();
     }
 

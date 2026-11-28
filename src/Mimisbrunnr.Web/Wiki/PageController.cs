@@ -60,15 +60,18 @@ public class PageController : ControllerBase
     /// Get version history for a page
     /// </summary>
     /// <param name="pageId">The ID of the page</param>
+    /// <param name="includeContent">Whether to include page content</param>
+    /// <param name="contentVersion">Limit included content to this version when specified</param>
     /// <returns>List of page versions</returns>
     [HttpGet("{pageId}/versions")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(PageVersionsListModel), 200)]
     [ProducesResponseType(401)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> GetVersions([FromRoute] string pageId)
+    public async Task<IActionResult> GetVersions([FromRoute] string pageId,
+        [FromQuery] bool includeContent = true, [FromQuery] long? contentVersion = null)
     {
-        return Ok(await _pageService.GetPageVersions(pageId, User?.ToInfo()));
+        return Ok(await _pageService.GetPageVersions(pageId, User?.ToInfo(), includeContent, contentVersion));
     }
     
     /// <summary>

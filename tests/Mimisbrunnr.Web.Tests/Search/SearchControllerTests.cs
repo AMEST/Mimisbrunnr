@@ -1,5 +1,6 @@
 using FakeItEasy;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mimisbrunnr.Integration.Wiki;
 using Mimisbrunnr.Web.Search;
@@ -27,7 +28,7 @@ public class SearchControllerTests
         var result = await new SearchController(service).SearchPages(null);
 
         result.Should().BeEmpty();
-        A.CallTo(() => service.SearchPages(A<string>._, A<Mimisbrunnr.Wiki.Contracts.UserInfo>._)).MustNotHaveHappened();
+        A.CallTo(() => service.SearchPages(A<string>._, A<Mimisbrunnr.Wiki.Contracts.UserInfo>._, A<int>._, A<int>._)).MustNotHaveHappened();
     }
 
     [Fact]
@@ -44,18 +45,25 @@ public class SearchControllerTests
         A.CallTo(() => service.SearchSpaces("docs", A<Mimisbrunnr.Wiki.Contracts.UserInfo>._)).MustHaveHappenedOnceExactly();
     }
 
-    [Fact]
-    public async Task Should_ForwardSearch_WhenSearchingPages()
+    [Theory]
+    [InlineData(100, 0, null)]
+    [InlineData(20, 20, 40)]
+    public async Task Should_ExposeNextOffset_WhenSearchingPages(int limit, int offset, int? nextOffset)
     {
         var service = A.Fake<ISearchService>();
         var expected = new[] { new PageModel { Id = "p1", Name = "Title" } };
-        A.CallTo(() => service.SearchPages("title", A<Mimisbrunnr.Wiki.Contracts.UserInfo>._))
-            .Returns(Task.FromResult<IEnumerable<PageModel>>(expected));
+        A.CallTo(() => service.SearchPages("title", A<Mimisbrunnr.Wiki.Contracts.UserInfo>._, limit, offset))
+            .Returns(new PageSearchResult(expected, nextOffset));
+        var controller = new SearchController(service)
+        {
+            ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() }
+        };
 
-        var result = await new SearchController(service).SearchPages("title");
+        var result = await controller.SearchPages("title", limit, offset);
 
         result.Should().BeEquivalentTo(expected);
-        A.CallTo(() => service.SearchPages("title", A<Mimisbrunnr.Wiki.Contracts.UserInfo>._)).MustHaveHappenedOnceExactly();
+        controller.Response.Headers["X-Next-Offset"].ToString().Should().Be(nextOffset?.ToString() ?? "");
+        A.CallTo(() => service.SearchPages("title", A<Mimisbrunnr.Wiki.Contracts.UserInfo>._, limit, offset)).MustHaveHappenedOnceExactly();
     }
 
     [Fact]

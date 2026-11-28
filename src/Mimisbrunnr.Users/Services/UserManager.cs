@@ -40,6 +40,22 @@ internal class UserManager : IUserManager, IUserSearcher
         return user;
     }
 
+    public Task<User[]> GetByIds(params string[] ids)
+    {
+        var normalized = Normalize(ids, value => value.ToLower());
+        if (normalized.Length == 0)
+            return Task.FromResult(Array.Empty<User>());
+        return _userRepository.GetAll().Where(x => normalized.Contains(x.Id)).ToArrayAsync();
+    }
+
+    public Task<User[]> GetByEmails(params string[] emails)
+    {
+        var normalized = Normalize(emails, value => value.ToLower());
+        if (normalized.Length == 0)
+            return Task.FromResult(Array.Empty<User>());
+        return _userRepository.GetAll().Where(x => normalized.Contains(x.Email)).ToArrayAsync();
+    }
+
     public async Task<User> Add(string email, string name, string avatarUrl, UserRole role)
     {
         var user = new User()
@@ -85,5 +101,16 @@ internal class UserManager : IUserManager, IUserSearcher
             .Take(20)
             .ToArrayAsync();
         return users;
+    }
+
+    private static string[] Normalize(string[] values, Func<string, string> selector)
+    {
+        if (values is null)
+            return [];
+        return values
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Select(selector)
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
     }
 }

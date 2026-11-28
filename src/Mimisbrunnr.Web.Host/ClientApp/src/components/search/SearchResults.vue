@@ -1,10 +1,13 @@
 <template>
   <b-overlay :show="overlayState" rounded="sm">
     <div class="text-left search-results">
-      <h2 v-if="searchResults.length == 0">
+      <b-alert v-if="searchFailed" variant="warning" show>
+        {{ $t("search.results.failed") }}
+      </b-alert>
+      <h2 v-if="!searchFailed && !overlayState && searchResults.length === 0 && nextPageOffset === null">
         {{ $t("search.results.noResults") }}
       </h2>
-      <h2 v-else>
+      <h2 v-else-if="searchResults.length > 0">
         {{ $t("search.results.hasResults") }} {{ searchResults.length }}
       </h2>
       <b-card
@@ -41,6 +44,15 @@
           }}
         </b-link>
       </b-card>
+      <b-button
+        v-if="searchType === 'page' && nextPageOffset !== null"
+        class="m-3"
+        variant="outline-primary"
+        :disabled="overlayState"
+        @click="search(true)"
+      >
+        {{ $t("search.results.loadMore") }}
+      </b-button>
     </div>
   </b-overlay>
 </template>
@@ -48,12 +60,18 @@
 <script>
 import { BIconFolder, BIconFileEarmarkText } from "bootstrap-vue";
 import SearchService from "@/services/searchService";
+
+const pageSize = 20;
+
 export default {
   name: "SearchResults",
   data() {
     return {
       searchResults: [],
       searchDelayTimeout: null,
+      searchRequestId: 0,
+      nextPageOffset: null,
+      searchFailed: false,
       overlayState: false,
     };
   },
@@ -67,37 +85,61 @@ export default {
   },
   methods: {
     initSearch() {
+      clearTimeout(this.searchDelayTimeout);
+      this.searchRequestId++;
+      this.searchResults = [];
+      this.nextPageOffset = null;
+      this.searchFailed = false;
       this.overlayState = true;
-      if (this.searchDelayTimeout != null)
-        clearTimeout(this.searchDelayTimeout);
-
-      this.searchDelayTimeout = setTimeout(this.search, 1000);
+      this.searchDelayTimeout = setTimeout(() => this.search(), 1000);
     },
-    search: async function () {
+    async search(append = false) {
       this.searchDelayTimeout = null;
-      var searchRequestResult =
-        this.searchType == "space"
-          ? await SearchService.findSpaces(this.textForSearch)
-          : await SearchService.findPages(this.textForSearch);
+      const requestId = ++this.searchRequestId;
+      const query = this.textForSearch.trim();
+      const searchPages = this.searchType === "page";
+      const offset = append ? this.nextPageOffset : 0;
+      this.overlayState = true;
+      this.searchFailed = false;
 
-      if (searchRequestResult != null) this.searchResults = searchRequestResult;
-      this.overlayState = false;
-    },
-    go: function (result) {
-      var route = "";
-      if (this.searchType == "space") {
-        route = "/space/" + result.key;
-      } else {
-        route = "/space/" + result.spaceKey + "/" + result.id;
+      try {
+        if (!query) return;
+
+        const matches = searchPages
+          ? await SearchService.findPages(query, pageSize, offset)
+          : await SearchService.findSpaces(query);
+
+        if (requestId !== this.searchRequestId) return;
+        if (matches == null) {
+          this.searchFailed = true;
+          return;
+        }
+
+        if (!searchPages) {
+          this.searchResults = matches;
+          return;
+        }
+
+        this.nextPageOffset = matches.nextOffset;
+        if (append) {
+          const seen = new Set(this.searchResults.map(result => result.id));
+          this.searchResults.push(...matches.pages.filter(result => !seen.has(result.id)));
+        } else {
+          this.searchResults = matches.pages;
+        }
+      } catch {
+        if (requestId === this.searchRequestId) this.searchFailed = true;
+      } finally {
+        if (requestId === this.searchRequestId) this.overlayState = false;
       }
-      this.$router.push(route);
     },
     getFoundedContent: function (result) {
-      var searchTextPosition = result.content
+      const content = result.content || "";
+      const searchTextPosition = content
         .toLowerCase()
-        .indexOf(this.textForSearch.toLowerCase());
-      if (searchTextPosition <= 25) return result.content.substring(0, 128);
-      return result.content.substring(
+        .indexOf(this.textForSearch.trim().toLowerCase());
+      if (searchTextPosition <= 25) return content.substring(0, 128);
+      return content.substring(
         searchTextPosition - 20,
         searchTextPosition + 108
       );
@@ -115,6 +157,10 @@ export default {
   },
   mounted() {
     this.initSearch();
+  },
+  beforeDestroy() {
+    clearTimeout(this.searchDelayTimeout);
+    this.searchRequestId++;
   },
 };
 </script>

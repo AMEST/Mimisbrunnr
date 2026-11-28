@@ -6,8 +6,10 @@ using Mimisbrunnr.Integration.Wiki;
 using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Mapping;
+using Mimisbrunnr.Web.Services;
 using Mimisbrunnr.Web.Wiki;
 using Mimisbrunnr.Wiki.Contracts;
+using Mimisbrunnr.Wiki.Services;
 
 namespace Mimisbrunnr.Web.Favorites;
 
@@ -44,7 +46,7 @@ public interface IFavoriteService
     /// Checks whether the specified item is in the user's favorites
     /// </summary>
     /// <param name="model">Criteria identifying the favorite</param>
-    /// <param name="user">Owner of the favorites</param>
+    /// <param name="user">Owner of the favorite</param>
     /// <returns>True if the item is in favorites; otherwise false</returns>
     Task<bool> EnsureInFavorites(FavoriteFindModel model, UserInfo user);
 
@@ -62,14 +64,25 @@ internal class FavoriteService : IFavoriteService
     private readonly IUserManager _userManager;
     private readonly IPageService _pageService;
     private readonly ISpaceService _spaceService;
+    private readonly IPageManager _pageManager;
+    private readonly ISpaceManager _spaceManager;
+    private readonly ISpaceDisplayService _spaceDisplayService;
 
-    public FavoriteService(IFavoritesManager favorites, IUserManager userManager,
-        IPageService pageService, ISpaceService spaceService)
+    public FavoriteService(IFavoritesManager favorites,
+        IUserManager userManager,
+        IPageService pageService,
+        ISpaceService spaceService,
+        IPageManager pageManager,
+        ISpaceManager spaceManager,
+        ISpaceDisplayService spaceDisplayService)
     {
         _favorites = favorites;
         _userManager = userManager;
         _pageService = pageService;
         _spaceService = spaceService;
+        _pageManager = pageManager;
+        _spaceManager = spaceManager;
+        _spaceDisplayService = spaceDisplayService;
     }
 
     public async Task<FavoriteModel> Add(FavoriteCreateModel model, UserInfo user)
@@ -107,26 +120,52 @@ internal class FavoriteService : IFavoriteService
         return await MapToFavoriteModel(user, favorite);
     }
 
+    /// <summary>
+    /// Maps the whole favorites list with one request per entity type instead of one request per favorite.
+    /// </summary>
     public async Task<FavoriteModel[]> GetFavorites(FavoriteFilterModel filter, UserInfo user)
     {
-        var favorites = await _favorites.FindAllByUserEmail(user.Email, filter?.ToEntity());
-        var result = new List<FavoriteModel>();
+        var favorites = (await _favorites.FindAllByUserEmail(user.Email, filter?.ToEntity())).ToArray();
+        if (favorites.Length == 0)
+            return [];
+
+        // TODO: Align space visibility with EnsureViewPermission when defining whether edit and remove imply view.
+        var visibleSpaces = (await _spaceDisplayService.FindUserVisibleSpaces(user)).ToArray();
+        var visibleSpacesById = visibleSpaces.ToDictionary(x => x.Id, x => x, StringComparer.Ordinal);
+        var visibleSpaceKeys = visibleSpaces.Select(x => x.Key).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var usersByEmail = await LoadUsers(favorites);
+        var pagesById = await LoadPages(favorites);
+        var spacesByKey = await LoadSpaces(favorites);
+
+        var result = new List<FavoriteModel>(favorites.Length);
         foreach (var favorite in favorites)
         {
-            try
+            var favoriteModel = favorite.ToModel();
+            switch (favorite)
             {
-                var favoriteModel = await MapToFavoriteModel(user, favorite);
-                result.Add(favoriteModel);
+                case FavoriteUser favoriteUser:
+                    if (!usersByEmail.TryGetValue(favoriteUser.UserEmail, out var favoriteTargetUser))
+                        continue;
+                    ((FavoriteUserModel)favoriteModel).User = favoriteTargetUser.ToModel();
+                    break;
+                case FavoritePage favoritePage:
+                    if (!pagesById.TryGetValue(favoritePage.PageId, out var favoriteTargetPage)
+                        || !visibleSpacesById.TryGetValue(favoriteTargetPage.SpaceId, out var pageSpace))
+                        continue;
+                    ((FavoritePageModel)favoriteModel).Page = favoriteTargetPage.ToModel(pageSpace.Key);
+                    break;
+                case FavoriteSpace favoriteSpace:
+                    if (!spacesByKey.TryGetValue(favoriteSpace.SpaceKey, out var favoriteTargetSpace)
+                        || !visibleSpaceKeys.Contains(favoriteTargetSpace.Key))
+                        continue;
+                    ((FavoriteSpaceModel)favoriteModel).Space = favoriteTargetSpace.ToModel();
+                    break;
             }
-            catch (Exception e) when (e is UserHasNotPermissionException
-             || e is PageNotFoundException
-              || e is SpaceNotFoundException
-               || e is UserNotFoundException)
-            {
-                continue;
-            }
+            result.Add(favoriteModel);
         }
-        return result.ToArray();
+
+        return [.. result];
     }
 
     public async Task Remove(string id, UserInfo user)
@@ -138,6 +177,54 @@ internal class FavoriteService : IFavoriteService
             throw new UserHasNotPermissionException("Can't delete favorite from another user favorites");
 
         await _favorites.Remove(favorite);
+    }
+
+    private async Task<Dictionary<string, Users.User>> LoadUsers(Favorite[] favorites)
+    {
+        var emails = favorites.OfType<FavoriteUser>()
+            .Select(x => x.UserEmail)
+            .Where(x => !string.IsNullOrEmpty(x))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+        if (emails.Length == 0)
+            return new Dictionary<string, Users.User>(StringComparer.OrdinalIgnoreCase);
+
+        var users = await _userManager.GetByEmails(emails);
+        return users
+            .Where(x => !string.IsNullOrEmpty(x.Email))
+            .ToDictionary(x => x.Email, StringComparer.OrdinalIgnoreCase);
+    }
+
+    private async Task<Dictionary<string, Page>> LoadPages(Favorite[] favorites)
+    {
+        var pageIds = favorites.OfType<FavoritePage>()
+            .Select(x => x.PageId)
+            .Where(x => !string.IsNullOrEmpty(x))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        if (pageIds.Length == 0)
+            return new Dictionary<string, Page>(StringComparer.Ordinal);
+
+        var pages = await _pageManager.GetByIds(pageIds);
+        return pages
+            .Where(x => !string.IsNullOrEmpty(x.Id))
+            .ToDictionary(x => x.Id, StringComparer.Ordinal);
+    }
+
+    private async Task<Dictionary<string, Space>> LoadSpaces(Favorite[] favorites)
+    {
+        var spaceKeys = favorites.OfType<FavoriteSpace>()
+            .Select(x => x.SpaceKey)
+            .Where(x => !string.IsNullOrEmpty(x))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+        if (spaceKeys.Length == 0)
+            return new Dictionary<string, Space>(StringComparer.OrdinalIgnoreCase);
+
+        var spaces = await _spaceManager.GetByKeys(spaceKeys);
+        return spaces
+            .Where(x => !string.IsNullOrEmpty(x.Key))
+            .ToDictionary(x => x.Key, StringComparer.OrdinalIgnoreCase);
     }
 
     private async Task EnsureFavoriteTargetExists(FavoriteCreateModel model, UserInfo requestedBy)

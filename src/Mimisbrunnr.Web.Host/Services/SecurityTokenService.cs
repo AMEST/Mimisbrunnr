@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Tokens;
 using Mimisbrunnr.Web.Host.Configuration;
 using Mimisbrunnr.Web.Infrastructure;
@@ -13,8 +14,13 @@ internal class SecurityTokenService : ISecurityTokenService
 {
     private const string TokenIdClaim = "TokenId";
     private const string SystemTokenClaim = "SystemToken";
+
+    // Revocation is checked on every bearer request, so the answer is cached. One minute keeps a revoked token alive for at most a minute.
+    private static readonly TimeSpan RevocationCacheTime = TimeSpan.FromMinutes(1);
+
     private readonly BearerTokenConfiguration _configuration;
     private readonly IRepository<UserToken> _userTokenRepository;
+    private readonly IDistributedCache _cache;
     private readonly ILogger<SecurityTokenService> _logger;
     private readonly JwtSecurityTokenHandler _tokenHandler = new();
     private readonly SymmetricSecurityKey _key;
@@ -22,30 +28,39 @@ internal class SecurityTokenService : ISecurityTokenService
     public SecurityTokenService(
         BearerTokenConfiguration configuration,
         IRepository<UserToken> userTokenRepository,
+        IDistributedCache cache,
         ILogger<SecurityTokenService> logger
     )
     {
         _configuration = configuration;
         _userTokenRepository = userTokenRepository;
+        _cache = cache;
         _logger = logger;
         var key = Encoding.ASCII.GetBytes(configuration.SymmetricKey);
         _key = new SymmetricSecurityKey(key);
     }
 
-    public async Task<bool> EnsureTokenNotRevoked(string token)
+    public async Task<bool> EnsureTokenNotRevoked(ClaimsPrincipal principal)
     {
-        var principal = GetPrincipal(token);
-        if (principal is null)
+        if (principal?.Identity?.IsAuthenticated != true)
             return false;
 
-        var tokenId = principal.FindFirstValue(TokenIdClaim);
         var systemTokenString = principal.FindFirstValue(SystemTokenClaim);
         if (!string.IsNullOrEmpty(systemTokenString) && bool.TryParse(systemTokenString, out var systemToken) && systemToken)
             return true;
 
-        var hasRevoked = await _userTokenRepository.GetAll().AnyAsync(x => x.Id == tokenId && x.Revoked);
+        var tokenId = principal.FindFirstValue(TokenIdClaim);
+        if (string.IsNullOrEmpty(tokenId))
+            return false;
 
-        return !hasRevoked;
+        var cacheKey = GetRevokedTokenCacheKey(tokenId);
+        var (found, revoked) = await _cache.TryGetValueAsync<bool?>(cacheKey);
+        if (found)
+            return revoked != true;
+
+        var isRevoked = await _userTokenRepository.GetAll().AnyAsync(x => x.Id == tokenId && x.Revoked);
+        await _cache.SetValueAsync(cacheKey, (bool?)isRevoked, RevocationCacheTime);
+        return !isRevoked;
     }
 
     public async Task<string> GenerateAccessToken(Users.User user, TimeSpan? tokenLifeTime = null, bool systemToken = false)
@@ -90,8 +105,12 @@ internal class SecurityTokenService : ISecurityTokenService
         var userToken = await _userTokenRepository
             .GetAll()
             .FirstOrDefaultAsync(x => x.Id == tokenId && x.UserId == user.Id);
+        if (userToken is null)
+            return;
+
         userToken.Revoked = true;
         await _userTokenRepository.Update(userToken);
+        await _cache.RemoveAsync(GetRevokedTokenCacheKey(tokenId));
     }
 
     private ClaimsPrincipal CreatePrincipal(Users.User user, string tokenId, bool systemToken)
@@ -121,4 +140,6 @@ internal class SecurityTokenService : ISecurityTokenService
             return null;
         }
     }
+
+    private static string GetRevokedTokenCacheKey(string tokenId) => $"token_revoked_{tokenId}";
 }

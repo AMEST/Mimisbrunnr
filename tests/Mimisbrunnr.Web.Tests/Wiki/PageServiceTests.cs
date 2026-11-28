@@ -175,9 +175,7 @@ public class PageServiceTests
 
         await service.Update("page", new Mimisbrunnr.Integration.Wiki.PageUpdateModel { Name = "New", Content = "New content" }, user);
 
-        page.Name.Should().Be("New");
-        page.Content.Should().Be("New content");
-        A.CallTo(() => pages.Update(page, user)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => pages.Update(page, "New", "New content", user)).MustHaveHappenedOnceExactly();
         A.CallTo(() => feed.AddPageUpdate(space, page, user)).MustHaveHappenedOnceExactly();
         A.CallTo(() => cache.RemoveAsync("page_tree_home", A<CancellationToken>._)).MustHaveHappenedOnceExactly();
     }
@@ -295,7 +293,7 @@ public class PageServiceTests
         var page = new Page { Id = "page", SpaceId = "space", Version = 3, Updated = updated };
         A.CallTo(() => pages.GetById("page")).Returns(Task.FromResult(page));
         A.CallTo(() => spaces.GetById("space")).Returns(Task.FromResult(new Space { Id = "space", Key = "DOCS" }));
-        A.CallTo(() => pages.GetAllVersions(page)).Returns(Task.FromResult(new[]
+        A.CallTo(() => pages.GetAllVersions(page, true, null)).Returns(Task.FromResult(new[]
         {
             new HistoricalPage { Id = "h1", Version = 1 },
             new HistoricalPage { Id = "h2", Version = 2 }

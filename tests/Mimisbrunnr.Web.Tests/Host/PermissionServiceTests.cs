@@ -1,8 +1,10 @@
 using FakeItEasy;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Mimisbrunnr.Integration.Wiki;
 using Mimisbrunnr.Users;
 using Mimisbrunnr.Web.Host.Services;
+using Mimisbrunnr.Web.Host.Services.CacheDecorators;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Web.Infrastructure.Contracts;
 using Mimisbrunnr.Wiki.Contracts;
@@ -115,6 +117,52 @@ public class PermissionServiceTests
         A.CallTo(() => groups.GetUserGroups(A<Users.User>._)).Returns([new Users.Group { Name = "devs" }]);
 
         await service.EnsureViewPermission("GRPS", new UserInfo { Email = "user@test.com" });
+    }
+
+    [Fact]
+    public async Task ShouldThrow_UserHasNotPermissionException_WhenMembershipWasRevokedOnAnotherInstance()
+    {
+        var group = new Users.Group { Id = "g1", Name = "devs" };
+        var user = new Users.User { Id = "u1", Email = "user@example.test", Role = UserRole.Employee };
+        var userInfo = new UserInfo { Email = user.Email };
+        var groups = A.Fake<IUserGroupManager>();
+        Users.Group[] memberships = [group];
+        A.CallTo(() => groups.GetUserGroups(A<Users.User>.That.Matches(x => x.Id == user.Id)))
+            .ReturnsLazily(() => Task.FromResult(memberships));
+        A.CallTo(() => groups.RemoveFromGroup(group, user)).Invokes(() => memberships = []);
+        var spaces = A.Fake<ISpaceManager>();
+        var space = new Space
+        {
+            Id = "space-1", Key = "PRIV", Type = SpaceType.Private,
+            Permissions = [new Permission { Group = new GroupInfo { Name = group.Name }, CanView = true }]
+        };
+        A.CallTo(() => spaces.GetByKey(space.Key)).Returns(space);
+        var users = A.Fake<IUserManager>();
+        A.CallTo(() => users.GetByEmail(user.Email)).Returns(user);
+
+        using var checkingInstance = CreateInstance();
+        using var revokingInstance = CreateInstance();
+        var permissions = checkingInstance.GetRequiredService<PermissionService>();
+        await permissions.EnsureViewPermission(space.Key, userInfo);
+
+        await revokingInstance.GetRequiredService<IUserGroupManager>().RemoveFromGroup(group, user);
+
+        await permissions.Invoking(x => x.EnsureViewPermission(space.Key, userInfo))
+            .Should().ThrowAsync<UserHasNotPermissionException>();
+
+        ServiceProvider CreateInstance()
+        {
+            var services = new ServiceCollection();
+            services.AddDistributedMemoryCache();
+            services.AddSingleton(A.Fake<IPageManager>());
+            services.AddSingleton(spaces);
+            services.AddSingleton(users);
+            services.AddSingleton(groups);
+            services.AddSingleton(A.Fake<IApplicationConfigurationManager>());
+            services.AddSingleton<PermissionService>();
+            new WebCacheModule().Configure(services);
+            return services.BuildServiceProvider();
+        }
     }
 
     [Fact]

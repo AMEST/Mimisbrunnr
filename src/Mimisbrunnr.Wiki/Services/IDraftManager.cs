@@ -13,4 +13,9 @@ public interface IDraftManager
     Task Remove(Draft draft);
 
     Task Remove(string pageId);
+
+    /// <summary>
+    /// Removes drafts of several pages with a single database request
+    /// </summary>
+    Task RemoveForPages(string[] pageIds);
 }

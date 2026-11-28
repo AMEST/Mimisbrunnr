@@ -1,19 +1,20 @@
 ﻿using Mimisbrunnr.Wiki.Contracts;
+using Mimisbrunnr.Wiki.Repositories;
 using Skidbladnir.Repository.Abstractions;
 
 namespace Mimisbrunnr.Wiki.Services;
 
 internal class PageManager : IPageManager
 {
-    private readonly IRepository<Page> _pageRepository;
-    private readonly IRepository<HistoricalPage> _historicalPageRepository;
+    private readonly IPageRepository _pageRepository;
+    private readonly IHistoricalPageRepository _historicalPageRepository;
     private readonly IAttachmentManager _attachmentManager;
     private readonly IDraftManager _draftManager;
     private readonly ICommentManager _commentManager;
     private readonly IPluginManager _pluginService;
 
-    public PageManager(IRepository<Page> pageRepository,
-        IRepository<HistoricalPage> historicalPageRepository,
+    public PageManager(IPageRepository pageRepository,
+        IHistoricalPageRepository historicalPageRepository,
         IAttachmentManager attachmentManager,
         IDraftManager draftManager,
         ICommentManager commentManager,
@@ -49,6 +50,13 @@ internal class PageManager : IPageManager
         return _pageRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
     }
 
+    public Task<Page[]> GetByIds(params string[] ids)
+    {
+        if (ids is null || ids.Length == 0)
+            return Task.FromResult(Array.Empty<Page>());
+        return _pageRepository.GetByIds(ids);
+    }
+
     public async Task<Page> Create(string spaceId, string name, string content, UserInfo createdBy, string parentPageId = null)
     {
         var page = new Page()
@@ -66,15 +74,25 @@ internal class PageManager : IPageManager
         return page;
     }
 
-    public async Task Update(Page page, UserInfo updatedBy)
+    public async Task Update(Page page, string name, string content, UserInfo updatedBy)
     {
-        await SaveCurrentPageVersion(page.Id);
-        page.Version++;
+        ArgumentNullException.ThrowIfNull(page);
+
+        var expectedVersion = page.Version;
+        // The snapshot must be taken before the page is changed: history keeps the previous state.
+        var previousVersion = HistoricalPage.Create(page);
+        // Saved before the page itself: a rejected (conflicting) update leaves only an accurate snapshot behind.
+        await _historicalPageRepository.SaveVersion(previousVersion);
+
+        page.Name = name;
+        page.Content = content;
+        page.Version = expectedVersion + 1;
         page.UpdatedBy = updatedBy;
         page.Updated = DateTime.UtcNow;
-        await _pageRepository.Update(page);
-        await _draftManager.Remove(page.Id);
 
+        // Fails when somebody else saved the page after it was read, so no update is silently lost.
+        await _pageRepository.ReplaceWithVersionCheck(page, expectedVersion);
+        await _draftManager.Remove(page.Id);
     }
 
     public async Task<Page> Copy(Page source, Page destinationParentPage)
@@ -89,32 +107,19 @@ internal class PageManager : IPageManager
 
     public async Task<Page> Move(Page source, Page destinationParentPage, bool withChilds = true)
     {
-        var originalParentId = source.ParentId;
+        var destinationSpaceId = destinationParentPage.SpaceId;
+        var destinationParentId = destinationParentPage.Id;
+        var children = withChilds ? await GetAllChilds(source) : [];
 
-        source.SpaceId = destinationParentPage.SpaceId;
-        source.ParentId = destinationParentPage.Id;
-        await _pageRepository.Update(source);
-
+        await _pageRepository.Move(source.Id, destinationSpaceId, destinationParentId);
         if (withChilds)
-        {
-            var childs = await GetAllChilds(source, lightContract: false);
-            foreach (var child in childs)
-            {
-                child.SpaceId = destinationParentPage.SpaceId;
-                await _pageRepository.Update(child);
-            }
-            return source;
-        }
+            await _pageRepository.MoveToSpace([.. children.Select(x => x.Id)], destinationSpaceId);
+        else
+            await _pageRepository.ReparentChildren(source.Id, source.ParentId);
 
-        var firstLevelChilds = await _pageRepository.GetAll()
-            .Where(x => x.ParentId == source.Id)
-            .ToArrayAsync();
-        foreach (var child in firstLevelChilds)
-        {
-            child.ParentId = originalParentId;
-            await _pageRepository.Update(child);
-        }
-    return source;
+        source.SpaceId = destinationSpaceId;
+        source.ParentId = destinationParentId;
+        return source;
     }
 
     public Task Remove(Page page, bool deleteChild = false)
@@ -125,9 +130,27 @@ internal class PageManager : IPageManager
     }
 
 
-    public Task<HistoricalPage[]> GetAllVersions(Page page)
+    public Task<HistoricalPage[]> GetAllVersions(Page page, bool includeContent = true, long? contentVersion = null)
     {
-        return _historicalPageRepository.GetAll().Where(x => x.PageId == page.Id).ToArrayAsync();
+        var versions = _historicalPageRepository.GetAll()
+            .Where(x => x.PageId == page.Id)
+            .OrderByDescending(x => x.Version);
+
+        if (includeContent && contentVersion is null)
+            return versions.ToArrayAsync();
+
+        return versions
+            .Select(x => new HistoricalPage
+            {
+                Id = x.Id,
+                PageId = x.PageId,
+                Version = x.Version,
+                Name = x.Name,
+                Content = includeContent && ((long?)x.Version ?? 0) == contentVersion ? x.Content : null,
+                Updated = x.Updated,
+                UpdatedBy = x.UpdatedBy
+            })
+            .ToArrayAsync();
     }
 
     public Task<HistoricalPage> GetVersionByPageId(string id, long version)
@@ -137,10 +160,9 @@ internal class PageManager : IPageManager
 
     public async Task<Page> RestoreVersion(Page page, long version, UserInfo restoredBy)
     {
-        var selectedVersion = await GetVersionByPageId(page.Id, version);
-        page.Name = selectedVersion.Name;
-        page.Content = selectedVersion.Content;
-        await Update(page, restoredBy);
+        var selectedVersion = await GetVersionByPageId(page.Id, version)
+            ?? throw new ArgumentOutOfRangeException(nameof(version), $"Page version '{version}' not found");
+        await Update(page, selectedVersion.Name, selectedVersion.Content, restoredBy);
         return page;
     }
 
@@ -153,71 +175,66 @@ internal class PageManager : IPageManager
 
     private async Task RemoveOnlyPage(Page page)
     {
-        var childs = await _pageRepository.GetAll().Where(x => x.ParentId == page.Id).ToArrayAsync();
-        foreach (var child in childs)
-        {
-            child.ParentId = page.ParentId;
-            await _pageRepository.Update(child);
-        }
-
-        await _attachmentManager.RemoveAll(page);
-        await _historicalPageRepository.DeleteAll( x => x.PageId == page.Id );
-        await _draftManager.Remove(page.Id);
-        await _commentManager.RemoveAll(page);
-        await _pluginService.DeleteAllStateInPage(page.Id);
+        await _pageRepository.ReparentChildren(page.Id, page.ParentId);
+        await RemovePageData([page.Id]);
         await _pageRepository.Delete(page);
     }
 
     private async Task RemoveRecursively(Page page)
     {
         var allChilds = await GetAllChilds(page);
-        foreach (var child in allChilds)
-        {
-            await _attachmentManager.RemoveAll(child);
-            await _draftManager.Remove(child.Id);
-            await _commentManager.RemoveAll(child);
-            await _pluginService.DeleteAllStateInPage(child.Id);
-            await _pageRepository.Delete(child);
-            await _historicalPageRepository.DeleteAll( x => x.PageId == child.Id );
-        }
+        var pageIds = new List<string> { page.Id };
+        pageIds.AddRange(allChilds.Select(x => x.Id));
+        var ids = pageIds.ToArray();
 
-        await _attachmentManager.RemoveAll(page);
-        await _historicalPageRepository.DeleteAll( x => x.PageId == page.Id );
-        await _draftManager.Remove(page.Id);
-        await _commentManager.RemoveAll(page);
-        await _pluginService.DeleteAllStateInPage(page.Id);
-        await _pageRepository.Delete(page);
+        await RemovePageData(ids);
+        await _pageRepository.DeleteAll(x => ids.Contains(x.Id));
     }
 
-    private async Task SaveCurrentPageVersion(string id)
+    /// <summary>
+    /// Removes every entity that belongs to the pages with one request per collection.
+    /// </summary>
+    private async Task RemovePageData(string[] pageIds)
     {
-        var currentPage = await GetById(id);
-        await _historicalPageRepository.Create(HistoricalPage.Create(currentPage));
+        await _attachmentManager.RemoveAllForPages(pageIds);
+        await _historicalPageRepository.DeleteAll(x => pageIds.Contains(x.PageId));
+        await _draftManager.RemoveForPages(pageIds);
+        await _commentManager.RemoveAllForPages(pageIds);
+        await _pluginService.DeleteAllStateInPages(pageIds);
     }
-    
+
     private async Task<Page[]> GetAllChilds(string[] pageIds, bool lightContract = true)
     {
-        var childsQuery = _pageRepository
-            .GetAll()
-            .Where(x => pageIds.Contains(x.ParentId));
-        if (lightContract)
-            childsQuery = childsQuery.Select(x => new Page
-            {
-                Id = x.Id,
-                ParentId = x.ParentId,
-                SpaceId = x.SpaceId,
-                Name = x.Name
-            });
+        var allChilds = new List<Page>();
+        var visited = new HashSet<string>(pageIds, StringComparer.Ordinal);
+        var currentLevel = pageIds;
 
-        var childs = await childsQuery.ToListAsync();
-        if (childs.Count == 0)
-            return [];
-        
-        var innerChilds = await GetAllChilds(childs.Select(x => x.Id).ToArray(), lightContract);
-        if (innerChilds.Length > 0)
-            childs.AddRange(innerChilds);
+        // One request per tree level. Visited ids protect from endless recursion on corrupted parent links.
+        while (currentLevel.Length > 0)
+        {
+            var childsQuery = _pageRepository
+                .GetAll()
+                .Where(x => currentLevel.Contains(x.ParentId));
 
-        return [.. childs];
+            if (lightContract)
+                childsQuery = childsQuery.Select(x => new Page
+                {
+                    Id = x.Id,
+                    ParentId = x.ParentId,
+                    SpaceId = x.SpaceId,
+                    Name = x.Name
+                });
+
+            var childs = await childsQuery.ToListAsync();
+            childs.RemoveAll(x => string.IsNullOrEmpty(x.Id) || !visited.Add(x.Id));
+            if (childs.Count == 0)
+                break;
+
+            allChilds.AddRange(childs);
+            currentLevel = [.. childs.Select(x => x.Id)];
+        }
+
+        return [.. allChilds];
     }
 
 }

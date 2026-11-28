@@ -15,7 +15,7 @@ public class UserManagerCacheDecoratorTests
         var inner = A.Fake<IUserManager>();
         var cache = new FakeDistributedCache();
         var user = new Users.User { Id = "u1", Email = "user@test.com", Name = "Test" };
-        await cache.SetAsync("user_cache_email_user@test.com", user, new DistributedCacheEntryOptions());
+        await cache.SetAsync("user_cache_v2_email_user@test.com", user, new DistributedCacheEntryOptions());
         var decorator = new UserManagerCacheDecorator(inner, cache);
 
         var result = await decorator.GetByEmail("user@test.com");
@@ -30,7 +30,7 @@ public class UserManagerCacheDecoratorTests
         var inner = A.Fake<IUserManager>();
         var cache = new FakeDistributedCache();
         var user = new Users.User { Id = "u1", Email = "user@test.com" };
-        await cache.SetAsync("user_cache_id_u1", user, new DistributedCacheEntryOptions());
+        await cache.SetAsync("user_cache_v2_id_u1", user, new DistributedCacheEntryOptions());
         var decorator = new UserManagerCacheDecorator(inner, cache);
 
         var result = await decorator.GetById("u1");
@@ -52,8 +52,32 @@ public class UserManagerCacheDecoratorTests
 
         result.Should().BeEquivalentTo(user);
         A.CallTo(() => inner.GetByEmail("user@test.com")).MustHaveHappenedOnceExactly();
-        (await cache.GetAsync<Users.User>("user_cache_email_user@test.com")).Should().NotBeNull();
-        (await cache.GetAsync<Users.User>("user_cache_id_u1")).Should().NotBeNull();
+        (await cache.GetAsync<Users.User>("user_cache_v2_email_user@test.com")).Should().NotBeNull();
+        (await cache.GetAsync<Users.User>("user_cache_v2_id_u1")).Should().NotBeNull();
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Should_ReturnCorrectUserAndCacheMiss_WhenEmailKeysPreviouslyCollided(bool cacheUserFirst)
+    {
+        const string missingEmail = "user@example.test";
+        var user = new Users.User { Id = "u1", Email = "missing_user@example.test" };
+        var inner = A.Fake<IUserManager>();
+        A.CallTo(() => inner.GetByEmail(user.Email)).Returns(user);
+        A.CallTo(() => inner.GetByEmail(missingEmail)).Returns((Users.User)null);
+        var cache = new FakeDistributedCache();
+        await cache.SetAsync("user_cache_email_missing_user@example.test", true, new DistributedCacheEntryOptions());
+        var decorator = new UserManagerCacheDecorator(inner, cache);
+
+        if (cacheUserFirst)
+            (await decorator.GetByEmail(user.Email)).Should().BeEquivalentTo(user);
+
+        (await decorator.GetByEmail(missingEmail)).Should().BeNull();
+        (await decorator.GetByEmail(user.Email)).Should().BeEquivalentTo(user);
+        (await decorator.GetByEmail(missingEmail)).Should().BeNull();
+        A.CallTo(() => inner.GetByEmail(user.Email)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => inner.GetByEmail(missingEmail)).MustHaveHappenedOnceExactly();
     }
 
     [Fact]
@@ -87,15 +111,15 @@ public class UserManagerCacheDecoratorTests
         var inner = A.Fake<IUserManager>();
         var cache = new FakeDistributedCache();
         var user = new Users.User { Id = "u1", Email = "user@test.com" };
-        await cache.SetAsync("user_cache_email_user@test.com", user, new DistributedCacheEntryOptions());
-        await cache.SetAsync("user_cache_id_u1", user, new DistributedCacheEntryOptions());
+        await cache.SetAsync("user_cache_v2_email_user@test.com", user, new DistributedCacheEntryOptions());
+        await cache.SetAsync("user_cache_v2_id_u1", user, new DistributedCacheEntryOptions());
         var decorator = new UserManagerCacheDecorator(inner, cache);
 
         await decorator.Disable(user);
 
         A.CallTo(() => inner.Disable(user)).MustHaveHappenedOnceExactly();
-        (await cache.GetAsync<Users.User>("user_cache_email_user@test.com")).Should().BeNull();
-        (await cache.GetAsync<Users.User>("user_cache_id_u1")).Should().BeNull();
+        (await cache.GetAsync<Users.User>("user_cache_v2_email_user@test.com")).Should().BeNull();
+        (await cache.GetAsync<Users.User>("user_cache_v2_id_u1")).Should().BeNull();
     }
 
     [Fact]
@@ -104,13 +128,13 @@ public class UserManagerCacheDecoratorTests
         var inner = A.Fake<IUserManager>();
         var cache = new FakeDistributedCache();
         var user = new Users.User { Id = "u1", Email = "user@test.com" };
-        await cache.SetAsync("user_cache_email_user@test.com", user, new DistributedCacheEntryOptions());
+        await cache.SetAsync("user_cache_v2_email_user@test.com", user, new DistributedCacheEntryOptions());
         var decorator = new UserManagerCacheDecorator(inner, cache);
 
         await decorator.Enable(user);
 
         A.CallTo(() => inner.Enable(user)).MustHaveHappenedOnceExactly();
-        (await cache.GetAsync<Users.User>("user_cache_email_user@test.com")).Should().BeNull();
+        (await cache.GetAsync<Users.User>("user_cache_v2_email_user@test.com")).Should().BeNull();
     }
 
     [Fact]
@@ -119,13 +143,13 @@ public class UserManagerCacheDecoratorTests
         var inner = A.Fake<IUserManager>();
         var cache = new FakeDistributedCache();
         var user = new Users.User { Id = "u1", Email = "user@test.com" };
-        await cache.SetAsync("user_cache_email_user@test.com", user, new DistributedCacheEntryOptions());
+        await cache.SetAsync("user_cache_v2_email_user@test.com", user, new DistributedCacheEntryOptions());
         var decorator = new UserManagerCacheDecorator(inner, cache);
 
         await decorator.ChangeRole(user, UserRole.Admin);
 
         A.CallTo(() => inner.ChangeRole(user, UserRole.Admin)).MustHaveHappenedOnceExactly();
-        (await cache.GetAsync<Users.User>("user_cache_email_user@test.com")).Should().BeNull();
+        (await cache.GetAsync<Users.User>("user_cache_v2_email_user@test.com")).Should().BeNull();
     }
 
     [Fact]
@@ -134,13 +158,13 @@ public class UserManagerCacheDecoratorTests
         var inner = A.Fake<IUserManager>();
         var cache = new FakeDistributedCache();
         var user = new Users.User { Id = "u1", Email = "user@test.com" };
-        await cache.SetAsync("user_cache_email_user@test.com", user, new DistributedCacheEntryOptions());
+        await cache.SetAsync("user_cache_v2_email_user@test.com", user, new DistributedCacheEntryOptions());
         var decorator = new UserManagerCacheDecorator(inner, cache);
 
         await decorator.UpdateUserInfo(user);
 
         A.CallTo(() => inner.UpdateUserInfo(user)).MustHaveHappenedOnceExactly();
-        (await cache.GetAsync<Users.User>("user_cache_email_user@test.com")).Should().BeNull();
+        (await cache.GetAsync<Users.User>("user_cache_v2_email_user@test.com")).Should().BeNull();
     }
 
     [Fact]
@@ -155,8 +179,8 @@ public class UserManagerCacheDecoratorTests
         var result = await decorator.Add("new@test.com", "New", "avatar", UserRole.Employee);
 
         result.Should().BeEquivalentTo(user);
-        (await cache.GetAsync<Users.User>("user_cache_email_new@test.com")).Should().NotBeNull();
-        (await cache.GetAsync<Users.User>("user_cache_id_u1")).Should().NotBeNull();
+        (await cache.GetAsync<Users.User>("user_cache_v2_email_new@test.com")).Should().NotBeNull();
+        (await cache.GetAsync<Users.User>("user_cache_v2_id_u1")).Should().NotBeNull();
     }
 
     [Fact]

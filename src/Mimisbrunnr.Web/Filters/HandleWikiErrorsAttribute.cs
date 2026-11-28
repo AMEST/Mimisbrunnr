@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Mimisbrunnr.Web.Infrastructure;
 using Mimisbrunnr.Integration.Wiki;
+using Mimisbrunnr.Wiki.Contracts;
 
 namespace Mimisbrunnr.Web.Filters;
 
@@ -15,6 +16,11 @@ public class HandleWikiErrorsAttribute : ExceptionFilterAttribute
     {
         switch (context.Exception)
         {
+            case PageConcurrencyException pageConcurrencyException:
+                context.Result = new ObjectResult(new { message = pageConcurrencyException.Message })
+                    { StatusCode = 409 };
+                context.ExceptionHandled = true;
+                break;
             case ArgumentOutOfRangeException notFoundEx:
                 context.Result = new NotFoundObjectResult(new { message = notFoundEx.Message });
                 break;

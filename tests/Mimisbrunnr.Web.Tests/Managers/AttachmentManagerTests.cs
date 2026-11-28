@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using FakeItEasy;
 using FluentAssertions;
 using Mimisbrunnr.Wiki.Contracts;
@@ -173,8 +174,32 @@ public class AttachmentManagerTests
 
         A.CallTo(() => storage.DeleteAsync("attachments/1")).MustHaveHappenedOnceExactly();
         A.CallTo(() => storage.DeleteAsync("attachments/2")).MustHaveHappenedOnceExactly();
-        A.CallTo(() => repository.Delete(attachment1, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => repository.Delete(attachment2, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        // Attachments of the page are removed with a single delete request.
+        A.CallTo(() => repository.DeleteAll(A<Expression<Func<Attachment, bool>>>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => repository.Delete(A<Attachment>._, A<CancellationToken>._)).MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_DeleteOnlySuccessfulMetadata_WhenOneFileDeletionFails()
+    {
+        var repository = A.Fake<IRepository<Attachment>>();
+        var deleted = new Attachment { Id = "deleted", PageId = "page", Name = "a.txt", Path = "attachments/a" };
+        var missing = new Attachment { Id = "missing", PageId = "page", Name = "b.txt", Path = "attachments/b" };
+        var failed = new Attachment { Id = "failed", PageId = "child", Name = "c.txt", Path = "attachments/c" };
+        var replacement = new Attachment { Id = "replacement", PageId = "page", Name = "a.txt", Path = "attachments/new" };
+        A.CallTo(() => repository.GetAll()).Returns(new[] { deleted, missing, failed }.AsQueryable());
+        var storage = A.Fake<IStorage>();
+        A.CallTo(() => storage.DeleteAsync(missing.Path)).ThrowsAsync(new FileNotFoundException());
+        A.CallTo(() => storage.DeleteAsync(failed.Path)).ThrowsAsync(new IOException("Storage failure"));
+        var manager = new AttachmentManager(repository, storage);
+
+        await manager.Invoking(x => x.RemoveAllForPages(["page", "child"]))
+            .Should().ThrowAsync<IOException>().WithMessage("Storage failure");
+
+        var cleanup = Fake.GetCalls(repository).Where(x => x.Method.Name == nameof(repository.DeleteAll))
+            .Should().ContainSingle().Which;
+        var matchesDeleted = cleanup.GetArgument<Expression<Func<Attachment, bool>>>(0).Compile();
+        new[] { deleted, missing, failed, replacement }.Where(matchesDeleted).Should().Equal(deleted, missing);
     }
 
     [Fact]
@@ -210,5 +235,45 @@ public class AttachmentManagerTests
         A.CallTo(() => storage.UploadFileAsync(content, A<string>._)).MustHaveHappenedOnceExactly();
         A.CallTo(() => repository.Create(A<Attachment>.That.Matches(x => x.PageId == "page" && x.Name == "file.txt"), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Should_KeepWaitingUploadSerialized_WhenPreviousUploadFails()
+    {
+        var repository = A.Fake<IRepository<Attachment>>();
+        A.CallTo(() => repository.GetAll()).Returns(Array.Empty<Attachment>().AsQueryable());
+        var storage = A.Fake<IStorage>();
+        var manager = new AttachmentManager(repository, storage);
+        var page = new Page { Id = "page-a" };
+        var user = new UserInfo { Email = "user@example.test" };
+        using var firstContent = new MemoryStream();
+        using var waitingContent = new MemoryStream();
+        using var otherContent = new MemoryStream();
+        var firstUploadStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var firstUpload = new TaskCompletionSource<Skidbladnir.Storage.Abstractions.FileInfo>(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        A.CallTo(() => storage.UploadFileAsync(firstContent, A<string>._))
+            .Invokes(() => firstUploadStarted.SetResult())
+            .Returns(firstUpload.Task);
+
+        var first = manager.Upload(page, firstContent, "file.txt", user);
+        Task waiting;
+        try
+        {
+            await firstUploadStarted.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            waiting = manager.Upload(page, waitingContent, "file.txt", user);
+            var other = manager.Upload(new Page { Id = "page" }, otherContent, "a-file.txt", user);
+            await other.WaitAsync(TimeSpan.FromSeconds(5));
+            A.CallTo(() => storage.UploadFileAsync(waitingContent, A<string>._)).MustNotHaveHappened();
+        }
+        finally
+        {
+            firstUpload.SetException(new IOException("Upload failed"));
+        }
+
+        Func<Task> finishFirst = () => first;
+        await finishFirst.Should().ThrowAsync<IOException>();
+        await waiting.WaitAsync(TimeSpan.FromSeconds(5));
+        A.CallTo(() => storage.UploadFileAsync(waitingContent, A<string>._)).MustHaveHappenedOnceExactly();
     }
 }
