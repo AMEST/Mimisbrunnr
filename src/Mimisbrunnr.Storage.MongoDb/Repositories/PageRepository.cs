@@ -31,11 +31,14 @@ public class PageRepository : MongoRepository<Page, BaseMongoDbContext>, IPageRe
             Builders<Page>.Update.Set(x => x.SpaceId, spaceId));
     }
 
-    public Task Reparent(string pageId, string newParentId)
+    public async Task Move(string pageId, string spaceId, string parentId)
     {
-        return Entities.UpdateOneAsync(
-            Builders<Page>.Filter.Eq(x => x.Id, pageId),
-            Builders<Page>.Update.Set(x => x.ParentId, newParentId));
+        var update = Builders<Page>.Update
+            .Set(x => x.SpaceId, spaceId)
+            .Set(x => x.ParentId, parentId);
+        var result = await Entities.UpdateOneAsync(Builders<Page>.Filter.Eq(x => x.Id, pageId), update);
+        if (result.MatchedCount == 0)
+            throw new PageConcurrencyException(pageId);
     }
 
     public Task ReparentChildren(string parentId, string newParentId)

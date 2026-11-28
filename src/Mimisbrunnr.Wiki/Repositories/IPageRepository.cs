@@ -19,9 +19,10 @@ public interface IPageRepository : IRepository<Page>
     Task MoveToSpace(string[] pageIds, string spaceId);
 
     /// <summary>
-    /// Changes the parent of a single page
+    /// Moves a single page by updating its space and parent in the same write
     /// </summary>
-    Task Reparent(string pageId, string newParentId);
+    /// <exception cref="PageConcurrencyException">The page was removed concurrently</exception>
+    Task Move(string pageId, string spaceId, string parentId);
 
     /// <summary>
     /// Re-parents all direct children of the page

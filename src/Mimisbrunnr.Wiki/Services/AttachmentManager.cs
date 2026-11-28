@@ -75,8 +75,20 @@ internal class AttachmentManager : IAttachmentManager
         if (attachments.Length == 0)
             return;
 
-        await Task.WhenAll(attachments.Select(DeleteFile));
-        await _attachmentRepository.DeleteAll(x => pageIds.Contains(x.PageId));
+        var deletions = attachments.Select(x => (x.Id, FileDeletion: DeleteFile(x))).ToArray();
+        try
+        {
+            await Task.WhenAll(deletions.Select(x => x.FileDeletion));
+        }
+        finally
+        {
+            // Keep metadata for failed deletions so the caller can retry those files.
+            var deletedIds = deletions.Where(x => x.FileDeletion.IsCompletedSuccessfully)
+                .Select(x => x.Id)
+                .ToArray();
+            if (deletedIds.Length > 0)
+                await _attachmentRepository.DeleteAll(x => deletedIds.Contains(x.Id));
+        }
     }
 
     public async Task Upload(Page page, Stream content, string name, UserInfo uploadedBy)

@@ -12,6 +12,36 @@ namespace Mimisbrunnr.Web.Tests.Repositories;
 public class PageRepositoryTests(MongoDbTestDatabase database)
 {
     [MongoDbFact]
+    public async Task Should_MovePageWithoutChangingContent_WhenSpaceAndParentChange()
+    {
+        var documents = database.Database.GetCollection<Page>("Pages");
+        var source = new Page
+        {
+            Id = "move-page", SpaceId = "old-space", ParentId = "old-parent",
+            Name = "Page title", Content = "Page text", Version = 2
+        };
+        await documents.InsertOneAsync(source);
+        var repository = database.CreateRepository<PageRepository>();
+
+        await repository.Move(source.Id, "new-space", "new-parent");
+
+        var saved = (await repository.GetByIds([source.Id])).Should().ContainSingle().Which;
+        saved.SpaceId.Should().Be("new-space");
+        saved.ParentId.Should().Be("new-parent");
+        saved.Content.Should().Be(source.Content);
+        saved.Version.Should().Be(source.Version);
+    }
+
+    [MongoDbFact]
+    public async Task ShouldThrow_PageConcurrencyException_WhenMovingMissingPage()
+    {
+        var repository = database.CreateRepository<PageRepository>();
+
+        await repository.Invoking(x => x.Move("removed-page", "new-space", "new-parent"))
+            .Should().ThrowAsync<PageConcurrencyException>();
+    }
+
+    [MongoDbFact]
     public async Task Should_ReplacePage_WhenStoredVersionIsMissingAndExpectedVersionIsZero()
     {
         var documents = database.Database.GetCollection<BsonDocument>("Pages");

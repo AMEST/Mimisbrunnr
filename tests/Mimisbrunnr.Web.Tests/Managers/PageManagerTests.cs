@@ -174,9 +174,9 @@ public class PageManagerTests
 
         result.SpaceId.Should().Be("s2");
         result.ParentId.Should().Be("p2");
-        A.CallTo(() => repository.MoveToSpace(A<string[]>.That.Matches(ids => ids.Contains("p1") && ids.Contains("child")), "s2"))
-            .MustHaveHappenedOnceExactly();
-        A.CallTo(() => repository.Reparent("p1", "p2")).MustHaveHappenedOnceExactly();
+        A.CallTo(() => repository.Move("p1", "s2", "p2")).MustHaveHappenedOnceExactly()
+            .Then(A.CallTo(() => repository.MoveToSpace(A<string[]>.That.Matches(ids => ids.SequenceEqual(new[] { "child" })), "s2"))
+                .MustHaveHappenedOnceExactly());
         A.CallTo(() => repository.ReparentChildren(A<string>._, A<string>._)).MustNotHaveHappened();
     }
 
@@ -196,10 +196,32 @@ public class PageManagerTests
 
         await manager.Move(source, destination, withChilds: false);
 
-        A.CallTo(() => repository.ReparentChildren("p1", "old")).MustHaveHappenedOnceExactly();
-        A.CallTo(() => repository.MoveToSpace(A<string[]>.That.Matches(ids => ids.Length == 1 && ids[0] == "p1"), "s2"))
-            .MustHaveHappenedOnceExactly();
-        A.CallTo(() => repository.Reparent("p1", "p2")).MustHaveHappenedOnceExactly();
+        A.CallTo(() => repository.Move("p1", "s2", "p2")).MustHaveHappenedOnceExactly()
+            .Then(A.CallTo(() => repository.ReparentChildren("p1", "old")).MustHaveHappenedOnceExactly());
+        A.CallTo(() => repository.MoveToSpace(A<string[]>._, A<string>._)).MustNotHaveHappened();
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Should_LeaveChildrenUntouched_WhenMovingRootFails(bool withChildren)
+    {
+        var repository = A.Fake<IPageRepository>();
+        var source = new Page { Id = "p1", SpaceId = "s1", ParentId = "old" };
+        var destination = new Page { Id = "p2", SpaceId = "s2" };
+        var child = new Page { Id = "child", SpaceId = "s1", ParentId = "p1" };
+        A.CallTo(() => repository.GetAll()).Returns(new[] { source, child }.AsQueryable());
+        A.CallTo(() => repository.Move("p1", "s2", "p2")).ThrowsAsync(new PageConcurrencyException("p1"));
+        var manager = new PageManager(repository, A.Fake<IHistoricalPageRepository>(), A.Fake<IAttachmentManager>(),
+            A.Fake<IDraftManager>(), A.Fake<ICommentManager>(), A.Fake<IPluginManager>());
+
+        await manager.Invoking(x => x.Move(source, destination, withChildren))
+            .Should().ThrowAsync<PageConcurrencyException>();
+
+        A.CallTo(() => repository.MoveToSpace(A<string[]>._, A<string>._)).MustNotHaveHappened();
+        A.CallTo(() => repository.ReparentChildren(A<string>._, A<string>._)).MustNotHaveHappened();
+        source.SpaceId.Should().Be("s1");
+        source.ParentId.Should().Be("old");
     }
 
     [Fact]

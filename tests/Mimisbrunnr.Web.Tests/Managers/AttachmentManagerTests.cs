@@ -180,6 +180,29 @@ public class AttachmentManagerTests
     }
 
     [Fact]
+    public async Task Should_DeleteOnlySuccessfulMetadata_WhenOneFileDeletionFails()
+    {
+        var repository = A.Fake<IRepository<Attachment>>();
+        var deleted = new Attachment { Id = "deleted", PageId = "page", Name = "a.txt", Path = "attachments/a" };
+        var missing = new Attachment { Id = "missing", PageId = "page", Name = "b.txt", Path = "attachments/b" };
+        var failed = new Attachment { Id = "failed", PageId = "child", Name = "c.txt", Path = "attachments/c" };
+        var replacement = new Attachment { Id = "replacement", PageId = "page", Name = "a.txt", Path = "attachments/new" };
+        A.CallTo(() => repository.GetAll()).Returns(new[] { deleted, missing, failed }.AsQueryable());
+        var storage = A.Fake<IStorage>();
+        A.CallTo(() => storage.DeleteAsync(missing.Path)).ThrowsAsync(new FileNotFoundException());
+        A.CallTo(() => storage.DeleteAsync(failed.Path)).ThrowsAsync(new IOException("Storage failure"));
+        var manager = new AttachmentManager(repository, storage);
+
+        await manager.Invoking(x => x.RemoveAllForPages(["page", "child"]))
+            .Should().ThrowAsync<IOException>().WithMessage("Storage failure");
+
+        var cleanup = Fake.GetCalls(repository).Where(x => x.Method.Name == nameof(repository.DeleteAll))
+            .Should().ContainSingle().Which;
+        var matchesDeleted = cleanup.GetArgument<Expression<Func<Attachment, bool>>>(0).Compile();
+        new[] { deleted, missing, failed, replacement }.Where(matchesDeleted).Should().Equal(deleted, missing);
+    }
+
+    [Fact]
     public async Task Should_UploadFile_WhenNoAttachmentExists()
     {
         var repository = A.Fake<IRepository<Attachment>>();

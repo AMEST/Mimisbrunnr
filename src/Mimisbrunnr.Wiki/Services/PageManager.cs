@@ -107,22 +107,18 @@ internal class PageManager : IPageManager
 
     public async Task<Page> Move(Page source, Page destinationParentPage, bool withChilds = true)
     {
-        var originalParentId = source.ParentId;
         var destinationSpaceId = destinationParentPage.SpaceId;
+        var destinationParentId = destinationParentPage.Id;
+        var children = withChilds ? await GetAllChilds(source) : [];
 
-        var pagesToMove = new List<string>() { source.Id };
+        await _pageRepository.Move(source.Id, destinationSpaceId, destinationParentId);
         if (withChilds)
-            pagesToMove.AddRange((await GetAllChilds(source)).Select(x => x.Id));
-
-        await _pageRepository.MoveToSpace([.. pagesToMove], destinationSpaceId);
-
-        if (!withChilds)
-            await _pageRepository.ReparentChildren(source.Id, originalParentId);
-
-        await _pageRepository.Reparent(source.Id, destinationParentPage.Id);
+            await _pageRepository.MoveToSpace([.. children.Select(x => x.Id)], destinationSpaceId);
+        else
+            await _pageRepository.ReparentChildren(source.Id, source.ParentId);
 
         source.SpaceId = destinationSpaceId;
-        source.ParentId = destinationParentPage.Id;
+        source.ParentId = destinationParentId;
         return source;
     }
 
