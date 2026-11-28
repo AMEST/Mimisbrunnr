@@ -293,7 +293,7 @@ public class PageServiceTests
         var page = new Page { Id = "page", SpaceId = "space", Version = 3, Updated = updated };
         A.CallTo(() => pages.GetById("page")).Returns(Task.FromResult(page));
         A.CallTo(() => spaces.GetById("space")).Returns(Task.FromResult(new Space { Id = "space", Key = "DOCS" }));
-        A.CallTo(() => pages.GetAllVersions(page)).Returns(Task.FromResult(new[]
+        A.CallTo(() => pages.GetAllVersions(page, true, null)).Returns(Task.FromResult(new[]
         {
             new HistoricalPage { Id = "h1", Version = 1 },
             new HistoricalPage { Id = "h2", Version = 2 }

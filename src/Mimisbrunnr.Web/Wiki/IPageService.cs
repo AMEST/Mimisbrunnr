@@ -21,8 +21,11 @@ public interface IPageService
     /// </summary>
     /// <param name="pageId">Page identifier</param>
     /// <param name="requestedBy">User requesting the versions</param>
+    /// <param name="includeContent">Whether to include page content</param>
+    /// <param name="contentVersion">Limit included content to this version when specified</param>
     /// <returns>List of page versions</returns>
-    Task<PageVersionsListModel> GetPageVersions(string pageId, UserInfo requestedBy);
+    Task<PageVersionsListModel> GetPageVersions(string pageId, UserInfo requestedBy,
+        bool includeContent = true, long? contentVersion = null);
 
     /// <summary>
     /// Get a specific historical version of a page

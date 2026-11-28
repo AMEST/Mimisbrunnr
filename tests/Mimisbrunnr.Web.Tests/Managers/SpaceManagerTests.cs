@@ -122,9 +122,10 @@ public class SpaceManagerTests
         var repository = A.Fake<ISpaceRepository>();
         A.CallTo(() => repository.GetAll()).Returns(new[] { new Space { Id = "s1" }, new Space { Id = "s2" }, new Space { Id = "s3" } }.AsQueryable());
 
-        var result = await new SpaceManager(repository, A.Fake<IPageManager>()).GetByIds("s1", "s3");
+        var result = await new SpaceManager(repository, A.Fake<IPageManager>()).GetByIds("s1", "s3", "s1", null, "");
 
         result.Select(x => x.Id).Should().BeEquivalentTo(["s1", "s3"]);
+        A.CallTo(() => repository.GetAll()).MustHaveHappenedOnceExactly();
     }
 
     [Fact]

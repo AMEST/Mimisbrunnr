@@ -40,7 +40,7 @@ public class SearchServiceTests
         var users = A.Fake<IUserManager>();
         var permissions = A.Fake<IPermissionService>();
         var display = A.Fake<ISpaceDisplayService>();
-        A.CallTo(() => pages.Search(A<string>._, A<string[]>._, A<int>._)).Returns(Task.FromResult(Array.Empty<Page>()));
+        A.CallTo(() => pages.Search(A<string>._, A<string[]>._, A<int>._, A<int>._)).Returns(Task.FromResult(Array.Empty<Page>()));
         var service = new SearchService(permissions, pages, A.Fake<ISpaceSearcher>(), A.Fake<IUserSearcher>(), users, display, A.Fake<ISpaceManager>());
 
         var result = await service.SearchPages("query", new UserInfo { Email = "user@example.test" });
@@ -51,24 +51,26 @@ public class SearchServiceTests
     }
 
     [Fact]
-    public async Task Should_ReturnOnlyFoundSpacePages_WhenAdminSearchesPages()
+    public async Task Should_PreserveNextOffset_WhenAdminSearchMatchesOrphanedPages()
     {
         var pages = A.Fake<IPageSearcher>();
         var users = A.Fake<IUserManager>();
         var spaces = A.Fake<ISpaceManager>();
         var user = new UserInfo { Email = "admin@example.test" };
-        A.CallTo(() => pages.Search("query", null, A<int>._)).Returns(Task.FromResult(new[]
+        A.CallTo(() => pages.Search("query", null, 3, 0)).Returns(Task.FromResult(new[]
         {
             new Page { Id = "p1", SpaceId = "s1", Name = "Found" },
-            new Page { Id = "p2", SpaceId = "missing-space", Name = "Orphan" }
+            new Page { Id = "p2", SpaceId = "missing-space", Name = "Orphan" },
+            new Page { Id = "p3", SpaceId = "s1", Name = "Next" }
         }));
         A.CallTo(() => users.GetByEmail(user.Email)).Returns(Task.FromResult(new Mimisbrunnr.Users.User { Role = UserRole.Admin }));
         A.CallTo(() => spaces.GetByIds(A<string[]>._)).Returns(Task.FromResult(new[] { new Space { Id = "s1", Key = "DOCS" } }));
         var service = new SearchService(A.Fake<IPermissionService>(), pages, A.Fake<ISpaceSearcher>(), A.Fake<IUserSearcher>(), users, A.Fake<ISpaceDisplayService>(), spaces);
 
-        var result = await service.SearchPages("query", user);
+        var result = await service.SearchPages("query", user, limit: 2, offset: 0);
 
-        result.Should().ContainSingle().Which.Should().Match<Mimisbrunnr.Integration.Wiki.PageModel>(x => x.Id == "p1" && x.SpaceKey == "DOCS");
+        result.Pages.Should().ContainSingle().Which.Should().Match<Mimisbrunnr.Integration.Wiki.PageModel>(x => x.Id == "p1" && x.SpaceKey == "DOCS");
+        result.NextOffset.Should().Be(2);
     }
 
     [Fact]
@@ -78,7 +80,7 @@ public class SearchServiceTests
         var users = A.Fake<IUserManager>();
         var display = A.Fake<ISpaceDisplayService>();
         var user = new UserInfo { Email = "user@example.test" };
-        A.CallTo(() => pages.Search("query", A<string[]>._, A<int>._)).Returns(Task.FromResult(new[]
+        A.CallTo(() => pages.Search("query", A<string[]>._, 21, 20)).Returns(Task.FromResult(new[]
         {
             new Page { Id = "pub", SpaceId = "s1", Name = "Visible" },
             new Page { Id = "hidden", SpaceId = "s2", Name = "Hidden" }
@@ -87,11 +89,12 @@ public class SearchServiceTests
         A.CallTo(() => display.FindUserVisibleSpaces(user, null, null)).Returns(Task.FromResult<IEnumerable<Space>>(new[] { new Space { Id = "s1", Key = "PUB" } }));
         var service = new SearchService(A.Fake<IPermissionService>(), pages, A.Fake<ISpaceSearcher>(), A.Fake<IUserSearcher>(), users, display, A.Fake<ISpaceManager>());
 
-        var result = await service.SearchPages("query", user);
+        var result = await service.SearchPages("query", user, limit: 20, offset: 20);
 
-        result.Should().ContainSingle().Which.Should().Match<Mimisbrunnr.Integration.Wiki.PageModel>(x => x.Id == "pub" && x.SpaceKey == "PUB");
+        result.Pages.Should().ContainSingle().Which.Should().Match<Mimisbrunnr.Integration.Wiki.PageModel>(x => x.Id == "pub" && x.SpaceKey == "PUB");
+        result.NextOffset.Should().BeNull();
         // The search itself is limited to the spaces the user can see.
-        A.CallTo(() => pages.Search("query", A<string[]>.That.Matches(ids => ids.Length == 1 && ids[0] == "s1"), A<int>._))
+        A.CallTo(() => pages.Search("query", A<string[]>.That.Matches(ids => ids.Length == 1 && ids[0] == "s1"), 21, 20))
             .MustHaveHappenedOnceExactly();
     }
 

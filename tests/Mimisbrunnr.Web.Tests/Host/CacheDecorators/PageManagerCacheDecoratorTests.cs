@@ -131,16 +131,16 @@ public class PageManagerCacheDecoratorTests
     }
 
     [Fact]
-    public async Task Should_DelegateGetAllVersions_ToInner()
+    public async Task Should_ForwardContentOptions_WhenGettingAllVersions()
     {
         var inner = A.Fake<IPageManager>();
         var cache = new FakeDistributedCache();
         var page = new Page { Id = "p1" };
         var decorator = new PageManagerCacheDecorator(inner, cache);
 
-        await decorator.GetAllVersions(page);
+        await decorator.GetAllVersions(page, true, 1);
 
-        A.CallTo(() => inner.GetAllVersions(page)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => inner.GetAllVersions(page, true, 1)).MustHaveHappenedOnceExactly();
     }
 
     [Fact]

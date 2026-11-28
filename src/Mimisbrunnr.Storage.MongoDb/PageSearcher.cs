@@ -19,7 +19,7 @@ internal class PageSearcher : IPageSearcher
 
     public Task<Page[]> Search(string text) => Search(text, null);
 
-    public async Task<Page[]> Search(string text, string[] spaceIds, int limit = DefaultLimit)
+    public async Task<Page[]> Search(string text, string[] spaceIds, int limit = DefaultLimit, int offset = 0)
     {
         // An empty set of visible spaces means the user can see nothing at all.
         if (spaceIds is { Length: 0 })
@@ -32,6 +32,8 @@ internal class PageSearcher : IPageSearcher
         // Page content is part of the result: the search UI builds a snippet around the match.
         var results = await _collection
             .Find(filter)
+            .Sort(Builders<Page>.Sort.MetaTextScore("score").Ascending(x => x.Id))
+            .Skip(offset)
             .Limit(limit > 0 ? limit : DefaultLimit)
             .ToListAsync();
         return [.. results];

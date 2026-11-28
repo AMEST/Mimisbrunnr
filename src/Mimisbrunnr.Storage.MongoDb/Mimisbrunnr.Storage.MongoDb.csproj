@@ -7,6 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <InternalsVisibleTo Include="Mimisbrunnr.Web.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\Mimisbrunnr.Users\Mimisbrunnr.Users.csproj" />
       <ProjectReference Include="..\Mimisbrunnr.Web\Mimisbrunnr.Web.csproj" />
       <ProjectReference Include="..\Mimisbrunnr.Favorites\Mimisbrunnr.Favorites.csproj" />

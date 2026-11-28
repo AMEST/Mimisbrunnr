@@ -10,10 +10,11 @@ public interface IPageSearcher
     Task<Page[]> Search(string text);
 
     /// <summary>
-    /// Searches pages by full text and returns only pages that belong to <paramref name="spaceIds"/>.
+    /// Searches pages by full text in relevance order within <paramref name="spaceIds"/>.
     /// </summary>
     /// <param name="text">Search query</param>
     /// <param name="spaceIds">Spaces visible to the caller. <c>null</c> means no space filtering.</param>
     /// <param name="limit">Maximum number of pages to return</param>
-    Task<Page[]> Search(string text, string[] spaceIds, int limit = 100);
+    /// <param name="offset">Number of matching pages to skip</param>
+    Task<Page[]> Search(string text, string[] spaceIds, int limit = 100, int offset = 0);
 }

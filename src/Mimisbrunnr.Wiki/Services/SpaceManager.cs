@@ -74,9 +74,10 @@ internal class SpaceManager : ISpaceManager, ISpaceSearcher
 
     public Task<Space[]> GetByIds(params string[] ids)
     {
-        if (ids.Length == 0)
+        var distinctIds = (ids ?? []).Where(id => !string.IsNullOrEmpty(id)).Distinct(StringComparer.Ordinal).ToArray();
+        if (distinctIds.Length == 0)
             return Task.FromResult<Space[]>([]);
-        return _spaceRepository.GetAll().Where(x => ids.Contains(x.Id)).ToArrayAsync();
+        return _spaceRepository.GetAll().Where(x => distinctIds.Contains(x.Id)).ToArrayAsync();
     }
 
     public Task<Space[]> GetByKeys(params string[] keys)

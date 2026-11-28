@@ -7,9 +7,12 @@ public interface IPageManager
     Task<Page[]> GetAllOnSpace(Space space);
 
     /// <summary>
-    /// Returns versions of the page without content. Use <see cref="GetVersionByPageId"/> to load a version with content.
+    /// Returns versions of the page with optional content.
     /// </summary>
-    Task<HistoricalPage[]> GetAllVersions(Page page);
+    /// <param name="page">The page whose history is requested</param>
+    /// <param name="includeContent">Whether to include page content</param>
+    /// <param name="contentVersion">Limit included content to this version when specified</param>
+    Task<HistoricalPage[]> GetAllVersions(Page page, bool includeContent = true, long? contentVersion = null);
 
     Task<Page[]> FindByName(string name);
 

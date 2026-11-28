@@ -74,12 +74,7 @@ internal class SpaceManagerCacheDecorator : ISpaceManager
 
     public Task<Space[]> GetByIds(params string[] ids)
     {
-        return GetMany(ids, GetSpaceCacheKeyById, missing => _inner.GetByIds(missing));
-    }
-
-    public Task<Space[]> GetByKeys(params string[] keys)
-    {
-        return GetMany(keys, GetSpaceCacheKey, missing => _inner.GetByKeys(missing));
+        return _inner.GetByIds(ids);
     }
 
     public async Task<Space> GetByKey(string key)
@@ -130,13 +125,13 @@ internal class SpaceManagerCacheDecorator : ISpaceManager
         await DeleteSpaceFromCache(space);
     }
 
-    private async Task<Space[]> GetMany(string[] keys, Func<string, string> cacheKeyFactory, Func<string[], Task<Space[]>> loader)
+    public async Task<Space[]> GetByKeys(params string[] keys)
     {
         var distinctKeys = (keys ?? []).Where(x => !string.IsNullOrEmpty(x)).Distinct(StringComparer.Ordinal).ToArray();
         if (distinctKeys.Length == 0)
             return [];
 
-        var cachedSpaces = await Task.WhenAll(distinctKeys.Select(key => _cache.GetAsync<Space>(cacheKeyFactory(key))));
+        var cachedSpaces = await Task.WhenAll(distinctKeys.Select(key => _cache.GetAsync<Space>(GetSpaceCacheKey(key))));
         var result = new List<Space>(distinctKeys.Length);
         var missingKeys = new List<string>();
 
@@ -150,7 +145,7 @@ internal class SpaceManagerCacheDecorator : ISpaceManager
 
         if (missingKeys.Count > 0)
         {
-            var loaded = await loader([.. missingKeys]);
+            var loaded = await _inner.GetByKeys([.. missingKeys]);
             await Task.WhenAll(loaded.Select(AddSpaceToCache));
             result.AddRange(loaded);
         }

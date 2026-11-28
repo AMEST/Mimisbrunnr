@@ -39,35 +39,44 @@ internal class SearchService : ISearchService
 
     public async Task<IEnumerable<PageModel>> SearchPages(string text, UserInfo searchBy)
     {
+        var result = await SearchPages(text, searchBy, 100, 0);
+        return result.Pages;
+    }
+
+    public async Task<PageSearchResult> SearchPages(string text, UserInfo searchBy, int limit, int offset)
+    {
         await _permissionService.EnsureAnonymousAllowed(searchBy);
 
         var user = await _userManager.GetByEmail(searchBy?.Email);
-        if (user?.Role == UserRole.Admin)
+        Dictionary<string, string> spaceKeysById = null;
+        if (user?.Role != UserRole.Admin)
         {
-            var pages = await _pageSearcher.Search(text, null);
-            if (pages.Length == 0)
-                return [];
-
-            var spaces = await _spaceManager.GetByIds(pages.Select(x => x.SpaceId).Distinct().ToArray());
-            var spaceKeysById = spaces
-                .Where(x => !string.IsNullOrEmpty(x.Id))
-                .ToDictionary(x => x.Id, x => x.Key, StringComparer.Ordinal);
-
-            return pages
-                .Where(x => spaceKeysById.ContainsKey(x.SpaceId))
-                .Select(x => x.ToModel(spaceKeysById[x.SpaceId]));
+            var spaces = await _spaceDisplayService.FindUserVisibleSpaces(searchBy);
+            spaceKeysById = spaces.ToDictionary(x => x.Id, x => x.Key, StringComparer.Ordinal);
+            if (spaceKeysById.Count == 0)
+                return new PageSearchResult([], null);
         }
 
-        // Search only inside the spaces the user can see, so the limit applies to visible pages.
-        var userSpaces = (await _spaceDisplayService.FindUserVisibleSpaces(searchBy)).ToArray();
-        if (userSpaces.Length == 0)
-            return [];
+        // Fetch one extra match to detect the next page without counting every match.
+        var foundPages = await _pageSearcher.Search(text, spaceKeysById?.Keys.ToArray(), limit + 1, offset);
+        if (foundPages.Length == 0)
+            return new PageSearchResult([], null);
 
-        var visibleSpacesById = userSpaces.ToDictionary(x => x.Id, x => x.Key, StringComparer.Ordinal);
-        var foundPages = await _pageSearcher.Search(text, [.. visibleSpacesById.Keys]);
-        return foundPages
-            .Where(x => visibleSpacesById.ContainsKey(x.SpaceId))
-            .Select(x => x.ToModel(visibleSpacesById[x.SpaceId]));
+        var page = foundPages.Take(limit).ToArray();
+        var nextOffset = foundPages.Length > limit ? offset + limit : (int?)null;
+        if (spaceKeysById is null)
+        {
+            var spaces = await _spaceManager.GetByIds(page.Select(x => x.SpaceId).Distinct().ToArray());
+            spaceKeysById = spaces
+                .Where(x => !string.IsNullOrEmpty(x.Id))
+                .ToDictionary(x => x.Id, x => x.Key, StringComparer.Ordinal);
+        }
+
+        var results = page
+            .Where(x => x.SpaceId is not null && spaceKeysById.ContainsKey(x.SpaceId))
+            .Select(x => x.ToModel(spaceKeysById[x.SpaceId]))
+            .ToArray();
+        return new PageSearchResult(results, nextOffset);
     }
 
     public async Task<IEnumerable<SpaceModel>> SearchSpaces(string text, UserInfo searchBy)

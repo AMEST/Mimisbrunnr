@@ -339,7 +339,9 @@
             "searchInSpaces": "Search space",
             "results": {
                 "hasResults": "results",
-                "noResults": "No results"
+                "noResults": "No results",
+                "loadMore": "Show more",
+                "failed": "Search failed. Please try again."
             }
         },
         "spaceDirectory": {
@@ -887,7 +889,9 @@
             "searchInSpaces": "Поиск пространств",
             "results": {
                 "hasResults": "найдено",
-                "noResults": "ничего не найдено"
+                "noResults": "ничего не найдено",
+                "loadMore": "Показать ещё",
+                "failed": "Не удалось выполнить поиск. Попробуйте ещё раз."
             }
         },
         "spaceDirectory": {

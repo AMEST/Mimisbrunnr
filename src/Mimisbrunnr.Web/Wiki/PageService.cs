@@ -184,7 +184,8 @@ internal class PageService : IPageService
     }
 
 
-    public async Task<PageVersionsListModel> GetPageVersions(string pageId, UserInfo requestedBy)
+    public async Task<PageVersionsListModel> GetPageVersions(string pageId, UserInfo requestedBy,
+        bool includeContent = true, long? contentVersion = null)
     {
         await _permissionService.EnsureAnonymousAllowed(requestedBy);
 
@@ -193,7 +194,7 @@ internal class PageService : IPageService
 
         await _permissionService.EnsureViewPermission(space.Key, requestedBy);
 
-        var versions = await _pageManager.GetAllVersions(page);
+        var versions = await _pageManager.GetAllVersions(page, includeContent, contentVersion);
         return new PageVersionsListModel()
         {
             Versions = versions.Select(x => x.ToModel()).ToArray(),

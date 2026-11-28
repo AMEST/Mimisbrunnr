@@ -41,6 +41,22 @@ public class SpaceManagerCacheDecoratorTests
     }
 
     [Fact]
+    public async Task Should_BypassCache_WhenGettingSpacesByIds()
+    {
+        var inner = A.Fake<ISpaceManager>();
+        var cache = A.Fake<IDistributedCache>();
+        var spaces = new[] { new Space { Id = "s1" }, new Space { Id = "s2" } };
+        A.CallTo(() => inner.GetByIds("s1", "s2")).Returns(spaces);
+        var decorator = new SpaceManagerCacheDecorator(inner, cache);
+
+        var result = await decorator.GetByIds("s1", "s2");
+
+        result.Should().BeSameAs(spaces);
+        A.CallTo(() => inner.GetByIds("s1", "s2")).MustHaveHappenedOnceExactly();
+        Fake.GetCalls(cache).Should().BeEmpty();
+    }
+
+    [Fact]
     public async Task Should_CallInnerAndCache_WhenCacheMiss()
     {
         var inner = A.Fake<ISpaceManager>();

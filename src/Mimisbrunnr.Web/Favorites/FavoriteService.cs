@@ -129,6 +129,7 @@ internal class FavoriteService : IFavoriteService
         if (favorites.Length == 0)
             return [];
 
+        // TODO: Align space visibility with EnsureViewPermission when defining whether edit and remove imply view.
         var visibleSpaces = (await _spaceDisplayService.FindUserVisibleSpaces(user)).ToArray();
         var visibleSpacesById = visibleSpaces.ToDictionary(x => x.Id, x => x, StringComparer.Ordinal);
         var visibleSpaceKeys = visibleSpaces.Select(x => x.Key).ToHashSet(StringComparer.OrdinalIgnoreCase);

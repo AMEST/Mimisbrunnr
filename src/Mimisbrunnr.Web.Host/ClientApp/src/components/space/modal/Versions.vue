@@ -65,7 +65,9 @@ export default {
   methods: {
     // eslint-disable-next-line
     init: async function (even) {
-      var pageVersions = await PageService.getVersions(this.page.id);
+      var pageVersions = await PageService.getVersions(this.page.id, {
+        includeContent: this.onVersionSelect != null,
+      });
       if(!pageVersions)
         return;
       this.versions = pageVersions.versions.sort((a,b) => b.version-a.version);

@@ -243,21 +243,27 @@ public class PageManagerTests
         A.CallTo(() => historical.DeleteAll(A<Expression<Func<HistoricalPage, bool>>>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
     }
 
-    [Fact]
-    public async Task Should_ReturnAllVersionsOfPage_WhenGettingAllVersions()
+    [Theory]
+    [InlineData(true, null, "Second", "First")]
+    [InlineData(false, null, null, null)]
+    [InlineData(true, 1L, null, "First")]
+    [InlineData(true, 3L, null, null)]
+    public async Task Should_ReturnRequestedVersionContent_WhenListingPageHistory(
+        bool includeContent, long? contentVersion, string secondContent, string firstContent)
     {
         var historical = A.Fake<IHistoricalPageRepository>();
         A.CallTo(() => historical.GetAll()).Returns(new[]
         {
-            new HistoricalPage { Id = "h1", PageId = "p1", Version = 1 },
-            new HistoricalPage { Id = "h2", PageId = "p1", Version = 2 },
+            new HistoricalPage { Id = "h1", PageId = "p1", Version = 1, Content = "First" },
+            new HistoricalPage { Id = "h2", PageId = "p1", Version = 2, Content = "Second" },
             new HistoricalPage { Id = "h3", PageId = "other", Version = 1 }
         }.AsQueryable());
         var manager = new PageManager(A.Fake<IPageRepository>(), historical, A.Fake<IAttachmentManager>(), A.Fake<IDraftManager>(), A.Fake<ICommentManager>(), A.Fake<IPluginManager>());
 
-        var result = await manager.GetAllVersions(new Page { Id = "p1" });
+        var result = await manager.GetAllVersions(new Page { Id = "p1" }, includeContent, contentVersion);
 
-        result.Should().HaveCount(2);
+        result.Select(x => x.Version).Should().Equal(2, 1);
+        result.Select(x => x.Content).Should().Equal(secondContent, firstContent);
     }
 
     [Fact]

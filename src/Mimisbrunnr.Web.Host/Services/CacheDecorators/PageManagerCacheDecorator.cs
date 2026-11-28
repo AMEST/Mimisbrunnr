@@ -107,9 +107,9 @@ internal class PageManagerCacheDecorator : IPageManager
         await ClearCache(page);
     }
 
-    public Task<HistoricalPage[]> GetAllVersions(Page page)
+    public Task<HistoricalPage[]> GetAllVersions(Page page, bool includeContent = true, long? contentVersion = null)
     {
-        return _inner.GetAllVersions(page);
+        return _inner.GetAllVersions(page, includeContent, contentVersion);
     }
 
     public Task<HistoricalPage> GetVersionByPageId(string id, long version)

@@ -134,18 +134,23 @@ internal class PageManager : IPageManager
     }
 
 
-    public Task<HistoricalPage[]> GetAllVersions(Page page)
+    public Task<HistoricalPage[]> GetAllVersions(Page page, bool includeContent = true, long? contentVersion = null)
     {
-        // Version list is metadata only: page content is loaded by GetVersionByPageId.
-        return _historicalPageRepository.GetAll()
+        var versions = _historicalPageRepository.GetAll()
             .Where(x => x.PageId == page.Id)
-            .OrderByDescending(x => x.Version)
+            .OrderByDescending(x => x.Version);
+
+        if (includeContent && contentVersion is null)
+            return versions.ToArrayAsync();
+
+        return versions
             .Select(x => new HistoricalPage
             {
                 Id = x.Id,
                 PageId = x.PageId,
                 Version = x.Version,
                 Name = x.Name,
+                Content = includeContent && ((long?)x.Version ?? 0) == contentVersion ? x.Content : null,
                 Updated = x.Updated,
                 UpdatedBy = x.UpdatedBy
             })

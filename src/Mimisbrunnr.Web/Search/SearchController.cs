@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Mimisbrunnr.Web.Filters;
@@ -46,16 +48,23 @@ public class SearchController : ControllerBase
     /// Search for pages by title or content
     /// </summary>
     /// <param name="search">Search query</param>
-    /// <returns>List of matching pages</returns>
+    /// <param name="limit">Maximum number of matching pages to return</param>
+    /// <param name="offset">Number of matching pages to skip</param>
+    /// <returns>List of matching pages in relevance order</returns>
     [HttpGet("page")]
     [ProducesResponseType(typeof(IEnumerable<PageModel>), 200)]
     [ProducesResponseType(401)]
-    public async Task<IEnumerable<PageModel>> SearchPages([FromQuery] string search)
+    public async Task<IEnumerable<PageModel>> SearchPages([FromQuery] string search,
+        [FromQuery, Range(1, 100)] int limit = 100, [FromQuery, Range(0, int.MaxValue - 100)] int offset = 0)
     {
-        if (string.IsNullOrEmpty(search))
+        if (string.IsNullOrWhiteSpace(search))
             return [];
-            
-        return await _searchService.SearchPages(search, User?.ToInfo());
+
+        var result = await _searchService.SearchPages(search, User?.ToInfo(), limit, offset);
+        if (result.NextOffset is int nextOffset)
+            Response.Headers["X-Next-Offset"] = nextOffset.ToString(CultureInfo.InvariantCulture);
+
+        return result.Pages;
     }
 
     /// <summary>
